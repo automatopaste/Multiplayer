@@ -1,0 +1,5 @@
+{
+	"plugins":{
+		#"mpCombatPlugin":"data.scripts.plugins.mpCombatPlugin"
+	}
+}

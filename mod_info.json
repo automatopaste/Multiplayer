@@ -1,0 +1,21 @@
+{
+	"id":"multiplayer",
+	"name":"Multiplayer",
+	"author":"hehe",
+	"version":"1.0.0",
+	"description":"Combat multiplayer mod.",
+	"gameVersion":"0.95a-RC15",
+	"jars":[
+		"jars/Multiplayer.jar",
+		"jars/netty/netty-all-4.1.69.Final.jar",
+		"jars/netty/netty-buffer-4.1.69.Final.jar",
+		"jars/netty/netty-codec-4.1.69.Final.jar",
+		"jars/netty/netty-codec-dns-4.1.69.Final.jar",
+		"jars/netty/netty-common-4.1.69.Final.jar",
+		"jars/netty/netty-transport-4.1.69.Final.jar",
+		"jars/netty/netty-resolver-4.1.69.Final.jar",
+		"jars/netty/netty-resolver-dns-4.1.69.Final.jar",
+	],
+	"modPlugin":"data.scripts.mpModPlugin",
+	"utility": true
+}
