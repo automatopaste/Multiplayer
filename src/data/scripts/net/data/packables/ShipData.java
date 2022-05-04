@@ -34,14 +34,14 @@ public class ShipData implements Packable {
     public ShipData(ShipAPI ship) {
         this.ship = ship;
 
-        loc = new Vector2fRecord(ship.getLocation(), (byte) 1);
-        vel = new Vector2fRecord(ship.getVelocity(), (byte) 2);
-//        acc = new Vector2fRecord(new Vector2f(), (byte) 3);
-        ang = new FloatRecord(ship.getFacing(), (byte) 4);
-        angVel = new FloatRecord(ship.getAngularVelocity(), (byte) 5);
-//        angAcc = new FloatRecord(0f, (byte) 6);
-        hull = new FloatRecord(ship.getHullLevel(), (byte) 7);
-        flux = new FloatRecord(ship.getFluxLevel(), (byte) 8);
+        loc = new Vector2fRecord(ship.getLocation(), 1);
+        vel = new Vector2fRecord(ship.getVelocity(), 2);
+//        acc = new Vector2fRecord(new Vector2f(), 3);
+        ang = new FloatRecord(ship.getFacing(), 4);
+        angVel = new FloatRecord(ship.getAngularVelocity(), 5);
+//        angAcc = new FloatRecord(0f, 6);
+        hull = new FloatRecord(ship.getHullLevel(), 7);
+        flux = new FloatRecord(ship.getFluxLevel(), 8);
 
         packer = ByteBuffer.allocate(100);
     }

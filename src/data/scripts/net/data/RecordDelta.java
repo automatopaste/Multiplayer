@@ -6,7 +6,7 @@ public interface RecordDelta {
 
     void write(ByteBuffer output);
 
-    byte getTypeId();
+    int getTypeId();
 
-    byte getUniqueId();
+    int getUniqueId();
 }

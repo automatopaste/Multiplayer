@@ -7,9 +7,9 @@ import java.nio.ByteBuffer;
 
 public class FloatRecord extends ARecord {
     private float record;
-    private final byte uniqueId;
+    private final int uniqueId;
 
-    public FloatRecord(float value, byte uniqueId) {
+    public FloatRecord(float value, int uniqueId) {
         record = value;
         this.uniqueId = uniqueId;
     }
@@ -39,12 +39,12 @@ public class FloatRecord extends ARecord {
     }
 
     @Override
-    public byte getTypeId() {
+    public int getTypeId() {
         return IDTypes.FLOAT_RECORD;
     }
 
     @Override
-    public byte getUniqueId() {
+    public int getUniqueId() {
         return uniqueId;
     }
 

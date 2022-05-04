@@ -8,9 +8,9 @@ import java.nio.ByteBuffer;
 
 public class Vector2fRecord extends ARecord {
     private Vector2f record;
-    private final byte uniqueId;
+    private final int uniqueId;
 
-    public Vector2fRecord(Vector2f value, byte uniqueId) {
+    public Vector2fRecord(Vector2f value, int uniqueId) {
         record = value;
         this.uniqueId = uniqueId;
     }
@@ -42,12 +42,12 @@ public class Vector2fRecord extends ARecord {
     }
 
     @Override
-    public byte getTypeId() {
+    public int getTypeId() {
         return IDTypes.V2F_RECORD;
     }
 
     @Override
-    public byte getUniqueId() {
+    public int getUniqueId() {
         return uniqueId;
     }
 

@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 public abstract class ARecord implements RecordDelta {
     @Override
     public void write(ByteBuffer output) {
-        output.put(getTypeId());
-        output.put(getUniqueId());
+        output.putInt(getTypeId());
+        output.putInt(getUniqueId());
     }
 }
