@@ -46,6 +46,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // probably need to do system time checking here to run at intervals instead of running every cycle
         Console.showMessage("Channel active on server");
 
+        Console.showMessage("Sending packet");
+        ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
+
         ctx.fireChannelActive();
     }
 
@@ -56,7 +59,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 //
 //        ChannelFuture future = ctx.writeAndFlush(responseData);
 
+        //Console.showMessage("Sending packet");
 
-        ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
+
+        //ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
     }
 }

@@ -77,6 +77,10 @@ public class ShipData implements Packable {
             // mark index so it can be reset if new entity is encountered
             in.markReaderIndex();
 
+            if (in.readerIndex() == in.writerIndex()) {
+                return out;
+            }
+
             int type = in.readInt();
 
             switch(type) {
