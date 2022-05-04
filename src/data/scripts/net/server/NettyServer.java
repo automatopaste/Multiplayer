@@ -1,19 +1,19 @@
 package data.scripts.net.server;
 
+import data.scripts.net.data.PacketManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.lazywizard.console.Console;
 
 public class NettyServer implements Runnable {
     private final int port;
+    private final PacketManager packetManager;
 
-    private boolean stop = false;
-
-    public NettyServer(int port) {
+    public NettyServer(int port, PacketManager packetManager) {
         this.port = port;
+        this.packetManager = packetManager;
     }
 
     @Override
@@ -38,8 +38,8 @@ public class NettyServer implements Runnable {
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline().addLast(
                                     new RequestDecoder(),
-                                    new ResponseDataEncoder(),
-                                    new ProcessingHandler()
+                                    new SendDataEncoder(),
+                                    new ProcessingHandler(packetManager)
                             );
                         }
                     })
@@ -54,11 +54,6 @@ public class NettyServer implements Runnable {
         } finally {
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
-            Console.showMessage("Server stopped");
         }
-    }
-
-    public void stop() {
-        stop = true;
     }
 }

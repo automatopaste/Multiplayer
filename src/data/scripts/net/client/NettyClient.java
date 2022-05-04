@@ -46,8 +46,6 @@ public class NettyClient implements Runnable {
             // Get channel after connected socket
             Channel channel = bootstrap.connect(host, port).sync().channel();
 
-
-
             // Wait for channel to close
             channel.closeFuture().sync();
         } finally {
