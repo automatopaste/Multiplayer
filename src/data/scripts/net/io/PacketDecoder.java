@@ -16,12 +16,16 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
         int numEntities = in.readInt();
 
-        for (int i = 0; i < numEntities; i++) {
-            entities.add(unpackRecords(in));
-        }
+        if (numEntities == 0) {
+            out.add(new Unpacked(new ArrayList<List<ARecord>>()));
+        } else {
+            for (int i = 0; i < numEntities; i++) {
+                entities.add(unpackRecords(in));
+            }
 
-        Unpacked unpacked = new Unpacked(entities);
-        out.add(unpacked);
+            Unpacked unpacked = new Unpacked(entities);
+            out.add(unpacked);
+        }
     }
 
     private List<ARecord> unpackRecords(ByteBuf in) {
