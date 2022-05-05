@@ -7,6 +7,7 @@ package data.scripts.net.data;
 public class IDTypes {
     // entities
     public static final int SHIP = 1;
+    public static final int INPUT_AGGREGATE = 2;
 
     // data record types
     public static final int FLOAT_RECORD = 100;

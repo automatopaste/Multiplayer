@@ -10,12 +10,19 @@ import java.nio.charset.StandardCharsets;
 public class StringRecord extends ARecord {
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-    private final String record;
+    private String record;
     private final int uniqueId;
 
     public StringRecord(String value, int uniqueId) {
         record = value;
         this.uniqueId = uniqueId;
+    }
+
+    public boolean update(String curr) {
+        boolean isUpdated = !record.equals(curr);
+        if (isUpdated) record = curr;
+
+        return isUpdated;
     }
 
     @Override

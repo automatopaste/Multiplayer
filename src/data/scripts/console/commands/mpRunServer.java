@@ -1,7 +1,6 @@
 package data.scripts.console.commands;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.server.NettyServer;
 import data.scripts.plugins.mpServerPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;

@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.client.NettyClient;
+import data.scripts.net.terminals.client.NettyClient;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
