@@ -32,7 +32,8 @@ public class Vector2fRecord extends ARecord {
         }
         if (isUpdated) record.set(curr);
 
-        return isUpdated;
+        return true;
+        //return isUpdated;
     }
 
     public Vector2f getRecord() {
