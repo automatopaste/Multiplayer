@@ -16,7 +16,7 @@ public class Vector2fRecord extends ARecord {
     }
 
     public boolean update(Vector2f curr) {
-        boolean isUpdated = record == curr;
+        boolean isUpdated = ((int) record.x != (int) curr.x) || ((int) record.y != (int) curr.y);
         if (isUpdated) record = curr;
 
         return isUpdated;

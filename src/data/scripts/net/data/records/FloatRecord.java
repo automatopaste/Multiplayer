@@ -15,7 +15,7 @@ public class FloatRecord extends ARecord {
     }
 
     public boolean update(float curr) {
-        boolean isUpdated = record == curr;
+        boolean isUpdated = (int) record != (int) curr;
         if (isUpdated) record = curr;
 
         return isUpdated;

@@ -75,7 +75,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // time delta
         long diffTimeNanos = currentTime - updateTime;
 
-        Console.showMessage("Sending packet");
+        Console.showMessage("Sending packets at " + TICK_RATE + "Hz");
 
         final ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
         ctx.fireChannelActive();
