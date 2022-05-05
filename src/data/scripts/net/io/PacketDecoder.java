@@ -13,19 +13,16 @@ public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
         List<List<ARecord>> entities = new ArrayList<>();
+        Unpacked unpacked = new Unpacked(entities);
 
         int numEntities = in.readInt();
 
-        if (numEntities == 0) {
-            out.add(new Unpacked(new ArrayList<List<ARecord>>()));
-        } else {
+        if (numEntities != 0) {
             for (int i = 0; i < numEntities; i++) {
                 entities.add(unpackRecords(in));
             }
-
-            Unpacked unpacked = new Unpacked(entities);
-            out.add(unpacked);
         }
+        out.add(unpacked);
     }
 
     private List<ARecord> unpackRecords(ByteBuf in) {
