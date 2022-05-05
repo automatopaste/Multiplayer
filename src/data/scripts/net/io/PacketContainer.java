@@ -15,6 +15,9 @@ public class PacketContainer {
     public PacketContainer(List<Packable> packables) throws IOException {
         data = ByteBuffer.allocate(PACKET_SIZE_INIT);
 
+        // number of entities to unpack
+        data.putInt(packables.size());
+
         for (Packable packable : packables) data.put(packable.pack());
 
         length = data.position();

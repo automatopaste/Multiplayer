@@ -14,24 +14,22 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
         List<List<ARecord>> entities = new ArrayList<>();
 
-        int length = in.readableBytes();
+        int numEntities = in.readInt();
 
-        while (in.readerIndex() < length) {
-            //int type = in.readInt();
-
-            entities.add(unpackRecords(in, length));
+        for (int i = 0; i < numEntities; i++) {
+            entities.add(unpackRecords(in));
         }
 
         Unpacked unpacked = new Unpacked(entities);
         out.add(unpacked);
     }
 
-    private List<ARecord> unpackRecords(ByteBuf in, int length) {
+    private List<ARecord> unpackRecords(ByteBuf in) {
         List<ARecord> out = new ArrayList<>();
 
         //iterate until new entity encountered
         outer:
-        while (in.readerIndex() < length) {
+        while (true) {
             // mark index so it can be reset if new entity is encountered
             in.markReaderIndex();
 
