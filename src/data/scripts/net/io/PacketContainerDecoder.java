@@ -17,7 +17,7 @@ public class PacketContainerDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 4) return;
 
         in.markReaderIndex();
@@ -36,6 +36,8 @@ public class PacketContainerDecoder extends ByteToMessageDecoder {
 
             entities.add(unpackRecords(in, length));
         }
+
+        in.release();
 
         Unpacked unpacked = new Unpacked(entities);
 
