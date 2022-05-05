@@ -8,14 +8,27 @@ import java.nio.ByteBuffer;
 public class FloatRecord extends ARecord {
     private float record;
     private final int uniqueId;
+    private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
     public FloatRecord(float value, int uniqueId) {
         record = value;
         this.uniqueId = uniqueId;
+        useDecimalPrecision = true;
+    }
+
+    public FloatRecord setUseDecimalPrecision(boolean useDecimalPrecision) {
+        this.useDecimalPrecision = useDecimalPrecision;
+        return this;
     }
 
     public boolean update(float curr) {
-        boolean isUpdated = (int) record != (int) curr;
+        boolean isUpdated;
+
+        if (useDecimalPrecision) {
+            isUpdated = (int) record != (int) curr;
+        } else {
+            isUpdated = record != curr;
+        }
         if (isUpdated) record = curr;
 
         return isUpdated;
@@ -29,13 +42,13 @@ public class FloatRecord extends ARecord {
     public void write(ByteBuffer output) {
         super.write(output);
 
-        output.putInt((int) record);
+        output.putFloat(record);
     }
 
     public static FloatRecord read(ByteBuf input) {
         int uniqueId = ARecord.readID(input);
 
-        float value = input.readInt();
+        float value = input.readFloat();
         return new FloatRecord(value, uniqueId);
     }
 

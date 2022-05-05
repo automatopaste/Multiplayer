@@ -10,7 +10,9 @@ public class IDTypes {
 
     // data record types
     public static final int FLOAT_RECORD = 100;
-    public static final int V2F_RECORD = 101;
+    public static final int INT_RECORD = 101;
+    public static final int V2F_RECORD = 102;
+    public static final int STRING_RECORD = 103;
 
     // record significance types
     public static final int SHIP_POS = 201;
