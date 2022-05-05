@@ -1,3 +1,3 @@
 command,class,tags,syntax,help
-mpConnectToHost,data.scripts.console.commands.mpConnectToHost,"combat,multiplayer",mpConnectToHost <ip:port>,Connect to a remote server
-mpHostServer,data.scripts.console.commands.mpRunServer,"combat,multiplayer",mpRunServer <port>,Host a server
+mpC,data.scripts.console.commands.mpConnectToHost,"combat,multiplayer",mpConnectToHost <ip:port>,Connect to a remote server
+mpH,data.scripts.console.commands.mpRunServer,"combat,multiplayer",mpRunServer <port>,Host a server
