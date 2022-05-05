@@ -8,60 +8,75 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lazywizard.console.Console;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
-    private final PacketManager packetManager;
+    public static final float TICK_RATE = 10f;
+    private long initialTime;
+    private double timeU;
+    private double deltaU;
+    private long updateTime;
 
-//    private ByteBuf tmp;
-//    private int tick = 0;
+    private final PacketManager packetManager;
 
     public ProcessingHandler(PacketManager packetManager) {
         this.packetManager = packetManager;
+
+        initialTime = System.nanoTime();
+        timeU = 1000000000d / TICK_RATE;
+        deltaU = 0;
+
+        updateTime = initialTime;
     }
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
         Console.showMessage("Server channel handler added");
-//        tmp = ctx.alloc().buffer(4);
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
         Console.showMessage("Server channel handler removed");
-//        tmp.release();
-//        tmp = null;
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RequestData requestData = (RequestData) msg;
         Console.showMessage("Server received request data: " + requestData.toString());
-
-//        tick = requestData.getIntValue();
     }
 
+    /**
+     * Called once when TCP connection is active
+     * @param ctx context
+     * @throws Exception something
+     */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//        ctx.writeAndFlush(Unpooled.copiedBuffer("lets go", CharsetUtil.UTF_8));
-//        ctx.fireChannelActive();
 
-        // probably need to do system time checking here to run at intervals instead of running every cycle
         Console.showMessage("Channel active on server");
 
         Console.showMessage("Sending packet");
         ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
-
-        ctx.fireChannelActive();
     }
 
+    /**
+     * Called once read is complete. Is used to wait and send next packet.
+     * @param ctx context
+     * @throws Exception something
+     */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-//        ResponseData responseData = new ResponseData();
-//        responseData.setIntValue(tick + 1);
-//
-//        ChannelFuture future = ctx.writeAndFlush(responseData);
+        long currentTime = System.nanoTime();
+        deltaU += (currentTime - initialTime) / timeU;
+        initialTime = currentTime;
 
-        //Console.showMessage("Sending packet");
+        if (deltaU >= 1) {
+            long diffTimeNanos = currentTime - updateTime;
 
+            Console.showMessage("Sending packet");
 
-        //ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
+            ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
+            ctx.fireChannelActive();
+
+            updateTime = currentTime;
+            deltaU--;
+        }
     }
 }

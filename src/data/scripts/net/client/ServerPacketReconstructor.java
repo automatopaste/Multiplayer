@@ -29,5 +29,8 @@ public class ServerPacketReconstructor {
                     break;
             }
         }
+
+        // probably does garbage collection
+        in.release();
     }
 }
