@@ -7,6 +7,8 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.PacketManager;
 import data.scripts.net.server.NettyServer;
 import org.apache.log4j.Logger;
+import org.lazywizard.console.Console;
+import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
@@ -40,6 +42,12 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
+            serverThread.interrupt();
+            serverThread = null;
+            Global.getCombatEngine().removePlugin(this);
+            Console.showMessage("Closed server");
+        }
 //        final float limit = 10f;
 //        tracker += amount;
 //        if (tracker > limit) {

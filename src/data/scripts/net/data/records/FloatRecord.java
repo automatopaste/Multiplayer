@@ -33,7 +33,8 @@ public class FloatRecord extends ARecord {
     }
 
     public static FloatRecord read(ByteBuf input) {
-        byte uniqueId = input.readByte();
+        int uniqueId = ARecord.readID(input);
+
         float value = input.readInt();
         return new FloatRecord(value, uniqueId);
     }

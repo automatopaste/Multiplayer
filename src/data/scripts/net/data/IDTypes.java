@@ -1,7 +1,8 @@
 package data.scripts.net.data;
 
 /**
- * Stores static IDs. Should be replaced with a dynamic allocation system at some point
+ * Stores static integer IDs. Should be replaced with a dynamic allocation system at some point and also use bytes for
+ * better compression
  */
 public class IDTypes {
     // entities

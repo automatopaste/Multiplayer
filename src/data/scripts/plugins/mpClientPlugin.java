@@ -1,14 +1,18 @@
 package data.scripts.plugins;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.client.NettyClient;
+import org.lazywizard.console.Console;
+import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
 public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private NettyClient client;
+    private Thread clientThread;
 
     private final int port;
     private final String host;
@@ -21,11 +25,17 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     @Override
     public void init(CombatEngineAPI engine) {
         client = new NettyClient(host, port);
-        new Thread(client, "mpClient").start();
+        clientThread = new Thread(client, "mpClient");
+        clientThread.start();
     }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
-
+        if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
+            clientThread.interrupt();
+            clientThread = null;
+            Global.getCombatEngine().removePlugin(this);
+            Console.showMessage("Closed client");
+        }
     }
 }

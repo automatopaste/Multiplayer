@@ -35,7 +35,8 @@ public class Vector2fRecord extends ARecord {
     }
 
     public static Vector2fRecord read(ByteBuf input) {
-        byte uniqueId = input.readByte();
+        int uniqueId = ARecord.readID(input);
+
         float x = input.readInt();
         float y = input.readInt();
         return new Vector2fRecord(new Vector2f(x, y), uniqueId);
