@@ -20,12 +20,9 @@ public class PacketContainerDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 4) return;
 
-        in.markReaderIndex();
-
         // wait for all data to arrive
         int length = in.readInt();
         if (in.readableBytes() < length) {
-            in.resetReaderIndex();
             return;
         }
 
