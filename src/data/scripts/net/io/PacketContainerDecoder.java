@@ -37,7 +37,7 @@ public class PacketContainerDecoder extends ByteToMessageDecoder {
             entities.add(unpackRecords(in, length));
         }
 
-        in.release();
+        in.markReaderIndex();
 
         Unpacked unpacked = new Unpacked(entities);
 
