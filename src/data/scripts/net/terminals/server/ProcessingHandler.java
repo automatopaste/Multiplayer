@@ -2,6 +2,7 @@ package data.scripts.net.terminals.server;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.records.ARecord;
+import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -9,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
@@ -30,9 +32,14 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         initialTime = System.nanoTime();
         timeU = 1000000000d / TICK_RATE;
-        deltaU = 0;
+        deltaU = 1d;
 
         updateTime = initialTime;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
     }
 
     @Override
@@ -58,27 +65,23 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     /**
      * Called once when TCP connection is active
      * @param ctx context
-     * @throws Exception something
      */
     @Override
-    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) throws IOException {
         logger.info("Channel active on server");
-
-        logger.info("Sending packet");
-        final ChannelFuture future = ctx.writeAndFlush(serverPacketManager.getPacket());
+        ctx.fireChannelReadComplete();
     }
 
     /**
      * Called once read is complete. Is used to wait and send next packet.
      * @param ctx context
-     * @throws Exception something
      */
     @Override
-    public void channelReadComplete(final ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
         // keep looping until timer lets it send another packet
 
-        long currentTime = System.nanoTime();
-        while (deltaU < 1f) {
+        long currentTime;
+        while (deltaU < 1d) {
             currentTime = System.nanoTime();
             deltaU += (currentTime - initialTime) / timeU;
             initialTime = currentTime;
@@ -87,21 +90,20 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // time delta
         //long diffTimeNanos = currentTime - updateTime;
 
-        logger.info("Sending packets at " + TICK_RATE + "Hz");
+        PacketContainer packet = serverPacketManager.getPacket();
 
-        final ChannelFuture future = ctx.writeAndFlush(serverPacketManager.getPacket());
-        ctx.fireChannelActive();
+        final ChannelFuture future = ctx.writeAndFlush(packet);
 
         future.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                if (future.isDone()) {
-                    ctx.fireChannelReadComplete();
+            public void operationComplete(ChannelFuture channelFuture) {
+                if (!future.isSuccess()) {
+                    deltaU = 1d;
                 }
             }
         });
 
-        updateTime = currentTime;
+        //updateTime = currentTime;
         deltaU--;
     }
 }

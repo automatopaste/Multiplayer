@@ -5,10 +5,12 @@ import data.scripts.net.data.records.ARecord;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
@@ -23,12 +25,17 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
+        logger.info("Channel active on client");
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         logger.info("Client received packet from server");
 
         Unpacked unpacked = (Unpacked) msg;
@@ -40,18 +47,28 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
         PacketContainer packet = clientPacketManager.getPacket();
+
         ChannelFuture future = ctx.writeAndFlush(packet);
+
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (!channelFuture.isSuccess()) {
+                    ctx.fireChannelReadComplete();
+                }
+            }
+        });
     }
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        logger.info("Client handler added");
+    public void handlerAdded(ChannelHandlerContext ctx) {
+        logger.info("Client channel handler added");
     }
 
     @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        logger.info("Client handler removed");
+    public void handlerRemoved(ChannelHandlerContext ctx) {
+        logger.info("Client channel handler removed");
     }
 }

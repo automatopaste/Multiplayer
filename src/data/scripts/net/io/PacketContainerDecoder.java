@@ -32,7 +32,7 @@ public class PacketContainerDecoder extends ByteToMessageDecoder {
         List<List<ARecord>> entities = new ArrayList<>();
 
         while (in.readerIndex() < length) {
-            int type = in.readInt();
+            //int type = in.readInt();
 
             entities.add(unpackRecords(in, length));
         }
