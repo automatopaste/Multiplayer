@@ -12,6 +12,8 @@ public class NettyClient implements Runnable {
     private final String host;
     private final int port;
 
+    private boolean stop;
+
     public NettyClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -29,29 +31,37 @@ public class NettyClient implements Runnable {
     public void runClient() throws Exception {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(workerGroup);
-            bootstrap.channel(NioSocketChannel.class);
-            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(
-                            new PacketContainerEncoder(),
-                            new PacketContainerDecoder(),
-                            new ClientHandler(new ClientPacketManager())
-                    );
-                }
-            });
+        while (!stop) {
+            try {
+                Bootstrap bootstrap = new Bootstrap();
+                bootstrap.group(workerGroup);
+                bootstrap.channel(NioSocketChannel.class);
+                bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+                bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        socketChannel.pipeline().addLast(
+                                new PacketContainerEncoder(),
+                                new PacketContainerDecoder(),
+                                new ClientHandler(new ClientPacketManager())
+                        );
+                    }
+                });
 
-            // Get channel after connected socket
-            Channel channel = bootstrap.connect(host, port).sync().channel();
+                // Get channel after connected socket
+                Channel channel = bootstrap.connect(host, port).sync().channel();
 
-            // Wait for channel to close
-            channel.closeFuture().sync();
-        } finally {
-            workerGroup.shutdownGracefully();
+                // Wait for channel to close
+                channel.closeFuture().sync();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                workerGroup.shutdownGracefully();
+            }
         }
+    }
+
+    public void stop() {
+        stop = true;
     }
 }

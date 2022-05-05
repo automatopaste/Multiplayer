@@ -32,6 +32,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
+            client.stop();
             clientThread.interrupt();
             clientThread = null;
             Global.getCombatEngine().removePlugin(this);

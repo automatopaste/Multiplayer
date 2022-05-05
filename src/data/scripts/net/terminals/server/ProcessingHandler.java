@@ -69,8 +69,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws IOException {
         logger.info("Channel active on server");
-        ctx.fireChannelReadComplete();
-    }
+
+        PacketContainer packet = serverPacketManager.getPacket();
+
+        final ChannelFuture future = ctx.writeAndFlush(packet);    }
 
     /**
      * Called once read is complete. Is used to wait and send next packet.
