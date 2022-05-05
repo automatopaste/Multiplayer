@@ -3,14 +3,15 @@ package data.scripts.net.server;
 import data.scripts.net.RequestData;
 import data.scripts.net.data.PacketManager;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lazywizard.console.Console;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
-    public static final float TICK_RATE = 10f;
+    public static final float TICK_RATE = 2f;
     private long initialTime;
-    private double timeU;
+    private final double timeU;
     private double deltaU;
     private long updateTime;
 
@@ -49,7 +50,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
         Console.showMessage("Channel active on server");
 
         Console.showMessage("Sending packet");
@@ -62,21 +62,34 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception something
      */
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(final ChannelHandlerContext ctx) throws Exception {
+        // keep looping until timer lets it send another packet
+
         long currentTime = System.nanoTime();
-        deltaU += (currentTime - initialTime) / timeU;
-        initialTime = currentTime;
-
-        if (deltaU >= 1) {
-            long diffTimeNanos = currentTime - updateTime;
-
-            Console.showMessage("Sending packet");
-
-            ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
-            ctx.fireChannelActive();
-
-            updateTime = currentTime;
-            deltaU--;
+        while (deltaU < 1f) {
+            currentTime = System.nanoTime();
+            deltaU += (currentTime - initialTime) / timeU;
+            initialTime = currentTime;
         }
+
+        // time delta
+        long diffTimeNanos = currentTime - updateTime;
+
+        Console.showMessage("Sending packet");
+
+        final ChannelFuture future = ctx.writeAndFlush(packetManager.getPacket());
+        ctx.fireChannelActive();
+
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (future.isDone()) {
+                    ctx.fireChannelReadComplete();
+                }
+            }
+        });
+
+        updateTime = currentTime;
+        deltaU--;
     }
 }
