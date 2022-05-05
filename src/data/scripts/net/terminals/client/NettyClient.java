@@ -2,6 +2,7 @@ package data.scripts.net.terminals.client;
 
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
+import data.scripts.net.io.PacketDecoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -43,6 +44,7 @@ public class NettyClient implements Runnable {
                         socketChannel.pipeline().addLast(
                                 new PacketContainerEncoder(),
                                 new PacketContainerDecoder(),
+                                new PacketDecoder(),
                                 new ClientHandler(new ClientPacketManager())
                         );
                     }

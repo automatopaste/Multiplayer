@@ -2,6 +2,7 @@ package data.scripts.net.terminals.server;
 
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
+import data.scripts.net.io.PacketDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -12,12 +13,9 @@ public class NettyServer implements Runnable {
     private final int port;
     private final ServerPacketManager serverPacketManager;
 
-    private boolean stop;
-
     public NettyServer(int port, ServerPacketManager serverPacketManager) {
         this.port = port;
         this.serverPacketManager = serverPacketManager;
-        stop = false;
     }
 
     @Override
@@ -33,39 +31,34 @@ public class NettyServer implements Runnable {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        while (!stop) {
-            try {
-                ServerBootstrap server = new ServerBootstrap();
-                server.group(bossGroup, workerGroup)
-                        .channel(NioServerSocketChannel.class)
-                        .childHandler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            protected void initChannel(SocketChannel socketChannel) {
-                                socketChannel.pipeline().addLast(
-                                        new PacketContainerDecoder(),
-                                        new PacketContainerEncoder(),
-                                        new ProcessingHandler(serverPacketManager)
-                                );
-                            }
-                        })
-                        .option(ChannelOption.SO_BACKLOG, 128)
-                        .childOption(ChannelOption.SO_KEEPALIVE, true);
+        try {
+            ServerBootstrap server = new ServerBootstrap();
+            server.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) {
+                            socketChannel.pipeline().addLast(
+                                    new PacketContainerDecoder(),
+                                    new PacketContainerEncoder(),
+                                    new PacketDecoder(),
+                                    new ProcessingHandler(serverPacketManager)
+                            );
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-                // Bind to TCP port and wait for channel from ready socket
-                Channel channel = server.bind(port).sync().channel();
+            // Bind to TCP port and wait for channel from ready socket
+            Channel channel = server.bind(port).sync().channel();
 
-                // Wait for channel to close
-                channel.closeFuture().sync();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                bossGroup.shutdownGracefully().sync();
-                workerGroup.shutdownGracefully().sync();
-            }
+            // Wait for channel to close
+            channel.closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            bossGroup.shutdownGracefully().sync();
+            workerGroup.shutdownGracefully().sync();
         }
-    }
-
-    public void stop() {
-        stop = true;
     }
 }
