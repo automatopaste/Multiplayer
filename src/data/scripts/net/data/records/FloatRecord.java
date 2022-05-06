@@ -31,7 +31,8 @@ public class FloatRecord extends ARecord {
         }
         if (isUpdated) record = curr;
 
-        return isUpdated;
+        return true;
+//        return isUpdated;
     }
 
     public float getRecord() {

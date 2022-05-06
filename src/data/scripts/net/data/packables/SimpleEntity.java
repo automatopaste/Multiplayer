@@ -1,13 +1,13 @@
 package data.scripts.net.data.packables;
 
 import data.scripts.net.data.IDTypes;
-import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.FloatRecord;
 
 public class SimpleEntity extends APackable {
-    private final StringRecord info;
+    private final FloatRecord info;
 
     public SimpleEntity() {
-        info = new StringRecord("HELP", 1);
+        info = new FloatRecord(69f, 1);
     }
 
     @Override
@@ -17,6 +17,6 @@ public class SimpleEntity extends APackable {
 
     @Override
     void update() {
-        if (info.update("HELP")) info.write(packer);
+        if (info.update(69f)) info.write(packer);
     }
 }

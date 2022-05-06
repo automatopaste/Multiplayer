@@ -19,7 +19,6 @@ public class PacketContainerDecoder extends ReplayingDecoder<DecodeState> {
             case READ_LENGTH:
                 length = in.readInt();
                 checkpoint(DecodeState.READ_CONTENT);
-                break;
             case READ_CONTENT:
                 ByteBuf frame = in.readBytes(length);
                 checkpoint(DecodeState.READ_LENGTH);
