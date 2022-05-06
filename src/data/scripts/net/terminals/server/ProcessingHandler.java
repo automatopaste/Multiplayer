@@ -25,10 +25,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     private int tick;
 
-    private final ServerPacketManager serverPacketManager;
+    private final ServerDataDuplex serverDataDuplex;
 
-    public ProcessingHandler(ServerPacketManager serverPacketManager) {
-        this.serverPacketManager = serverPacketManager;
+    public ProcessingHandler(ServerDataDuplex serverDataDuplex) {
+        this.serverDataDuplex = serverDataDuplex;
 
         logger = Global.getLogger(ProcessingHandler.class);
 
@@ -115,7 +115,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
-        PacketContainer packet = serverPacketManager.getPacket(tick);
+        PacketContainer packet = serverDataDuplex.getPacket(tick);
         tick++;
         return ctx.writeAndFlush(packet);
     }

@@ -14,11 +14,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer implements Runnable {
     private final int port;
-    private final ServerPacketManager serverPacketManager;
+    private final ServerDataDuplex serverDataDuplex;
 
-    public NettyServer(int port, ServerPacketManager serverPacketManager) {
+    public NettyServer(int port, ServerDataDuplex serverDataDuplex) {
         this.port = port;
-        this.serverPacketManager = serverPacketManager;
+        this.serverDataDuplex = serverDataDuplex;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class NettyServer implements Runnable {
                                     new PacketContainerEncoder(),
                                     new PacketContainerDecoder(),
                                     new PacketDecoder(),
-                                    new ProcessingHandler(serverPacketManager)
+                                    new ProcessingHandler(serverDataDuplex)
                             );
                         }
                     })
@@ -63,5 +63,9 @@ public class NettyServer implements Runnable {
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
         }
+    }
+
+    public ServerDataDuplex getServerDataDuplex() {
+        return serverDataDuplex;
     }
 }

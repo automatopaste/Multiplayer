@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
+import data.scripts.net.terminals.client.ClientDataDuplex;
 import data.scripts.net.terminals.client.NettyClient;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
@@ -13,6 +14,8 @@ import java.util.List;
 public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private NettyClient client;
     private Thread clientThread;
+
+    private ClientDataDuplex clientDataDuplex;
 
     private final int port;
     private final String host;
@@ -24,7 +27,8 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
     @Override
     public void init(CombatEngineAPI engine) {
-        client = new NettyClient(host, port);
+        clientDataDuplex = new ClientDataDuplex();
+        client = new NettyClient(host, port, clientDataDuplex);
         clientThread = new Thread(client, "mpClient");
         clientThread.start();
     }
@@ -44,5 +48,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Closed client");
         }
+
+        clientDataDuplex.update();
     }
 }

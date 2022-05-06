@@ -14,14 +14,14 @@ import java.io.IOException;
 import java.util.List;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
-    private final ClientPacketManager clientPacketManager;
+    private final ClientDataDuplex clientDataDuplex;
 
     private final Logger logger;
 
     private int clientTick;
 
-    public ClientHandler(ClientPacketManager clientPacketManager) {
-        this.clientPacketManager = clientPacketManager;
+    public ClientHandler(ClientDataDuplex clientDataDuplex) {
+        this.clientDataDuplex = clientDataDuplex;
 
         logger = Global.getLogger(ClientHandler.class);
 
@@ -77,7 +77,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
-        PacketContainer packet = clientPacketManager.getPacket(clientTick);
+        PacketContainer packet = clientDataDuplex.getPacket(clientTick);
         clientTick++;
         return ctx.writeAndFlush(packet);
     }

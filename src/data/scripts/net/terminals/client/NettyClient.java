@@ -13,11 +13,14 @@ public class NettyClient implements Runnable {
     private final String host;
     private final int port;
 
+    private final ClientDataDuplex clientDataDuplex;
+
     private boolean stop;
 
-    public NettyClient(String host, int port) {
+    public NettyClient(String host, int port, ClientDataDuplex clientDataDuplex) {
         this.host = host;
         this.port = port;
+        this.clientDataDuplex = clientDataDuplex;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class NettyClient implements Runnable {
                                 new PacketContainerEncoder(),
                                 new PacketContainerDecoder(),
                                 new PacketDecoder(),
-                                new ClientHandler(new ClientPacketManager())
+                                new ClientHandler(clientDataDuplex)
                         );
                     }
                 });
@@ -61,6 +64,10 @@ public class NettyClient implements Runnable {
                 workerGroup.shutdownGracefully();
             }
         }
+    }
+
+    public ClientDataDuplex getClientDataDuplex() {
+        return clientDataDuplex;
     }
 
     public void stop() {

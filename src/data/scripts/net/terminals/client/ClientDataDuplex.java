@@ -2,22 +2,30 @@ package data.scripts.net.terminals.client;
 
 import data.scripts.net.data.Packable;
 import data.scripts.net.data.packables.InputAggregateData;
+import data.scripts.net.data.records.ARecord;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientPacketManager {
+/**
+ * Handles packet generation and transferring deltas to main thread plugin
+ */
+public class ClientDataDuplex {
     public List<Packable> packables;
 
-    public ClientPacketManager() {
+    public ClientDataDuplex() {
         packables = new ArrayList<>();
 
         packables.add(new InputAggregateData());
     }
 
-    public synchronized void update() {
+    public void update() {
+
+    }
+
+    public void clientThreadUpdate(List<List<ARecord>> entities) {
 
     }
 
