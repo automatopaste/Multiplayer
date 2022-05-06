@@ -66,11 +66,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         List<Map<Integer, RecordDelta>> entities = unpacked.getUnpacked();
 
-//        for (Map<Integer, RecordDelta> unpackedEntity : entities) {
-//            for (RecordDelta record : unpackedEntity.values()) {
-//                logger.info(record.toString());
-//            }
-//        }
+        for (Map<Integer, RecordDelta> unpackedEntity : entities) {
+            for (RecordDelta record : unpackedEntity.values()) {
+                logger.info(record.toString());
+            }
+        }
 
         serverDataDuplex.threadUpdate(entities);
     }
