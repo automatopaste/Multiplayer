@@ -21,7 +21,7 @@ public class ClientPacketManager {
 
     }
 
-    public PacketContainer getPacket() throws IOException {
-        return new PacketContainer(new ArrayList<>(packables));
+    public PacketContainer getPacket(int clientTick) throws IOException {
+        return new PacketContainer(new ArrayList<>(packables), clientTick);
     }
 }

@@ -12,8 +12,14 @@ public class PacketContainer {
     private final ByteBuffer data;
     private final int length;
 
-    public PacketContainer(List<Packable> packables) throws IOException {
+    private final int tick;
+
+    public PacketContainer(List<Packable> packables, int tick) throws IOException {
+        this.tick = tick;
+
         data = ByteBuffer.allocate(PACKET_SIZE_INIT);
+
+        data.putInt(tick);
 
         // number of entities to unpack
         data.putInt(packables.size());

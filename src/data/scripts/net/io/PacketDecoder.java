@@ -15,6 +15,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
         List<List<ARecord>> entities = new ArrayList<>();
         Unpacked unpacked = new Unpacked(entities);
 
+        int tick = in.readInt();
+        unpacked.setTick(tick);
+
         int numEntities = in.readInt();
 
         if (numEntities != 0) {

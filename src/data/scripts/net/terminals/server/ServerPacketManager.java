@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerPacketManager {
-    public List<Packable> packables;
+    private final List<Packable> packables;
 
     public ServerPacketManager() {
         packables = new ArrayList<>();
@@ -22,7 +22,7 @@ public class ServerPacketManager {
 
     }
 
-    public PacketContainer getPacket() throws IOException {
-        return new PacketContainer(new ArrayList<>(packables));
+    public PacketContainer getPacket(int tick) throws IOException {
+        return new PacketContainer(new ArrayList<>(packables), tick);
     }
 }

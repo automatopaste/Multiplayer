@@ -23,6 +23,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     private double deltaU;
     private long updateTime;
 
+    private int tick;
+
     private final ServerPacketManager serverPacketManager;
 
     public ProcessingHandler(ServerPacketManager serverPacketManager) {
@@ -35,6 +37,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         deltaU = 1d;
 
         updateTime = initialTime;
+
+        tick = 0;
     }
 
     @Override
@@ -55,6 +59,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         Unpacked unpacked = (Unpacked) msg;
+
+        int clientTick = unpacked.getTick();
+
         for (List<ARecord> unpackedEntity : unpacked.getUnpacked()) {
             for (ARecord record : unpackedEntity) {
                 logger.info(record.toString());
@@ -70,9 +77,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(final ChannelHandlerContext ctx) throws IOException {
         logger.info("Channel active on server");
 
-        PacketContainer packet = serverPacketManager.getPacket();
-
-        final ChannelFuture future = ctx.writeAndFlush(packet);    }
+        ChannelFuture future = writeAndFlushPacket(ctx);
+    }
 
     /**
      * Called once read is complete. Is used to wait and send next packet.
@@ -92,9 +98,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // time delta
         //long diffTimeNanos = currentTime - updateTime;
 
-        PacketContainer packet = serverPacketManager.getPacket();
-
-        final ChannelFuture future = ctx.writeAndFlush(packet);
+        final ChannelFuture future = writeAndFlushPacket(ctx);
 
         future.addListener(new ChannelFutureListener() {
             @Override
@@ -107,5 +111,11 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         //updateTime = currentTime;
         deltaU--;
+    }
+
+    private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
+        PacketContainer packet = serverPacketManager.getPacket(tick);
+        tick++;
+        return ctx.writeAndFlush(packet);
     }
 }
