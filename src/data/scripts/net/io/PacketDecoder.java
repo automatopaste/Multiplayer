@@ -12,6 +12,10 @@ import java.util.List;
 public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
+        if (in.readableBytes() < 4) {
+            return;
+        }
+
         List<List<ARecord>> entities = new ArrayList<>();
         Unpacked unpacked = new Unpacked(entities);
 
@@ -26,8 +30,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
             }
         }
         out.add(unpacked);
-
-        in.release();
     }
 
     private List<ARecord> unpackRecords(ByteBuf in) {
