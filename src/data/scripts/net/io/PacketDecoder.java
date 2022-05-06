@@ -30,7 +30,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
         //iterate until new entity encountered
         outer:
-        while (true) {
+        while (in.readableBytes() >= (Integer.SIZE / Byte.SIZE)) {
             // mark index so it can be reset if new entity is encountered
             in.markReaderIndex();
 
