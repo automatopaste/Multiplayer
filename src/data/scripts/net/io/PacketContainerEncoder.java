@@ -9,8 +9,6 @@ public class PacketContainerEncoder  extends MessageToByteEncoder<PacketContaine
     @Override
     protected void encode(ChannelHandlerContext ctx, PacketContainer msg, ByteBuf out) throws Exception {
         // encode length of buffer so completeness can be checked when reconstructed by client
-        // account for <num entities, tick> integers
-//        out.writeInt(msg.getLength() + (2 * (Integer.SIZE / Byte.SIZE)));
         out.writeInt(msg.getLength());
 
         // there it goes :))))
