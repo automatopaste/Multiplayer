@@ -20,8 +20,7 @@ public class StringRecord extends ARecord<String> {
         boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
 
-        return true;
-        //return isUpdated;
+        return isUpdated;
     }
 
     @Override

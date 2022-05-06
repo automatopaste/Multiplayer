@@ -2,7 +2,7 @@ package data.scripts.net.data;
 
 /**
  * Stores static integer IDs. Should be replaced with a dynamic allocation system at some point and also use
- * better compression
+ * better byte compression
  */
 public class IDTypes {
     // entities

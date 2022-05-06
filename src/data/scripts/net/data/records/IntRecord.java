@@ -37,13 +37,13 @@ public class IntRecord extends ARecord<Integer> {
 
     @Override
     public int getTypeId() {
-        return IDTypes.FLOAT_RECORD;
+        return IDTypes.INT_RECORD;
     }
 
     @Override
     public String toString() {
         return "IntRecord{" +
-                "record=" + record +
+                "record=" + Integer.toBinaryString(record) +
                 '}';
     }
 }
