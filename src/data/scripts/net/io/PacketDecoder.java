@@ -30,7 +30,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
             }
         }
 
-        if (in.readableBytes() > 0) {
+        int readable = in.readableBytes();
+        if (readable > 0) {
             throw new OutOfMemoryError(in.readableBytes() + " bytes left in packet decoder frame");
         }
 
