@@ -26,6 +26,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
             }
         }
         out.add(unpacked);
+
+        in.clear();
     }
 
     private List<ARecord> unpackRecords(ByteBuf in) {
