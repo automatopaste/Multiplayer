@@ -60,6 +60,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                     break;
             }
         }
+        e.add(a);
 
         Unpacked unpacked = new Unpacked(e, tick);
 
