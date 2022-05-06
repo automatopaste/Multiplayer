@@ -5,10 +5,16 @@ import data.scripts.net.data.records.StringRecord;
 import org.lwjgl.input.Keyboard;
 
 public class InputAggregateData extends APackable {
-    private final StringRecord info;
+    private final StringRecord w;
+    private final StringRecord a;
+    private final StringRecord s;
+    private final StringRecord d;
 
     public InputAggregateData() {
-        info = new StringRecord("LOL GOTEM", 1);
+        w = new StringRecord("LOL GOTEM", 1);
+        a = new StringRecord("LOL GOTEM", 1);
+        s = new StringRecord("LOL GOTEM", 1);
+        d = new StringRecord("LOL GOTEM", 1);
     }
 
     @Override
@@ -18,6 +24,9 @@ public class InputAggregateData extends APackable {
 
     @Override
     void update() {
-        if (info.update("KEY J IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_J))) info.write(packer);
+        if (w.update("KEY W IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_W))) w.write(packer);
+        if (a.update("KEY A IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_S))) a.write(packer);
+        if (s.update("KEY S IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_A))) s.write(packer);
+        if (d.update("KEY D IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_D))) d.write(packer);
     }
 }

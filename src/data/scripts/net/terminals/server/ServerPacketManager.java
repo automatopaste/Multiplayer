@@ -1,7 +1,8 @@
 package data.scripts.net.terminals.server;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.Packable;
-import data.scripts.net.data.packables.SimpleEntity;
+import data.scripts.net.data.packables.ShipData;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
@@ -14,8 +15,8 @@ public class ServerPacketManager {
     public ServerPacketManager() {
         packables = new ArrayList<>();
 
-//        packables.add(new ShipData(Global.getCombatEngine().getPlayerShip()));
-        packables.add(new SimpleEntity());
+        packables.add(new ShipData(Global.getCombatEngine().getPlayerShip()));
+        //packables.add(new SimpleEntity());
     }
 
     public synchronized void update() {

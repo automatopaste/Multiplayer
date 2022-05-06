@@ -1,7 +1,7 @@
 package data.scripts.net.terminals.client;
 
 import data.scripts.net.data.Packable;
-import data.scripts.net.data.packables.SimpleEntity;
+import data.scripts.net.data.packables.InputAggregateData;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class ClientPacketManager {
     public ClientPacketManager() {
         packables = new ArrayList<>();
 
-        packables.add(new SimpleEntity());
+        packables.add(new InputAggregateData());
     }
 
     public synchronized void update() {
