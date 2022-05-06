@@ -14,6 +14,7 @@ public class PacketContainerDecoder extends ReplayingDecoder<DecodeState> {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         int length = in.readInt();
-        out.add(in.readBytes(length));
+        ByteBuf frame = in.readBytes(length);
+        out.add(frame);
     }
 }
