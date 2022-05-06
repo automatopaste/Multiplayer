@@ -61,6 +61,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Unpacked unpacked = (Unpacked) msg;
 
         int clientTick = unpacked.getTick();
+        logger.info("Received client tick notice: " + clientTick);
 
         for (List<ARecord> unpackedEntity : unpacked.getUnpacked()) {
             for (ARecord record : unpackedEntity) {
