@@ -3,6 +3,9 @@ package data.scripts.net.data.packables;
 import data.scripts.net.data.IDTypes;
 import data.scripts.net.data.records.FloatRecord;
 
+/**
+ * Used for decoder debugging
+ */
 public class SimpleEntity extends APackable {
     private final FloatRecord info;
 
