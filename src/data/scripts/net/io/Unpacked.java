@@ -6,18 +6,15 @@ import java.util.List;
 
 public class Unpacked {
     private final List<List<ARecord>> unpacked;
-    private int tick = -1;
+    private final int tick;
 
-    public Unpacked(List<List<ARecord>> unpacked) {
+    public Unpacked(List<List<ARecord>> unpacked, int tick) {
         this.unpacked = unpacked;
+        this.tick = tick;
     }
 
     public List<List<ARecord>> getUnpacked() {
         return unpacked;
-    }
-
-    public void setTick(int tick) {
-        this.tick = tick;
     }
 
     public int getTick() {

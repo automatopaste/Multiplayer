@@ -4,7 +4,10 @@ import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -39,8 +42,8 @@ public class NettyServer implements Runnable {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
                             socketChannel.pipeline().addLast(
-                                    new PacketContainerDecoder(),
                                     new PacketContainerEncoder(),
+                                    new PacketContainerDecoder(),
                                     new PacketDecoder(),
                                     new ProcessingHandler(serverPacketManager)
                             );

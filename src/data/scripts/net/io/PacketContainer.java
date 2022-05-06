@@ -22,7 +22,7 @@ public class PacketContainer {
         data.putInt(tick);
 
         // number of entities to unpack
-        data.putInt(packables.size());
+//        data.putInt(packables.size());
 
         for (Packable packable : packables) data.put(packable.pack());
 
