@@ -40,11 +40,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        logger.info("Client received packet from server");
-
         Unpacked unpacked = (Unpacked) msg;
 
         int serverTick = unpacked.getTick();
+        logger.info("Received server tick notice: " + serverTick);
 
         for (List<ARecord> unpackedEntity : unpacked.getUnpacked()) {
             for (ARecord record : unpackedEntity) {
