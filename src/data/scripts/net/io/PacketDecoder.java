@@ -29,6 +29,11 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 entities.add(unpackRecords(in));
             }
         }
+
+        if (in.readableBytes() > 0) {
+            throw new OutOfMemoryError(in.readableBytes() + " bytes left in packet decoder frame");
+        }
+
         out.add(unpacked);
     }
 
