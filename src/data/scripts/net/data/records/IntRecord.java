@@ -19,7 +19,7 @@ public class IntRecord extends ARecord<Integer> {
         return isUpdated;
     }
 
-    public float getRecord() {
+    public int getRecord() {
         return record;
     }
 

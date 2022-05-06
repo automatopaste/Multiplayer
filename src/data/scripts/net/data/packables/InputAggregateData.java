@@ -36,5 +36,13 @@ public class InputAggregateData extends APackable {
         if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK);
     }
 
+    public static boolean[] unmask(int bitmask) {
+        boolean[] controls = new boolean[4];
+        for (int i = 0; i < controls.length; i++) {
+            if ((bitmask & 1 << i) != 0) controls[i] = true;
+        }
+        return controls;
+    }
+
     // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
 }
