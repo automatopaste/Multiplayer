@@ -5,14 +5,12 @@ import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
-public class FloatRecord extends ARecord {
+public class FloatRecord extends ARecord<Float> {
     private float record;
-    private final int uniqueId;
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public FloatRecord(float value, int uniqueId) {
+    public FloatRecord(float value) {
         record = value;
-        this.uniqueId = uniqueId;
         useDecimalPrecision = true;
     }
 
@@ -21,18 +19,18 @@ public class FloatRecord extends ARecord {
         return this;
     }
 
-    public boolean update(float curr) {
+    @Override
+    public boolean checkUpdate(Float curr) {
         boolean isUpdated;
 
         if (useDecimalPrecision) {
-            isUpdated = (int) record != (int) curr;
+            isUpdated = (int) record != curr.intValue();
         } else {
             isUpdated = record != curr;
         }
         if (isUpdated) record = curr;
 
-        return true;
-//        return isUpdated;
+        return isUpdated;
     }
 
     public float getRecord() {
@@ -40,17 +38,15 @@ public class FloatRecord extends ARecord {
     }
 
     @Override
-    public void write(ByteBuffer output) {
-        super.write(output);
+    public void write(ByteBuffer output, int uniqueId) {
+        super.write(output, uniqueId);
 
         output.putFloat(record);
     }
 
     public static FloatRecord read(ByteBuf input) {
-        int uniqueId = ARecord.readID(input);
-
         float value = input.readFloat();
-        return new FloatRecord(value, uniqueId);
+        return new FloatRecord(value);
     }
 
     @Override
@@ -59,15 +55,9 @@ public class FloatRecord extends ARecord {
     }
 
     @Override
-    public int getUniqueId() {
-        return uniqueId;
-    }
-
-    @Override
     public String toString() {
         return "FloatRecord{" +
                 "record=" + record +
-                ", uniqueId=" + uniqueId +
                 '}';
     }
 }

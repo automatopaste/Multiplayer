@@ -1,7 +1,7 @@
 package data.scripts.net.terminals.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.records.ARecord;
+import data.scripts.net.data.RecordDelta;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelFuture;
@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     public static final float TICK_RATE = 2f;
@@ -63,11 +64,15 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         int clientTick = unpacked.getTick();
         logger.info("Received client tick notice: " + clientTick);
 
-        for (List<ARecord> unpackedEntity : unpacked.getUnpacked()) {
-            for (ARecord record : unpackedEntity) {
-                logger.info(record.toString());
-            }
-        }
+        List<Map<Integer, RecordDelta>> entities = unpacked.getUnpacked();
+
+//        for (Map<Integer, RecordDelta> unpackedEntity : entities) {
+//            for (RecordDelta record : unpackedEntity.values()) {
+//                logger.info(record.toString());
+//            }
+//        }
+
+        serverDataDuplex.threadUpdate(entities);
     }
 
     /**

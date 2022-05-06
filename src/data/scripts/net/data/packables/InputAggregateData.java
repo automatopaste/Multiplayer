@@ -1,20 +1,17 @@
 package data.scripts.net.data.packables;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.IDTypes;
-import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.IntRecord;
 import org.lwjgl.input.Keyboard;
 
 public class InputAggregateData extends APackable {
-    private final StringRecord w;
-    private final StringRecord a;
-    private final StringRecord s;
-    private final StringRecord d;
+    private final IntRecord keysBitmask;
+
+    private static final int BITMASK = 0;
 
     public InputAggregateData() {
-        w = new StringRecord("LOL GOTEM", 1);
-        a = new StringRecord("LOL GOTEM", 1);
-        s = new StringRecord("LOL GOTEM", 1);
-        d = new StringRecord("LOL GOTEM", 1);
+        keysBitmask = new IntRecord(0);
     }
 
     @Override
@@ -23,10 +20,21 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
-    void update() {
-        if (w.update("KEY W IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_W))) w.write(packer);
-        if (a.update("KEY A IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_S))) a.write(packer);
-        if (s.update("KEY S IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_A))) s.write(packer);
-        if (d.update("KEY D IS DOWN: " + Keyboard.isKeyDown(Keyboard.KEY_D))) d.write(packer);
+    void write() {
+        boolean[] controls = new boolean[4];
+        controls[0] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE")));
+        controls[1] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE_BACKWARDS")));
+        controls[2] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_TURN_LEFT")));
+        controls[3] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_TURN_RIGHT")));
+
+        // max length 32
+        int bits = 0;
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i]) bits |= 1 << i;
+        }
+
+        if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK);
     }
+
+    // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
 }

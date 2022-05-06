@@ -6,12 +6,14 @@ import data.scripts.net.data.records.FloatRecord;
 /**
  * Used for decoder debugging
  */
-public class SimpleEntity extends APackable {
+public class SimpleEntityData extends APackable {
     private final FloatRecord info;
 //    private final StringRecord string;
 
-    public SimpleEntity() {
-        info = new FloatRecord(69f, 1);
+    private static final int INFO = 0;
+
+    public SimpleEntityData() {
+        info = new FloatRecord(69f);
 
     }
 
@@ -21,7 +23,7 @@ public class SimpleEntity extends APackable {
     }
 
     @Override
-    void update() {
-        if (info.update(69f)) info.write(packer);
+    void write() {
+        if (info.checkUpdate(69f)) info.write(packer, INFO);
     }
 }

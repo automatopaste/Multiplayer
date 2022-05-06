@@ -7,18 +7,16 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class StringRecord extends ARecord {
+public class StringRecord extends ARecord<String> {
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     private String record;
-    private final int uniqueId;
 
-    public StringRecord(String value, int uniqueId) {
+    public StringRecord(String value) {
         record = value;
-        this.uniqueId = uniqueId;
     }
 
-    public boolean update(String curr) {
+    public boolean checkUpdate(String curr) {
         boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
 
@@ -27,8 +25,8 @@ public class StringRecord extends ARecord {
     }
 
     @Override
-    public void write(ByteBuffer output) {
-        super.write(output);
+    public void write(ByteBuffer output, int uniqueId) {
+        super.write(output, uniqueId);
 
         byte[] bytes = record.getBytes(CHARSET);
 
@@ -39,12 +37,10 @@ public class StringRecord extends ARecord {
     }
 
     public static StringRecord read(ByteBuf input) {
-        int uniqueId = ARecord.readID(input);
-
         int length = input.readInt();
         String value = input.readCharSequence(length, CHARSET).toString();
 
-        return new StringRecord(value, uniqueId);
+        return new StringRecord(value);
     }
 
     @Override
@@ -52,16 +48,14 @@ public class StringRecord extends ARecord {
         return IDTypes.STRING_RECORD;
     }
 
-    @Override
-    public int getUniqueId() {
-        return 0;
+    public String getRecord() {
+        return record;
     }
 
     @Override
     public String toString() {
         return "StringRecord{" +
                 "record='" + record + '\'' +
-                ", uniqueId=" + uniqueId +
                 '}';
     }
 }

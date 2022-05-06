@@ -6,14 +6,12 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.nio.ByteBuffer;
 
-public class Vector2fRecord extends ARecord {
+public class Vector2fRecord extends ARecord<Vector2f> {
     private final Vector2f record;
-    private final int uniqueId;
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Vector2fRecord(Vector2f value, int uniqueId) {
+    public Vector2fRecord(Vector2f value) {
         record = new Vector2f(value);
-        this.uniqueId = uniqueId;
         useDecimalPrecision = true;
     }
 
@@ -22,7 +20,7 @@ public class Vector2fRecord extends ARecord {
         return this;
     }
 
-    public boolean update(Vector2f curr) {
+    public boolean checkUpdate(Vector2f curr) {
         boolean isUpdated;
 
         if (useDecimalPrecision) {
@@ -41,19 +39,17 @@ public class Vector2fRecord extends ARecord {
     }
 
     @Override
-    public void write(ByteBuffer output) {
-        super.write(output);
+    public void write(ByteBuffer output, int uniqueId) {
+        super.write(output, uniqueId);
 
         output.putFloat(record.x);
         output.putFloat(record.y);
     }
 
     public static Vector2fRecord read(ByteBuf input) {
-        int uniqueId = ARecord.readID(input);
-
         float x = input.readFloat();
         float y = input.readFloat();
-        return new Vector2fRecord(new Vector2f(x, y), uniqueId);
+        return new Vector2fRecord(new Vector2f(x, y));
     }
 
     @Override
@@ -62,15 +58,9 @@ public class Vector2fRecord extends ARecord {
     }
 
     @Override
-    public int getUniqueId() {
-        return uniqueId;
-    }
-
-    @Override
     public String toString() {
         return "Vector2fRecord{" +
                 "record=" + record +
-                ", uniqueId=" + uniqueId +
                 '}';
     }
 }

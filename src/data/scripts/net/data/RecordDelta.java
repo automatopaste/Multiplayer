@@ -4,9 +4,7 @@ import java.nio.ByteBuffer;
 
 public interface RecordDelta {
 
-    void write(ByteBuffer output);
+    void write(ByteBuffer output, int uniqueId);
 
     int getTypeId();
-
-    int getUniqueId();
 }

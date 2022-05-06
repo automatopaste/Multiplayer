@@ -17,7 +17,7 @@ public abstract class APackable implements Packable {
         // so packer type can be identified
         packer.putInt(getTypeId());
 
-        update();
+        write();
 
         packer.flip();
         byte[] out = new byte[packer.remaining()];
@@ -26,5 +26,5 @@ public abstract class APackable implements Packable {
         return out;
     }
 
-    abstract void update();
+    abstract void write();
 }

@@ -1,13 +1,16 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.RecordDelta;
 import data.scripts.net.data.records.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PacketDecoder extends ByteToMessageDecoder {
     @Override
@@ -32,31 +35,31 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
         int tick = in.readInt();
 
-        List<List<ARecord>> e = new ArrayList<>();
-        List<ARecord> a = new ArrayList<>();
+        List<Map<Integer, RecordDelta>> e = new ArrayList<>();
+        Map<Integer, RecordDelta> a = new HashMap<>();
 
         while (in.readableBytes() > 0) {
             int type = in.readInt();
 
             switch(type) {
                 case IDTypes.FLOAT_RECORD:
-                    a.add(FloatRecord.read(in));
+                    a.put(ARecord.readID(in), FloatRecord.read(in));
                     break;
                 case IDTypes.V2F_RECORD:
-                    a.add(Vector2fRecord.read(in));
+                    a.put(ARecord.readID(in), Vector2fRecord.read(in));
                     break;
                 case IDTypes.INT_RECORD:
-                    a.add(IntRecord.read(in));
+                    a.put(ARecord.readID(in), IntRecord.read(in));
                     break;
                 case IDTypes.STRING_RECORD:
-                    a.add(StringRecord.read(in));
+                    a.put(ARecord.readID(in), StringRecord.read(in));
                     break;
 
                 case IDTypes.SHIP:
                 case IDTypes.INPUT_AGGREGATE:
                 case IDTypes.SIMPLE_ENTITY:
                     e.add(a);
-                    a = new ArrayList<>();
+                    a = new HashMap<>();
                     break;
             }
         }
