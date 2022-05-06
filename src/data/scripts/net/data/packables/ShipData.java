@@ -3,12 +3,14 @@ package data.scripts.net.data.packables;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.IDTypes;
 import data.scripts.net.data.records.FloatRecord;
+import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
 
 /**
  * Container for tracking network data about a ship
  */
 public class ShipData extends APackable {
+    private final StringRecord id;
     private final Vector2fRecord loc;
     private final Vector2fRecord vel;
     private final FloatRecord ang;
@@ -21,6 +23,7 @@ public class ShipData extends APackable {
     public ShipData(ShipAPI ship) {
         this.ship = ship;
 
+        id = new StringRecord(ship.getId(), 9);
         loc = new Vector2fRecord(ship.getLocation(), 1).setUseDecimalPrecision(false);
         vel = new Vector2fRecord(ship.getVelocity(), 2).setUseDecimalPrecision(false);
         ang = new FloatRecord(ship.getFacing(), 4).setUseDecimalPrecision(false);
@@ -31,6 +34,7 @@ public class ShipData extends APackable {
 
     @Override
     void update() {
+        if (id.update(ship.getId())) id.write(packer);
         if (loc.update(ship.getLocation())) loc.write(packer);
         if (vel.update(ship.getVelocity())) vel.write(packer);
         if (ang.update(ship.getFacing())) ang.write(packer);

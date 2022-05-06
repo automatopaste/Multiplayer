@@ -8,9 +8,11 @@ import data.scripts.net.data.records.FloatRecord;
  */
 public class SimpleEntity extends APackable {
     private final FloatRecord info;
+//    private final StringRecord string;
 
     public SimpleEntity() {
         info = new FloatRecord(69f, 1);
+
     }
 
     @Override
