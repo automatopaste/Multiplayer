@@ -159,7 +159,7 @@ public class ShipData extends APackable {
         vel.forceUpdate(ship.getVelocity());
         vel.write(packer, SHIP_VEL);
         ang.forceUpdate(ship.getAngularVelocity());
-        ang.write(packer, SHIP_VEL);
+        ang.write(packer, SHIP_ANG);
         angVel.forceUpdate(ship.getAngularVelocity());
         angVel.write(packer, SHIP_ANGVEL);
         hull.forceUpdate(ship.getHullLevel());
