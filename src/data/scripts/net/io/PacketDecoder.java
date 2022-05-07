@@ -30,6 +30,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     private Unpacked getUnpacked(ByteBuf in, int tick) {
+        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), tick);
+
         // integer keys are unique instance IDs
         Map<Integer, APackable> entities = new HashMap<>();
         // integer keys are unique record IDs
