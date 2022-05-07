@@ -20,7 +20,9 @@ public abstract class ARecord<T> {
 
     public abstract boolean checkUpdate(T curr);
 
-    protected abstract void doUpdate(T delta);
+    public void forceUpdate(T curr) {
+        record = curr;
+    }
 
     public abstract int getTypeId();
 

@@ -34,11 +34,6 @@ public class Vector2fRecord extends ARecord<Vector2f> {
     }
 
     @Override
-    public void doUpdate(Vector2f delta) {
-        record = delta;
-    }
-
-    @Override
     public void write(ByteBuffer output, int uniqueId) {
         super.write(output, uniqueId);
 

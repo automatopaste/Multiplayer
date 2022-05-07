@@ -47,6 +47,11 @@ public class SimpleEntityData extends APackable {
     }
 
     @Override
+    protected void flushWrite() {
+
+    }
+
+    @Override
     public SimpleEntityData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
         return new SimpleEntityData(instanceID);
     }

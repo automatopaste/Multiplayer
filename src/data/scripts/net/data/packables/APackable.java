@@ -10,6 +10,9 @@ public abstract class APackable {
 
     private final int instanceID;
 
+    // used to transfer complete snapshot instead of delta
+    protected boolean flush = true;
+
     public APackable(int instanceID) {
         this.instanceID = instanceID;
 
@@ -24,7 +27,11 @@ public abstract class APackable {
         // so packer instance can be identified
         packer.putInt(getInstanceID());
 
-        if (!write()) return null;
+        if (flush) {
+            doFlushWrite();
+        } else {
+            if (!write()) return null;
+        }
 
         packer.flip();
         byte[] out = new byte[packer.remaining()];
@@ -36,6 +43,17 @@ public abstract class APackable {
     public int getInstanceID() {
         return instanceID;
     }
+
+    public void flush() {
+        flush = true;
+    }
+
+    private void doFlushWrite() {
+        flushWrite();
+        flush = false;
+    }
+
+    protected abstract void flushWrite();
 
     public abstract void updateFromDelta(APackable delta);
 

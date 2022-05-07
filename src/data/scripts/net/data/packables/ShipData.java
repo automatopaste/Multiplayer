@@ -52,14 +52,14 @@ public class ShipData extends APackable {
     @Override
     public void updateFromDelta(APackable delta) {
         ShipData d = (ShipData) delta;
-        if (d.getId() != null) id.doUpdate(d.getId().getRecord());
-        if (d.getLoc() != null) loc.doUpdate(d.getLoc().getRecord());
-        if (d.getVel() != null) vel.doUpdate(d.getVel().getRecord());
-        if (d.getAng() != null) ang.doUpdate(d.getAng().getRecord());
-        if (d.getAngVel() != null) angVel.doUpdate(d.getAngVel().getRecord());
-        if (d.getFlux() != null) flux.doUpdate(d.getFlux().getRecord());
-        if (d.getHull() != null) hull.doUpdate(d.getHull().getRecord());
-        if (d.getCursor() != null) cursor.doUpdate(d.getCursor().getRecord());
+        if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
+        if (d.getLoc() != null) loc.forceUpdate(d.getLoc().getRecord());
+        if (d.getVel() != null) vel.forceUpdate(d.getVel().getRecord());
+        if (d.getAng() != null) ang.forceUpdate(d.getAng().getRecord());
+        if (d.getAngVel() != null) angVel.forceUpdate(d.getAngVel().getRecord());
+        if (d.getFlux() != null) flux.forceUpdate(d.getFlux().getRecord());
+        if (d.getHull() != null) hull.forceUpdate(d.getHull().getRecord());
+        if (d.getCursor() != null) cursor.forceUpdate(d.getCursor().getRecord());
     }
 
     public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
@@ -127,6 +127,26 @@ public class ShipData extends APackable {
         }
 
         return update;
+    }
+
+    @Override
+    protected void flushWrite() {
+        id.forceUpdate(ship.getId());
+        id.write(packer, SHIP_ID);
+        loc.forceUpdate(ship.getLocation());
+        loc.write(packer, SHIP_LOC);
+        vel.forceUpdate(ship.getVelocity());
+        vel.write(packer, SHIP_VEL);
+        ang.forceUpdate(ship.getAngularVelocity());
+        ang.write(packer, SHIP_VEL);
+        angVel.forceUpdate(ship.getAngularVelocity());
+        angVel.write(packer, SHIP_ANGVEL);
+        hull.forceUpdate(ship.getHullLevel());
+        hull.write(packer, SHIP_HULL);
+        flux.forceUpdate(ship.getFluxLevel());
+        flux.write(packer, SHIP_FLUX);
+        cursor.forceUpdate(ship.getMouseTarget());
+        cursor.write(packer, CURSOR);
     }
 
     public static void setTypeID(int typeID) {
