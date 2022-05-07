@@ -57,9 +57,11 @@ public class ShipData extends APackable {
         hull = (FloatRecord) records.get(SHIP_HULL);
         flux = (FloatRecord) records.get(SHIP_FLUX);
 
-        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-            if (ship.getId().equals(id.getRecord())) {
-                this.ship = ship;
+        if (id != null) {
+            for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+                if (ship.getId().equals(id.getRecord())) {
+                    this.ship = ship;
+                }
             }
         }
     }
@@ -71,6 +73,8 @@ public class ShipData extends APackable {
 
     @Override
     protected boolean write() {
+        if (ship == null) return false;
+
         boolean update = false;
         if (id.checkUpdate(ship.getId())) {
             id.write(packer, SHIP_ID);
