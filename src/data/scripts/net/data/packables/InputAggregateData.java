@@ -36,7 +36,9 @@ public class InputAggregateData extends APackable {
     public InputAggregateData(int instanceID, Map<Integer, ARecord<?>> records) {
         super(instanceID);
 
-        keysBitmask = (IntRecord) records.get(BITMASK);
+        IntRecord keysBitmask1 = (IntRecord) records.get(BITMASK);
+        if (keysBitmask1 == null) keysBitmask1 = new IntRecord(0);
+        keysBitmask = keysBitmask1;
     }
 
     @Override

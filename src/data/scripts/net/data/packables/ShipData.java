@@ -49,6 +49,48 @@ public class ShipData extends APackable {
         cursor = new Vector2fRecord(new Vector2f(0f, 0f));
     }
 
+    public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
+        super(instanceID);
+
+        StringRecord id1 = (StringRecord) records.get(SHIP_ID);
+        if (id1 == null) id1 = new StringRecord("DEFAULT_ID_STRING");
+        id = id1;
+
+        Vector2fRecord loc1 = (Vector2fRecord) records.get(SHIP_LOC);
+        if (loc1 == null) loc1 = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
+        loc = loc1;
+
+        Vector2fRecord vel1 = (Vector2fRecord) records.get(SHIP_VEL);
+        if (vel1 == null) vel1 = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
+        vel = vel1;
+
+        FloatRecord ang1 = (FloatRecord) records.get(SHIP_ANG);
+        if (ang1 == null) ang1 = new FloatRecord(0f).setUseDecimalPrecision(false);
+        ang = ang1;
+
+        FloatRecord angVel1 = (FloatRecord) records.get(SHIP_ANGVEL);
+        if (angVel1 == null) angVel1 = new FloatRecord(0f).setUseDecimalPrecision(false);
+        angVel = angVel1;
+
+        FloatRecord hull1 = (FloatRecord) records.get(SHIP_HULL);
+        if (hull1 == null) hull1 = new FloatRecord(0f);
+        hull = hull1;
+
+        FloatRecord flux1 = (FloatRecord) records.get(SHIP_FLUX);
+        if (flux1 == null) flux1 = new FloatRecord(0f);
+        flux = flux1;
+
+        Vector2fRecord cursor1 = (Vector2fRecord) records.get(CURSOR);
+        if (cursor1 == null) cursor1 = new Vector2fRecord(new Vector2f(0f, 0f));
+        cursor = cursor1;
+
+        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+            if (ship.getId().equals(id.getRecord())) {
+                this.ship = ship;
+            }
+        }
+    }
+
     @Override
     public void updateFromDelta(APackable delta) {
         ShipData d = (ShipData) delta;
@@ -60,27 +102,6 @@ public class ShipData extends APackable {
         if (d.getFlux() != null) flux.forceUpdate(d.getFlux().getRecord());
         if (d.getHull() != null) hull.forceUpdate(d.getHull().getRecord());
         if (d.getCursor() != null) cursor.forceUpdate(d.getCursor().getRecord());
-    }
-
-    public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
-        super(instanceID);
-
-        id = (StringRecord) records.get(SHIP_ID);
-        loc = (Vector2fRecord) records.get(SHIP_LOC);
-        vel = (Vector2fRecord) records.get(SHIP_VEL);
-        ang = (FloatRecord) records.get(SHIP_ANG);
-        angVel = (FloatRecord) records.get(SHIP_ANGVEL);
-        hull = (FloatRecord) records.get(SHIP_HULL);
-        flux = (FloatRecord) records.get(SHIP_FLUX);
-        cursor = (Vector2fRecord) records.get(CURSOR);
-
-        if (id != null) {
-            for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-                if (ship.getId().equals(id.getRecord())) {
-                    this.ship = ship;
-                }
-            }
-        }
     }
 
     @Override
