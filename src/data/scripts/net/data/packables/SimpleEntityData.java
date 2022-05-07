@@ -1,6 +1,5 @@
 package data.scripts.net.data.packables;
 
-import data.scripts.net.data.DataManager;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.FloatRecord;
 
@@ -10,10 +9,7 @@ import java.util.Map;
  * Used for decoder debugging
  */
 public class SimpleEntityData extends APackable {
-    private static final int typeID;
-    static {
-        typeID = DataManager.registerEntityType(SimpleEntityData.class, new SimpleEntityData(-1));
-    }
+    private static int typeID;
 
     private final FloatRecord info;
 //    private final StringRecord string;
@@ -24,6 +20,10 @@ public class SimpleEntityData extends APackable {
         super(instanceID);
 
         info = new FloatRecord(69f);
+    }
+
+    public static void setTypeID(int typeID) {
+        SimpleEntityData.typeID = typeID;
     }
 
     @Override

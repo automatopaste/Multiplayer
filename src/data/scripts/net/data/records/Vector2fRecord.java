@@ -1,16 +1,12 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.nio.ByteBuffer;
 
 public class Vector2fRecord extends ARecord<Vector2f> {
-    private static final int typeID;
-    static {
-        typeID = DataManager.registerRecordType(Vector2fRecord.class, new Vector2fRecord(null));
-    }
+    private static int typeID;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
@@ -50,6 +46,10 @@ public class Vector2fRecord extends ARecord<Vector2f> {
         float x = input.readFloat();
         float y = input.readFloat();
         return new Vector2fRecord(new Vector2f(x, y));
+    }
+
+    public static void setTypeID(int typeID) {
+        Vector2fRecord.typeID = typeID;
     }
 
     @Override

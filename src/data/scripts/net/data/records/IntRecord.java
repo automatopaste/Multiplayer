@@ -1,15 +1,11 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
 public class IntRecord extends ARecord<Integer> {
-    private static final int typeID;
-    static {
-        typeID = DataManager.registerRecordType(IntRecord.class, new IntRecord(null));
-    }
+    private static int typeID;
 
     public IntRecord(Integer record) {
         super(record);
@@ -34,6 +30,10 @@ public class IntRecord extends ARecord<Integer> {
     public IntRecord read(ByteBuf input) {
         int value = input.readInt();
         return new IntRecord(value);
+    }
+
+    public static void setTypeID(int typeID) {
+        IntRecord.typeID = typeID;
     }
 
     @Override

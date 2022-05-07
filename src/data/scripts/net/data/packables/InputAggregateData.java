@@ -9,10 +9,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.Map;
 
 public class InputAggregateData extends APackable {
-    private static final int typeID;
-    static {
-        typeID = DataManager.registerEntityType(ShipData.class, new InputAggregateData(-1));
-    }
+    private static int typeID;
 
     private final IntRecord keysBitmask;
 
@@ -56,6 +53,10 @@ public class InputAggregateData extends APackable {
         }
 
         return update;
+    }
+
+    public static void setTypeID(int typeID) {
+        InputAggregateData.typeID = typeID;
     }
 
     @Override

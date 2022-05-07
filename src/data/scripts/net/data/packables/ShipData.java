@@ -2,7 +2,6 @@ package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.DataManager;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.StringRecord;
@@ -15,10 +14,7 @@ import java.util.Map;
  * Container for tracking network data about a ship
  */
 public class ShipData extends APackable {
-    private static final int typeID;
-    static {
-        typeID = DataManager.registerEntityType(ShipData.class, new ShipData(-1));
-    }
+    private static int typeID;
 
     private final StringRecord id;
     private final Vector2fRecord loc;
@@ -106,6 +102,10 @@ public class ShipData extends APackable {
         }
 
         return update;
+    }
+
+    public static void setTypeID(int typeID) {
+        ShipData.typeID = typeID;
     }
 
     @Override
