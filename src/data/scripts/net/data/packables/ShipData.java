@@ -27,14 +27,14 @@ public class ShipData extends APackable {
 
     private ShipAPI ship;
     
-    private static final int SHIP_LOC = 50;
-    private static final int SHIP_VEL = 51;
-    private static final int SHIP_ANG = 52;
-    private static final int SHIP_ANGVEL = 53;
-    private static final int SHIP_HULL = 54;
-    private static final int SHIP_FLUX = 55;
-    private static final int SHIP_ID = 56;
-    private static final int CURSOR = 57;
+    private static final int SHIP_LOC = 10;
+    private static final int SHIP_VEL = 20;
+    private static final int SHIP_ANG = 30;
+    private static final int SHIP_ANGVEL = 40;
+    private static final int SHIP_HULL = 50;
+    private static final int SHIP_FLUX = 60;
+    private static final int SHIP_ID = 70;
+    private static final int CURSOR = 80;
 
     public ShipData(int instanceID) {
         super(instanceID);
