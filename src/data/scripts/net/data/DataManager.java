@@ -18,24 +18,23 @@ public class DataManager {
     public static Map<Integer, Class<? extends ARecord<?>>> typeIDRecords = new HashMap<>();
     public static Map<Integer, ARecord<?>> recordInstances = new HashMap<>();
 
-    private static int entity = 1;
-    private static int record = 1;
+    private static int idIncrementer = 1;
 
-    public static int registerEntityType(Class<? extends APackable> clazz, APackable instance) {
-        int id = entity;
+    public synchronized static int registerEntityType(Class<? extends APackable> clazz, APackable instance) {
+        int id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         typeIDEntities.put(id, clazz);
         entityInstances.put(id, instance);
-        entity++;
+        idIncrementer++;
         return id;
     }
 
-    public static int registerRecordType(Class<? extends ARecord<?>> clazz, ARecord<?> instance) {
-        int id = record;
+    public synchronized static int registerRecordType(Class<? extends ARecord<?>> clazz, ARecord<?> instance) {
+        int id = idIncrementer;
         recordTypeIDs.put(clazz, id);
         typeIDRecords.put(id, clazz);
         recordInstances.put(id, instance);
-        record++;
+        idIncrementer++;
         return id;
     }
 
