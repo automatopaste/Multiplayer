@@ -47,8 +47,8 @@ public class ClientEntityManager extends BaseEveryFrameCombatPlugin {
                 ship.getVelocity().set(shipData.getVel().getRecord());
                 ship.setFacing(shipData.getAng().getRecord());
                 ship.setAngularVelocity(shipData.getAngVel().getRecord());
-                ship.getFluxTracker().setCurrFlux(shipData.getFlux().getRecord());
-                ship.setHitpoints(shipData.getHull().getRecord());
+                ship.getFluxTracker().setCurrFlux(shipData.getFlux().getRecord() * ship.getFluxTracker().getMaxFlux());
+                ship.setHitpoints(shipData.getHull().getRecord() * ship.getHullSpec().getHitpoints());
                 ship.getMouseTarget().set(shipData.getCursor().getRecord());
             }
         }
