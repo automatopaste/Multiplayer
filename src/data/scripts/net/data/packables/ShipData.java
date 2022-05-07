@@ -75,14 +75,35 @@ public class ShipData extends APackable {
 
     @Override
     protected boolean write() {
-        boolean update = true;
-        if (id.checkUpdate(ship.getId())) id.write(packer, SHIP_ID); else update = false;
-        if (loc.checkUpdate(ship.getLocation())) loc.write(packer, SHIP_LOC); else update = false;
-        if (vel.checkUpdate(ship.getVelocity())) vel.write(packer, SHIP_VEL); else update = false;
-        if (ang.checkUpdate(ship.getFacing())) ang.write(packer, SHIP_VEL); else update = false;
-        if (angVel.checkUpdate(ship.getAngularVelocity())) angVel.write(packer, SHIP_ANGVEL); else update = false;
-        if (hull.checkUpdate(ship.getHullLevel())) hull.write(packer, SHIP_HULL); else update = false;
-        if (flux.checkUpdate(ship.getFluxLevel())) flux.write(packer, SHIP_FLUX); else update = false;
+        boolean update = false;
+        if (id.checkUpdate(ship.getId())) {
+            id.write(packer, SHIP_ID);
+            update = true;
+        }
+        if (loc.checkUpdate(ship.getLocation())) {
+            loc.write(packer, SHIP_LOC);
+            update = true;
+        }
+        if (vel.checkUpdate(ship.getVelocity())) {
+            vel.write(packer, SHIP_VEL);
+            update = true;
+        }
+        if (ang.checkUpdate(ship.getFacing())) {
+            ang.write(packer, SHIP_VEL);
+            update = true;
+        }
+        if (angVel.checkUpdate(ship.getAngularVelocity())) {
+            angVel.write(packer, SHIP_ANGVEL);
+            update = true;
+        }
+        if (hull.checkUpdate(ship.getHullLevel())) {
+            hull.write(packer, SHIP_HULL);
+            update = true;
+        }
+        if (flux.checkUpdate(ship.getFluxLevel())) {
+            flux.write(packer, SHIP_FLUX);
+            update = true;
+        }
 
         return update;
     }

@@ -50,7 +50,10 @@ public class InputAggregateData extends APackable {
             if (controls[i]) bits |= 1 << i;
         }
 
-        if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK); else update = false;
+        if (keysBitmask.checkUpdate(bits)) {
+            keysBitmask.write(packer, BITMASK);
+            update = true;
+        }
 
         return update;
     }
