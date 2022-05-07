@@ -36,7 +36,7 @@ public class InputAggregateData extends APackable {
 
     @Override
     protected boolean write() {
-        boolean update = true;
+        boolean update = false;
 
         boolean[] controls = new boolean[4];
         controls[0] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE")));
