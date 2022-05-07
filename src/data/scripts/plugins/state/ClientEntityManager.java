@@ -41,13 +41,7 @@ public class ClientEntityManager extends BaseEveryFrameCombatPlugin {
             if (packable instanceof ShipData) {
                 ShipData shipData = (ShipData) packable;
 
-                ShipAPI ship = null;
-                for (ShipAPI s : Global.getCombatEngine().getShips()) {
-                    if (s.getId().equals(shipData.getId().getRecord())) {
-                        ship = s;
-                    }
-                }
-                if (ship == null) continue;
+                ShipAPI ship = Global.getCombatEngine().getPlayerShip();
 
                 ship.getLocation().set(shipData.getLoc().getRecord());
                 ship.getVelocity().set(shipData.getVel().getRecord());
