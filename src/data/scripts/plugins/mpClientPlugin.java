@@ -53,7 +53,6 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         Map<Integer, APackable> entities = clientDataDuplex.update();
         for (APackable packable : entities.values()) {
-            Global.getLogger(mpServerPlugin.class).info(packable.getTypeId() + ", " + packable.getInstanceID());
         }
     }
 }

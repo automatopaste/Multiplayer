@@ -2,7 +2,6 @@ package data.scripts.net.terminals.server;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.records.ARecord;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import data.scripts.plugins.state.ServerDataDuplex;
@@ -11,12 +10,13 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
+import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
-    public static final float TICK_RATE = 2f;
+    public static final float TICK_RATE = Global.getSettings().getFloat("mpServerTickRate");
 
     private final Logger logger;
 
@@ -77,6 +77,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws IOException {
         logger.info("Channel active on server");
+        logger.info("Server running at " + TICK_RATE + "Hz");
+
+        Console.showMessage("Channel active on server");
+        Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
         ChannelFuture future = writeAndFlushPacket(ctx);
     }

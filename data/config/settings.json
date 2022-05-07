@@ -1,5 +1,7 @@
 {
 	"plugins":{
 		#"mpCombatPlugin":"data.scripts.plugins.mpCombatPlugin"
-	}
+	},
+
+	"mpServerTickRate": 10,
 }

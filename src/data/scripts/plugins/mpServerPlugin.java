@@ -43,6 +43,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         serverThread.start();
         inputManager = new ServerInputManager();
+        engine.addPlugin(inputManager);
     }
 
     @Override
@@ -66,22 +67,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
                 inputManager.updateClientInput(packable.getInstanceID(), (InputAggregateData) packable);
             }
         }
-
-
-//        for (Map<Integer, ARecord<?>> map : entities.values()) {
-//            for (ARecord<?> record : map.values()) {
-//                if (record instanceof IntRecord) {
-//                    boolean[] controls = InputAggregateData.unmask(((IntRecord) record).getRecord());
-//
-//                    ShipAPI ship = Global.getCombatEngine().getPlayerShip();
-//
-//                    if (controls[0]) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
-//                    if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
-//                    if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
-//                    if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
-//                }
-//            }
-//        }
 
 
     }

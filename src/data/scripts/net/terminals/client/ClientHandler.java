@@ -2,7 +2,6 @@ package data.scripts.net.terminals.client;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.records.ARecord;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import data.scripts.plugins.state.ClientDataDuplex;
@@ -11,6 +10,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
+import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,6 +41,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         logger.info("Channel active on client");
+
+        Console.showMessage("Channel active on client");
     }
 
     @Override
