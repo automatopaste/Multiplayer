@@ -46,8 +46,8 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 records.put(uniqueID, DataManager.recordFactory(type).read(in));
             }
         }
-        if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityID);
-        entities.put(entityInstanceID, getEntity(type, records));
+//        if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityID);
+//        entities.put(entityInstanceID, getEntity(type, records));
 
         Unpacked unpacked = new Unpacked(entities, tick);
 
