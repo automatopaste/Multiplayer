@@ -35,7 +35,9 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
-    protected void write() {
+    protected boolean write() {
+        boolean update = true;
+
         boolean[] controls = new boolean[4];
         controls[0] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE")));
         controls[1] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE_BACKWARDS")));
@@ -48,7 +50,9 @@ public class InputAggregateData extends APackable {
             if (controls[i]) bits |= 1 << i;
         }
 
-        if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK);
+        if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK); else update = false;
+
+        return update;
     }
 
     @Override

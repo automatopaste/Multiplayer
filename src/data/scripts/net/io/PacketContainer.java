@@ -21,7 +21,10 @@ public class PacketContainer {
 
         data.putInt(tick);
 
-        for (APackable packable : packables) data.put(packable.pack());
+        for (APackable packable : packables) {
+            byte[] written = packable.pack();
+            if (written != null) data.put(written);
+        }
 
         length = data.position();
         data.flip();

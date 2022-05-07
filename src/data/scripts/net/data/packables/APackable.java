@@ -24,7 +24,7 @@ public abstract class APackable {
         // so packer instance can be identified
         packer.putInt(getInstanceID());
 
-        write();
+        if (!write()) return null;
 
         packer.flip();
         byte[] out = new byte[packer.remaining()];
@@ -37,7 +37,7 @@ public abstract class APackable {
         return instanceID;
     }
 
-    protected abstract void write();
+    protected abstract boolean write();
 
     public abstract int getTypeId();
 

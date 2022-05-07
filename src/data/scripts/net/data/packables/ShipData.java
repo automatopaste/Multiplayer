@@ -74,14 +74,17 @@ public class ShipData extends APackable {
     }
 
     @Override
-    protected void write() {
-        if (id.checkUpdate(ship.getId())) id.write(packer, SHIP_ID);
-        if (loc.checkUpdate(ship.getLocation())) loc.write(packer, SHIP_LOC);
-        if (vel.checkUpdate(ship.getVelocity())) vel.write(packer, SHIP_VEL);
-        if (ang.checkUpdate(ship.getFacing())) ang.write(packer, SHIP_VEL);
-        if (angVel.checkUpdate(ship.getAngularVelocity())) angVel.write(packer, SHIP_ANGVEL);
-        if (hull.checkUpdate(ship.getHullLevel())) hull.write(packer, SHIP_HULL);
-        if (flux.checkUpdate(ship.getFluxLevel())) flux.write(packer, SHIP_FLUX);
+    protected boolean write() {
+        boolean update = true;
+        if (id.checkUpdate(ship.getId())) id.write(packer, SHIP_ID); else update = false;
+        if (loc.checkUpdate(ship.getLocation())) loc.write(packer, SHIP_LOC); else update = false;
+        if (vel.checkUpdate(ship.getVelocity())) vel.write(packer, SHIP_VEL); else update = false;
+        if (ang.checkUpdate(ship.getFacing())) ang.write(packer, SHIP_VEL); else update = false;
+        if (angVel.checkUpdate(ship.getAngularVelocity())) angVel.write(packer, SHIP_ANGVEL); else update = false;
+        if (hull.checkUpdate(ship.getHullLevel())) hull.write(packer, SHIP_HULL); else update = false;
+        if (flux.checkUpdate(ship.getFluxLevel())) flux.write(packer, SHIP_FLUX); else update = false;
+
+        return update;
     }
 
     @Override
