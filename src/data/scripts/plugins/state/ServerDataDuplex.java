@@ -26,7 +26,6 @@ public class ServerDataDuplex {
         data.setShip(Global.getCombatEngine().getPlayerShip());
 
         packables.add(data);
-//        packables.add(new SimpleEntity());
     }
 
     public Map<Integer, APackable> update() {

@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.packables.InputAggregateData;
 import data.scripts.net.terminals.server.NettyServer;
 import data.scripts.plugins.state.ServerDataDuplex;
 import data.scripts.plugins.state.ServerInputManager;
@@ -61,7 +62,9 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         Map<Integer, APackable> entities = serverDataDuplex.update();
         for (APackable packable : entities.values()) {
-            Global.getLogger(mpServerPlugin.class).info(packable.getTypeId() + ", " + packable.getInstanceID());
+            if (packable instanceof InputAggregateData) {
+                inputManager.updateClientInput(packable.getInstanceID(), (InputAggregateData) packable);
+            }
         }
 
 
