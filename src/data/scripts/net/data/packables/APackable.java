@@ -50,7 +50,7 @@ public abstract class APackable {
 
     private void doFlushWrite() {
         flushWrite();
-        //flush = false;
+        flush = false;
     }
 
     protected abstract void flushWrite();
