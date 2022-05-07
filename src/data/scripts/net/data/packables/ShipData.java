@@ -154,18 +154,25 @@ public class ShipData extends APackable {
     protected void flushWrite() {
         id.forceUpdate(ship.getId());
         id.write(packer, SHIP_ID);
+
         loc.forceUpdate(ship.getLocation());
         loc.write(packer, SHIP_LOC);
+
         vel.forceUpdate(ship.getVelocity());
         vel.write(packer, SHIP_VEL);
-        ang.forceUpdate(ship.getAngularVelocity());
+
+        ang.forceUpdate(ship.getFacing());
         ang.write(packer, SHIP_ANG);
+
         angVel.forceUpdate(ship.getAngularVelocity());
         angVel.write(packer, SHIP_ANGVEL);
+
         hull.forceUpdate(ship.getHullLevel());
         hull.write(packer, SHIP_HULL);
+
         flux.forceUpdate(ship.getFluxLevel());
         flux.write(packer, SHIP_FLUX);
+
         cursor.forceUpdate(ship.getMouseTarget());
         cursor.write(packer, CURSOR);
     }
