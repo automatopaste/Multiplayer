@@ -22,6 +22,11 @@ public class SimpleEntityData extends APackable {
         info = new FloatRecord(69f);
     }
 
+    @Override
+    public void updateFromDelta(APackable delta) {
+
+    }
+
     public static void setTypeID(int typeID) {
         SimpleEntityData.typeID = typeID;
     }

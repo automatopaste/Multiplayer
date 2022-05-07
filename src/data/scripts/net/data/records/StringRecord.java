@@ -24,6 +24,11 @@ public class StringRecord extends ARecord<String> {
     }
 
     @Override
+    public void doUpdate(String delta) {
+        record = delta;
+    }
+
+    @Override
     public void write(ByteBuffer output, int uniqueId) {
         super.write(output, uniqueId);
 

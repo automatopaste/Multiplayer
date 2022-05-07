@@ -141,6 +141,11 @@ public class InputAggregateData extends APackable {
         return new InputAggregateData(instanceID, records);
     }
 
+    @Override
+    public void updateFromDelta(APackable delta) {
+
+    }
+
     public IntRecord getKeysBitmask() {
         return keysBitmask;
     }

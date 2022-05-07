@@ -37,6 +37,8 @@ public abstract class APackable {
         return instanceID;
     }
 
+    public abstract void updateFromDelta(APackable delta);
+
     protected abstract boolean write();
 
     public abstract int getTypeId();

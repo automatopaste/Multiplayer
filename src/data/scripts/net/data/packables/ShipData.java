@@ -49,6 +49,19 @@ public class ShipData extends APackable {
         cursor = new Vector2fRecord(new Vector2f(0f, 0f));
     }
 
+    @Override
+    public void updateFromDelta(APackable delta) {
+        ShipData d = (ShipData) delta;
+        if (d.getId() != null) id.doUpdate(d.getId().getRecord());
+        if (d.getLoc() != null) loc.doUpdate(d.getLoc().getRecord());
+        if (d.getVel() != null) vel.doUpdate(d.getVel().getRecord());
+        if (d.getAng() != null) ang.doUpdate(d.getAng().getRecord());
+        if (d.getAngVel() != null) angVel.doUpdate(d.getAngVel().getRecord());
+        if (d.getFlux() != null) flux.doUpdate(d.getFlux().getRecord());
+        if (d.getHull() != null) hull.doUpdate(d.getHull().getRecord());
+        if (d.getCursor() != null) cursor.doUpdate(d.getCursor().getRecord());
+    }
+
     public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
         super(instanceID);
 
@@ -131,5 +144,37 @@ public class ShipData extends APackable {
 
     public ShipAPI getShip() {
         return ship;
+    }
+
+    public Vector2fRecord getLoc() {
+        return loc;
+    }
+
+    public Vector2fRecord getVel() {
+        return vel;
+    }
+
+    public FloatRecord getAng() {
+        return ang;
+    }
+
+    public FloatRecord getAngVel() {
+        return angVel;
+    }
+
+    public FloatRecord getFlux() {
+        return flux;
+    }
+
+    public FloatRecord getHull() {
+        return hull;
+    }
+
+    public StringRecord getId() {
+        return id;
+    }
+
+    public Vector2fRecord getCursor() {
+        return cursor;
     }
 }

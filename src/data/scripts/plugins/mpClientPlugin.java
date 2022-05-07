@@ -5,8 +5,9 @@ import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
-import data.scripts.plugins.state.ClientDataDuplex;
 import data.scripts.net.terminals.client.NettyClient;
+import data.scripts.plugins.state.ClientDataDuplex;
+import data.scripts.plugins.state.ClientEntityManager;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
@@ -18,6 +19,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private Thread clientThread;
 
     private ClientDataDuplex clientDataDuplex;
+    private ClientEntityManager entityManager;
 
     private final int port;
     private final String host;
@@ -33,6 +35,9 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         client = new NettyClient(host, port, clientDataDuplex);
         clientThread = new Thread(client, "mpClient");
         clientThread.start();
+
+        entityManager = new ClientEntityManager();
+        engine.addPlugin(entityManager);
     }
 
     @Override
@@ -52,7 +57,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         Map<Integer, APackable> entities = clientDataDuplex.update();
-        for (APackable packable : entities.values()) {
-        }
+
+        entityManager.processDeltas(entities);
     }
 }

@@ -18,7 +18,9 @@ public abstract class ARecord<T> {
 
     public abstract ARecord<T> read(ByteBuf in);
 
-    protected abstract boolean checkUpdate(T curr);
+    public abstract boolean checkUpdate(T curr);
+
+    protected abstract void doUpdate(T delta);
 
     public abstract int getTypeId();
 
