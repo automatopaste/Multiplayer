@@ -4,12 +4,14 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
+import data.scripts.net.data.packables.APackable;
 import data.scripts.plugins.state.ClientDataDuplex;
 import data.scripts.net.terminals.client.NettyClient;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
+import java.util.Map;
 
 public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private NettyClient client;
@@ -49,12 +51,9 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed client");
         }
 
-        clientDataDuplex.update();
-
-//        for (Map<Integer, RecordDelta> map : clientDataDuplex.getEntities()) {
-//            for (RecordDelta record : map.values()) {
-//                Global.getLogger(mpClientPlugin.class).info(record.toString());
-//            }
-//        }
+        Map<Integer, APackable> entities = clientDataDuplex.update();
+        for (APackable packable : entities.values()) {
+            Global.getLogger(mpServerPlugin.class).info(packable.getTypeId() + ", " + packable.getInstanceID());
+        }
     }
 }

@@ -60,6 +60,9 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         Map<Integer, APackable> entities = serverDataDuplex.update();
+        for (APackable packable : entities.values()) {
+            Global.getLogger(mpServerPlugin.class).info(packable.getTypeId() + ", " + packable.getInstanceID());
+        }
 
 
 //        for (Map<Integer, ARecord<?>> map : entities.values()) {

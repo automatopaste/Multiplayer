@@ -24,8 +24,10 @@ public class ClientDataDuplex {
         packables.add(new InputAggregateData(1));
     }
 
-    public void update() {
-
+    public Map<Integer, APackable> update() {
+        synchronized (entities) {
+            return entities;
+        }
     }
 
     public PacketContainer getPacket(int tick) throws IOException {
@@ -36,12 +38,6 @@ public class ClientDataDuplex {
         synchronized (this.entities) {
             this.entities.clear();
             this.entities.putAll(entities);
-        }
-    }
-
-    public Map<Integer, APackable> getEntities() {
-        synchronized (entities) {
-            return entities;
         }
     }
 }
