@@ -23,16 +23,18 @@ public class ShipData extends APackable {
     private final FloatRecord angVel;
     private final FloatRecord hull;
     private final FloatRecord flux;
+    private final Vector2fRecord cursor;
 
     private ShipAPI ship;
     
-    private static final int SHIP_LOC = 0;
-    private static final int SHIP_VEL = 1;
-    private static final int SHIP_ANG = 2;
-    private static final int SHIP_ANGVEL = 3;
-    private static final int SHIP_HULL = 4;
-    private static final int SHIP_FLUX = 5;
-    private static final int SHIP_ID = 6;
+    private static final int SHIP_LOC = 50;
+    private static final int SHIP_VEL = 51;
+    private static final int SHIP_ANG = 52;
+    private static final int SHIP_ANGVEL = 53;
+    private static final int SHIP_HULL = 54;
+    private static final int SHIP_FLUX = 55;
+    private static final int SHIP_ID = 56;
+    private static final int CURSOR = 57;
 
     public ShipData(int instanceID) {
         super(instanceID);
@@ -44,6 +46,7 @@ public class ShipData extends APackable {
         angVel = new FloatRecord(0f).setUseDecimalPrecision(false);
         hull = new FloatRecord(0f);
         flux = new FloatRecord(0f);
+        cursor = new Vector2fRecord(new Vector2f(0f, 0f));
     }
 
     public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
@@ -56,6 +59,7 @@ public class ShipData extends APackable {
         angVel = (FloatRecord) records.get(SHIP_ANGVEL);
         hull = (FloatRecord) records.get(SHIP_HULL);
         flux = (FloatRecord) records.get(SHIP_FLUX);
+        cursor = (Vector2fRecord) records.get(CURSOR);
 
         if (id != null) {
             for (ShipAPI ship : Global.getCombatEngine().getShips()) {
@@ -102,6 +106,10 @@ public class ShipData extends APackable {
         }
         if (flux.checkUpdate(ship.getFluxLevel())) {
             flux.write(packer, SHIP_FLUX);
+            update = true;
+        }
+        if (cursor.checkUpdate(ship.getMouseTarget())) {
+            cursor.write(packer, CURSOR);
             update = true;
         }
 
