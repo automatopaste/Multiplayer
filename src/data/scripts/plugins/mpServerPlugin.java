@@ -3,14 +3,11 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.RecordDelta;
-import data.scripts.net.data.packables.InputAggregateData;
-import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.packables.APackable;
 import data.scripts.net.terminals.server.NettyServer;
-import data.scripts.net.terminals.server.ServerDataDuplex;
+import data.scripts.plugins.state.ServerDataDuplex;
+import data.scripts.plugins.state.ServerInputManager;
 import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
@@ -24,6 +21,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     private NettyServer server;
     private Thread serverThread;
+
+    private ServerInputManager inputManager;
 
     private final ServerDataDuplex serverDataDuplex;
 
@@ -42,6 +41,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         logger.info("Starting server");
 
         serverThread.start();
+        inputManager = new ServerInputManager();
     }
 
     @Override
@@ -59,19 +59,24 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
-        for (Map<Integer, RecordDelta> map : serverDataDuplex.getEntities()) {
-            for (RecordDelta record : map.values()) {
-                if (record instanceof IntRecord) {
-                    boolean[] controls = InputAggregateData.unmask(((IntRecord) record).getRecord());
+        Map<Integer, APackable> entities = serverDataDuplex.update();
 
-                    ShipAPI ship = Global.getCombatEngine().getPlayerShip();
 
-                    if (controls[0]) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
-                    if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
-                    if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
-                    if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
-                }
-            }
-        }
+//        for (Map<Integer, ARecord<?>> map : entities.values()) {
+//            for (ARecord<?> record : map.values()) {
+//                if (record instanceof IntRecord) {
+//                    boolean[] controls = InputAggregateData.unmask(((IntRecord) record).getRecord());
+//
+//                    ShipAPI ship = Global.getCombatEngine().getPlayerShip();
+//
+//                    if (controls[0]) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
+//                    if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
+//                    if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+//                    if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
+//                }
+//            }
+//        }
+
+
     }
 }

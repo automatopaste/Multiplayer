@@ -1,112 +1,63 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.IDTypes;
-import data.scripts.net.data.RecordDelta;
-import data.scripts.net.data.records.*;
+import data.scripts.net.data.DataManager;
+import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.records.ARecord;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Big boy decoder module. Uses polymorphic tricks to allow mod-defined APackable and ARecord types
+ */
 public class PacketDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
-        if (in.readableBytes() < 4) {
-            return;
-        }
-
-//        List<List<ARecord>> entities = new ArrayList<>();
-//        Unpacked unpacked = new Unpacked(entities);
-
-//        int tick = in.readInt();
-//        unpacked.setTick(tick);
-
-//        int numEntities = in.readInt();
-//
-//        if (numEntities != 0) {
-//            for (int i = 0; i < numEntities; i++) {
-//                entities.add(unpackRecords(in));
-//            }
-//        }
+        if (in.readableBytes() < 4) return;
 
         int tick = in.readInt();
 
-        List<Map<Integer, RecordDelta>> e = new ArrayList<>();
-        Map<Integer, RecordDelta> a = new HashMap<>();
+        // integer keys are unique instance IDs
+        Map<Integer, APackable> entities = new HashMap<>();
+        // integer keys are unique record IDs
+        Map<Integer, ARecord<?>> records = new HashMap<>();
+
+        int type = in.readInt();
+        int entityID = type;
+        int entityInstanceID = in.readInt();
 
         while (in.readableBytes() > 0) {
-            int type = in.readInt();
+            type = in.readInt();
 
-            switch(type) {
-                case IDTypes.FLOAT_RECORD:
-                    a.put(ARecord.readID(in), FloatRecord.read(in));
-                    break;
-                case IDTypes.V2F_RECORD:
-                    a.put(ARecord.readID(in), Vector2fRecord.read(in));
-                    break;
-                case IDTypes.INT_RECORD:
-                    a.put(ARecord.readID(in), IntRecord.read(in));
-                    break;
-                case IDTypes.STRING_RECORD:
-                    a.put(ARecord.readID(in), StringRecord.read(in));
-                    break;
+            if (DataManager.entityTypeIDs.containsValue(type)) {
+                // reached new entity
+                if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityID);
+                entities.put(entityInstanceID, getEntity(entityID, records));
 
-                case IDTypes.SHIP:
-                case IDTypes.INPUT_AGGREGATE:
-                case IDTypes.SIMPLE_ENTITY:
-                    e.add(a);
-                    a = new HashMap<>();
-                    break;
+                entityID = type;
+                entityInstanceID = in.readInt();
+                records = new HashMap<>();
+            } else {
+                int uniqueID = in.readInt();
+                records.put(uniqueID, DataManager.recordFactory(type).read(in));
             }
         }
-        e.add(a);
+        if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityID);
+        entities.put(entityInstanceID, getEntity(type, records));
 
-        Unpacked unpacked = new Unpacked(e, tick);
+        Unpacked unpacked = new Unpacked(entities, tick);
 
         int readable = in.readableBytes();
-        if (readable > 0) {
-            throw new OutOfMemoryError(in.readableBytes() + " bytes left in packet decoder frame");
-        }
+        if (readable > 0) throw new OutOfMemoryError(in.readableBytes() + " bytes left in packet decoder frame");
 
         out.add(unpacked);
     }
 
-//    private List<ARecord> unpackRecords(ByteBuf in) {
-//        List<ARecord> out = new ArrayList<>();
-//
-//        //iterate until new entity encountered
-//        outer:
-//        while (in.readableBytes() > 0) {
-//            // mark index so it can be reset if new entity is encountered
-//            in.markReaderIndex();
-//
-//            int type = in.readInt();
-//
-//            switch(type) {
-//                case IDTypes.FLOAT_RECORD:
-//                    out.add(FloatRecord.read(in));
-//                    break;
-//                case IDTypes.V2F_RECORD:
-//                    out.add(Vector2fRecord.read(in));
-//                    break;
-//                case IDTypes.INT_RECORD:
-//                    out.add(IntRecord.read(in));
-//                    break;
-//                case IDTypes.STRING_RECORD:
-//                    out.add(StringRecord.read(in));
-//                    break;
-//
-//                case IDTypes.SHIP:
-//                    //reset index if encountering a new entity
-//                    in.resetReaderIndex();
-//                    break outer;
-//            }
-//        }
-//
-//        return out;
-//    }
+    private APackable getEntity(int id, Map<Integer, ARecord<?>> records) {
+        return DataManager.entityFactory(id).unpack(id, records);
+    }
 }

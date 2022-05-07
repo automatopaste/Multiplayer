@@ -3,6 +3,7 @@ package data.scripts.net.terminals.client;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
+import data.scripts.plugins.state.ClientDataDuplex;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

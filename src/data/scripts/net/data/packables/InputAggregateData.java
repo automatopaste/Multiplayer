@@ -1,26 +1,41 @@
 package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.DataManager;
+import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.IntRecord;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Map;
+
 public class InputAggregateData extends APackable {
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerEntityType(ShipData.class, new InputAggregateData(-1));
+    }
+
     private final IntRecord keysBitmask;
 
     private static final int BITMASK = 0;
 
-    public InputAggregateData() {
+    static {
+        DataManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
+    }
+
+    public InputAggregateData(int instanceID) {
+        super(instanceID);
+
         keysBitmask = new IntRecord(0);
     }
 
-    @Override
-    public int getTypeId() {
-        return IDTypes.INPUT_AGGREGATE;
+    public InputAggregateData(int instanceID, Map<Integer, ARecord<?>> records) {
+        super(instanceID);
+
+        keysBitmask = (IntRecord) records.get(BITMASK);
     }
 
     @Override
-    void write() {
+    protected void write() {
         boolean[] controls = new boolean[4];
         controls[0] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE")));
         controls[1] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE_BACKWARDS")));
@@ -36,6 +51,12 @@ public class InputAggregateData extends APackable {
         if (keysBitmask.checkUpdate(bits)) keysBitmask.write(packer, BITMASK);
     }
 
+    @Override
+    public int getTypeId() {
+        return typeID;
+    }
+
+    // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
     public static boolean[] unmask(int bitmask) {
         boolean[] controls = new boolean[4];
         for (int i = 0; i < controls.length; i++) {
@@ -44,5 +65,12 @@ public class InputAggregateData extends APackable {
         return controls;
     }
 
-    // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
+    @Override
+    public InputAggregateData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
+        return new InputAggregateData(instanceID, records);
+    }
+
+    public IntRecord getKeysBitmask() {
+        return keysBitmask;
+    }
 }

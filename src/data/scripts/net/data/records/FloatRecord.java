@@ -1,17 +1,20 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
 public class FloatRecord extends ARecord<Float> {
-    private float record;
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerRecordType(FloatRecord.class, new FloatRecord(null));
+    }
+
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public FloatRecord(float value) {
-        record = value;
-        useDecimalPrecision = true;
+    public FloatRecord(Float record) {
+        super(record);
     }
 
     public FloatRecord setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -24,17 +27,13 @@ public class FloatRecord extends ARecord<Float> {
         boolean isUpdated;
 
         if (useDecimalPrecision) {
-            isUpdated = (int) record != curr.intValue();
+            isUpdated = record.intValue() != curr.intValue();
         } else {
-            isUpdated = record != curr;
+            isUpdated = !record.equals(curr);
         }
         if (isUpdated) record = curr;
 
         return isUpdated;
-    }
-
-    public float getRecord() {
-        return record;
     }
 
     @Override
@@ -44,14 +43,15 @@ public class FloatRecord extends ARecord<Float> {
         output.putFloat(record);
     }
 
-    public static FloatRecord read(ByteBuf input) {
+    @Override
+    public FloatRecord read(ByteBuf input) {
         float value = input.readFloat();
         return new FloatRecord(value);
     }
 
     @Override
     public int getTypeId() {
-        return IDTypes.FLOAT_RECORD;
+        return typeID;
     }
 
     @Override

@@ -2,11 +2,12 @@ package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.IDTypes;
-import data.scripts.net.data.RecordDelta;
+import data.scripts.net.data.DataManager;
+import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.util.Map;
 
@@ -14,6 +15,11 @@ import java.util.Map;
  * Container for tracking network data about a ship
  */
 public class ShipData extends APackable {
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerEntityType(ShipData.class, new ShipData(-1));
+    }
+
     private final StringRecord id;
     private final Vector2fRecord loc;
     private final Vector2fRecord vel;
@@ -32,19 +38,21 @@ public class ShipData extends APackable {
     private static final int SHIP_FLUX = 5;
     private static final int SHIP_ID = 6;
 
-    public ShipData(ShipAPI ship) {
-        this.ship = ship;
+    public ShipData(int instanceID) {
+        super(instanceID);
 
-        id = new StringRecord(ship.getId());
-        loc = new Vector2fRecord(ship.getLocation()).setUseDecimalPrecision(false);
-        vel = new Vector2fRecord(ship.getVelocity()).setUseDecimalPrecision(false);
-        ang = new FloatRecord(ship.getFacing()).setUseDecimalPrecision(false);
-        angVel = new FloatRecord(ship.getAngularVelocity()).setUseDecimalPrecision(false);
-        hull = new FloatRecord(ship.getHullLevel());
-        flux = new FloatRecord(ship.getFluxLevel());
+        id = new StringRecord("DEFAULT_ID_STRING");
+        loc = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
+        vel = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
+        ang = new FloatRecord(0f).setUseDecimalPrecision(false);
+        angVel = new FloatRecord(0f).setUseDecimalPrecision(false);
+        hull = new FloatRecord(0f);
+        flux = new FloatRecord(0f);
     }
 
-    public ShipData(Map<Integer, RecordDelta> records) {
+    public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
+        super(instanceID);
+
         id = (StringRecord) records.get(SHIP_ID);
         loc = (Vector2fRecord) records.get(SHIP_LOC);
         vel = (Vector2fRecord) records.get(SHIP_VEL);
@@ -61,7 +69,12 @@ public class ShipData extends APackable {
     }
 
     @Override
-    void write() {
+    public ShipData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
+        return new ShipData(instanceID, records);
+    }
+
+    @Override
+    protected void write() {
         if (id.checkUpdate(ship.getId())) id.write(packer, SHIP_ID);
         if (loc.checkUpdate(ship.getLocation())) loc.write(packer, SHIP_LOC);
         if (vel.checkUpdate(ship.getVelocity())) vel.write(packer, SHIP_VEL);
@@ -73,6 +86,14 @@ public class ShipData extends APackable {
 
     @Override
     public int getTypeId() {
-        return IDTypes.SHIP;
+        return typeID;
+    }
+
+    public void setShip(ShipAPI ship) {
+        this.ship = ship;
+    }
+
+    public ShipAPI getShip() {
+        return ship;
     }
 }

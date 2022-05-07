@@ -1,20 +1,19 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.RecordDelta;
+import data.scripts.net.data.packables.APackable;
 
-import java.util.List;
 import java.util.Map;
 
 public class Unpacked {
-    private final List<Map<Integer, RecordDelta>> unpacked;
+    private final Map<Integer, APackable> unpacked;
     private final int tick;
 
-    public Unpacked(List<Map<Integer, RecordDelta>> unpacked, int tick) {
+    public Unpacked(Map<Integer, APackable> unpacked, int tick) {
         this.unpacked = unpacked;
         this.tick = tick;
     }
 
-    public List<Map<Integer, RecordDelta>> getUnpacked() {
+    public Map<Integer, APackable> getUnpacked() {
         return unpacked;
     }
 

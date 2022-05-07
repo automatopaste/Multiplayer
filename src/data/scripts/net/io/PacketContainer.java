@@ -1,6 +1,6 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.Packable;
+import data.scripts.net.data.packables.APackable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,17 +14,14 @@ public class PacketContainer {
 
     private final int tick;
 
-    public PacketContainer(List<Packable> packables, int tick) throws IOException {
+    public PacketContainer(List<APackable> packables, int tick) throws IOException {
         this.tick = tick;
 
         data = ByteBuffer.allocate(PACKET_SIZE_INIT);
 
         data.putInt(tick);
 
-        // number of entities to unpack
-//        data.putInt(packables.size());
-
-        for (Packable packable : packables) data.put(packable.pack());
+        for (APackable packable : packables) data.put(packable.pack());
 
         length = data.position();
         data.flip();

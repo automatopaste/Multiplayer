@@ -1,25 +1,28 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.RecordDelta;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
-public abstract class ARecord<T> implements RecordDelta {
-    @Override
+public abstract class ARecord<T> {
+    protected T record;
+
+    public ARecord(T record) {
+        this.record = record;
+    }
+
     public void write(ByteBuffer output, int uniqueId) {
         output.putInt(getTypeId());
         output.putInt(uniqueId);
     }
 
-    /**
-     * Exists to make it easier to switch to byte or short ids in future
-     * @param input ByteBuf to read from
-     * @return int id
-     */
-    public static int readID(ByteBuf input) {
-        return input.readInt();
-    }
+    public abstract ARecord<T> read(ByteBuf in);
 
-    abstract boolean checkUpdate(T curr);
+    protected abstract boolean checkUpdate(T curr);
+
+    public abstract int getTypeId();
+
+    public T getRecord() {
+        return record;
+    }
 }

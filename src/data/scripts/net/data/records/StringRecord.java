@@ -1,6 +1,6 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
@@ -8,14 +8,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class StringRecord extends ARecord<String> {
-    private static final Charset CHARSET = StandardCharsets.UTF_8;
-
-    private String record;
-
-    public StringRecord(String value) {
-        record = value;
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerRecordType(StringRecord.class, new StringRecord(null));
     }
 
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    public StringRecord(String record) {
+        super(record);
+    }
+
+    @Override
     public boolean checkUpdate(String curr) {
         boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
@@ -35,7 +39,8 @@ public class StringRecord extends ARecord<String> {
         }
     }
 
-    public static StringRecord read(ByteBuf input) {
+    @Override
+    public StringRecord read(ByteBuf input) {
         int length = input.readInt();
         String value = input.readCharSequence(length, CHARSET).toString();
 
@@ -44,11 +49,7 @@ public class StringRecord extends ARecord<String> {
 
     @Override
     public int getTypeId() {
-        return IDTypes.STRING_RECORD;
-    }
-
-    public String getRecord() {
-        return record;
+        return typeID;
     }
 
     @Override

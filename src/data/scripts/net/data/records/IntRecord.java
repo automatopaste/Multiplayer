@@ -1,26 +1,26 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
 public class IntRecord extends ARecord<Integer> {
-    private int record;
-
-    public IntRecord(int value) {
-        record = value;
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerRecordType(IntRecord.class, new IntRecord(null));
     }
 
+    public IntRecord(Integer record) {
+        super(record);
+    }
+
+    @Override
     public boolean checkUpdate(Integer curr) {
-        boolean isUpdated = record != curr;
+        boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
 
         return isUpdated;
-    }
-
-    public int getRecord() {
-        return record;
     }
 
     @Override
@@ -30,14 +30,15 @@ public class IntRecord extends ARecord<Integer> {
         output.putInt(record);
     }
 
-    public static IntRecord read(ByteBuf input) {
+    @Override
+    public IntRecord read(ByteBuf input) {
         int value = input.readInt();
         return new IntRecord(value);
     }
 
     @Override
     public int getTypeId() {
-        return IDTypes.INT_RECORD;
+        return typeID;
     }
 
     @Override

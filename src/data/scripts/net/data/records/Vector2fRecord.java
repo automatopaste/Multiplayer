@@ -1,18 +1,21 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.IDTypes;
+import data.scripts.net.data.DataManager;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.nio.ByteBuffer;
 
 public class Vector2fRecord extends ARecord<Vector2f> {
-    private final Vector2f record;
+    private static final int typeID;
+    static {
+        typeID = DataManager.registerRecordType(Vector2fRecord.class, new Vector2fRecord(null));
+    }
+
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Vector2fRecord(Vector2f value) {
-        record = new Vector2f(value);
-        useDecimalPrecision = true;
+    public Vector2fRecord(Vector2f record) {
+        super(record);
     }
 
     public Vector2fRecord setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -20,6 +23,7 @@ public class Vector2fRecord extends ARecord<Vector2f> {
         return this;
     }
 
+    @Override
     public boolean checkUpdate(Vector2f curr) {
         boolean isUpdated;
 
@@ -33,10 +37,6 @@ public class Vector2fRecord extends ARecord<Vector2f> {
         return isUpdated;
     }
 
-    public Vector2f getRecord() {
-        return record;
-    }
-
     @Override
     public void write(ByteBuffer output, int uniqueId) {
         super.write(output, uniqueId);
@@ -45,7 +45,8 @@ public class Vector2fRecord extends ARecord<Vector2f> {
         output.putFloat(record.y);
     }
 
-    public static Vector2fRecord read(ByteBuf input) {
+    @Override
+    public Vector2fRecord read(ByteBuf input) {
         float x = input.readFloat();
         float y = input.readFloat();
         return new Vector2fRecord(new Vector2f(x, y));
@@ -53,7 +54,7 @@ public class Vector2fRecord extends ARecord<Vector2f> {
 
     @Override
     public int getTypeId() {
-        return IDTypes.V2F_RECORD;
+        return typeID;
     }
 
     @Override
