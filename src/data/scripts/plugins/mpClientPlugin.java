@@ -44,6 +44,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     public void advance(float amount, List<InputEventAPI> events) {
         if (!clientThread.isAlive() || clientThread.isInterrupted()) {
             clientThread = null;
+            Global.getCombatEngine().removePlugin(entityManager);
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Server interrupted");
         }
@@ -52,7 +53,10 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             client.stop();
             clientThread.interrupt();
             clientThread = null;
+
+            Global.getCombatEngine().removePlugin(entityManager);
             Global.getCombatEngine().removePlugin(this);
+
             Console.showMessage("Closed client");
         }
 

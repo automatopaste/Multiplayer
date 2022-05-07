@@ -106,7 +106,7 @@ public class ShipData extends APackable {
             update = true;
         }
         if (ang.checkUpdate(ship.getFacing())) {
-            ang.write(packer, SHIP_VEL);
+            ang.write(packer, SHIP_ANG);
             update = true;
         }
         if (angVel.checkUpdate(ship.getAngularVelocity())) {

@@ -50,6 +50,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     public void advance(float amount, List<InputEventAPI> events) {
         if (!serverThread.isAlive() || serverThread.isInterrupted()) {
             serverThread = null;
+            Global.getCombatEngine().removePlugin(inputManager);
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Server interrupted");
         }
