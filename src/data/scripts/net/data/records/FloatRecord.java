@@ -33,9 +33,7 @@ public class FloatRecord extends ARecord<Float> {
     }
 
     @Override
-    public void write(ByteBuffer output, int uniqueId) {
-        super.write(output, uniqueId);
-
+    public void doWrite(ByteBuffer output) {
         output.putFloat(record);
     }
 

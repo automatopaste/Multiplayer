@@ -14,9 +14,13 @@ public abstract class ARecord<T> {
     public void write(ByteBuffer output, int uniqueId) {
         output.putInt(getTypeId());
         output.putInt(uniqueId);
+
+        doWrite(output);
     }
 
     public abstract ARecord<T> read(ByteBuf in);
+
+    public abstract void doWrite(ByteBuffer output);
 
     public abstract boolean checkUpdate(T curr);
 

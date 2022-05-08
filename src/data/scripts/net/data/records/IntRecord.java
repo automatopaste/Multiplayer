@@ -20,9 +20,7 @@ public class IntRecord extends ARecord<Integer> {
     }
 
     @Override
-    public void write(ByteBuffer output, int uniqueId) {
-        super.write(output, uniqueId);
-
+    public void doWrite(ByteBuffer output) {
         output.putInt(record);
     }
 

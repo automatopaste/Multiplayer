@@ -13,8 +13,6 @@ import data.scripts.net.data.records.Vector2fRecord;
 public class mpModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() {
-        System.out.println(System.getProperty("io.netty.tryReflectionSetAccessible"));
-
         ShipData.setTypeID(DataManager.registerEntityType(ShipData.class, new ShipData(-1)));
         InputAggregateData.setTypeID(DataManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1)));
         SimpleEntityData.setTypeID(DataManager.registerEntityType(SimpleEntityData.class, new SimpleEntityData(-1)));
@@ -24,7 +22,9 @@ public class mpModPlugin extends BaseModPlugin {
         StringRecord.setTypeID(DataManager.registerRecordType(StringRecord.class, new StringRecord(null)));
         Vector2fRecord.setTypeID(DataManager.registerRecordType(Vector2fRecord.class, new Vector2fRecord(null)));
 
-        // toy for later
-        //System.setProperty("io.netty.noUnsafe", String.valueOf(true));
+        // oi, you got a loicense for unsafe?
+        // put this after -classpath in vmparams and install SSMS unlock tool for perf gain
+        // ..//mods//unlock.jar;janino.jar;
+        System.setProperty("io.netty.noUnsafe", String.valueOf(true));
     }
 }

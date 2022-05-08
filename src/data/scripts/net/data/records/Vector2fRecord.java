@@ -34,9 +34,7 @@ public class Vector2fRecord extends ARecord<Vector2f> {
     }
 
     @Override
-    public void write(ByteBuffer output, int uniqueId) {
-        super.write(output, uniqueId);
-
+    public void doWrite(ByteBuffer output) {
         output.putFloat(record.x);
         output.putFloat(record.y);
     }

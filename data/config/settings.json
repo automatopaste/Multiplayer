@@ -3,5 +3,5 @@
 		#"mpCombatPlugin":"data.scripts.plugins.mpCombatPlugin"
 	},
 
-	"mpServerTickRate": 10,
+	"mpServerTickRate": 30,
 }

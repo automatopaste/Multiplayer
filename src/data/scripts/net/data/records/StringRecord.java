@@ -24,9 +24,7 @@ public class StringRecord extends ARecord<String> {
     }
 
     @Override
-    public void write(ByteBuffer output, int uniqueId) {
-        super.write(output, uniqueId);
-
+    public void doWrite(ByteBuffer output) {
         byte[] bytes = record.getBytes(CHARSET);
 
         output.putInt(bytes.length);
