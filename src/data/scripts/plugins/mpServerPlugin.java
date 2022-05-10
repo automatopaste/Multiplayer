@@ -6,7 +6,6 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.packables.ShipData;
 import data.scripts.net.terminals.server.NettyServer;
 import data.scripts.plugins.state.DataDuplex;
 import data.scripts.plugins.state.ServerCombatEntityManager;
@@ -35,21 +34,11 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         this.port = port;
         logger = Global.getLogger(mpServerPlugin.class);
 
-        List<APackable> packables = new ArrayList<>();
-
-        ShipData data = new ShipData(1);
-        data.setShip(Global.getCombatEngine().getPlayerShip());
-
-        packables.add(data);
-
         serverDataDuplex = new DataDuplex();
 
         serverEntityManager = new ServerInboundEntityManager(this);
-        Map<Integer, APackable> deltas = new HashMap<>();
-        for (APackable p : packables) {
-            deltas.put(getNewInstanceID(null), p);
-        }
-        serverEntityManager.processDeltas(deltas);
+//        Map<Integer, APackable> deltas = new HashMap<>();
+//        serverEntityManager.processDeltas(deltas);
 
         serverCombatEntityManager = new ServerCombatEntityManager(this);
     }
@@ -79,9 +68,11 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
+        // outbound data update
         List<Integer> removedInstanceIDs = serverCombatEntityManager.updateAndGetRemovedEntityInstanceIds();
         Map<Integer, APackable> entities = serverCombatEntityManager.getEntities();
 
+        //inbound data update
         serverEntityManager.processDeltas(serverDataDuplex.getDeltas());
         serverEntityManager.delete(new ArrayList<>(serverDataDuplex.getRemovedInbound()));
         serverEntityManager.updateEntities();
