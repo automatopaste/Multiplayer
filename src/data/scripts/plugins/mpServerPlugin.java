@@ -97,12 +97,13 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             nextInstanceID++;
             id = nextInstanceID;
         }
-        while (!usedIDs.contains(id)) {
+        while (usedIDs.contains(id)) {
             logger.warn("Attempted to provide new instance with historic ID: is ShipAPI String ID the same?");
             nextInstanceID++;
             id = nextInstanceID;
-            usedIDs.add(id);
         }
+
+        usedIDs.add(id);
 
         return id;
     }
