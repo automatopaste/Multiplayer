@@ -3,7 +3,7 @@ package data.scripts.net.terminals.server;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
-import data.scripts.plugins.state.ServerDataDuplex;
+import data.scripts.plugins.state.DataDuplex;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -15,9 +15,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer implements Runnable {
     private final int port;
-    private final ServerDataDuplex serverDataDuplex;
+    private final DataDuplex serverDataDuplex;
 
-    public NettyServer(int port, ServerDataDuplex serverDataDuplex) {
+    public NettyServer(int port, DataDuplex serverDataDuplex) {
         this.port = port;
         this.serverDataDuplex = serverDataDuplex;
     }
@@ -66,7 +66,7 @@ public class NettyServer implements Runnable {
         }
     }
 
-    public ServerDataDuplex getServerDataDuplex() {
+    public DataDuplex getServerDataDuplex() {
         return serverDataDuplex;
     }
 }

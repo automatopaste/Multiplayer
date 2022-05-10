@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.FloatRecord;
@@ -175,6 +176,32 @@ public class ShipData extends APackable {
 
         cursor.forceUpdate(ship.getMouseTarget());
         cursor.write(packer, CURSOR);
+    }
+
+    @Override
+    public void destinationInit() {
+
+    }
+
+    @Override
+    public void destinationDelete() {
+
+    }
+
+    @Override
+    public boolean destinationUpdate() {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (ship == null || !engine.isEntityInPlay(ship)) return true;
+
+        ship.getLocation().set(loc.getRecord());
+        ship.getVelocity().set(loc.getRecord());
+        ship.setFacing(ang.getRecord());
+        ship.setAngularVelocity(angVel.getRecord());
+        ship.setHitpoints(ship.getMaxHitpoints() * hull.getRecord());
+        ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux.getRecord());
+        ship.getMouseTarget().set(cursor.getRecord());
+
+        return false;
     }
 
     public static void setTypeID(int typeID) {

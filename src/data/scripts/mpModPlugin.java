@@ -21,10 +21,5 @@ public class mpModPlugin extends BaseModPlugin {
         IntRecord.setTypeID(DataManager.registerRecordType(IntRecord.class, new IntRecord(null)));
         StringRecord.setTypeID(DataManager.registerRecordType(StringRecord.class, new StringRecord(null)));
         Vector2fRecord.setTypeID(DataManager.registerRecordType(Vector2fRecord.class, new Vector2fRecord(null)));
-
-        // oi, you got a loicense for unsafe?
-        // put this after -classpath in vmparams and install SSMS unlock tool for perf gain
-        // ..//mods//unlock.jar;janino.jar;
-        System.setProperty("io.netty.noUnsafe", String.valueOf(true));
     }
 }

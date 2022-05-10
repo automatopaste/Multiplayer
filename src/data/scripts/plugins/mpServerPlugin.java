@@ -3,18 +3,19 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.packables.InputAggregateData;
+import data.scripts.net.data.packables.ShipData;
 import data.scripts.net.terminals.server.NettyServer;
-import data.scripts.plugins.state.ServerDataDuplex;
-import data.scripts.plugins.state.ServerInputManager;
+import data.scripts.plugins.state.DataDuplex;
+import data.scripts.plugins.state.ServerCombatEntityManager;
+import data.scripts.plugins.state.ServerInboundEntityManager;
 import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final int port;
@@ -23,15 +24,34 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private NettyServer server;
     private Thread serverThread;
 
-    private ServerInputManager inputManager;
+    private final DataDuplex serverDataDuplex;
+    private final ServerInboundEntityManager serverEntityManager;
+    private final ServerCombatEntityManager serverCombatEntityManager;
 
-    private final ServerDataDuplex serverDataDuplex;
+    private int nextInstanceID = 0;
+    private Set<Integer> usedIDs = new HashSet<>();
 
     public mpServerPlugin(int port) {
         this.port = port;
         logger = Global.getLogger(mpServerPlugin.class);
 
-        serverDataDuplex = new ServerDataDuplex();
+        List<APackable> packables = new ArrayList<>();
+
+        ShipData data = new ShipData(1);
+        data.setShip(Global.getCombatEngine().getPlayerShip());
+
+        packables.add(data);
+
+        serverDataDuplex = new DataDuplex();
+
+        serverEntityManager = new ServerInboundEntityManager(this);
+        Map<Integer, APackable> deltas = new HashMap<>();
+        for (APackable p : packables) {
+            deltas.put(getNewInstanceID(null), p);
+        }
+        serverEntityManager.processDeltas(deltas);
+
+        serverCombatEntityManager = new ServerCombatEntityManager(this);
     }
 
     @Override
@@ -42,15 +62,12 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         logger.info("Starting server");
 
         serverThread.start();
-        inputManager = new ServerInputManager();
-        engine.addPlugin(inputManager);
     }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
         if (!serverThread.isAlive() || serverThread.isInterrupted()) {
             serverThread = null;
-            Global.getCombatEngine().removePlugin(inputManager);
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Server interrupted");
         }
@@ -62,13 +79,32 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
-        Map<Integer, APackable> entities = serverDataDuplex.update();
-        for (APackable packable : entities.values()) {
-            if (packable instanceof InputAggregateData) {
-                inputManager.updateClientInput(packable.getInstanceID(), (InputAggregateData) packable);
-            }
+        List<Integer> removedInstanceIDs = serverCombatEntityManager.updateAndGetRemovedEntityInstanceIds();
+        Map<Integer, APackable> entities = serverCombatEntityManager.getEntities();
+
+        serverEntityManager.processDeltas(serverDataDuplex.getDeltas());
+        serverEntityManager.delete(new ArrayList<>(serverDataDuplex.getRemovedInbound()));
+        serverEntityManager.updateEntities();
+
+        serverDataDuplex.updateOutbound(entities, removedInstanceIDs);
+    }
+
+    public int getNewInstanceID(ShipAPI ship) {
+        int id;
+        if (ship != null) {
+            id = ship.getId().hashCode();
+        } else {
+            nextInstanceID++;
+            id = nextInstanceID;
+        }
+        while (!usedIDs.contains(id)) {
+            logger.warn("Attempted to provide new instance with historic ID: is ShipAPI String ID the same?");
+            nextInstanceID++;
+            id = nextInstanceID;
         }
 
+        usedIDs.add(id);
 
+        return id;
     }
 }

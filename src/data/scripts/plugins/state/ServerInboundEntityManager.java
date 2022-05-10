@@ -1,23 +1,20 @@
 package data.scripts.plugins.state;
 
 import data.scripts.net.data.packables.APackable;
+import data.scripts.plugins.mpServerPlugin;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClientEntityManager implements InboundEntityManager {
+public class ServerInboundEntityManager implements InboundEntityManager {
     private final Map<Integer, APackable> entities;
 
-    public ClientEntityManager() {
+    public ServerInboundEntityManager(mpServerPlugin serverPlugin) {
         entities = new HashMap<>();
     }
 
-    /**
-     * Take incoming partial entity deltas and update existing entities. If no existing entity matches delta instance ID
-     * then assume it is newly created and init it
-     * @param toProcess new deltas
-     */
+    @Override
     public void processDeltas(Map<Integer, APackable> toProcess) {
         for (Integer key : toProcess.keySet()) {
             APackable entity = entities.get(key);
@@ -32,16 +29,6 @@ public class ClientEntityManager implements InboundEntityManager {
     }
 
     @Override
-    public void updateEntities() {
-        for (APackable entity : entities.values()) {
-            entity.destinationUpdate();
-        }
-    }
-
-    /**
-     * Remove entities that the server has communicated should be discarded
-     * @param toDelete list of instance IDs
-     */
     public void delete(List<Integer> toDelete) {
         for (Integer i : toDelete) {
             APackable entity = entities.get(i);
@@ -49,6 +36,13 @@ public class ClientEntityManager implements InboundEntityManager {
                 entity.destinationDelete();
             }
             entities.remove(i);
+        }
+    }
+
+    @Override
+    public void updateEntities() {
+        for (APackable entity : entities.values()) {
+            entity.destinationUpdate();
         }
     }
 }

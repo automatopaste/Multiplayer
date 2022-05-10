@@ -53,13 +53,50 @@ public abstract class APackable {
         flush = false;
     }
 
+    /**
+     * Called every time an entity plugin updates on the game thread. May be called by either client or server
+     * @return If the packable should be deleted (e.g. if the associated entity has been destroyed)
+     */
+    public abstract boolean destinationUpdate();
+
+    /**
+     * Called when entity is initialised on client
+     */
+    public abstract void destinationInit();
+
+    /**
+     * Called when entity is deleted on client
+     */
+    public abstract void destinationDelete();
+
+    /**
+     * Force a complete write instead of a delta write
+     */
     protected abstract void flushWrite();
 
+    /**
+     * Update stored data with changes from a delta
+     * @param delta incoming delta (still uses same class as non-transmitting entity for convenience)
+     */
     public abstract void updateFromDelta(APackable delta);
 
+    /**
+     * Ouput data to a byte buffer
+     * @return true if data has update, false if no updated data and entity can be ignored by packer
+     */
     protected abstract boolean write();
 
+    /**
+     * Immutable ID type to identify and construct entity when decoding packet
+     * @return id
+     */
     public abstract int getTypeId();
 
+    /**
+     * Unpack data into a new packet instance
+     * @param instanceID instance of ID to identify between client/server
+     * @param records maps unique IDs to record
+     * @return new instance of packable with data
+     */
     public abstract APackable unpack(int instanceID, Map<Integer, ARecord<?>> records);
 }

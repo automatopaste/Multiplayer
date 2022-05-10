@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="netty-buffer-4.1.69.Final">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-buffer-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-codec-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-codec-dns-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-common-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-resolver-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-resolver-dns-4.1.69.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jars/netty/netty-transport-4.1.69.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

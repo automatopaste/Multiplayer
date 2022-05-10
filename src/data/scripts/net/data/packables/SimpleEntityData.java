@@ -52,6 +52,21 @@ public class SimpleEntityData extends APackable {
     }
 
     @Override
+    public void destinationInit() {
+
+    }
+
+    @Override
+    public void destinationDelete() {
+
+    }
+
+    @Override
+    public boolean destinationUpdate() {
+        return false;
+    }
+
+    @Override
     public SimpleEntityData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
         return new SimpleEntityData(instanceID);
     }

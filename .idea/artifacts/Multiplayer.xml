@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/jars</output-path>
     <root id="archive" name="Multiplayer.jar">
       <element id="module-output" name="Multiplayer" />
-      <element id="library" level="project" name="netty-all-4.1.69.Final" />
     </root>
   </artifact>
 </component>

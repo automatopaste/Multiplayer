@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
-import data.scripts.plugins.state.ServerDataDuplex;
+import data.scripts.plugins.state.DataDuplex;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
@@ -27,9 +28,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     private int tick;
 
-    private final ServerDataDuplex serverDataDuplex;
+    private final DataDuplex serverDataDuplex;
 
-    public ProcessingHandler(ServerDataDuplex serverDataDuplex) {
+    public ProcessingHandler(DataDuplex serverDataDuplex) {
         this.serverDataDuplex = serverDataDuplex;
 
         logger = Global.getLogger(ProcessingHandler.class);
@@ -67,7 +68,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         Map<Integer, APackable> entities = unpacked.getUnpacked();
 
-        serverDataDuplex.threadUpdate(entities);
+        // client doesn't send any entity deletions to worry about
+        serverDataDuplex.updateInbound(entities, new ArrayList<Integer>());
     }
 
     /**

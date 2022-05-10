@@ -3,9 +3,12 @@ package data.scripts.net.terminals.client;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
-import data.scripts.plugins.state.ClientDataDuplex;
+import data.scripts.plugins.state.DataDuplex;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -14,11 +17,11 @@ public class NettyClient implements Runnable {
     private final String host;
     private final int port;
 
-    private final ClientDataDuplex clientDataDuplex;
+    private final DataDuplex clientDataDuplex;
 
     private boolean stop;
 
-    public NettyClient(String host, int port, ClientDataDuplex clientDataDuplex) {
+    public NettyClient(String host, int port, DataDuplex clientDataDuplex) {
         this.host = host;
         this.port = port;
         this.clientDataDuplex = clientDataDuplex;
@@ -65,10 +68,6 @@ public class NettyClient implements Runnable {
                 workerGroup.shutdownGracefully();
             }
         }
-    }
-
-    public ClientDataDuplex getClientDataDuplex() {
-        return clientDataDuplex;
     }
 
     public void stop() {

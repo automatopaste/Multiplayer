@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,16 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     private Unpacked getUnpacked(ByteBuf in, int tick) {
-        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), tick);
+        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), new ArrayList<Integer>(), tick);
+
+        // unpack deleted instance IDs
+        int numDeleted = in.readInt();
+        int n = 0;
+        List<Integer> deleted = new ArrayList<>();
+        while (n < numDeleted) {
+            deleted.add(in.readInt());
+            n++;
+        }
 
         // integer keys are unique instance IDs
         Map<Integer, APackable> entities = new HashMap<>();
@@ -61,6 +71,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
         APackable entity = DataManager.entityFactory(entityID).unpack(entityInstanceID, records);
         entities.put(entityInstanceID, entity);
 
-        return new Unpacked(entities, tick);
+        return new Unpacked(entities, deleted, tick);
     }
 }

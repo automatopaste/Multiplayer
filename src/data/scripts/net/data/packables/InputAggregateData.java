@@ -23,6 +23,8 @@ public class InputAggregateData extends APackable {
 
     private static final int BITMASK = 0;
 
+    private ShipAPI shipUnderControl;
+
     static {
         DataManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
     }
@@ -75,6 +77,25 @@ public class InputAggregateData extends APackable {
         keysBitmask.write(packer, BITMASK);
     }
 
+    @Override
+    public void destinationInit() {
+
+    }
+
+    @Override
+    public void destinationDelete() {
+
+    }
+
+    @Override
+    public boolean destinationUpdate() {
+        if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return true;
+
+        unmask(keysBitmask.getRecord(), shipUnderControl);
+
+        return false;
+    }
+
     public static void setTypeID(int typeID) {
         InputAggregateData.typeID = typeID;
     }
@@ -85,7 +106,7 @@ public class InputAggregateData extends APackable {
     }
 
     // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
-    public static void unmask(int bitmask, ShipAPI ship) {
+    private void unmask(int bitmask, ShipAPI ship) {
         boolean[] controls = new boolean[NUM_CONTROLS];
         for (int i = 0; i < controls.length; i++) {
             if ((bitmask & 1 << i) != 0) controls[i] = true;
@@ -165,7 +186,8 @@ public class InputAggregateData extends APackable {
 
     @Override
     public void updateFromDelta(APackable delta) {
-
+        InputAggregateData d = (InputAggregateData) delta;
+        if (d.getKeysBitmask() != null) keysBitmask.forceUpdate(d.getKeysBitmask().getRecord());
     }
 
     public IntRecord getKeysBitmask() {

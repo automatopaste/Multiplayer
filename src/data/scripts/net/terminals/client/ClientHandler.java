@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
-import data.scripts.plugins.state.ClientDataDuplex;
+import data.scripts.plugins.state.DataDuplex;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,19 +13,20 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Main logic for handling network packet data
  */
 public class ClientHandler extends ChannelInboundHandlerAdapter {
-    private final ClientDataDuplex clientDataDuplex;
+    private final DataDuplex clientDataDuplex;
 
     private final Logger logger;
 
     private int clientTick;
 
-    public ClientHandler(ClientDataDuplex clientDataDuplex) {
+    public ClientHandler(DataDuplex clientDataDuplex) {
         this.clientDataDuplex = clientDataDuplex;
 
         logger = Global.getLogger(ClientHandler.class);
@@ -53,8 +54,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         logger.info("Received server tick notice: " + serverTick);
 
         Map<Integer, APackable> entities = unpacked.getUnpacked();
+        List<Integer> deleted = unpacked.getDeleted();
 
-        clientDataDuplex.threadUpdate(entities);
+        clientDataDuplex.updateInbound(entities, deleted);
     }
 
     @Override
