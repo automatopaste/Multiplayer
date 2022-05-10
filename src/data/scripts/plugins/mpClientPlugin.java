@@ -3,6 +3,7 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.data.packables.InputAggregateData;
@@ -46,6 +47,10 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         // placeholder id
         int id = -10;
         inputManager = new ClientInputManager(id, new InputAggregateData(id));
+
+        for (ShipAPI ship : engine.getShips()) {
+            engine.removeEntity(ship);
+        }
     }
 
     @Override
