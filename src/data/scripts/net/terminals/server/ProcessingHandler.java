@@ -94,6 +94,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
         // keep looping until timer lets it send another packet
+        // probably should replace with a thread sleep
 
         long currentTime;
         while (deltaU < 1d) {

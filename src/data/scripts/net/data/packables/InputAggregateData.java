@@ -44,7 +44,12 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
-    protected boolean write() {
+    protected boolean write(boolean flush) {
+        if (flush) {
+            flushWrite();
+            return true;
+        }
+
         boolean update = false;
 
         boolean[] controls = poll();
@@ -63,8 +68,7 @@ public class InputAggregateData extends APackable {
         return update;
     }
 
-    @Override
-    protected void flushWrite() {
+    private void flushWrite() {
         boolean[] controls = poll();
 
         // max length 32

@@ -26,7 +26,6 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
      * @return instance IDs of entities to remove
      */
     public List<Integer> updateAndGetRemovedEntityInstanceIds() {
-        List<Integer> out = new ArrayList<>();
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
@@ -56,7 +55,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         for (Integer key : shipsToRem) {
             ships.remove(key);
         }
-        out.addAll(shipsToRem);
+        List<Integer> out = new ArrayList<>(shipsToRem);
 
         // init data
         initShips(engineShips);
@@ -75,9 +74,6 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
     }
 
     public Map<Integer, APackable> getEntities() {
-        Map<Integer, APackable> out = new HashMap<>();
-        out.putAll(ships);
-
-        return out;
+        return new HashMap<Integer, APackable>(ships);
     }
 }

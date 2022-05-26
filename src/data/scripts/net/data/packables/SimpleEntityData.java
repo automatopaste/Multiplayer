@@ -37,18 +37,13 @@ public class SimpleEntityData extends APackable {
     }
 
     @Override
-    protected boolean write() {
+    protected boolean write(boolean flush) {
         boolean update = false;
         if (info.checkUpdate(69f)) {
             info.write(packer, INFO);
             update = true;
         }
         return update;
-    }
-
-    @Override
-    protected void flushWrite() {
-
     }
 
     @Override
