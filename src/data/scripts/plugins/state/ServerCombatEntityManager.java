@@ -41,7 +41,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         for (Iterator<ShipAPI> iterator = engineShips.iterator(); iterator.hasNext();) {
             ShipAPI ship = iterator.next();
 
-            if (ships.containsKey(ship.getId().hashCode())) {
+            if (ships.containsKey(ship.getFleetMemberId().hashCode())) {
                 iterator.remove();
             }
             /* Replace inefficient code with faster string hashcode (probability of collision is unlikely)
