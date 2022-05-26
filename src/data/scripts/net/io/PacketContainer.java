@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class PacketContainer {
-    private static final int PACKET_SIZE_INIT = 1024;
+    private static final int PACKET_SIZE_INIT = 2048;
 
     private final ByteBuffer data;
     private final int length;
