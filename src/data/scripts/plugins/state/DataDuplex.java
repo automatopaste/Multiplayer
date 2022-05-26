@@ -98,11 +98,10 @@ public class DataDuplex {
             for (Integer key : entities.keySet()) {
                 APackable p = outbound.get(key);
                 APackable e = entities.get(key);
-                if (p != null) {
-                    p.updateFromDelta(e);
-                } else {
-                    outbound.put(key, e);
-                }
+
+                if (p.equals(e)) continue;
+
+                p.updateFromDelta(e);
             }
         }
         synchronized (this.removedOutbound) {
