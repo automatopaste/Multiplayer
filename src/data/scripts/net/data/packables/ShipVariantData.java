@@ -46,8 +46,12 @@ public class ShipVariantData extends APackable {
             Collection<String> slots2 = variant.getFittedWeaponSlots();
 
             for (String slot : variant.getNonBuiltInWeaponSlots()) {
-                weaponSlots.add(new StringRecord(slot));
-                weaponIds.add(new StringRecord(variant.getWeaponId(slot)));
+                String slotId = variant.getWeaponId(slot);
+
+                if (slotId != null) {
+                    weaponSlots.add(new StringRecord(slot));
+                    weaponIds.add(new StringRecord(slotId));
+                }
             }
         }
     }
