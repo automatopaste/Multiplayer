@@ -21,12 +21,12 @@ public class ClientEntityManager implements InboundEntityManager {
     public void processDeltas(Map<Integer, APackable> toProcess) {
         for (Integer key : toProcess.keySet()) {
             APackable entity = entities.get(key);
-            APackable toUpdate = toProcess.get(key);
+            APackable newEntity = toProcess.get(key);
             if (entity == null) {
-                toUpdate.destinationInit();
-                entities.put(key, toUpdate);
+                newEntity.destinationInit();
+                entities.put(key, newEntity);
             } else {
-                toUpdate.updateFromDelta(entity);
+                entity.updateFromDelta(newEntity);
             }
         }
     }
