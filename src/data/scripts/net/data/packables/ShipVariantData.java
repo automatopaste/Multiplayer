@@ -2,13 +2,12 @@ package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +27,11 @@ public class ShipVariantData extends APackable {
 
     private boolean destComplete = false;
 
-    public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
+    public ShipVariantData(int instanceID, ShipAPI ship, String id) {
         super(instanceID);
 
-        int c = (variant == null) ? 0 : variant.getNumFluxCapacitors();
-        int v = (variant == null) ? 0 : variant.getNumFluxVents();
+        int c = (ship == null) ? 0 : ship.getVariant().getNumFluxCapacitors();
+        int v = (ship == null) ? 0 : ship.getVariant().getNumFluxVents();
 
         capacitors = new IntRecord(c);
         vents = new IntRecord(v);
@@ -41,16 +40,12 @@ public class ShipVariantData extends APackable {
         weaponIds = new ArrayList<>();
         weaponSlots = new ArrayList<>();
 
-        if (variant != null) {
-            List<String> slots1 = variant.getNonBuiltInWeaponSlots();
-            Collection<String> slots2 = variant.getFittedWeaponSlots();
-
-            for (String slot : variant.getNonBuiltInWeaponSlots()) {
-                String slotId = variant.getWeaponId(slot);
-
-                if (slotId != null) {
+        if (ship != null) {
+            for (WeaponAPI weapon : ship.getAllWeapons()) {
+                String slot = weapon.getSlot().getId();
+                if (ship.getVariant().getNonBuiltInWeaponSlots().contains(weapon.getSlot().getId())) {
                     weaponSlots.add(new StringRecord(slot));
-                    weaponIds.add(new StringRecord(slotId));
+                    weaponIds.add(new StringRecord(weapon.getId()));
                 }
             }
         }

@@ -84,7 +84,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
             ships.put(id, data);
 
             int id2 = serverPlugin.getNewInstanceID(null);
-            ShipVariantData variantData = new ShipVariantData(id2, ship.getVariant(), ship.getFleetMemberId());
+            ShipVariantData variantData = new ShipVariantData(id2, ship, ship.getFleetMemberId());
             variants.put(id2, variantData);
 
             shipToVariants.put(id, id2);
