@@ -92,12 +92,11 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
-    public boolean destinationUpdate() {
-        if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return true;
+    public void destinationUpdate() {
+        if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return;
 
         unmask(keysBitmask.getRecord(), shipUnderControl);
 
-        return false;
     }
 
     public static void setTypeID(int typeID) {

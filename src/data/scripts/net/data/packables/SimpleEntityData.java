@@ -57,8 +57,7 @@ public class SimpleEntityData extends APackable {
     }
 
     @Override
-    public boolean destinationUpdate() {
-        return false;
+    public void destinationUpdate() {
     }
 
     @Override

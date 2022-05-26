@@ -204,9 +204,16 @@ public class ShipData extends APackable {
     }
 
     @Override
-    public boolean destinationUpdate() {
+    public void destinationUpdate() {
         CombatEngineAPI engine = Global.getCombatEngine();
-        if (ship == null || !engine.isEntityInPlay(ship)) return true;
+
+        if (ship == null || !engine.isEntityInPlay(ship)) {
+            for (ShipAPI ship : engine.getShips()) {
+                if (ship.getId().equals(id.getRecord())) {
+                    this.ship = ship;
+                }
+            }
+        }
 
         ship.getLocation().set(loc.getRecord());
         ship.getVelocity().set(loc.getRecord());
@@ -217,7 +224,6 @@ public class ShipData extends APackable {
         ship.getMouseTarget().set(cursor.getRecord());
         ship.setOwner(owner.getRecord());
 
-        return false;
     }
 
     public static void setTypeID(int typeID) {

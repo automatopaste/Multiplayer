@@ -54,9 +54,8 @@ public abstract class APackable {
 
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server
-     * @return If the packable should be deleted (e.g. if the associated entity has been destroyed)
      */
-    public abstract boolean destinationUpdate();
+    public abstract void destinationUpdate();
 
     /**
      * Called when entity is initialised on client
