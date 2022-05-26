@@ -3,6 +3,7 @@ package data.scripts.net.data.packables;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.records.*;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -115,7 +116,7 @@ public class ShipData extends APackable {
         if (ship == null) return false;
 
         boolean update = false;
-        if (id.checkUpdate(ship.getId())) {
+        if (id.checkUpdate(ship.getFleetMemberId())) {
             id.write(packer, SHIP_ID);
             update = true;
         }
@@ -160,7 +161,7 @@ public class ShipData extends APackable {
     }
 
     private void flushWrite() {
-        id.forceUpdate(ship.getId());
+        id.forceUpdate(ship.getFleetMemberId());
         id.write(packer, SHIP_ID);
 
         loc.forceUpdate(ship.getLocation());
@@ -194,7 +195,10 @@ public class ShipData extends APackable {
     @Override
     public void destinationInit() {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord() + "_Hull", loc.getRecord(), ang.getRecord());
+        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord() + "_Hull", loc.getRecord(), ang.getRecord());
+        // need to handle default id
+        Ship s = (Ship) ship;
+        s.setFleetMemberId(id.getRecord());
     }
 
     @Override
