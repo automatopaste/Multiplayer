@@ -29,13 +29,17 @@ public class DataDuplex {
      */
     public Map<Integer, APackable> getDeltas() {
         synchronized (inbound) {
-            return inbound;
+            Map<Integer, APackable> out = new HashMap<>(inbound);
+            inbound.clear();
+            return out;
         }
     }
 
     public Set<Integer> getRemovedInbound() {
         synchronized (removedInbound) {
-            return removedInbound;
+            Set<Integer> out = new HashSet<>(removedInbound);
+            removedInbound.clear();
+            return out;
         }
     }
 
@@ -69,11 +73,17 @@ public class DataDuplex {
      */
     public void updateInbound(Map<Integer, APackable> entities, List<Integer> removed) {
         synchronized (this.inbound) {
-            this.inbound.clear();
-            this.inbound.putAll(entities);
+            for (Integer key : entities.keySet()) {
+                APackable p = inbound.get(key);
+                APackable e = entities.get(key);
+                if (p != null) {
+                    p.updateFromDelta(e);
+                } else {
+                    inbound.put(key, e);
+                }
+            }
         }
         synchronized (this.removedInbound) {
-            this.removedInbound.clear();
             this.removedInbound.addAll(removed);
         }
     }
@@ -85,11 +95,17 @@ public class DataDuplex {
      */
     public void updateOutbound(Map<Integer, APackable> entities, List<Integer> removed) {
         synchronized (this.outbound) {
-            this.outbound.clear();
-            this.outbound.putAll(entities);
+            for (Integer key : entities.keySet()) {
+                APackable p = outbound.get(key);
+                APackable e = entities.get(key);
+                if (p != null) {
+                    p.updateFromDelta(e);
+                } else {
+                    outbound.put(key, e);
+                }
+            }
         }
         synchronized (this.removedOutbound) {
-            this.removedOutbound.clear();
             this.removedOutbound.addAll(removed);
         }
     }
