@@ -8,6 +8,7 @@ import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,9 @@ public class ShipVariantData extends APackable {
         weaponSlots = new ArrayList<>();
 
         if (variant != null) {
+            List<String> slots1 = variant.getNonBuiltInWeaponSlots();
+            Collection<String> slots2 = variant.getFittedWeaponSlots();
+
             for (String slot : variant.getNonBuiltInWeaponSlots()) {
                 weaponSlots.add(new StringRecord(slot));
                 weaponIds.add(new StringRecord(variant.getWeaponId(slot)));
@@ -121,14 +125,15 @@ public class ShipVariantData extends APackable {
         if (d.getCapacitors() != null) capacitors.forceUpdate(d.getCapacitors().getRecord());
         if (d.getVents() != null) vents.forceUpdate(d.getVents().getRecord());
         if (d.getShipId() != null) shipId.forceUpdate(d.getShipId().getRecord());
-        if (d.getWeaponIds() != null){
+        if (d.getWeaponIds() != null && !d.getWeaponIds().isEmpty()) {
             weaponIds.clear();
             weaponIds.addAll(d.getWeaponIds());
         }
-        if (d.getWeaponSlots() != null) {
+        if (d.getWeaponSlots() != null && !d.getWeaponSlots().isEmpty()) {
             weaponSlots.clear();
             weaponSlots.addAll(d.getWeaponSlots());
         }
+        float f = 0f;
     }
 
     @Override
