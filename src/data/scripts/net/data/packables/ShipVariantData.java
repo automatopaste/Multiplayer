@@ -67,9 +67,10 @@ public class ShipVariantData extends APackable {
         int gaming = WEAPONS;
         temp = records.get(gaming);
         while (temp != null) {
-            temp = records.get(gaming);
             tempWeapons.add((StringRecord) temp);
             gaming++;
+
+            temp = records.get(gaming);
         }
 
         int num = tempWeapons.size();
@@ -130,7 +131,6 @@ public class ShipVariantData extends APackable {
             weaponSlots.clear();
             weaponSlots.addAll(d.getWeaponSlots());
         }
-        float f = 0f;
     }
 
     @Override
