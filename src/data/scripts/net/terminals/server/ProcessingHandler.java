@@ -25,6 +25,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     private final double timeU;
     private double deltaU;
     private long updateTime;
+    private boolean doFlush = true;
 
     private int tick;
 
@@ -113,6 +114,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             public void operationComplete(ChannelFuture channelFuture) {
                 if (!future.isSuccess()) {
                     deltaU = 1d;
+                    doFlush = true;
                 }
             }
         });
@@ -122,6 +124,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
+        if (doFlush) serverDataDuplex.flush();
+
         PacketContainer packet = serverDataDuplex.getPacket(tick);
         tick++;
         return ctx.writeAndFlush(packet);
