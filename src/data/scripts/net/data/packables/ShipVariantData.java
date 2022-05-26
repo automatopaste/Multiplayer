@@ -70,6 +70,7 @@ public class ShipVariantData extends APackable {
         List<StringRecord> tempWeapons = new ArrayList<>();
 
         int gaming = WEAPONS;
+        temp = records.get(gaming);
         while (temp != null) {
             temp = records.get(gaming);
             tempWeapons.add((StringRecord) temp);
