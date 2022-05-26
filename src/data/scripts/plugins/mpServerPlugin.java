@@ -83,7 +83,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     public int getNewInstanceID(ShipAPI ship) {
         int id;
         if (ship != null) {
-            id = ship.getId().hashCode();
+            id = ship.getFleetMemberId().hashCode();
         } else {
             nextInstanceID++;
             id = nextInstanceID;

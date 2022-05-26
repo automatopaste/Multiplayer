@@ -1,8 +1,7 @@
 package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.records.*;
 import org.lwjgl.util.vector.Vector2f;
@@ -199,6 +198,42 @@ public class ShipData extends APackable {
         // need to handle default id
         Ship s = (Ship) ship;
         s.setFleetMemberId(id.getRecord());
+        ship.setShipAI(new ShipAIPlugin() {
+            @Override
+            public void setDoNotFireDelay(float amount) {
+
+            }
+
+            @Override
+            public void forceCircumstanceEvaluation() {
+
+            }
+
+            @Override
+            public void advance(float amount) {
+
+            }
+
+            @Override
+            public boolean needsRefit() {
+                return false;
+            }
+
+            @Override
+            public ShipwideAIFlags getAIFlags() {
+                return null;
+            }
+
+            @Override
+            public void cancelCurrentManeuver() {
+
+            }
+
+            @Override
+            public ShipAIConfig getConfig() {
+                return null;
+            }
+        });
     }
 
     @Override
@@ -228,7 +263,6 @@ public class ShipData extends APackable {
         ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux.getRecord());
         ship.getMouseTarget().set(cursor.getRecord());
         ship.setOwner(owner.getRecord());
-
     }
 
     public static void setTypeID(int typeID) {

@@ -12,11 +12,15 @@ public class DataDuplex {
     private final Set<Integer> removedInbound;
     private final Set<Integer> removedOutbound;
 
+    private boolean doFlush;
+
     public DataDuplex() {
         inbound = new HashMap<>();
         outbound = new HashMap<>();
         removedInbound = new HashSet<>();
         removedOutbound = new HashSet<>();
+
+        doFlush = true;
     }
 
     /**
@@ -53,7 +57,9 @@ public class DataDuplex {
             removedOutbound.clear();
         }
 
-        return new PacketContainer(outEntities, outRemovedInstances, tick);
+        PacketContainer p = new PacketContainer(outEntities, outRemovedInstances, tick, doFlush);
+        doFlush = false;
+        return p;
     }
 
     /**
@@ -86,5 +92,9 @@ public class DataDuplex {
             this.removedOutbound.clear();
             this.removedOutbound.addAll(removed);
         }
+    }
+
+    public void flush() {
+        doFlush = true;
     }
 }

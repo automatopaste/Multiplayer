@@ -7,14 +7,14 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class PacketContainer {
-    private static final int PACKET_SIZE_INIT = 2048;
+    private static final int PACKET_SIZE_INIT = 1536;
 
     private final ByteBuffer data;
     private final int length;
 
     private final int tick;
 
-    public PacketContainer(List<APackable> packables, List<Integer> deleted, int tick) throws IOException {
+    public PacketContainer(List<APackable> packables, List<Integer> deleted, int tick, boolean flush) throws IOException {
         this.tick = tick;
 
         data = ByteBuffer.allocate(PACKET_SIZE_INIT);
@@ -27,7 +27,7 @@ public class PacketContainer {
         }
 
         for (APackable packable : packables) {
-            byte[] written = packable.pack(true);
+            byte[] written = packable.pack(flush);
             if (written != null) data.put(written);
         }
 
@@ -41,5 +41,9 @@ public class PacketContainer {
 
     public int getLength() {
         return length;
+    }
+
+    public int getTick() {
+        return tick;
     }
 }

@@ -5,18 +5,25 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.data.packables.ShipData;
+import data.scripts.net.data.packables.ShipVariantData;
 import data.scripts.plugins.mpServerPlugin;
 
 import java.util.*;
 
 public class ServerCombatEntityManager implements OutboundEntityManager {
     private final Map<Integer, ShipData> ships;
+
+    private final Map<Integer, ShipVariantData> variants;
+    private final Map<Integer, Integer> shipToVariants;
+
     private final mpServerPlugin serverPlugin;
 
     public ServerCombatEntityManager(mpServerPlugin serverPlugin) {
         this.serverPlugin = serverPlugin;
 
         ships = new HashMap<>();
+        variants = new HashMap<>();
+        shipToVariants = new HashMap<>();
 
         initShips(Global.getCombatEngine().getShips());
     }
@@ -26,7 +33,6 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
      * @return instance IDs of entities to remove
      */
     public List<Integer> updateAndGetRemovedEntityInstanceIds() {
-
         CombatEngineAPI engine = Global.getCombatEngine();
 
         List<ShipAPI> engineShips = new ArrayList<>(engine.getShips());
@@ -47,6 +53,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         }
 
         List<Integer> shipsToRem = new ArrayList<>();
+        List<Integer> variantsToRem = new ArrayList<>();
         for (Integer key : ships.keySet()) {
             if (!engine.isEntityInPlay(ships.get(key).getShip())) {
                 shipsToRem.add(key);
@@ -54,10 +61,15 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         }
         for (Integer key : shipsToRem) {
             ships.remove(key);
+
+            int variantKey = shipToVariants.get(key);
+            variantsToRem.add(variantKey);
+            variants.remove(variantKey);
+            shipToVariants.remove(key);
         }
         List<Integer> out = new ArrayList<>(shipsToRem);
+        out.addAll(variantsToRem);
 
-        // init data
         initShips(engineShips);
 
         return out;
@@ -70,10 +82,19 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
             data.setShip(ship);
 
             ships.put(id, data);
+
+            int id2 = serverPlugin.getNewInstanceID(null);
+            ShipVariantData variantData = new ShipVariantData(id2, ship.getVariant(), ship.getFleetMemberId());
+            variants.put(id2, variantData);
+
+            shipToVariants.put(id, id2);
         }
     }
 
     public Map<Integer, APackable> getEntities() {
-        return new HashMap<Integer, APackable>(ships);
+        Map<Integer, APackable> out = new HashMap<Integer, APackable>(ships);
+        out.putAll(variants);
+
+        return out;
     }
 }

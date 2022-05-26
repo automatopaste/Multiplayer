@@ -22,7 +22,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private NettyClient client;
     private Thread clientThread;
 
-    private DataDuplex clientDataDuplex;
+    private static DataDuplex clientDataDuplex;
     private ClientEntityManager entityManager;
     private ClientInputManager inputManager;
 
@@ -83,5 +83,9 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         // provide empty list because server does not care about any deletions on client
         clientDataDuplex.updateOutbound(outbound, new ArrayList<Integer>());
+    }
+
+    public static void flush() {
+        clientDataDuplex.flush();
     }
 }
