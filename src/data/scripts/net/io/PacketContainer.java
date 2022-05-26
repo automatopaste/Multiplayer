@@ -27,7 +27,7 @@ public class PacketContainer {
         }
 
         for (APackable packable : packables) {
-            byte[] written = packable.pack();
+            byte[] written = packable.pack(true);
             if (written != null) data.put(written);
         }
 
