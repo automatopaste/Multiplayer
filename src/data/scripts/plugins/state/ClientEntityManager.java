@@ -2,6 +2,7 @@ package data.scripts.plugins.state;
 
 import data.scripts.net.data.packables.APackable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,17 @@ public class ClientEntityManager implements InboundEntityManager {
 
     @Override
     public void updateEntities() {
+        List<Integer> toRemove = new ArrayList<>();
+
         for (Integer key : entities.keySet()) {
             APackable entity = entities.get(key);
             entity.destinationUpdate();
 
-            if (entity.shouldDeleteOnDestination()) entities.remove(key);
+            if (entity.shouldDeleteOnDestination()) toRemove.add(key);
+        }
+
+        for (Integer i : toRemove) {
+            entities.remove(i);
         }
     }
 
