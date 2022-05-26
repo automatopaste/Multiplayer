@@ -89,19 +89,16 @@ public class ShipVariantData extends APackable {
 
     @Override
     public void destinationUpdate() {
-        ShipAPI ship = null;
         for (ShipAPI s : Global.getCombatEngine().getShips()) {
             if (s.getFleetMemberId().equals(shipId.getRecord())) {
-                ship = s;
+                for (int i = 0; i < weaponSlots.size(); i++) {
+                    s.getVariant().addWeapon(weaponSlots.get(i).getRecord(), weaponIds.get(i).getRecord());
+                }
+                s.getVariant().autoGenerateWeaponGroups();
             }
         }
-        if (ship != null) {
-            for (int i = 0; i < weaponSlots.size(); i++) {
-                ship.getVariant().addWeapon(weaponSlots.get(i).getRecord(), weaponIds.get(i).getRecord());
-            }
 
-            destComplete = true;
-        }
+        destComplete = true;
     }
 
     @Override
