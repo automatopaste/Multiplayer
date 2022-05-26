@@ -215,6 +215,7 @@ public class ShipData extends APackable {
             }
         }
 
+        if (ship == null) return;
         ship.getLocation().set(loc.getRecord());
         ship.getVelocity().set(loc.getRecord());
         ship.setFacing(ang.getRecord());
