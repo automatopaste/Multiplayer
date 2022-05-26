@@ -41,7 +41,7 @@ public class ShipVariantData extends APackable {
         weaponSlots = new ArrayList<>();
 
         if (variant != null) {
-            for (String slot : variant.getFittedWeaponSlots()) {
+            for (String slot : variant.getNonBuiltInWeaponSlots()) {
                 weaponSlots.add(new StringRecord(slot));
                 weaponIds.add(new StringRecord(variant.getWeaponId(slot)));
             }

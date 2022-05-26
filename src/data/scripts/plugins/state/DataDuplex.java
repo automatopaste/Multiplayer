@@ -61,7 +61,7 @@ public class DataDuplex {
             removedOutbound.clear();
         }
 
-        PacketContainer p = new PacketContainer(outEntities, outRemovedInstances, tick, doFlush);
+        PacketContainer p = new PacketContainer(outEntities, outRemovedInstances, tick, true);
         doFlush = false;
         return p;
     }
