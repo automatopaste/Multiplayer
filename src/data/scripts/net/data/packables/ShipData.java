@@ -194,7 +194,7 @@ public class ShipData extends APackable {
     @Override
     public void destinationInit() {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord(), loc.getRecord(), ang.getRecord());
+        engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord() + "_Hull", loc.getRecord(), ang.getRecord());
     }
 
     @Override
