@@ -154,6 +154,9 @@ public class InputAggregateData extends APackable {
 
     private boolean[] poll() {
         boolean[] controls = new boolean[NUM_CONTROLS];
+
+        if (!Keyboard.isCreated()) return controls;
+
         controls[0] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE")));
         controls[1] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_ACCELERATE_BACKWARDS")));
         controls[2] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_TURN_LEFT")));
