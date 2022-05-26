@@ -90,6 +90,8 @@ public class ShipVariantData extends APackable {
 
     @Override
     public void destinationUpdate() {
+        if (destComplete) return;
+
         for (ShipAPI s : Global.getCombatEngine().getShips()) {
             if (s.getFleetMemberId().equals(shipId.getRecord())) {
                 for (int i = 0; i < weaponSlots.size(); i++) {
