@@ -33,8 +33,11 @@ public class ClientEntityManager implements InboundEntityManager {
 
     @Override
     public void updateEntities() {
-        for (APackable entity : entities.values()) {
+        for (Integer key : entities.keySet()) {
+            APackable entity = entities.get(key);
             entity.destinationUpdate();
+
+            if (entity.shouldDeleteOnDestination()) entities.remove(key);
         }
     }
 

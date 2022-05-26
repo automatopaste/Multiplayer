@@ -92,6 +92,11 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
+    public boolean shouldDeleteOnDestination() {
+        return false;
+    }
+
+    @Override
     public void destinationUpdate() {
         if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return;
 

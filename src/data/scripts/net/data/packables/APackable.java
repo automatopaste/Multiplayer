@@ -50,14 +50,20 @@ public abstract class APackable {
     public abstract void destinationUpdate();
 
     /**
-     * Called when entity is initialised on client
+     * Called when entity is initialised on dest
      */
     public abstract void destinationInit();
 
     /**
-     * Called when entity is deleted on client
+     * Called when entity is deleted on dest
      */
     public abstract void destinationDelete();
+
+    /**
+     * Useful when a packable is used for a consumable single-use task
+     * @return if it should be deleted from the destination outbound entity manager
+     */
+    public abstract boolean shouldDeleteOnDestination();
 
     /**
      * Update stored data with changes from a delta

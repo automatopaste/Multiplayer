@@ -25,6 +25,8 @@ public class ShipVariantData extends APackable {
     private static final int SHIP_ID = 3;
     private static final int WEAPONS = 69;
 
+    private boolean destComplete = false;
+
     public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
         super(instanceID);
 
@@ -76,11 +78,6 @@ public class ShipVariantData extends APackable {
 
     @Override
     public void destinationUpdate() {
-
-    }
-
-    @Override
-    public void destinationInit() {
         ShipAPI ship = null;
         for (ShipAPI s : Global.getCombatEngine().getShips()) {
             if (s.getFleetMemberId().equals(shipId.getRecord())) {
@@ -91,12 +88,24 @@ public class ShipVariantData extends APackable {
             for (int i = 0; i < weaponSlots.size(); i++) {
                 ship.getVariant().addWeapon(weaponSlots.get(i).getRecord(), weaponIds.get(i).getRecord());
             }
+
+            destComplete = true;
         }
+    }
+
+    @Override
+    public void destinationInit() {
+
     }
 
     @Override
     public void destinationDelete() {
 
+    }
+
+    @Override
+    public boolean shouldDeleteOnDestination() {
+        return destComplete;
     }
 
     @Override

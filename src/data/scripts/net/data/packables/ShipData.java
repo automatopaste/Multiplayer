@@ -243,6 +243,11 @@ public class ShipData extends APackable {
     }
 
     @Override
+    public boolean shouldDeleteOnDestination() {
+        return false;
+    }
+
+    @Override
     public void destinationUpdate() {
         CombatEngineAPI engine = Global.getCombatEngine();
 
