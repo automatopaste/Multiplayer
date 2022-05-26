@@ -77,9 +77,13 @@ public class DataDuplex {
                 APackable p = inbound.get(key);
                 APackable e = entities.get(key);
 
-                if (p.equals(e)) continue;
+                if (p != null) {
+                    if (p.equals(e)) continue;
 
-                p.updateFromDelta(e);
+                    p.updateFromDelta(e);
+                } else {
+                    inbound.put(key, e);
+                }
             }
         }
         synchronized (this.removedInbound) {
@@ -98,9 +102,13 @@ public class DataDuplex {
                 APackable p = outbound.get(key);
                 APackable e = entities.get(key);
 
-                if (p.equals(e)) continue;
+                if (p != null) {
+                    if (p.equals(e)) continue;
 
-                p.updateFromDelta(e);
+                    p.updateFromDelta(e);
+                } else {
+                    outbound.put(key, e);
+                }
             }
         }
         synchronized (this.removedOutbound) {
