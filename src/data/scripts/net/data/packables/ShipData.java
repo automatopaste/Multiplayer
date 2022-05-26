@@ -80,7 +80,7 @@ public class ShipData extends APackable {
         specId = (temp == null) ? new StringRecord("DEFAULT_SPEC_ID") : (StringRecord) temp;
 
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-            if (ship.getId().equals(id.getRecord())) {
+            if (ship.getFleetMemberId().equals(id.getRecord())) {
                 this.ship = ship;
             }
         }
@@ -253,7 +253,7 @@ public class ShipData extends APackable {
 
         if (ship == null || !engine.isEntityInPlay(ship)) {
             for (ShipAPI ship : engine.getShips()) {
-                if (ship.getId().equals(id.getRecord())) {
+                if (ship.getFleetMemberId().equals(id.getRecord())) {
                     this.ship = ship;
                 }
             }
