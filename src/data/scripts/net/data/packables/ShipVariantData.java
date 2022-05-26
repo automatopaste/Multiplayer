@@ -39,6 +39,13 @@ public class ShipVariantData extends APackable {
 
         weaponIds = new ArrayList<>();
         weaponSlots = new ArrayList<>();
+
+        if (variant != null) {
+            for (String slot : variant.getFittedWeaponSlots()) {
+                weaponSlots.add(new StringRecord(slot));
+                weaponIds.add(new StringRecord(variant.getWeaponId(slot)));
+            }
+        }
     }
 
     public ShipVariantData(int instanceID, Map<Integer, ARecord<?>> records) {
