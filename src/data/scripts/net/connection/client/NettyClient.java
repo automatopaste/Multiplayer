@@ -52,7 +52,7 @@ public class NettyClient implements Runnable {
                                 new PacketContainerEncoder(),
                                 new PacketContainerDecoder(),
                                 new PacketDecoder(),
-                                new ClientHandler(clientDataDuplex)
+                                new ClientChannelHandler(clientDataDuplex)
                         );
                     }
                 });

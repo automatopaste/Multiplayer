@@ -45,13 +45,24 @@ public class PacketContainer {
             size += byteArr.length;
 
             if (bytes.isEmpty()) {
-                sections.add(ByteBuffer.wrap(data.toByteArray()));
+                ByteBuffer buffer = ByteBuffer.wrap(data.toByteArray());
+                buffer.flip();
+
+                sections.add(buffer);
             }
         }
     }
 
     public Queue<ByteBuffer> getSections() {
         return sections;
+    }
+
+    public int getCurrentSectionLength() {
+        try {
+            return getSections().peek().limit();
+        } catch (NullPointerException e) {
+            return 0;
+        }
     }
 
     public int getTick() {

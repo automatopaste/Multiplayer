@@ -2,11 +2,11 @@ package data.scripts.net.connection.client;
 
 import data.scripts.net.connection.DataDuplex;
 
-public class ClientConnectionManager {
+public class ClientConnectionWrapper {
     private final DataDuplex dataDuplex;
     private boolean loading;
 
-    public ClientConnectionManager() {
+    public ClientConnectionWrapper() {
         dataDuplex = new DataDuplex();
         loading = true;
     }

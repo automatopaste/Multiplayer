@@ -10,7 +10,7 @@ import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.connection.server.NettyServer;
 import data.scripts.net.connection.server.ServerCombatEntityManager;
-import data.scripts.net.connection.server.ServerConnectionManager;
+import data.scripts.net.connection.server.ServerConnectionWrapper;
 import data.scripts.net.connection.server.ServerInboundEntityManager;
 import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
@@ -25,7 +25,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private NettyServer server;
     private Thread serverThread;
 
-    private final List<ServerConnectionManager> connections = new ArrayList<>();
+    private final List<ServerConnectionWrapper> connections = new ArrayList<>();
 
     private final ServerInboundEntityManager serverEntityManager;
     private final ServerCombatEntityManager serverCombatEntityManager;
@@ -66,7 +66,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
-        for (ServerConnectionManager connection : connections) {
+        for (ServerConnectionWrapper connection : connections) {
             if (connection.isRequestLoad()) {
                 connection.getDuplex().updateOutbound(LoadedDataStore.generate(engine, this));
                 connection.setRequestLoad(false);
@@ -77,7 +77,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         if (thing != null) {
             engine.getCustomData().remove(mpFlush.FLUSH_KEY);
 
-            for (ServerConnectionManager connection : connections) {
+            for (ServerConnectionWrapper connection : connections) {
                 connection.getDuplex().flush();
                 Console.showMessage("Flushing server outbound data for client " + connection.getId());
             }
@@ -87,26 +87,26 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverCombatEntityManager.update();
         Map<Integer, BasePackable> entities = serverCombatEntityManager.getEntities();
 
-        for (ServerConnectionManager connection : connections) {
+        for (ServerConnectionWrapper connection : connections) {
             serverEntityManager.processDeltas(connection.getDuplex().getDeltas());
         }
 
         //inbound data update
         serverEntityManager.updateEntities();
 
-        for (ServerConnectionManager connection : connections) {
+        for (ServerConnectionWrapper connection : connections) {
             connection.getDuplex().updateOutbound(entities);
         }
     }
 
-    public ServerConnectionManager getNewConnection() {
-        ServerConnectionManager connectionManager = new ServerConnectionManager(getNewInstanceID());
+    public ServerConnectionWrapper getNewConnection() {
+        ServerConnectionWrapper connectionManager = new ServerConnectionWrapper(getNewInstanceID());
         connections.add(connectionManager);
 
         return connectionManager;
     }
 
-    public void removeConnection(ServerConnectionManager connection) {
+    public void removeConnection(ServerConnectionWrapper connection) {
         connections.remove(connection);
     }
 

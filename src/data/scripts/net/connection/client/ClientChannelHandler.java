@@ -18,17 +18,17 @@ import java.util.Map;
 /**
  * Main logic for handling network packet data
  */
-public class ClientHandler extends ChannelInboundHandlerAdapter {
+public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     private final DataDuplex clientDataDuplex;
 
     private final Logger logger;
 
     private int clientTick;
 
-    public ClientHandler(DataDuplex clientDataDuplex) {
+    public ClientChannelHandler(DataDuplex clientDataDuplex) {
         this.clientDataDuplex = clientDataDuplex;
 
-        logger = Global.getLogger(ClientHandler.class);
+        logger = Global.getLogger(ClientChannelHandler.class);
 
         clientTick = 0;
     }

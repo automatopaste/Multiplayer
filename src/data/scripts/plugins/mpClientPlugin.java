@@ -7,7 +7,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.console.commands.mpFlush;
 import data.scripts.data.LoadedDataStore;
-import data.scripts.net.connection.client.ClientConnectionManager;
+import data.scripts.net.connection.client.ClientConnectionWrapper;
 import data.scripts.net.connection.client.ClientEntityManager;
 import data.scripts.net.connection.client.ClientInputManager;
 import data.scripts.net.connection.client.NettyClient;
@@ -23,7 +23,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private final NettyClient client;
     private Thread clientThread;
 
-    private final ClientConnectionManager connection;
+    private final ClientConnectionWrapper connection;
     private final ClientEntityManager entityManager;
     private final ClientInputManager inputManager;
     private LoadedDataStore loadedDataStore;
@@ -36,7 +36,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         this.host = host;
         this.port = port;
 
-        connection = new ClientConnectionManager();
+        connection = new ClientConnectionWrapper();
 
         client = new NettyClient(host, port, connection.getDuplex());
         clientThread = new Thread(client, "mpClient");

@@ -37,7 +37,7 @@ public class NettyServer implements Runnable {
             server.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
-                        private ServerConnectionManager connection;
+                        private ServerConnectionWrapper connection;
 
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
@@ -47,7 +47,7 @@ public class NettyServer implements Runnable {
                                     new PacketContainerEncoder(),
                                     new PacketContainerDecoder(),
                                     new PacketDecoder(),
-                                    new ProcessingHandler(connection)
+                                    new ServerChannelHandler(connection)
                             );
                         }
 

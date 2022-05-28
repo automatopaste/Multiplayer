@@ -2,12 +2,12 @@ package data.scripts.net.connection.server;
 
 import data.scripts.net.connection.DataDuplex;
 
-public class ServerConnectionManager {
+public class ServerConnectionWrapper {
     private final DataDuplex dataDuplex;
     private boolean requestLoad;
     private final int id;
 
-    public ServerConnectionManager(int id) {
+    public ServerConnectionWrapper(int id) {
         dataDuplex = new DataDuplex();
         requestLoad = true;
         this.id = id;

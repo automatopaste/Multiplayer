@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-public class ProcessingHandler extends ChannelInboundHandlerAdapter {
+public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     public static final float TICK_RATE = Global.getSettings().getFloat("mpServerTickRate");
 
     private final Logger logger;
@@ -23,25 +23,23 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     private long initialTime;
     private final double timeU;
     private double deltaU;
-    private long updateTime;
     private boolean doFlush = true;
 
     private int tick;
 
-    private final ServerConnectionManager connectionManager;
+    private final ServerConnectionWrapper connectionManager;
 
-    public ProcessingHandler(ServerConnectionManager connectionManager) {
+    public ServerChannelHandler(ServerConnectionWrapper connectionManager) {
         this.connectionManager = connectionManager;
 
-        logger = Global.getLogger(ProcessingHandler.class);
+        logger = Global.getLogger(ServerChannelHandler.class);
 
         initialTime = System.nanoTime();
         timeU = 1000000000d / TICK_RATE;
         deltaU = 1d;
 
-        updateTime = initialTime;
-
-        tick = 0;
+        // -1 indicates in process of loading, not sending remote simulation data yet
+        tick = -1;
     }
 
     @Override
@@ -68,7 +66,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
         Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
-        // client doesn't send any entity deletions to worry about
         connectionManager.getDuplex().updateInbound(entities);
     }
 
@@ -84,9 +81,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Console.showMessage("Channel active on server");
         Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
-        PacketContainer container = connectionManager.getDuplex().getPacket(-1);
+        sendQueuedData(ctx);
 
-        ChannelFuture future = writeAndFlushPackets(ctx);
+        tick = 0;
     }
 
     /**
@@ -108,7 +105,8 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // time delta
         //long diffTimeNanos = currentTime - updateTime;
 
-        final ChannelFuture future = writeAndFlushPackets(ctx);
+        final ChannelFuture future = sendQueuedData(ctx);
+        tick++;
 
         future.addListener(new ChannelFutureListener() {
             @Override
@@ -124,7 +122,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         deltaU--;
     }
 
-    private ChannelFuture writeAndFlushPackets(ChannelHandlerContext ctx) throws IOException {
+    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
         if (doFlush) connectionManager.getDuplex().flush();
 
         PacketContainer container = connectionManager.getDuplex().getPacket(tick);
@@ -136,7 +134,6 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
             future = ctx.writeAndFlush(packet);
         }
 
-        tick++;
         return future;
     }
 }
