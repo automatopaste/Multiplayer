@@ -5,7 +5,6 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -102,15 +101,15 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         final ChannelFuture future = sendQueuedData(ctx);
 
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture channelFuture) {
-                if (!future.isSuccess()) {
-                    deltaU = 1d;
-                    doFlush = true;
-                }
-            }
-        });
+//        future.addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture channelFuture) {
+//                if (!future.isSuccess()) {
+//                    deltaU = 1d;
+//                    doFlush = true;
+//                }
+//            }
+//        });
 
         //updateTime = currentTime;
         deltaU--;
@@ -129,11 +128,12 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         while (container.getSections().peek() != null) {
             ByteBuffer packet = container.getSections().poll();
 
-            future = ctx.writeAndFlush(packet);
+            future = ctx.write(packet);
         }
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
 
+        ctx.flush();
         return future;
     }
 }
