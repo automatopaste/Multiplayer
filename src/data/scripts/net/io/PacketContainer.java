@@ -25,9 +25,9 @@ public class PacketContainer {
             if (written != null && written.length > 0) entities.add(written);
         }
 
-        int size = Integer.SIZE / Byte.SIZE;
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         data.write(tick);
+        int size = Integer.SIZE / Byte.SIZE;
         while (!entities.isEmpty()) {
             byte[] entity = entities.poll();
 
