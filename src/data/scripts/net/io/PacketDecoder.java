@@ -32,19 +32,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
     private Unpacked getUnpacked(ByteBuf in, int tick) {
         if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, BasePackable>(), tick);
 
-        // unpack deleted instance IDs
-//        int numDeleted = in.readInt();
-//        int n = 0;
-//        List<Integer> deleted = new ArrayList<>();
-//        while (n < numDeleted) {
-//            deleted.add(in.readInt());
-//            n++;
-//        }
-
-        if (in.readableBytes() == 0) {
-            return new Unpacked(new HashMap<Integer, BasePackable>(), tick);
-        }
-
         // integer keys are unique instance IDs
         Map<Integer, BasePackable> entities = new HashMap<>();
         // integer keys are unique record IDs

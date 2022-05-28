@@ -27,22 +27,19 @@ public class PacketContainer {
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         data.write(tick);
-        int size = Integer.SIZE / Byte.SIZE;
         while (!entities.isEmpty()) {
             byte[] entity = entities.poll();
 
-            int newSize = size + entity.length;
+            int newSize = data.size() + entity.length;
 
             if (newSize > PACKET_SIZE) {
                 sections.add(ByteBuffer.wrap(data.toByteArray()));
 
                 data.reset();
                 data.write(tick);
-                size = Integer.SIZE / Byte.SIZE;
             }
 
             data.write(entity);
-            size += entity.length;
 
             if (entities.isEmpty()) {
                 ByteBuffer buffer = ByteBuffer.wrap(data.toByteArray());
