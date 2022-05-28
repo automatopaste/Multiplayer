@@ -1,46 +1,57 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.*;
 
 public class PacketContainer {
-    private static final int PACKET_SIZE_INIT = 1536;
-
-    private final ByteBuffer data;
-    private final int length;
+    private static final int PACKET_SIZE = 1536;
 
     private final int tick;
 
-    public PacketContainer(List<APackable> packables, int tick, boolean flush) throws IOException {
+    private final Queue<ByteBuffer> sections;
+
+    public PacketContainer(List<BasePackable> packables, int tick, boolean flush) throws IOException {
         this.tick = tick;
 
-        data = ByteBuffer.allocate(PACKET_SIZE_INIT);
+        sections = new LinkedList<>();
 
-        data.putInt(tick);
-
-//        data.putInt(deleted.size());
-//        for (Integer i : deleted) {
-//            data.putInt(i);
-//        }
-
-        for (APackable packable : packables) {
+        Queue<byte[]> bytes = new LinkedList<>();
+        for (BasePackable packable : packables) {
             byte[] written = packable.pack(flush);
-            if (written != null) data.put(written);
+            if (written != null && written.length > 0) bytes.add(written);
         }
 
-        length = data.position();
-        data.flip();
+        int size = 8;
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        data.write(tick);
+        while (!bytes.isEmpty()) {
+            byte[] byteArr = bytes.poll();
+
+            int newSize = size + byteArr.length;
+
+            if (newSize > PACKET_SIZE) {
+                sections.add(ByteBuffer.wrap(data.toByteArray()));
+
+                data.reset();
+                data.write(tick);
+                size = 8;
+            }
+
+            data.write(byteArr);
+            size += byteArr.length;
+
+            if (bytes.isEmpty()) {
+                sections.add(ByteBuffer.wrap(data.toByteArray()));
+            }
+        }
     }
 
-    public ByteBuffer getData() {
-        return data;
-    }
-
-    public int getLength() {
-        return length;
+    public Queue<ByteBuffer> getSections() {
+        return sections;
     }
 
     public int getTick() {

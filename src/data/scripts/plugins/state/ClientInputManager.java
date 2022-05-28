@@ -1,6 +1,6 @@
 package data.scripts.plugins.state;
 
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.InputAggregateData;
 
 import java.util.HashMap;
@@ -16,8 +16,8 @@ public class ClientInputManager implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Integer, APackable> getEntities() {
-        Map<Integer, APackable> out = new HashMap<>();
+    public Map<Integer, BasePackable> getEntities() {
+        Map<Integer, BasePackable> out = new HashMap<>();
         out.put(instanceID, input);
         return out;
     }

@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.InputAggregateData;
 import data.scripts.net.terminals.client.NettyClient;
 import data.scripts.plugins.state.ClientEntityManager;
@@ -66,7 +66,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed client");
         }
 
-        Map<Integer, APackable> entities = clientDataDuplex.getDeltas();
+        Map<Integer, BasePackable> entities = clientDataDuplex.getDeltas();
 //        List<Integer> toDelete = new ArrayList<>(clientDataDuplex.getRemovedInbound());
 
 //        entityManager.delete(toDelete);
@@ -74,7 +74,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         entityManager.updateEntities();
 
-        Map<Integer, APackable> outbound = inputManager.getEntities();
+        Map<Integer, BasePackable> outbound = inputManager.getEntities();
 
         clientDataDuplex.updateOutbound(outbound);
     }

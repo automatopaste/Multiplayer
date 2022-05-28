@@ -1,7 +1,7 @@
 package data.scripts.net.terminals.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import data.scripts.plugins.state.DataDuplex;
@@ -50,9 +50,9 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         Unpacked unpacked = (Unpacked) msg;
 
         int serverTick = unpacked.getTick();
-        logger.info("Received server tick notice: " + serverTick);
+        logger.info("Received unpacked with tick: " + serverTick);
 
-        Map<Integer, APackable> entities = unpacked.getUnpacked();
+        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
         clientDataDuplex.updateInbound(entities);
     }

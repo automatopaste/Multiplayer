@@ -1,10 +1,11 @@
 package data.scripts.net.data.records;
 
+import data.scripts.net.data.BaseRecord;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
-public class FloatRecord extends ARecord<Float> {
+public class FloatRecord extends BaseRecord<Float> {
     private static int typeID;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic

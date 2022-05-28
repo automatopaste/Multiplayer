@@ -3,6 +3,8 @@ package data.scripts.net.data.packables;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.combat.entities.Ship;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.*;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -11,7 +13,7 @@ import java.util.Map;
 /**
  * Container for tracking network data about a ship
  */
-public class ShipData extends APackable {
+public class ShipData extends BasePackable {
     private static int typeID;
 
     private final StringRecord id;
@@ -53,10 +55,10 @@ public class ShipData extends APackable {
         specId = new StringRecord("DEFAULT_SPEC_ID");
     }
 
-    public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
+    public ShipData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
-        ARecord<?> temp;
+        BaseRecord<?> temp;
 
         temp = records.get(SHIP_ID);
         id = (temp == null) ? new StringRecord("DEFAULT_ID_STRING") : (StringRecord) temp;
@@ -87,7 +89,7 @@ public class ShipData extends APackable {
     }
 
     @Override
-    public void updateFromDelta(APackable delta) {
+    public void updateFromDelta(BasePackable delta) {
         ShipData d = (ShipData) delta;
         if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
         if (d.getLoc() != null) loc.forceUpdate(d.getLoc().getRecord());
@@ -102,7 +104,7 @@ public class ShipData extends APackable {
     }
 
     @Override
-    public ShipData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
+    public ShipData unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
         return new ShipData(instanceID, records);
     }
 

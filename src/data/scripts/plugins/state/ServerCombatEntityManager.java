@@ -3,16 +3,16 @@ package data.scripts.plugins.state;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ShipData;
-import data.scripts.net.data.packables.ShipVariantData;
+import data.scripts.net.data.loading.ShipVariantData;
 import data.scripts.plugins.mpServerPlugin;
 
 import java.util.*;
 
 public class ServerCombatEntityManager implements OutboundEntityManager {
     private final Map<Integer, ShipData> ships;
-    private final Map<Integer, APackable> consumable;
+    private final Map<Integer, BasePackable> consumable;
 
     private final Map<Integer, Integer> shipToVariants;
 
@@ -89,8 +89,8 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         }
     }
 
-    public Map<Integer, APackable> getEntities() {
-        Map<Integer, APackable> out = new HashMap<Integer, APackable>(ships);
+    public Map<Integer, BasePackable> getEntities() {
+        Map<Integer, BasePackable> out = new HashMap<Integer, BasePackable>(ships);
 
         out.putAll(consumable);
         consumable.clear();

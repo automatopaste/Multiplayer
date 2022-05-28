@@ -1,10 +1,10 @@
-package data.scripts.net.data.packables;
+package data.scripts.net.data.loading;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
-import data.scripts.net.data.records.ARecord;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ShipVariantData extends APackable {
+public class ShipVariantData extends BasePackable {
     private static int typeID;
 
     private final IntRecord capacitors;
@@ -28,11 +28,11 @@ public class ShipVariantData extends APackable {
 
     private boolean destComplete = false;
 
-    public ShipVariantData(int instanceID, ShipAPI ship, String id) {
+    public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
         super(instanceID);
 
-        int c = (ship == null) ? 0 : ship.getVariant().getNumFluxCapacitors();
-        int v = (ship == null) ? 0 : ship.getVariant().getNumFluxVents();
+        int c = (variant == null) ? 0 : variant.getNumFluxCapacitors();
+        int v = (variant == null) ? 0 : variant.getNumFluxVents();
 
         capacitors = new IntRecord(c);
         vents = new IntRecord(v);
@@ -41,21 +41,22 @@ public class ShipVariantData extends APackable {
         weaponIds = new ArrayList<>();
         weaponSlots = new ArrayList<>();
 
-        if (ship != null) {
-            for (WeaponAPI weapon : ship.getAllWeapons()) {
-                String slot = weapon.getSlot().getId();
-                if (ship.getVariant().getNonBuiltInWeaponSlots().contains(weapon.getSlot().getId())) {
-                    weaponSlots.add(new StringRecord(slot));
-                    weaponIds.add(new StringRecord(weapon.getId()));
-                }
+        if (variant != null) {
+            for (String slot : variant.getNonBuiltInWeaponSlots()) {
+                String weaponId = variant.getWeaponId(slot);
+
+                if (weaponId == null) continue;
+
+                weaponSlots.add(new StringRecord(slot));
+                weaponIds.add(new StringRecord(weaponId));
             }
         }
     }
 
-    public ShipVariantData(int instanceID, Map<Integer, ARecord<?>> records) {
+    public ShipVariantData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
-        ARecord<?> temp;
+        BaseRecord<?> temp;
         temp = records.get(CAPACITORS);
         capacitors = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
         temp = records.get(VENTS);
@@ -131,7 +132,7 @@ public class ShipVariantData extends APackable {
     }
 
     @Override
-    public void updateFromDelta(APackable delta) {
+    public void updateFromDelta(BasePackable delta) {
         ShipVariantData d = (ShipVariantData) delta;
         if (d.getCapacitors() != null) capacitors.forceUpdate(d.getCapacitors().getRecord());
         if (d.getVents() != null) vents.forceUpdate(d.getVents().getRecord());
@@ -171,7 +172,7 @@ public class ShipVariantData extends APackable {
     }
 
     @Override
-    public APackable unpack(int instanceID, Map<Integer, ARecord<?>> records) {
+    public BasePackable unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
         return new ShipVariantData(instanceID, records);
     }
 

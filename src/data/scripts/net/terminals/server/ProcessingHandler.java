@@ -1,7 +1,7 @@
 package data.scripts.net.terminals.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import data.scripts.plugins.state.DataDuplex;
@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
@@ -66,7 +67,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         int clientTick = unpacked.getTick();
         logger.info("Received client tick notice: " + clientTick);
 
-        Map<Integer, APackable> entities = unpacked.getUnpacked();
+        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
         // client doesn't send any entity deletions to worry about
         serverDataDuplex.updateInbound(entities);
@@ -84,7 +85,9 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Console.showMessage("Channel active on server");
         Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
-        ChannelFuture future = writeAndFlushPacket(ctx);
+        PacketContainer container = serverDataDuplex.getPacket(-1);
+
+        ChannelFuture future = writeAndFlushPackets(ctx);
     }
 
     /**
@@ -106,7 +109,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         // time delta
         //long diffTimeNanos = currentTime - updateTime;
 
-        final ChannelFuture future = writeAndFlushPacket(ctx);
+        final ChannelFuture future = writeAndFlushPackets(ctx);
 
         future.addListener(new ChannelFutureListener() {
             @Override
@@ -122,11 +125,18 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         deltaU--;
     }
 
-    private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
+    private ChannelFuture writeAndFlushPackets(ChannelHandlerContext ctx) throws IOException {
         if (doFlush) serverDataDuplex.flush();
 
-        PacketContainer packet = serverDataDuplex.getPacket(tick);
+        PacketContainer container = serverDataDuplex.getPacket(tick);
+        ChannelFuture future = ctx.newSucceededFuture();
+        while (container.getSections().peek() != null) {
+            ByteBuffer packet = container.getSections().poll();
+
+            future = ctx.writeAndFlush(packet);
+        }
+
         tick++;
-        return ctx.writeAndFlush(packet);
+        return future;
     }
 }

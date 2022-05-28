@@ -1,13 +1,13 @@
-package data.scripts.net.data.records;
+package data.scripts.net.data;
 
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
-public abstract class ARecord<T> {
+public abstract class BaseRecord<T> {
     protected T record;
 
-    public ARecord(T record) {
+    public BaseRecord(T record) {
         this.record = record;
     }
 
@@ -18,7 +18,7 @@ public abstract class ARecord<T> {
         doWrite(output);
     }
 
-    public abstract ARecord<T> read(ByteBuf in);
+    public abstract BaseRecord<T> read(ByteBuf in);
 
     public abstract void doWrite(ByteBuffer output);
 

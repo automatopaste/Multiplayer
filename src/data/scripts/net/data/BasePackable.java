@@ -1,6 +1,4 @@
-package data.scripts.net.data.packables;
-
-import data.scripts.net.data.records.ARecord;
+package data.scripts.net.data;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -8,12 +6,12 @@ import java.util.Map;
 /**
  * Used to store data on remote/host and used to read/write data
  */
-public abstract class APackable {
+public abstract class BasePackable {
     protected final ByteBuffer packer;
 
     private final int instanceID;
 
-    public APackable(int instanceID) {
+    public BasePackable(int instanceID) {
         this.instanceID = instanceID;
 
         packer = ByteBuffer.allocate(1024);
@@ -69,7 +67,7 @@ public abstract class APackable {
      * Update stored data with changes from a delta
      * @param delta incoming delta (still uses same class as non-transmitting entity for convenience)
      */
-    public abstract void updateFromDelta(APackable delta);
+    public abstract void updateFromDelta(BasePackable delta);
 
     /**
      * Ouput data to a byte buffer
@@ -89,5 +87,5 @@ public abstract class APackable {
      * @param records maps unique IDs to record
      * @return new instance of packable with data
      */
-    public abstract APackable unpack(int instanceID, Map<Integer, ARecord<?>> records);
+    public abstract BasePackable unpack(int instanceID, Map<Integer, BaseRecord<?>> records);
 }

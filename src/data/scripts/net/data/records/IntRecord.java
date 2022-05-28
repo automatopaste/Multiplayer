@@ -1,10 +1,11 @@
 package data.scripts.net.data.records;
 
+import data.scripts.net.data.BaseRecord;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 
-public class IntRecord extends ARecord<Integer> {
+public class IntRecord extends BaseRecord<Integer> {
     private static int typeID;
 
     public IntRecord(Integer record) {

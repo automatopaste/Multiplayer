@@ -1,7 +1,7 @@
-package data.scripts.net.data;
+package data.scripts.data;
 
-import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.records.ARecord;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,15 +10,15 @@ import java.util.Map;
  * Allows mods to specify entity types and record types dynamically
  */
 public class DataGenManager {
-    public static Map<Class<? extends APackable>, Integer> entityTypeIDs = new HashMap<>();
-    public static Map<Integer, APackable> entityInstances = new HashMap<>();
+    public static Map<Class<? extends BasePackable>, Integer> entityTypeIDs = new HashMap<>();
+    public static Map<Integer, BasePackable> entityInstances = new HashMap<>();
 
-    public static Map<Class<? extends ARecord<?>>, Integer> recordTypeIDs = new HashMap<>();
-    public static Map<Integer, ARecord<?>> recordInstances = new HashMap<>();
+    public static Map<Class<? extends BaseRecord<?>>, Integer> recordTypeIDs = new HashMap<>();
+    public static Map<Integer, BaseRecord<?>> recordInstances = new HashMap<>();
 
     private static int idIncrementer = 1;
 
-    public synchronized static int registerEntityType(Class<? extends APackable> clazz, APackable instance) {
+    public synchronized static int registerEntityType(Class<? extends BasePackable> clazz, BasePackable instance) {
         int id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         entityInstances.put(id, instance);
@@ -26,7 +26,7 @@ public class DataGenManager {
         return id;
     }
 
-    public synchronized static int registerRecordType(Class<? extends ARecord<?>> clazz, ARecord<?> instance) {
+    public synchronized static int registerRecordType(Class<? extends BaseRecord<?>> clazz, BaseRecord<?> instance) {
         int id = idIncrementer;
         recordTypeIDs.put(clazz, id);
         recordInstances.put(id, instance);
@@ -39,7 +39,7 @@ public class DataGenManager {
      * @param typeID id
      * @return new empty instance
      */
-    public static APackable entityFactory(int typeID) {
+    public static BasePackable entityFactory(int typeID) {
         return entityInstances.get(typeID);
     }
 
@@ -48,7 +48,7 @@ public class DataGenManager {
      * @param typeID id
      * @return new empty instance
      */
-    public static ARecord<?> recordFactory(int typeID) {
+    public static BaseRecord<?> recordFactory(int typeID) {
         return recordInstances.get(typeID);
     }
 }

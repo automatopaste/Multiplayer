@@ -1,15 +1,19 @@
 package data.scripts.plugins.state;
 
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Instantiate one per connection
+ */
 public class DataDuplex {
-    private final Map<Integer, APackable> inbound;
-    private final Map<Integer, APackable> outbound;
+    private final Map<Integer, BasePackable> inbound;
+    private final Map<Integer, BasePackable> outbound;
 
+    private boolean isClientLoading;
     private boolean doFlush;
 
     public DataDuplex() {
@@ -17,27 +21,20 @@ public class DataDuplex {
         outbound = new HashMap<>();
 
         doFlush = true;
+        isClientLoading = false;
     }
 
     /**
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public Map<Integer, APackable> getDeltas() {
+    public Map<Integer, BasePackable> getDeltas() {
         synchronized (inbound) {
-            Map<Integer, APackable> out = new HashMap<>(inbound);
+            Map<Integer, BasePackable> out = new HashMap<>(inbound);
             inbound.clear();
             return out;
         }
     }
-//
-//    public Set<Integer> getRemovedInbound() {
-//        synchronized (removedInbound) {
-//            Set<Integer> out = new HashSet<>(removedInbound);
-//            removedInbound.clear();
-//            return out;
-//        }
-//    }
 
     /**
      * Create a packet to send over socket connection
@@ -46,16 +43,11 @@ public class DataDuplex {
      * @throws IOException fuck up
      */
     public PacketContainer getPacket(int tick) throws IOException {
-        List<APackable> outEntities;
+        List<BasePackable> outEntities;
         synchronized (outbound) {
             outEntities = new ArrayList<>(outbound.values());
             outbound.clear();
         }
-        List<Integer> outRemovedInstances;
-//        synchronized (removedOutbound) {
-//            outRemovedInstances = new ArrayList<>(removedOutbound);
-//            removedOutbound.clear();
-//        }
 
         PacketContainer p = new PacketContainer(outEntities, tick, doFlush);
         doFlush = false;
@@ -66,11 +58,11 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateInbound(Map<Integer, APackable> entities) {
+    public void updateInbound(Map<Integer, BasePackable> entities) {
         synchronized (this.inbound) {
             for (Integer key : entities.keySet()) {
-                APackable p = inbound.get(key);
-                APackable e = entities.get(key);
+                BasePackable p = inbound.get(key);
+                BasePackable e = entities.get(key);
 
                 if (p != null) {
                     if (p.equals(e)) continue;
@@ -81,20 +73,17 @@ public class DataDuplex {
                 }
             }
         }
-//        synchronized (this.removedInbound) {
-//            this.removedInbound.addAll(removed);
-//        }
     }
 
     /**
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateOutbound(Map<Integer, APackable> entities) {
+    public void updateOutbound(Map<Integer, BasePackable> entities) {
         synchronized (this.outbound) {
             for (Integer key : entities.keySet()) {
-                APackable p = outbound.get(key);
-                APackable e = entities.get(key);
+                BasePackable p = outbound.get(key);
+                BasePackable e = entities.get(key);
 
                 if (p != null) {
                     if (p.equals(e)) continue;
@@ -105,12 +94,13 @@ public class DataDuplex {
                 }
             }
         }
-//        synchronized (this.removedOutbound) {
-//            this.removedOutbound.addAll(removed);
-//        }
     }
 
     public void flush() {
         doFlush = true;
+    }
+
+    public boolean isClientLoading() {
+        return isClientLoading;
     }
 }

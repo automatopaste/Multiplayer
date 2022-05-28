@@ -4,8 +4,9 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.net.data.DataGenManager;
-import data.scripts.net.data.records.ARecord;
+import data.scripts.net.data.BasePackable;
+import data.scripts.data.DataGenManager;
+import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -13,7 +14,7 @@ import org.lwjgl.input.Mouse;
 import java.util.List;
 import java.util.Map;
 
-public class InputAggregateData extends APackable {
+public class InputAggregateData extends BasePackable {
     private static int typeID;
 
     // must be below 32
@@ -35,7 +36,7 @@ public class InputAggregateData extends APackable {
         keysBitmask = new IntRecord(0);
     }
 
-    public InputAggregateData(int instanceID, Map<Integer, ARecord<?>> records) {
+    public InputAggregateData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
         IntRecord keysBitmask1 = (IntRecord) records.get(BITMASK);
@@ -191,12 +192,12 @@ public class InputAggregateData extends APackable {
     }
 
     @Override
-    public InputAggregateData unpack(int instanceID, Map<Integer, ARecord<?>> records) {
+    public InputAggregateData unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
         return new InputAggregateData(instanceID, records);
     }
 
     @Override
-    public void updateFromDelta(APackable delta) {
+    public void updateFromDelta(BasePackable delta) {
         InputAggregateData d = (InputAggregateData) delta;
         if (d.getKeysBitmask() != null) keysBitmask.forceUpdate(d.getKeysBitmask().getRecord());
     }

@@ -1,11 +1,12 @@
 package data.scripts.net.data.records;
 
+import data.scripts.net.data.BaseRecord;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.nio.ByteBuffer;
 
-public class Vector2fRecord extends ARecord<Vector2f> {
+public class Vector2fRecord extends BaseRecord<Vector2f> {
     private static int typeID;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic

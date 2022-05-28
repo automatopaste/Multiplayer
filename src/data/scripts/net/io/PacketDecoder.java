@@ -1,8 +1,8 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.DataGenManager;
-import data.scripts.net.data.packables.APackable;
-import data.scripts.net.data.records.ARecord;
+import data.scripts.data.DataGenManager;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -24,13 +24,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
         Unpacked unpacked = getUnpacked(in, tick);
 
         int readable = in.readableBytes();
-        if (readable > 0) throw new OutOfMemoryError(in.readableBytes() + " bytes left in packet decoder frame");
+        if (readable > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in packet decoder frame");
 
         out.add(unpacked);
     }
 
     private Unpacked getUnpacked(ByteBuf in, int tick) {
-        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), tick);
+        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, BasePackable>(), tick);
 
         // unpack deleted instance IDs
 //        int numDeleted = in.readInt();
@@ -42,13 +42,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
 //        }
 
         if (in.readableBytes() == 0) {
-            return new Unpacked(new HashMap<Integer, APackable>(), tick);
+            return new Unpacked(new HashMap<Integer, BasePackable>(), tick);
         }
 
         // integer keys are unique instance IDs
-        Map<Integer, APackable> entities = new HashMap<>();
+        Map<Integer, BasePackable> entities = new HashMap<>();
         // integer keys are unique record IDs
-        Map<Integer, ARecord<?>> records = new HashMap<>();
+        Map<Integer, BaseRecord<?>> records = new HashMap<>();
 
         int entityID = in.readInt();
         int entityInstanceID = in.readInt();
@@ -59,7 +59,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             if (DataGenManager.entityTypeIDs.containsValue(type)) {
                 // reached new entity
                 if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
-                APackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
+                BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
                 entities.put(entityInstanceID, entity);
 
                 entityID = type;
@@ -71,7 +71,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             }
         }
         if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
-        APackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
+        BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
         entities.put(entityInstanceID, entity);
 
         return new Unpacked(entities, tick);

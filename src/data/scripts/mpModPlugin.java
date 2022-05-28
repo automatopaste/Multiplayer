@@ -1,10 +1,10 @@
 package data.scripts;
 
 import com.fs.starfarer.api.BaseModPlugin;
-import data.scripts.net.data.DataGenManager;
+import data.scripts.data.DataGenManager;
 import data.scripts.net.data.packables.InputAggregateData;
 import data.scripts.net.data.packables.ShipData;
-import data.scripts.net.data.packables.ShipVariantData;
+import data.scripts.net.data.loading.ShipVariantData;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;

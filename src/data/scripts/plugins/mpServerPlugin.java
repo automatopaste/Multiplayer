@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.terminals.server.NettyServer;
 import data.scripts.plugins.state.DataDuplex;
 import data.scripts.plugins.state.ServerCombatEntityManager;
@@ -51,19 +51,9 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         logger.info("Starting server");
 
         serverThread.start();
-
-        ShipVariantAPI variant = Global.getCombatEngine().getPlayerShip().getVariant();
-
-        for (int i = 0; i < variant.getNonBuiltInWeaponSlots().size(); i++) {
-            String slot = variant.getNonBuiltInWeaponSlots().get(i);
-
-//            if (variant.getFittedWeaponSlots().contains(slot)) continue;
-
-            variant.addWeapon(slot, "pdlaser");
-        }
-
-        variant.autoGenerateWeaponGroups();
     }
+
+    boolean yeah = true;
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
@@ -80,9 +70,11 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
+
+
         // outbound data update
         serverCombatEntityManager.update();
-        Map<Integer, APackable> entities = serverCombatEntityManager.getEntities();
+        Map<Integer, BasePackable> entities = serverCombatEntityManager.getEntities();
 
         //inbound data update
         serverEntityManager.processDeltas(serverDataDuplex.getDeltas());
@@ -90,6 +82,22 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverEntityManager.updateEntities();
 
         serverDataDuplex.updateOutbound(entities);
+
+        ShipVariantAPI variant = Global.getCombatEngine().getPlayerShip().getVariant().clone();
+
+        String wpn = (yeah) ? "pdlaser" : "pdburst";
+        yeah = !yeah;
+        for (int i = 0; i < variant.getNonBuiltInWeaponSlots().size(); i++) {
+            String slot = variant.getNonBuiltInWeaponSlots().get(i);
+
+            variant.addWeapon(slot, wpn);
+        }
+        System.out.println(variant.getWeaponId("WS 001"));
+
+        variant.autoGenerateWeaponGroups();
+
+        ShipAPI ship = Global.getCombatEngine().getPlayerShip();
+        ship.getFleetMember().setVariant(variant, true, true);
     }
 
     public int getNewInstanceID(ShipAPI ship) {

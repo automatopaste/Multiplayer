@@ -1,6 +1,6 @@
 package data.scripts.plugins.state;
 
-import data.scripts.net.data.packables.APackable;
+import data.scripts.net.data.BasePackable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientEntityManager implements InboundEntityManager {
-    private final Map<Integer, APackable> entities;
+    private final Map<Integer, BasePackable> entities;
 
     public ClientEntityManager() {
         entities = new HashMap<>();
@@ -19,10 +19,10 @@ public class ClientEntityManager implements InboundEntityManager {
      * then assume it is newly created and init it
      * @param toProcess new deltas
      */
-    public void processDeltas(Map<Integer, APackable> toProcess) {
+    public void processDeltas(Map<Integer, BasePackable> toProcess) {
         for (Integer key : toProcess.keySet()) {
-            APackable entity = entities.get(key);
-            APackable newEntity = toProcess.get(key);
+            BasePackable entity = entities.get(key);
+            BasePackable newEntity = toProcess.get(key);
             if (entity == null) {
                 newEntity.destinationInit();
                 entities.put(key, newEntity);
@@ -37,7 +37,7 @@ public class ClientEntityManager implements InboundEntityManager {
         List<Integer> toRemove = new ArrayList<>();
 
         for (Integer key : entities.keySet()) {
-            APackable entity = entities.get(key);
+            BasePackable entity = entities.get(key);
             entity.destinationUpdate();
 
             if (entity.shouldDeleteOnDestination()) toRemove.add(key);
