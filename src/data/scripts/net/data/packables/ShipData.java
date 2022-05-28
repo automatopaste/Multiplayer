@@ -24,7 +24,6 @@ public class ShipData extends APackable {
     private final Vector2fRecord cursor;
     private final IntRecord owner;
     private final StringRecord specId;
-    private final StringRecord baseVariant;
 
     private ShipAPI ship;
     
@@ -38,7 +37,6 @@ public class ShipData extends APackable {
     private static final int CURSOR = 8;
     private static final int OWNER = 9;
     private static final int SPEC_ID = 10;
-    private static final int BASE_VARIANT = 10;
 
     public ShipData(int instanceID) {
         super(instanceID);
@@ -53,7 +51,6 @@ public class ShipData extends APackable {
         cursor = new Vector2fRecord(new Vector2f(0f, 0f));
         owner = new IntRecord(0);
         specId = new StringRecord("DEFAULT_SPEC_ID");
-        baseVariant = new StringRecord("DEFAULT_VARIANT");
     }
 
     public ShipData(int instanceID, Map<Integer, ARecord<?>> records) {
@@ -81,8 +78,6 @@ public class ShipData extends APackable {
         owner = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
         temp = records.get(SPEC_ID);
         specId = (temp == null) ? new StringRecord("DEFAULT_SPEC_ID") : (StringRecord) temp;
-        temp = records.get(BASE_VARIANT);
-        baseVariant = (temp == null) ? new StringRecord("DEFAULT_VARIANT") : (StringRecord) temp;
 
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             if (ship.getFleetMemberId().equals(id.getRecord())) {
@@ -104,7 +99,6 @@ public class ShipData extends APackable {
         if (d.getCursor() != null) cursor.forceUpdate(d.getCursor().getRecord());
         if (d.getOwner() != null) cursor.forceUpdate(d.getCursor().getRecord());
         if (d.getSpecId() != null) specId.forceUpdate(d.getSpecId().getRecord());
-        if (d.getBaseVariant() != null) baseVariant.forceUpdate(d.getBaseVariant().getRecord());
     }
 
     @Override
@@ -162,10 +156,6 @@ public class ShipData extends APackable {
             specId.write(packer, SPEC_ID);
             update = true;
         }
-        if (baseVariant.checkUpdate(ship.getVariant().getHullVariantId())) {
-            baseVariant.write(packer, BASE_VARIANT);
-            update = true;
-        }
 
         return update;
     }
@@ -200,16 +190,13 @@ public class ShipData extends APackable {
 
         specId.forceUpdate(ship.getHullSpec().getHullId());
         specId.write(packer, SPEC_ID);
-
-        baseVariant.forceUpdate(ship.getVariant().getHullVariantId());
-        baseVariant.write(packer, BASE_VARIANT);
     }
 
     @Override
     public void destinationInit() {
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(baseVariant.getRecord(), loc.getRecord(), ang.getRecord());
+        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord() + "_Hull", loc.getRecord(), ang.getRecord());
 
         Ship s = (Ship) ship;
         s.setFleetMemberId(id.getRecord());
@@ -340,9 +327,5 @@ public class ShipData extends APackable {
 
     public StringRecord getSpecId() {
         return specId;
-    }
-
-    public StringRecord getBaseVariant() {
-        return baseVariant;
     }
 }

@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface OutboundEntityManager {
-
     Map<Integer, ? extends APackable> getEntities();
 
     List<Integer> updateAndGetRemovedEntityInstanceIds();
-
 }
