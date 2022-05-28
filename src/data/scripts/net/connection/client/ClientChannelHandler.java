@@ -4,7 +4,6 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
-import data.scripts.net.connection.DataDuplex;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,14 +18,14 @@ import java.util.Map;
  * Main logic for handling network packet data
  */
 public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
-    private final DataDuplex clientDataDuplex;
+    private final ClientConnectionWrapper connection;
 
     private final Logger logger;
 
     private int clientTick;
 
-    public ClientChannelHandler(DataDuplex clientDataDuplex) {
-        this.clientDataDuplex = clientDataDuplex;
+    public ClientChannelHandler(ClientConnectionWrapper connection) {
+        this.connection = connection;
 
         logger = Global.getLogger(ClientChannelHandler.class);
 
@@ -52,14 +51,19 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         int serverTick = unpacked.getTick();
         logger.info("Received unpacked with tick: " + serverTick);
 
+        connection.getDuplex().setCurrTick(serverTick);
+
         Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
-        clientDataDuplex.updateInbound(entities);
+        // if getting -1 value tick from server, server is sending preload data
+        connection.setLoading(serverTick == -1);
+
+        connection.getDuplex().updateInbound(entities);
     }
 
     @Override
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
-        ChannelFuture future = writeAndFlushPacket(ctx);
+        ChannelFuture future = sendQueuedData(ctx);
 
         future.addListener(new ChannelFutureListener() {
             @Override
@@ -81,8 +85,8 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         logger.info("Client channel handler removed");
     }
 
-    private ChannelFuture writeAndFlushPacket(ChannelHandlerContext ctx) throws IOException {
-        PacketContainer packet = clientDataDuplex.getPacket(clientTick);
+    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
+        PacketContainer packet = connection.getDuplex().getPacket(clientTick);
         clientTick++;
         return ctx.writeAndFlush(packet);
     }

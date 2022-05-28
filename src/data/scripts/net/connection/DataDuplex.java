@@ -13,6 +13,8 @@ public class DataDuplex {
     private final Map<Integer, BasePackable> inbound;
     private final Map<Integer, BasePackable> outbound;
 
+    private int currTick;
+
     private boolean doFlush;
 
     public DataDuplex() {
@@ -20,6 +22,7 @@ public class DataDuplex {
         outbound = new HashMap<>();
 
         doFlush = true;
+        currTick = 0;
     }
 
     /**
@@ -96,5 +99,13 @@ public class DataDuplex {
 
     public void flush() {
         doFlush = true;
+    }
+
+    public synchronized void setCurrTick(int currTick) {
+        this.currTick = currTick;
+    }
+
+    public synchronized int getCurrTick() {
+        return currTick;
     }
 }

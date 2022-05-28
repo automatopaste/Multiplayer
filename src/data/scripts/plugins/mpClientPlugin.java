@@ -38,7 +38,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         connection = new ClientConnectionWrapper();
 
-        client = new NettyClient(host, port, connection.getDuplex());
+        client = new NettyClient(host, port, connection);
         clientThread = new Thread(client, "mpClient");
         clientThread.start();
 
@@ -83,6 +83,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
+        // resend all data (flush)
         Object thing = engine.getCustomData().get(mpFlush.FLUSH_KEY);
         if (thing != null) {
             engine.getCustomData().remove(mpFlush.FLUSH_KEY);

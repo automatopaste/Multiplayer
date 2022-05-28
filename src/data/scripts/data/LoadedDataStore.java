@@ -19,6 +19,8 @@ import java.util.Map;
 public class LoadedDataStore {
     private final Map<String, ShipVariantData> variantData;
 
+    private Map<Integer, BasePackable> generated;
+
     public LoadedDataStore(Map<Integer, BasePackable> incoming) {
         variantData = new HashMap<>();
 
@@ -28,6 +30,10 @@ public class LoadedDataStore {
                 variantData.put(variant.getShipId().getRecord(), variant);
             }
         }
+    }
+
+    public LoadedDataStore() {
+        variantData = new HashMap<>();
     }
 
     public Map<String, ShipVariantData> getVariantData() {
@@ -40,7 +46,7 @@ public class LoadedDataStore {
      * @param plugin the plugin
      * @return entities to load
      */
-    public static Map<Integer, BasePackable> generate(CombatEngineAPI engine, mpServerPlugin plugin) {
+    public void generate(CombatEngineAPI engine, mpServerPlugin plugin) {
         List<FleetMemberAPI> members = new ArrayList<>();
 
         CombatFleetManagerAPI manager0 = engine.getFleetManager(0);
@@ -51,15 +57,17 @@ public class LoadedDataStore {
         members.addAll(manager1.getDeployedCopy());
         members.addAll(manager1.getReservesCopy());
 
-        Map<Integer, BasePackable> data = new HashMap<>();
+        generated = new HashMap<>();
 
         for (FleetMemberAPI member : members) {
             int id = plugin.getNewInstanceID();
             ShipVariantData variantData = new ShipVariantData(id, member.getVariant(), member.getId());
 
-            data.put(id, variantData);
+            generated.put(id, variantData);
         }
+    }
 
-        return data;
+    public Map<Integer, BasePackable> getGenerated() {
+        return generated;
     }
 }

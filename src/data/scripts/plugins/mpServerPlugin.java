@@ -22,8 +22,12 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final int port;
     private final Logger logger;
 
+    private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
+
     private NettyServer server;
     private Thread serverThread;
+
+    private int tick;
 
     private final List<ServerConnectionWrapper> connections = new ArrayList<>();
 
@@ -33,6 +37,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private int nextInstanceID = Integer.MIN_VALUE;
     private final Set<Integer> usedIDs = new HashSet<>();
 
+    private final LoadedDataStore dataStore;
+
     public mpServerPlugin(int port) {
         this.port = port;
         logger = Global.getLogger(mpServerPlugin.class);
@@ -40,6 +46,9 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverEntityManager = new ServerInboundEntityManager(this);
 
         serverCombatEntityManager = new ServerCombatEntityManager(this);
+
+        dataStore = new LoadedDataStore();
+        dataStore.generate(Global.getCombatEngine(), this);
 
         server = new NettyServer(port, this);
         serverThread = new Thread(server, "mpServer");
@@ -68,8 +77,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         for (ServerConnectionWrapper connection : connections) {
             if (connection.isRequestLoad()) {
-                connection.getDuplex().updateOutbound(LoadedDataStore.generate(engine, this));
-                connection.setRequestLoad(false);
+                connection.getDuplex().updateOutbound(dataStore.getGenerated());
             }
         }
 
@@ -88,6 +96,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         Map<Integer, BasePackable> entities = serverCombatEntityManager.getEntities();
 
         for (ServerConnectionWrapper connection : connections) {
+            if (connection.isRequestLoad()) continue;
+
             serverEntityManager.processDeltas(connection.getDuplex().getDeltas());
         }
 
@@ -95,11 +105,25 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverEntityManager.updateEntities();
 
         for (ServerConnectionWrapper connection : connections) {
+            if (connection.isRequestLoad()) continue;
+
             connection.getDuplex().updateOutbound(entities);
+        }
+
+        // move tick forward
+        tick++;
+        for (ServerConnectionWrapper connection : connections) {
+            if (connection.isRequestLoad()) continue;
+
+            connection.getDuplex().setCurrTick(tick);
         }
     }
 
     public ServerConnectionWrapper getNewConnection() {
+        if (connections.size() >= maxConnections) {
+            return null;
+        }
+
         ServerConnectionWrapper connectionManager = new ServerConnectionWrapper(getNewInstanceID());
         connections.add(connectionManager);
 

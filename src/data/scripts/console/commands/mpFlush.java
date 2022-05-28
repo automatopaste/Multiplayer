@@ -15,7 +15,7 @@ public class mpFlush implements BaseCommand {
         }
 
         Console.showMessage("Flushing data");
-        Global.getCombatEngine().getCustomData().put(FLUSH_KEY, true);
+        Global.getCombatEngine().getCustomData().put(FLUSH_KEY, new Object());
 
         return CommandResult.SUCCESS;
     }

@@ -13,15 +13,15 @@ public class ServerConnectionWrapper {
         this.id = id;
     }
 
-    public DataDuplex getDuplex() {
+    public synchronized DataDuplex getDuplex() {
         return dataDuplex;
     }
 
-    public boolean isRequestLoad() {
+    public synchronized boolean isRequestLoad() {
         return requestLoad;
     }
 
-    public void setRequestLoad(boolean requestLoad) {
+    public synchronized void setRequestLoad(boolean requestLoad) {
         this.requestLoad = requestLoad;
     }
 

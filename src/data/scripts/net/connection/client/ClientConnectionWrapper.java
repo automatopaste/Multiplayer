@@ -11,15 +11,15 @@ public class ClientConnectionWrapper {
         loading = true;
     }
 
-    public DataDuplex getDuplex() {
+    public synchronized DataDuplex getDuplex() {
         return dataDuplex;
     }
 
-    public boolean isLoading() {
+    public synchronized boolean isLoading() {
         return loading;
     }
 
-    public void setLoading(boolean loading) {
+    public synchronized void setLoading(boolean loading) {
         this.loading = loading;
     }
 }

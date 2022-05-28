@@ -3,7 +3,6 @@ package data.scripts.net.connection.client;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
-import data.scripts.net.connection.DataDuplex;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -17,14 +16,14 @@ public class NettyClient implements Runnable {
     private final String host;
     private final int port;
 
-    private final DataDuplex clientDataDuplex;
+    private final ClientConnectionWrapper connection;
 
     private boolean stop;
 
-    public NettyClient(String host, int port, DataDuplex clientDataDuplex) {
+    public NettyClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
         this.port = port;
-        this.clientDataDuplex = clientDataDuplex;
+        this.connection = connection;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class NettyClient implements Runnable {
                                 new PacketContainerEncoder(),
                                 new PacketContainerDecoder(),
                                 new PacketDecoder(),
-                                new ClientChannelHandler(clientDataDuplex)
+                                new ClientChannelHandler(connection)
                         );
                     }
                 });

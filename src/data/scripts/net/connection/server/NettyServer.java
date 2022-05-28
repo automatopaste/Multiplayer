@@ -40,8 +40,12 @@ public class NettyServer implements Runnable {
                         private ServerConnectionWrapper connection;
 
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) {
+                        protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
                             connection = serverPlugin.getNewConnection();
+
+                            if (connection == null) {
+                                throw new InterruptedException("Channel connection refused: max connections exceeded");
+                            }
 
                             socketChannel.pipeline().addLast(
                                     new PacketContainerEncoder(),

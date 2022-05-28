@@ -25,12 +25,10 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     private double deltaU;
     private boolean doFlush = true;
 
-    private int tick;
+    private final ServerConnectionWrapper connection;
 
-    private final ServerConnectionWrapper connectionManager;
-
-    public ServerChannelHandler(ServerConnectionWrapper connectionManager) {
-        this.connectionManager = connectionManager;
+    public ServerChannelHandler(ServerConnectionWrapper connection) {
+        this.connection = connection;
 
         logger = Global.getLogger(ServerChannelHandler.class);
 
@@ -39,7 +37,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         deltaU = 1d;
 
         // -1 indicates in process of loading, not sending remote simulation data yet
-        tick = -1;
     }
 
     @Override
@@ -66,7 +63,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
-        connectionManager.getDuplex().updateInbound(entities);
+        connection.getDuplex().updateInbound(entities);
     }
 
     /**
@@ -82,8 +79,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
         sendQueuedData(ctx);
-
-        tick = 0;
     }
 
     /**
@@ -106,7 +101,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         //long diffTimeNanos = currentTime - updateTime;
 
         final ChannelFuture future = sendQueuedData(ctx);
-        tick++;
 
         future.addListener(new ChannelFutureListener() {
             @Override
@@ -123,9 +117,13 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
-        if (doFlush) connectionManager.getDuplex().flush();
+        if (doFlush) connection.getDuplex().flush();
 
-        PacketContainer container = connectionManager.getDuplex().getPacket(tick);
+        int tick = connection.getDuplex().getCurrTick();
+        // send -1 value tick to indicate server is sending preload data
+        if (connection.isRequestLoad()) tick = -1;
+
+        PacketContainer container = connection.getDuplex().getPacket(tick);
 
         ChannelFuture future = ctx.newSucceededFuture();
         while (container.getSections().peek() != null) {
@@ -133,6 +131,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
             future = ctx.writeAndFlush(packet);
         }
+
+        if (connection.isRequestLoad()) connection.setRequestLoad(false);
 
         return future;
     }
