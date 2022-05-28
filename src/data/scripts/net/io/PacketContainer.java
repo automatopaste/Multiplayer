@@ -26,6 +26,7 @@ public class PacketContainer {
         }
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();
+        ByteBuffer buffer = ByteBuffer.allocateDirect(PACKET_SIZE);
         data.write(tick);
         while (!entities.isEmpty()) {
             byte[] entity = entities.poll();
@@ -34,7 +35,7 @@ public class PacketContainer {
 
             // flip and dump buffer into queue before writing new entity data
             if (newSize > PACKET_SIZE) {
-                outputToQueue(data);
+                outputToQueue(data, buffer);
 
                 data.write(tick);
             }
@@ -42,13 +43,14 @@ public class PacketContainer {
             data.write(entity);
 
             if (entities.isEmpty()) {
-                outputToQueue(data);
+                outputToQueue(data,buffer);
             }
         }
     }
 
-    private void outputToQueue(ByteArrayOutputStream stream) {
-        ByteBuffer buffer = ByteBuffer.wrap(stream.toByteArray());
+    private void outputToQueue(ByteArrayOutputStream stream, ByteBuffer buffer) {
+        buffer.clear();
+        buffer.put(stream.toByteArray());
         buffer.flip();
 
         sections.add(buffer);
