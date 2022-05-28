@@ -125,11 +125,17 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         PacketContainer container = connection.getDuplex().getPacket(tick);
 
-        ChannelFuture future = ctx.newSucceededFuture();
+        ChannelFuture future = null;
         while (container.getSections().peek() != null) {
             ByteBuffer packet = container.getSections().poll();
 
             future = ctx.writeAndFlush(packet);
+        }
+        if (future == null) {
+            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
+            empty.flip();
+
+            return ctx.writeAndFlush(empty);
         }
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
