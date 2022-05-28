@@ -40,7 +40,7 @@ public class LoadedDataStore {
      * @param plugin the plugin
      * @return entities to load
      */
-    public static Map<Integer, BasePackable> get(CombatEngineAPI engine, mpServerPlugin plugin) {
+    public static Map<Integer, BasePackable> generate(CombatEngineAPI engine, mpServerPlugin plugin) {
         List<FleetMemberAPI> members = new ArrayList<>();
 
         CombatFleetManagerAPI manager0 = engine.getFleetManager(0);

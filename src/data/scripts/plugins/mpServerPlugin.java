@@ -68,7 +68,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         for (ServerConnectionManager connection : connections) {
             if (connection.isRequestLoad()) {
-                connection.getDuplex().updateOutbound(LoadedDataStore.get(engine, this));
+                connection.getDuplex().updateOutbound(LoadedDataStore.generate(engine, this));
                 connection.setRequestLoad(false);
             }
         }
