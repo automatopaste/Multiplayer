@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 /**
@@ -86,8 +87,18 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
-        PacketContainer packet = connection.getDuplex().getPacket(clientTick);
-        clientTick++;
-        return ctx.writeAndFlush(packet);
+        int tick = connection.getDuplex().getCurrTick();
+
+        PacketContainer container = connection.getDuplex().getPacket(tick);
+
+        ChannelFuture future = ctx.newSucceededFuture();
+        while (container.getSections().peek() != null) {
+            ByteBuffer packet = container.getSections().poll();
+
+            future = ctx.write(packet);
+        }
+
+        ctx.flush();
+        return future;
     }
 }
