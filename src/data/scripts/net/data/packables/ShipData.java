@@ -236,7 +236,7 @@ public class ShipData extends APackable {
 
             @Override
             public ShipwideAIFlags getAIFlags() {
-                return null;
+                return new ShipwideAIFlags();
             }
 
             @Override
@@ -246,7 +246,7 @@ public class ShipData extends APackable {
 
             @Override
             public ShipAIConfig getConfig() {
-                return null;
+                return new ShipAIConfig();
             }
         });
     }
