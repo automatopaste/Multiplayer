@@ -1,10 +1,9 @@
-package data.scripts.net.terminals.server;
+package data.scripts.net.connection.server;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
-import data.scripts.plugins.state.DataDuplex;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,10 +28,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
 
     private int tick;
 
-    private final DataDuplex serverDataDuplex;
+    private final ServerConnectionManager connectionManager;
 
-    public ProcessingHandler(DataDuplex serverDataDuplex) {
-        this.serverDataDuplex = serverDataDuplex;
+    public ProcessingHandler(ServerConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
 
         logger = Global.getLogger(ProcessingHandler.class);
 
@@ -70,7 +69,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
         // client doesn't send any entity deletions to worry about
-        serverDataDuplex.updateInbound(entities);
+        connectionManager.getDuplex().updateInbound(entities);
     }
 
     /**
@@ -85,7 +84,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Console.showMessage("Channel active on server");
         Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
-        PacketContainer container = serverDataDuplex.getPacket(-1);
+        PacketContainer container = connectionManager.getDuplex().getPacket(-1);
 
         ChannelFuture future = writeAndFlushPackets(ctx);
     }
@@ -126,9 +125,10 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private ChannelFuture writeAndFlushPackets(ChannelHandlerContext ctx) throws IOException {
-        if (doFlush) serverDataDuplex.flush();
+        if (doFlush) connectionManager.getDuplex().flush();
 
-        PacketContainer container = serverDataDuplex.getPacket(tick);
+        PacketContainer container = connectionManager.getDuplex().getPacket(tick);
+
         ChannelFuture future = ctx.newSucceededFuture();
         while (container.getSections().peek() != null) {
             ByteBuffer packet = container.getSections().poll();

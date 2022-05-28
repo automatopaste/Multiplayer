@@ -1,11 +1,12 @@
 package data.scripts.console.commands;
 
-import data.scripts.plugins.mpClientPlugin;
+import com.fs.starfarer.api.Global;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
 import org.lazywizard.console.Console;
 
 public class mpFlush implements BaseCommand {
+    public static final String FLUSH_KEY = "JESSE_WE_NEED_TO_COOK";
     @Override
     public CommandResult runCommand(@NotNull String args, @NotNull CommandContext context) {
         if (context != CommandContext.COMBAT_SIMULATION) {
@@ -14,8 +15,7 @@ public class mpFlush implements BaseCommand {
         }
 
         Console.showMessage("Flushing data");
-        mpClientPlugin.flush();
-        Console.showMessage("Flushed data successfully");
+        Global.getCombatEngine().getCustomData().put(FLUSH_KEY, true);
 
         return CommandResult.SUCCESS;
     }

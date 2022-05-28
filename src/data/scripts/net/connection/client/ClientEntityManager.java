@@ -1,30 +1,34 @@
-package data.scripts.plugins.state;
+package data.scripts.net.connection.client;
 
+import data.scripts.net.connection.InboundEntityManager;
 import data.scripts.net.data.BasePackable;
-import data.scripts.plugins.mpServerPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServerInboundEntityManager implements InboundEntityManager {
+public class ClientEntityManager implements InboundEntityManager {
     private final Map<Integer, BasePackable> entities;
 
-    public ServerInboundEntityManager(mpServerPlugin serverPlugin) {
+    public ClientEntityManager() {
         entities = new HashMap<>();
     }
 
-    @Override
+    /**
+     * Take incoming partial entity deltas and update existing entities. If no existing entity matches delta instance ID
+     * then assume it is newly created and init it
+     * @param toProcess new deltas
+     */
     public void processDeltas(Map<Integer, BasePackable> toProcess) {
         for (Integer key : toProcess.keySet()) {
             BasePackable entity = entities.get(key);
+            BasePackable newEntity = toProcess.get(key);
             if (entity == null) {
-                BasePackable newEntity = toProcess.get(key);
                 newEntity.destinationInit();
                 entities.put(key, newEntity);
             } else {
-                entity.updateFromDelta(entity);
+                entity.updateFromDelta(newEntity);
             }
         }
     }
@@ -44,4 +48,5 @@ public class ServerInboundEntityManager implements InboundEntityManager {
             entities.remove(i);
         }
     }
+
 }

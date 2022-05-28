@@ -1,9 +1,9 @@
-package data.scripts.net.terminals.client;
+package data.scripts.net.connection.client;
 
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
-import data.scripts.plugins.state.DataDuplex;
+import data.scripts.net.connection.DataDuplex;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;

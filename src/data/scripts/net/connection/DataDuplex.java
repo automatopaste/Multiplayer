@@ -1,4 +1,4 @@
-package data.scripts.plugins.state;
+package data.scripts.net.connection;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
@@ -13,7 +13,6 @@ public class DataDuplex {
     private final Map<Integer, BasePackable> inbound;
     private final Map<Integer, BasePackable> outbound;
 
-    private boolean isClientLoading;
     private boolean doFlush;
 
     public DataDuplex() {
@@ -21,7 +20,6 @@ public class DataDuplex {
         outbound = new HashMap<>();
 
         doFlush = true;
-        isClientLoading = false;
     }
 
     /**
@@ -98,9 +96,5 @@ public class DataDuplex {
 
     public void flush() {
         doFlush = true;
-    }
-
-    public boolean isClientLoading() {
-        return isClientLoading;
     }
 }

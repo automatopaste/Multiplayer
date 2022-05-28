@@ -1,5 +1,6 @@
-package data.scripts.plugins.state;
+package data.scripts.net.connection.client;
 
+import data.scripts.net.connection.OutboundEntityManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.InputAggregateData;
 

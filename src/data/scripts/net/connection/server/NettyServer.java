@@ -1,25 +1,22 @@
-package data.scripts.net.terminals.server;
+package data.scripts.net.connection.server;
 
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
-import data.scripts.plugins.state.DataDuplex;
+import data.scripts.plugins.mpServerPlugin;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer implements Runnable {
     private final int port;
-    private final DataDuplex serverDataDuplex;
+    private final mpServerPlugin serverPlugin;
 
-    public NettyServer(int port, DataDuplex serverDataDuplex) {
+    public NettyServer(int port, mpServerPlugin serverPlugin) {
         this.port = port;
-        this.serverDataDuplex = serverDataDuplex;
+        this.serverPlugin = serverPlugin;
     }
 
     @Override
@@ -36,18 +33,27 @@ public class NettyServer implements Runnable {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
-            ServerBootstrap server = new ServerBootstrap();
+            final ServerBootstrap server = new ServerBootstrap();
             server.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
+                        private ServerConnectionManager connection;
+
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
+                            connection = serverPlugin.getNewConnection();
+
                             socketChannel.pipeline().addLast(
                                     new PacketContainerEncoder(),
                                     new PacketContainerDecoder(),
                                     new PacketDecoder(),
-                                    new ProcessingHandler(serverDataDuplex)
+                                    new ProcessingHandler(connection)
                             );
+                        }
+
+                        @Override
+                        public void channelUnregistered(ChannelHandlerContext ctx) {
+                            serverPlugin.removeConnection(connection);
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -64,9 +70,5 @@ public class NettyServer implements Runnable {
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
         }
-    }
-
-    public DataDuplex getServerDataDuplex() {
-        return serverDataDuplex;
     }
 }

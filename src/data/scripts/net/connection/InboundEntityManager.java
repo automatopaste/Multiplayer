@@ -1,4 +1,4 @@
-package data.scripts.plugins.state;
+package data.scripts.net.connection;
 
 import data.scripts.net.data.BasePackable;
 

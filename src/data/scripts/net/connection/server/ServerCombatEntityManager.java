@@ -1,11 +1,11 @@
-package data.scripts.plugins.state;
+package data.scripts.net.connection.server;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import data.scripts.net.connection.OutboundEntityManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ShipData;
-import data.scripts.net.data.loading.ShipVariantData;
 import data.scripts.plugins.mpServerPlugin;
 
 import java.util.*;
@@ -13,8 +13,6 @@ import java.util.*;
 public class ServerCombatEntityManager implements OutboundEntityManager {
     private final Map<Integer, ShipData> ships;
     private final Map<Integer, BasePackable> consumable;
-
-    private final Map<Integer, Integer> shipToVariants;
 
     private final mpServerPlugin serverPlugin;
 
@@ -24,7 +22,6 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         consumable = new HashMap<>();
 
         ships = new HashMap<>();
-        shipToVariants = new HashMap<>();
 
         initShips(Global.getCombatEngine().getShips());
     }
@@ -41,19 +38,13 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         for (Iterator<ShipAPI> iterator = engineShips.iterator(); iterator.hasNext();) {
             ShipAPI ship = iterator.next();
 
+            // fingers crossed :)
             if (ships.containsKey(ship.getFleetMemberId().hashCode())) {
                 iterator.remove();
             }
-            /* Replace inefficient code with faster string hashcode (probability of collision is unlikely)
-            for (ShipData data : ships.values()) {
-                if (data.getShip().equals(ship)) {
-                    iterator.remove();
-                }
-            }*/
         }
 
         List<Integer> shipsToRem = new ArrayList<>();
-        List<Integer> variantsToRem = new ArrayList<>();
         for (Integer key : ships.keySet()) {
             if (!engine.isEntityInPlay(ships.get(key).getShip())) {
                 shipsToRem.add(key);
@@ -61,14 +52,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         }
         for (Integer key : shipsToRem) {
             ships.remove(key);
-
-            int variantKey = shipToVariants.get(key);
-            variantsToRem.add(variantKey);
-            consumable.remove(variantKey);
-            shipToVariants.remove(key);
         }
-        //List<Integer> out = new ArrayList<>(shipsToRem);
-        //out.addAll(variantsToRem);
 
         initShips(engineShips);
     }
@@ -80,12 +64,6 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
             data.setShip(ship);
 
             ships.put(id, data);
-
-            int id2 = serverPlugin.getNewInstanceID(null);
-            ShipVariantData variantData = new ShipVariantData(id2, ship, ship.getFleetMemberId());
-            consumable.put(id2, variantData);
-
-            shipToVariants.put(id, id2);
         }
     }
 
