@@ -5,7 +5,6 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -66,14 +65,14 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
         ChannelFuture future = sendQueuedData(ctx);
 
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture channelFuture) {
-                if (!channelFuture.isSuccess()) {
-                    ctx.fireChannelReadComplete();
-                }
-            }
-        });
+//        future.addListener(new ChannelFutureListener() {
+//            @Override
+//            public void operationComplete(ChannelFuture channelFuture) {
+//                if (!channelFuture.isSuccess()) {
+//                    ctx.fireChannelReadComplete();
+//                }
+//            }
+//        });
     }
 
     @Override

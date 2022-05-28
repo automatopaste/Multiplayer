@@ -34,7 +34,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final ServerInboundEntityManager serverEntityManager;
     private final ServerCombatEntityManager serverCombatEntityManager;
 
-    private int nextInstanceID = Integer.MIN_VALUE;
+    private int nextInstanceID = 1;
     private final Set<Integer> usedIDs = new HashSet<>();
 
     private final LoadedDataStore dataStore;
