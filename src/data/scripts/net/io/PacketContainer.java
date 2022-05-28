@@ -32,22 +32,28 @@ public class PacketContainer {
 
             int newSize = data.size() + entity.length;
 
+            // flip and dump buffer into queue before writing new entity data
             if (newSize > PACKET_SIZE) {
-                sections.add(ByteBuffer.wrap(data.toByteArray()));
+                outputToQueue(data);
 
-                data.reset();
                 data.write(tick);
             }
 
             data.write(entity);
 
             if (entities.isEmpty()) {
-                ByteBuffer buffer = ByteBuffer.wrap(data.toByteArray());
-                buffer.flip();
-
-                sections.add(buffer);
+                outputToQueue(data);
             }
         }
+    }
+
+    private void outputToQueue(ByteArrayOutputStream stream) {
+        ByteBuffer buffer = ByteBuffer.wrap(stream.toByteArray());
+        buffer.flip();
+
+        sections.add(buffer);
+
+        stream.reset();
     }
 
     public Queue<ByteBuffer> getSections() {
