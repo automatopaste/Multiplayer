@@ -42,7 +42,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         clientThread = new Thread(client, "mpClient");
         clientThread.start();
 
-        entityManager = new ClientEntityManager();
+        entityManager = new ClientEntityManager(this);
 
         // placeholder id
         int id = -10;
