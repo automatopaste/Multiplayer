@@ -48,17 +48,4 @@ public class ClientEntityManager implements InboundEntityManager {
         }
     }
 
-    /**
-     * Remove entities that the server has communicated should be discarded
-     * @param toDelete list of instance IDs
-     */
-    public void delete(List<Integer> toDelete) {
-        for (Integer i : toDelete) {
-            APackable entity = entities.get(i);
-            if (entity != null) {
-                entity.destinationDelete();
-            }
-            entities.remove(i);
-        }
-    }
 }

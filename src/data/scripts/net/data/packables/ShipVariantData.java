@@ -2,6 +2,7 @@ package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.IntRecord;
@@ -94,19 +95,24 @@ public class ShipVariantData extends APackable {
 
         for (ShipAPI s : Global.getCombatEngine().getShips()) {
             if (s.getFleetMemberId().equals(shipId.getRecord())) {
+                ShipVariantAPI variant = s.getVariant();
+
+                variant.clear();
+
+                variant.setNumFluxCapacitors(capacitors.getRecord());
+                variant.setNumFluxVents(vents.getRecord());
+
                 for (int i = 0; i < weaponSlots.size(); i++) {
                     String slot = weaponSlots.get(i).getRecord();
-
-                    if (s.getVariant().getFittedWeaponSlots().contains(slot)) continue;
 
                     s.getVariant().addWeapon(slot, weaponIds.get(i).getRecord());
                 }
 
                 s.getVariant().autoGenerateWeaponGroups();
+
+                destComplete = true;
             }
         }
-
-        destComplete = true;
     }
 
     @Override

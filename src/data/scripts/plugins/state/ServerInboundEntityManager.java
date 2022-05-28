@@ -3,6 +3,7 @@ package data.scripts.plugins.state;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.plugins.mpServerPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,20 +30,18 @@ public class ServerInboundEntityManager implements InboundEntityManager {
     }
 
     @Override
-    public void delete(List<Integer> toDelete) {
-        for (Integer i : toDelete) {
-            APackable entity = entities.get(i);
-            if (entity != null) {
-                entity.destinationDelete();
-            }
-            entities.remove(i);
-        }
-    }
-
-    @Override
     public void updateEntities() {
-        for (APackable entity : entities.values()) {
+        List<Integer> toRemove = new ArrayList<>();
+
+        for (Integer key : entities.keySet()) {
+            APackable entity = entities.get(key);
             entity.destinationUpdate();
+
+            if (entity.shouldDeleteOnDestination()) toRemove.add(key);
+        }
+
+        for (Integer i : toRemove) {
+            entities.remove(i);
         }
     }
 }
