@@ -4,14 +4,14 @@ import data.scripts.net.data.BasePackable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketContainer {
 //    private static final int PACKET_SIZE = 1536;
 
     private final int tick;
-    private final ByteBuffer out;
+    private final ByteArrayOutputStream data;
 
 //    private final Queue<ByteBuffer> sections;
 
@@ -25,19 +25,12 @@ public class PacketContainer {
         }
 
 //        ByteBuffer buffer = ByteBuffer.allocateDirect(PACKET_SIZE);
-        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        data = new ByteArrayOutputStream();
         data.write(tick);
 
         for (byte[] entity : entities) {
             data.write(entity);
         }
-
-        out = ByteBuffer.allocateDirect(data.size());
-
-        out.put(data.toByteArray());
-
-        out.flip();
-
 
 //        while (!entities.isEmpty()) {
 //            byte[] entity = entities.poll();
@@ -69,8 +62,8 @@ public class PacketContainer {
 //        stream.reset();
 //    }
 
-    public ByteBuffer get() {
-        return out;
+    public ByteArrayOutputStream get() {
+        return data;
     }
 
 //    public Queue<ByteBuffer> getSections() {

@@ -4,17 +4,16 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
 
-public class PacketContainerEncoder extends MessageToByteEncoder<ByteBuffer> {
+public class PacketContainerEncoder extends MessageToByteEncoder<ByteArrayOutputStream> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuffer msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ByteArrayOutputStream msg, ByteBuf out) throws Exception {
         // encode length of buffer so completeness can be checked when reconstructed by client
-        out.writeInt(msg.capacity());
+        out.writeInt(msg.size());
 
         // there it goes :))))
-        out.writeBytes(msg);
-        float f = 0f;
+        out.writeBytes(msg.toByteArray());
     }
 }

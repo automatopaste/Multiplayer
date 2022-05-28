@@ -21,7 +21,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     private long initialTime;
     private final double timeU;
     private double deltaU;
-    private boolean doFlush = true;
 
     private final ServerConnectionWrapper connection;
 
@@ -76,7 +75,15 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         Console.showMessage("Channel active on server");
         Console.showMessage("Server running at " + TICK_RATE + "Hz");
 
-        sendQueuedData(ctx);
+        int tick = connection.getDuplex().getCurrTick();
+        // send -1 value tick to indicate server is sending preload data
+        if (connection.isRequestLoad()) tick = -1;
+
+        PacketContainer container = connection.getDuplex().getPacket(tick);
+
+        ChannelFuture future = ctx.writeAndFlush(container.get());
+
+        if (connection.isRequestLoad()) connection.setRequestLoad(false);
     }
 
     /**
@@ -95,28 +102,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             initialTime = currentTime;
         }
 
-        // time delta
-        //long diffTimeNanos = currentTime - updateTime;
-
-        final ChannelFuture future = sendQueuedData(ctx);
-
-//        future.addListener(new ChannelFutureListener() {
-//            @Override
-//            public void operationComplete(ChannelFuture channelFuture) {
-//                if (!future.isSuccess()) {
-//                    deltaU += 1d;
-//                    ctx.fireChannelReadComplete();
-//                }
-//            }
-//        });
-
-        //updateTime = currentTime;
-        deltaU--;
-    }
-
-    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException, InterruptedException {
-        if (doFlush) connection.getDuplex().flush();
-
         int tick = connection.getDuplex().getCurrTick();
         // send -1 value tick to indicate server is sending preload data
         if (connection.isRequestLoad()) tick = -1;
@@ -125,22 +110,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         ChannelFuture future = ctx.writeAndFlush(container.get());
 
-//        ChannelFuture future = null;
-//        while (container.getSections().peek() != null) {
-//            ByteBuffer packet = container.getSections().poll();
-//
-//            future = ctx.writeAndFlush(packet);
-//            future.await();
-//        }
-//        if (future == null) {
-//            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
-//            empty.flip();
-//
-//            return ctx.writeAndFlush(empty);
-//        }
-
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
 
-        return future;
+        deltaU--;
     }
 }
