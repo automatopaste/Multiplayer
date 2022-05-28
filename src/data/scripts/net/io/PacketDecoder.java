@@ -67,7 +67,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 records = new HashMap<>();
             } else {
                 int uniqueID = in.readInt();
-                records.put(uniqueID, DataGenManager.recordFactory(type).read(in));
+                BaseRecord<?> record = DataGenManager.recordFactory(type);
+                BaseRecord<?> read = record.read(in);
+                records.put(uniqueID, read);
             }
         }
         if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);

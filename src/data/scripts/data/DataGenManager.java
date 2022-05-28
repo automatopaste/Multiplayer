@@ -40,7 +40,9 @@ public class DataGenManager {
      * @return new empty instance
      */
     public static BasePackable entityFactory(int typeID) {
-        return entityInstances.get(typeID);
+        BasePackable out = entityInstances.get(typeID);
+        if (out == null) throw new NullPointerException("No entity packable type found at ID: " + typeID);
+        return out;
     }
 
     /**
@@ -49,6 +51,8 @@ public class DataGenManager {
      * @return new empty instance
      */
     public static BaseRecord<?> recordFactory(int typeID) {
-        return recordInstances.get(typeID);
+        BaseRecord<?> out = recordInstances.get(typeID);
+        if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
+        return out;
     }
 }
