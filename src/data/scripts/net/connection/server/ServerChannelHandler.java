@@ -129,12 +129,11 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         while (container.getSections().peek() != null) {
             ByteBuffer packet = container.getSections().poll();
 
-            future = ctx.write(packet);
+            future = ctx.writeAndFlush(packet);
         }
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
 
-        ctx.flush();
         return future;
     }
 }

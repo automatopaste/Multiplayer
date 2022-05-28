@@ -95,10 +95,9 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         while (container.getSections().peek() != null) {
             ByteBuffer packet = container.getSections().poll();
 
-            future = ctx.write(packet);
+            future = ctx.writeAndFlush(packet);
         }
 
-        ctx.flush();
         return future;
     }
 }
