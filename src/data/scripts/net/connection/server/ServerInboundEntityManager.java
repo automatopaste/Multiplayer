@@ -11,9 +11,11 @@ import java.util.Map;
 
 public class ServerInboundEntityManager implements InboundEntityManager {
     private final Map<Integer, BasePackable> entities;
+    private final mpServerPlugin serverPlugin;
 
     public ServerInboundEntityManager(mpServerPlugin serverPlugin) {
         entities = new HashMap<>();
+        this.serverPlugin = serverPlugin;
     }
 
     @Override
@@ -22,7 +24,7 @@ public class ServerInboundEntityManager implements InboundEntityManager {
             BasePackable entity = entities.get(key);
             if (entity == null) {
                 BasePackable newEntity = toProcess.get(key);
-                newEntity.destinationInit();
+                newEntity.destinationInit(serverPlugin.getDataStore());
                 entities.put(key, newEntity);
             } else {
                 entity.updateFromDelta(entity);

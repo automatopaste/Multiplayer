@@ -161,4 +161,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         usedIDs.add(id);
         return id;
     }
+
+    public LoadedDataStore getDataStore() {
+        return dataStore;
+    }
 }

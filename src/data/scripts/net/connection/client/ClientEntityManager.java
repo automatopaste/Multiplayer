@@ -2,6 +2,7 @@ package data.scripts.net.connection.client;
 
 import data.scripts.net.connection.InboundEntityManager;
 import data.scripts.net.data.BasePackable;
+import data.scripts.plugins.mpClientPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +11,10 @@ import java.util.Map;
 
 public class ClientEntityManager implements InboundEntityManager {
     private final Map<Integer, BasePackable> entities;
+    private final mpClientPlugin clientPlugin;
 
-    public ClientEntityManager() {
+    public ClientEntityManager(mpClientPlugin clientPlugin) {
+        this.clientPlugin = clientPlugin;
         entities = new HashMap<>();
     }
 
@@ -25,7 +28,7 @@ public class ClientEntityManager implements InboundEntityManager {
             BasePackable entity = entities.get(key);
             BasePackable newEntity = toProcess.get(key);
             if (entity == null) {
-                newEntity.destinationInit();
+                newEntity.destinationInit(clientPlugin.getDataStore());
                 entities.put(key, newEntity);
             } else {
                 entity.updateFromDelta(newEntity);

@@ -1,5 +1,7 @@
 package data.scripts.net.data;
 
+import data.scripts.data.LoadedDataStore;
+
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -50,7 +52,7 @@ public abstract class BasePackable {
     /**
      * Called when entity is initialised on dest
      */
-    public abstract void destinationInit();
+    public abstract void destinationInit(LoadedDataStore loadedDataStore);
 
     /**
      * Called when entity is deleted on dest

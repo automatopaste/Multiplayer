@@ -26,7 +26,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private final ClientConnectionWrapper connection;
     private final ClientEntityManager entityManager;
     private final ClientInputManager inputManager;
-    private LoadedDataStore loadedDataStore;
+    private LoadedDataStore dataStore;
     private boolean loaded = true;
 
     private final int port;
@@ -76,7 +76,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             return;
         } else if (loaded) {
             Map<Integer, BasePackable> loadedEntities = connection.getDuplex().getDeltas();
-            loadedDataStore = new LoadedDataStore(loadedEntities);
+            dataStore = new LoadedDataStore(loadedEntities);
 
             loaded = false;
         }
@@ -99,5 +99,9 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         Map<Integer, BasePackable> outbound = inputManager.getEntities();
         connection.getDuplex().updateOutbound(outbound);
+    }
+
+    public LoadedDataStore getDataStore() {
+        return dataStore;
     }
 }

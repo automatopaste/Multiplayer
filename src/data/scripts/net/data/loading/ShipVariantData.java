@@ -1,8 +1,7 @@
 package data.scripts.net.data.loading;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
+import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
@@ -26,7 +25,7 @@ public class ShipVariantData extends BasePackable {
     private static final int SHIP_ID = 3;
     private static final int WEAPONS = 69;
 
-    private boolean destComplete = false;
+//    private boolean destComplete = false;
 
     public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
         super(instanceID);
@@ -92,32 +91,32 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public void destinationUpdate() {
-        if (destComplete) return;
-
-        for (ShipAPI s : Global.getCombatEngine().getShips()) {
-            if (s.getFleetMemberId().equals(shipId.getRecord())) {
-                ShipVariantAPI variant = s.getVariant();
-
-                variant.clear();
-
-                variant.setNumFluxCapacitors(capacitors.getRecord());
-                variant.setNumFluxVents(vents.getRecord());
-
-                for (int i = 0; i < weaponSlots.size(); i++) {
-                    String slot = weaponSlots.get(i).getRecord();
-
-                    s.getVariant().addWeapon(slot, weaponIds.get(i).getRecord());
-                }
-
-                s.getVariant().autoGenerateWeaponGroups();
-
-                destComplete = true;
-            }
-        }
+//        if (destComplete) return;
+//
+//        for (ShipAPI s : Global.getCombatEngine().getShips()) {
+//            if (s.getFleetMemberId().equals(shipId.getRecord())) {
+//                ShipVariantAPI variant = s.getVariant();
+//
+//                variant.clear();
+//
+//                variant.setNumFluxCapacitors(capacitors.getRecord());
+//                variant.setNumFluxVents(vents.getRecord());
+//
+//                for (int i = 0; i < weaponSlots.size(); i++) {
+//                    String slot = weaponSlots.get(i).getRecord();
+//
+//                    s.getVariant().addWeapon(slot, weaponIds.get(i).getRecord());
+//                }
+//
+//                s.getVariant().autoGenerateWeaponGroups();
+//
+//                destComplete = true;
+//            }
+//        }
     }
 
     @Override
-    public void destinationInit() {
+    public void destinationInit(LoadedDataStore dataStore) {
 
     }
 
@@ -128,7 +127,7 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public boolean shouldDeleteOnDestination() {
-        return destComplete;
+        return false;
     }
 
     @Override

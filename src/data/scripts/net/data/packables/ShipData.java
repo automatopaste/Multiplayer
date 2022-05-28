@@ -3,11 +3,17 @@ package data.scripts.net.data.packables;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.combat.entities.Ship;
+import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.records.*;
+import data.scripts.net.data.loading.ShipVariantData;
+import data.scripts.net.data.records.FloatRecord;
+import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.Vector2fRecord;
 import org.lwjgl.util.vector.Vector2f;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -195,13 +201,37 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public void destinationInit() {
+    public void destinationInit(LoadedDataStore dataStore) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(specId.getRecord() + "_Hull", loc.getRecord(), ang.getRecord());
+        ShipVariantData variantData = dataStore.getVariantData().get(id.getRecord());
 
+        // update variant
+        String hullSpecId = specId.getRecord();
+        ShipVariantAPI empty = Global.getSettings().createEmptyVariant(
+                hullSpecId + "_Hull",
+                Global.getSettings().getHullSpec(hullSpecId)
+        );
+
+        empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
+        empty.setNumFluxVents(variantData.getVents().getRecord());
+
+        List<StringRecord> weaponSlots = variantData.getWeaponSlots();
+        List<StringRecord> weaponIds = variantData.getWeaponIds();
+        for (int i = 0; i < weaponSlots.size(); i++) {
+            String slot = weaponSlots.get(i).getRecord();
+
+            empty.addWeapon(slot, weaponIds.get(i).getRecord());
+        }
+
+        empty.autoGenerateWeaponGroups();
+
+        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(empty.getHullVariantId(), loc.getRecord(), ang.getRecord());
+
+        // set fleetmember id to sync with server
         Ship s = (Ship) ship;
         s.setFleetMemberId(id.getRecord());
+
         ship.setShipAI(new ShipAIPlugin() {
             @Override
             public void setDoNotFireDelay(float amount) {

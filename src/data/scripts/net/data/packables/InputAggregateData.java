@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
+import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.data.DataGenManager;
 import data.scripts.net.data.BaseRecord;
@@ -83,7 +84,7 @@ public class InputAggregateData extends BasePackable {
     }
 
     @Override
-    public void destinationInit() {
+    public void destinationInit(LoadedDataStore dataStore) {
 
     }
 
