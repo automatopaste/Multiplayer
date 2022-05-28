@@ -2,7 +2,6 @@ package data.scripts.plugins;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
@@ -31,10 +30,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     public mpClientPlugin(String host, int port) {
         this.host = host;
         this.port = port;
-    }
 
-    @Override
-    public void init(CombatEngineAPI engine) {
         clientDataDuplex = new DataDuplex();
 
         client = new NettyClient(host, port, clientDataDuplex);
@@ -47,8 +43,8 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         int id = -10;
         inputManager = new ClientInputManager(id, new InputAggregateData(id));
 
-        for (ShipAPI ship : engine.getShips()) {
-            engine.removeEntity(ship);
+        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+            Global.getCombatEngine().removeEntity(ship);
         }
     }
 

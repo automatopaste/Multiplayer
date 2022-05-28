@@ -2,8 +2,8 @@ package data.scripts.plugins;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.terminals.server.NettyServer;
@@ -14,7 +14,10 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final int port;
@@ -41,16 +44,25 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 //        serverEntityManager.processDeltas(deltas);
 
         serverCombatEntityManager = new ServerCombatEntityManager(this);
-    }
 
-    @Override
-    public void init(CombatEngineAPI engine) {
         server = new NettyServer(port, serverDataDuplex);
         serverThread = new Thread(server, "mpServer");
 
         logger.info("Starting server");
 
         serverThread.start();
+
+        ShipVariantAPI variant = Global.getCombatEngine().getPlayerShip().getVariant();
+
+        for (int i = 0; i < variant.getNonBuiltInWeaponSlots().size(); i++) {
+            String slot = variant.getNonBuiltInWeaponSlots().get(i);
+
+//            if (variant.getFittedWeaponSlots().contains(slot)) continue;
+
+            variant.addWeapon(slot, "pdlaser");
+        }
+
+        variant.autoGenerateWeaponGroups();
     }
 
     @Override
