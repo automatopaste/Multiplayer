@@ -62,16 +62,11 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
-        ChannelFuture future = sendQueuedData(ctx);
+        int tick = connection.getDuplex().getCurrTick();
 
-//        future.addListener(new ChannelFutureListener() {
-//            @Override
-//            public void operationComplete(ChannelFuture channelFuture) {
-//                if (!channelFuture.isSuccess()) {
-//                    ctx.fireChannelReadComplete();
-//                }
-//            }
-//        });
+        PacketContainer container = connection.getDuplex().getPacket(tick);
+
+        ctx.writeAndFlush(container.get());
     }
 
     @Override
