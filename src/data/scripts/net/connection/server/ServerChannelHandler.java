@@ -81,7 +81,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         PacketContainer container = connection.getDuplex().getPacket(tick);
 
-        ChannelFuture future = ctx.writeAndFlush(container.get());
+        ChannelFuture future = ctx.writeAndFlush(container);
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
     }
@@ -108,7 +108,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         PacketContainer container = connection.getDuplex().getPacket(tick);
 
-        ChannelFuture future = ctx.writeAndFlush(container.get());
+        ChannelFuture future = ctx.writeAndFlush(container);
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
 

@@ -4,7 +4,6 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -66,7 +65,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
         PacketContainer container = connection.getDuplex().getPacket(tick);
 
-        ctx.writeAndFlush(container.get());
+        ctx.writeAndFlush(container);
     }
 
     @Override
@@ -79,24 +78,24 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         logger.info("Client channel handler removed");
     }
 
-    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
-        int tick = connection.getDuplex().getCurrTick();
-
-        PacketContainer container = connection.getDuplex().getPacket(tick);
-
-        //        ChannelFuture future = null;
-//        while (container.getSections().peek() != null) {
-//            ByteBuffer packet = container.getSections().poll();
+//    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
+//        int tick = connection.getDuplex().getCurrTick();
 //
-//            future = ctx.writeAndFlush(packet);
-//        }
-//        if (future == null) {
-//            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
-//            empty.flip();
+//        PacketContainer container = connection.getDuplex().getPacket(tick);
 //
-//            return ctx.writeAndFlush(empty);
-//        }
-
-        return ctx.writeAndFlush(container.get());
-    }
+//        //        ChannelFuture future = null;
+////        while (container.getSections().peek() != null) {
+////            ByteBuffer packet = container.getSections().poll();
+////
+////            future = ctx.writeAndFlush(packet);
+////        }
+////        if (future == null) {
+////            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
+////            empty.flip();
+////
+////            return ctx.writeAndFlush(empty);
+////        }
+//
+//        return ctx.writeAndFlush(container.get());
+//    }
 }

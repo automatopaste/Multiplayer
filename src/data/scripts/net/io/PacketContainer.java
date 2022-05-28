@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacketContainer {
-//    private static final int PACKET_SIZE = 1536;
+    private static final int PACKET_SIZE = 1024;
 
     private final int tick;
     private final ByteArrayOutputStream data;
@@ -25,8 +25,7 @@ public class PacketContainer {
         }
 
 //        ByteBuffer buffer = ByteBuffer.allocateDirect(PACKET_SIZE);
-        data = new ByteArrayOutputStream();
-        data.write(tick);
+        data = new ByteArrayOutputStream(PACKET_SIZE);
 
         for (byte[] entity : entities) {
             data.write(entity);
