@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Map;
 
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
@@ -70,7 +69,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
      * @param ctx context
      */
     @Override
-    public void channelActive(final ChannelHandlerContext ctx) throws IOException {
+    public void channelActive(final ChannelHandlerContext ctx) throws IOException, InterruptedException {
         logger.info("Channel active on server");
         logger.info("Server running at " + TICK_RATE + "Hz");
 
@@ -85,7 +84,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
      * @param ctx context
      */
     @Override
-    public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
+    public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException, InterruptedException {
         // keep looping until timer lets it send another packet
         // probably should replace with a thread sleep
 
@@ -115,7 +114,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         deltaU--;
     }
 
-    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException {
+    private ChannelFuture sendQueuedData(ChannelHandlerContext ctx) throws IOException, InterruptedException {
         if (doFlush) connection.getDuplex().flush();
 
         int tick = connection.getDuplex().getCurrTick();
@@ -124,18 +123,21 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
         PacketContainer container = connection.getDuplex().getPacket(tick);
 
-        ChannelFuture future = null;
-        while (container.getSections().peek() != null) {
-            ByteBuffer packet = container.getSections().poll();
+        ChannelFuture future = ctx.writeAndFlush(container.get());
 
-            future = ctx.writeAndFlush(packet);
-        }
-        if (future == null) {
-            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
-            empty.flip();
-
-            return ctx.writeAndFlush(empty);
-        }
+//        ChannelFuture future = null;
+//        while (container.getSections().peek() != null) {
+//            ByteBuffer packet = container.getSections().poll();
+//
+//            future = ctx.writeAndFlush(packet);
+//            future.await();
+//        }
+//        if (future == null) {
+//            ByteBuffer empty = ByteBuffer.allocateDirect(4).putInt(tick);
+//            empty.flip();
+//
+//            return ctx.writeAndFlush(empty);
+//        }
 
         if (connection.isRequestLoad()) connection.setRequestLoad(false);
 

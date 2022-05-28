@@ -56,6 +56,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         logger.info("Starting server");
 
         serverThread.start();
+
+        tick = 0;
     }
 
     @Override
