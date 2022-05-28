@@ -14,17 +14,17 @@ public class PacketContainer {
 
     private final int tick;
 
-    public PacketContainer(List<APackable> packables, List<Integer> deleted, int tick, boolean flush) throws IOException {
+    public PacketContainer(List<APackable> packables, int tick, boolean flush) throws IOException {
         this.tick = tick;
 
         data = ByteBuffer.allocate(PACKET_SIZE_INIT);
 
         data.putInt(tick);
 
-        data.putInt(deleted.size());
-        for (Integer i : deleted) {
-            data.putInt(i);
-        }
+//        data.putInt(deleted.size());
+//        for (Integer i : deleted) {
+//            data.putInt(i);
+//        }
 
         for (APackable packable : packables) {
             byte[] written = packable.pack(flush);

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Allows mods to specify entity types and record types dynamically
  */
-public class DataManager {
+public class DataGenManager {
     public static Map<Class<? extends APackable>, Integer> entityTypeIDs = new HashMap<>();
     public static Map<Integer, APackable> entityInstances = new HashMap<>();
 

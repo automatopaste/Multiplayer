@@ -4,7 +4,6 @@ import data.scripts.net.data.packables.APackable;
 import data.scripts.net.data.packables.InputAggregateData;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ClientInputManager implements OutboundEntityManager {
@@ -24,7 +23,7 @@ public class ClientInputManager implements OutboundEntityManager {
     }
 
     @Override
-    public List<Integer> updateAndGetRemovedEntityInstanceIds() {
-        return null;
+    public void update() {
+
     }
 }

@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.net.data.DataManager;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.records.ARecord;
 import data.scripts.net.data.records.IntRecord;
 import org.lwjgl.input.Keyboard;
@@ -26,7 +26,7 @@ public class InputAggregateData extends APackable {
     private ShipAPI shipUnderControl;
 
     static {
-        DataManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
+        DataGenManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
     }
 
     public InputAggregateData(int instanceID) {

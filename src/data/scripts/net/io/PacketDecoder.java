@@ -1,13 +1,12 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.DataManager;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.APackable;
 import data.scripts.net.data.records.ARecord;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,19 +30,19 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     private Unpacked getUnpacked(ByteBuf in, int tick) {
-        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), new ArrayList<Integer>(), tick);
+        if (in.readableBytes() == 0) return new Unpacked(new HashMap<Integer, APackable>(), tick);
 
         // unpack deleted instance IDs
-        int numDeleted = in.readInt();
-        int n = 0;
-        List<Integer> deleted = new ArrayList<>();
-        while (n < numDeleted) {
-            deleted.add(in.readInt());
-            n++;
-        }
+//        int numDeleted = in.readInt();
+//        int n = 0;
+//        List<Integer> deleted = new ArrayList<>();
+//        while (n < numDeleted) {
+//            deleted.add(in.readInt());
+//            n++;
+//        }
 
         if (in.readableBytes() == 0) {
-            return new Unpacked(new HashMap<Integer, APackable>(), new ArrayList<Integer>(), tick);
+            return new Unpacked(new HashMap<Integer, APackable>(), tick);
         }
 
         // integer keys are unique instance IDs
@@ -57,10 +56,10 @@ public class PacketDecoder extends ByteToMessageDecoder {
         while (in.readableBytes() > 0) {
             int type = in.readInt();
 
-            if (DataManager.entityTypeIDs.containsValue(type)) {
+            if (DataGenManager.entityTypeIDs.containsValue(type)) {
                 // reached new entity
                 if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
-                APackable entity = DataManager.entityFactory(entityID).unpack(entityInstanceID, records);
+                APackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
                 entities.put(entityInstanceID, entity);
 
                 entityID = type;
@@ -68,13 +67,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 records = new HashMap<>();
             } else {
                 int uniqueID = in.readInt();
-                records.put(uniqueID, DataManager.recordFactory(type).read(in));
+                records.put(uniqueID, DataGenManager.recordFactory(type).read(in));
             }
         }
         if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
-        APackable entity = DataManager.entityFactory(entityID).unpack(entityInstanceID, records);
+        APackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
         entities.put(entityInstanceID, entity);
 
-        return new Unpacked(entities, deleted, tick);
+        return new Unpacked(entities, tick);
     }
 }

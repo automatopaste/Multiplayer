@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,9 +53,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         logger.info("Received server tick notice: " + serverTick);
 
         Map<Integer, APackable> entities = unpacked.getUnpacked();
-        List<Integer> deleted = unpacked.getDeleted();
 
-        clientDataDuplex.updateInbound(entities, deleted);
+        clientDataDuplex.updateInbound(entities);
     }
 
     @Override

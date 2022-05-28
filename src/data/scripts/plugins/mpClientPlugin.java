@@ -14,7 +14,6 @@ import data.scripts.plugins.state.DataDuplex;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -72,17 +71,16 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         Map<Integer, APackable> entities = clientDataDuplex.getDeltas();
-        List<Integer> toDelete = new ArrayList<>(clientDataDuplex.getRemovedInbound());
+//        List<Integer> toDelete = new ArrayList<>(clientDataDuplex.getRemovedInbound());
 
-        entityManager.delete(toDelete);
+//        entityManager.delete(toDelete);
         entityManager.processDeltas(entities);
 
         entityManager.updateEntities();
 
         Map<Integer, APackable> outbound = inputManager.getEntities();
 
-        // provide empty list because server does not care about any deletions on client
-        clientDataDuplex.updateOutbound(outbound, new ArrayList<Integer>());
+        clientDataDuplex.updateOutbound(outbound);
     }
 
     public static void flush() {

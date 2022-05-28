@@ -69,15 +69,15 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         // outbound data update
-        List<Integer> removedInstanceIDs = serverCombatEntityManager.updateAndGetRemovedEntityInstanceIds();
+        serverCombatEntityManager.update();
         Map<Integer, APackable> entities = serverCombatEntityManager.getEntities();
 
         //inbound data update
         serverEntityManager.processDeltas(serverDataDuplex.getDeltas());
-        serverEntityManager.delete(new ArrayList<>(serverDataDuplex.getRemovedInbound()));
+//        serverEntityManager.delete(new ArrayList<>(serverDataDuplex.getRemovedInbound()));
         serverEntityManager.updateEntities();
 
-        serverDataDuplex.updateOutbound(entities, removedInstanceIDs);
+        serverDataDuplex.updateOutbound(entities);
     }
 
     public int getNewInstanceID(ShipAPI ship) {

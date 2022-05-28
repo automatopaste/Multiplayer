@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class ProcessingHandler extends ChannelInboundHandlerAdapter {
@@ -70,7 +69,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter {
         Map<Integer, APackable> entities = unpacked.getUnpacked();
 
         // client doesn't send any entity deletions to worry about
-        serverDataDuplex.updateInbound(entities, new ArrayList<Integer>());
+        serverDataDuplex.updateInbound(entities);
     }
 
     /**

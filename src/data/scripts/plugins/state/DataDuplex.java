@@ -9,16 +9,12 @@ import java.util.*;
 public class DataDuplex {
     private final Map<Integer, APackable> inbound;
     private final Map<Integer, APackable> outbound;
-    private final Set<Integer> removedInbound;
-    private final Set<Integer> removedOutbound;
 
     private boolean doFlush;
 
     public DataDuplex() {
         inbound = new HashMap<>();
         outbound = new HashMap<>();
-        removedInbound = new HashSet<>();
-        removedOutbound = new HashSet<>();
 
         doFlush = true;
     }
@@ -34,14 +30,14 @@ public class DataDuplex {
             return out;
         }
     }
-
-    public Set<Integer> getRemovedInbound() {
-        synchronized (removedInbound) {
-            Set<Integer> out = new HashSet<>(removedInbound);
-            removedInbound.clear();
-            return out;
-        }
-    }
+//
+//    public Set<Integer> getRemovedInbound() {
+//        synchronized (removedInbound) {
+//            Set<Integer> out = new HashSet<>(removedInbound);
+//            removedInbound.clear();
+//            return out;
+//        }
+//    }
 
     /**
      * Create a packet to send over socket connection
@@ -56,12 +52,12 @@ public class DataDuplex {
             outbound.clear();
         }
         List<Integer> outRemovedInstances;
-        synchronized (removedOutbound) {
-            outRemovedInstances = new ArrayList<>(removedOutbound);
-            removedOutbound.clear();
-        }
+//        synchronized (removedOutbound) {
+//            outRemovedInstances = new ArrayList<>(removedOutbound);
+//            removedOutbound.clear();
+//        }
 
-        PacketContainer p = new PacketContainer(outEntities, outRemovedInstances, tick, doFlush);
+        PacketContainer p = new PacketContainer(outEntities, tick, doFlush);
         doFlush = false;
         return p;
     }
@@ -69,9 +65,8 @@ public class DataDuplex {
     /**
      * Synchronises update of current data store
      * @param entities new entities copy
-     * @param removed items deleted last tick
      */
-    public void updateInbound(Map<Integer, APackable> entities, List<Integer> removed) {
+    public void updateInbound(Map<Integer, APackable> entities) {
         synchronized (this.inbound) {
             for (Integer key : entities.keySet()) {
                 APackable p = inbound.get(key);
@@ -86,17 +81,16 @@ public class DataDuplex {
                 }
             }
         }
-        synchronized (this.removedInbound) {
-            this.removedInbound.addAll(removed);
-        }
+//        synchronized (this.removedInbound) {
+//            this.removedInbound.addAll(removed);
+//        }
     }
 
     /**
      * Synchronises update of current data store
      * @param entities new entities copy
-     * @param removed items deleted last tick
      */
-    public void updateOutbound(Map<Integer, APackable> entities, List<Integer> removed) {
+    public void updateOutbound(Map<Integer, APackable> entities) {
         synchronized (this.outbound) {
             for (Integer key : entities.keySet()) {
                 APackable p = outbound.get(key);
@@ -111,9 +105,9 @@ public class DataDuplex {
                 }
             }
         }
-        synchronized (this.removedOutbound) {
-            this.removedOutbound.addAll(removed);
-        }
+//        synchronized (this.removedOutbound) {
+//            this.removedOutbound.addAll(removed);
+//        }
     }
 
     public void flush() {
