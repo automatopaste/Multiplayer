@@ -56,17 +56,16 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
         if (!clientThread.isAlive() || clientThread.isInterrupted()) {
+            client.stop();
             clientThread = null;
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Server interrupted");
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
-            clientThread.interrupt();
+            client.stop();
             clientThread = null;
-
             Global.getCombatEngine().removePlugin(this);
-
             Console.showMessage("Closed client");
         }
 

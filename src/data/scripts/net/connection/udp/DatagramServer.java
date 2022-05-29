@@ -17,16 +17,14 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.lazywizard.console.Console;
 
 public class DatagramServer implements Runnable {
-    public static final float TICK_RATE = Global.getSettings().getFloat("mpServerTickRate");
+    public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final int port;
     private final mpServerPlugin serverPlugin;
     private final EventLoopGroup bossLoopGroup;
     private final ChannelGroup channelGroup;
 
-    private long initialTime;
-    private final double timeU;
-    private double deltaU;
+    private final Clock clock;
 
     public DatagramServer(int port, mpServerPlugin serverPlugin) {
         this.port = port;
@@ -35,9 +33,7 @@ public class DatagramServer implements Runnable {
         bossLoopGroup = new NioEventLoopGroup();
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-        initialTime = System.nanoTime();
-        timeU = 1000000000d / TICK_RATE;
-        deltaU = 1d;
+        clock = new Clock(TICK_RATE);
     }
 
     @Override
@@ -86,16 +82,10 @@ public class DatagramServer implements Runnable {
 
             Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
             while (serverPlugin.isActive()) {
-                long currentTime;
-                while (deltaU < 1d) {
-                    currentTime = System.nanoTime();
-                    deltaU += (currentTime - initialTime) / timeU;
-                    initialTime = currentTime;
-                }
+                // engages thread until time passed
+                clock.runUntilUpdate();
 
                 channelGroup.write(serverPlugin.getTick()).sync();
-
-                deltaU--;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
