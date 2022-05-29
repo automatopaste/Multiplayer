@@ -2,7 +2,6 @@ package data.scripts.net.connection.udp;
 
 import data.scripts.net.connection.client.ClientConnectionWrapper;
 import data.scripts.net.io.PacketContainerDecoder;
-import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -13,7 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
-public class NettyClient implements Runnable{
+public class DatagramClient implements Runnable{
     private final int port;
     private final String host;
     private final EventLoopGroup workGroup;
@@ -21,7 +20,7 @@ public class NettyClient implements Runnable{
 
     private Channel channel;
 
-    public NettyClient(String host, int port, ClientConnectionWrapper connection) {
+    public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
         this.port = port;
         this.connection = connection;
@@ -48,10 +47,9 @@ public class NettyClient implements Runnable{
                 @Override
                 protected void initChannel(SocketChannel socketChannel) throws Exception {
                     socketChannel.pipeline().addLast(
-                            new PacketContainerEncoder(),
                             new PacketContainerDecoder(),
                             new PacketDecoder(),
-                            new ClientChannelHandler(connection)
+                            new ClientInboundChannelHandler(connection)
                     );
                 }
             });

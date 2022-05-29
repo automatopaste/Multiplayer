@@ -1,4 +1,4 @@
 {
-	"mpServerTickRate": 30,
+	"mpServerTickRate": 3,
 	"mpMaxConnections": 4,
 }

@@ -1,7 +1,6 @@
-package data.scripts.net.connection.udp;
+package data.scripts.net.connection.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.server.ServerConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
@@ -92,7 +91,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException, InterruptedException {
         // keep looping until timer lets it send another packet
-        // probably should replace with a thread sleep
 
         long currentTime;
         while (deltaU < 1d) {

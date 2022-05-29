@@ -24,11 +24,14 @@ public class PacketDecoder extends ByteToMessageDecoder {
         Unpacked result;
         if (in.readableBytes() == 0) {
             result = new Unpacked(new HashMap<Integer, BasePackable>(), tick);
-        } else {// integer keys are unique instance IDs
-            Map<Integer, BasePackable> entities = new HashMap<>();// integer keys are unique record IDs
+        } else {
+            // integer keys are unique instance IDs
+            Map<Integer, BasePackable> entities = new HashMap<>();
+            // integer keys are unique record IDs
             Map<Integer, BaseRecord<?>> records = new HashMap<>();
             int entityID = in.readInt();
             int entityInstanceID = in.readInt();
+
             while (in.readableBytes() > 0) {
                 int type = in.readInt();
 

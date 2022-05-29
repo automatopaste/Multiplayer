@@ -7,11 +7,11 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.console.commands.mpFlush;
 import data.scripts.data.LoadedDataStore;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.connection.server.NettyServer;
 import data.scripts.net.connection.server.ServerCombatEntityManager;
 import data.scripts.net.connection.server.ServerConnectionWrapper;
 import data.scripts.net.connection.server.ServerInboundEntityManager;
+import data.scripts.net.connection.udp.DatagramServer;
+import data.scripts.net.data.BasePackable;
 import org.apache.log4j.Logger;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
@@ -24,7 +24,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
-    private NettyServer server;
     private Thread serverThread;
 
     private int tick;
@@ -39,9 +38,14 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     private final LoadedDataStore dataStore;
 
+    private boolean active;
+
     public mpServerPlugin(int port) {
         this.port = port;
         logger = Global.getLogger(mpServerPlugin.class);
+
+        tick = 0;
+        active = true;
 
         serverEntityManager = new ServerInboundEntityManager(this);
 
@@ -50,14 +54,9 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         dataStore = new LoadedDataStore();
         dataStore.generate(Global.getCombatEngine(), this);
 
-        server = new NettyServer(port, this);
-        serverThread = new Thread(server, "mpServer");
-
-        logger.info("Starting server");
-
+        DatagramServer server = new DatagramServer(port, this);
+        serverThread = new Thread(server, "MP_SERVER_THREAD");
         serverThread.start();
-
-        tick = 0;
     }
 
     @Override
@@ -65,13 +64,14 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         if (!serverThread.isAlive() || serverThread.isInterrupted()) {
+            active = false;
             serverThread = null;
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Server interrupted");
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
-            serverThread.interrupt();
+            active = false;
             serverThread = null;
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Closed server");
@@ -166,5 +166,13 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     public LoadedDataStore getDataStore() {
         return dataStore;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public int getTick() {
+        return tick;
     }
 }

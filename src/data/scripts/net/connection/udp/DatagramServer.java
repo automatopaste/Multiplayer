@@ -1,5 +1,6 @@
 package data.scripts.net.connection.udp;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.server.ServerConnectionWrapper;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
@@ -13,19 +14,30 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.lazywizard.console.Console;
 
-public class NettyServer implements Runnable {
+public class DatagramServer implements Runnable {
+    public static final float TICK_RATE = Global.getSettings().getFloat("mpServerTickRate");
+
     private final int port;
     private final mpServerPlugin serverPlugin;
     private final EventLoopGroup bossLoopGroup;
     private final ChannelGroup channelGroup;
 
-    public NettyServer(int port, mpServerPlugin serverPlugin) {
+    private long initialTime;
+    private final double timeU;
+    private double deltaU;
+
+    public DatagramServer(int port, mpServerPlugin serverPlugin) {
         this.port = port;
         this.serverPlugin = serverPlugin;
 
         bossLoopGroup = new NioEventLoopGroup();
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+        initialTime = System.nanoTime();
+        timeU = 1000000000d / TICK_RATE;
+        deltaU = 1d;
     }
 
     @Override
@@ -57,7 +69,7 @@ public class NettyServer implements Runnable {
                                     new PacketContainerEncoder(),
                                     new PacketContainerDecoder(),
                                     new PacketDecoder(),
-                                    new ServerChannelHandler(connection)
+                                    new ServerOutboundChannelHandler(connection)
                             );
                         }
 
@@ -69,8 +81,22 @@ public class NettyServer implements Runnable {
                     .option(ChannelOption.AUTO_CLOSE, true)
                     .option(ChannelOption.SO_BROADCAST, true);
 
-            ChannelFuture channelFuture = bootstrap.bind(port).sync();
-            channelGroup.add(channelFuture.channel());
+            Channel channel = bootstrap.bind(port).sync().channel();
+            channelGroup.add(channel);
+
+            Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
+            while (serverPlugin.isActive()) {
+                long currentTime;
+                while (deltaU < 1d) {
+                    currentTime = System.nanoTime();
+                    deltaU += (currentTime - initialTime) / timeU;
+                    initialTime = currentTime;
+                }
+
+                channelGroup.write(serverPlugin.getTick()).sync();
+
+                deltaU--;
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

@@ -10,7 +10,7 @@ import data.scripts.data.LoadedDataStore;
 import data.scripts.net.connection.client.ClientConnectionWrapper;
 import data.scripts.net.connection.client.ClientEntityManager;
 import data.scripts.net.connection.client.ClientInputManager;
-import data.scripts.net.connection.client.NettyClient;
+import data.scripts.net.connection.udp.DatagramClient;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.InputAggregateData;
 import org.lazywizard.console.Console;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
-    private final NettyClient client;
+    private final DatagramClient client;
     private Thread clientThread;
 
     private final ClientConnectionWrapper connection;
@@ -38,7 +38,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
         connection = new ClientConnectionWrapper();
 
-        client = new NettyClient(host, port, connection);
+        client = new DatagramClient(host, port, connection);
         clientThread = new Thread(client, "mpClient");
         clientThread.start();
 
@@ -62,7 +62,6 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
-            client.stop();
             clientThread.interrupt();
             clientThread = null;
 

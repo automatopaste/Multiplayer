@@ -1,7 +1,6 @@
-package data.scripts.net.connection.udp;
+package data.scripts.net.connection.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.client.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
