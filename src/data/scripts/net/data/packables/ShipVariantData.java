@@ -1,11 +1,12 @@
-package data.scripts.net.data.loading;
+package data.scripts.net.data.packables;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
-import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.plugins.mpClientPlugin;
+import data.scripts.plugins.mpServerPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,32 +92,16 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public void destinationUpdate() {
-//        if (destComplete) return;
-//
-//        for (ShipAPI s : Global.getCombatEngine().getShips()) {
-//            if (s.getFleetMemberId().equals(shipId.getRecord())) {
-//                ShipVariantAPI variant = s.getVariant();
-//
-//                variant.clear();
-//
-//                variant.setNumFluxCapacitors(capacitors.getRecord());
-//                variant.setNumFluxVents(vents.getRecord());
-//
-//                for (int i = 0; i < weaponSlots.size(); i++) {
-//                    String slot = weaponSlots.get(i).getRecord();
-//
-//                    s.getVariant().addWeapon(slot, weaponIds.get(i).getRecord());
-//                }
-//
-//                s.getVariant().autoGenerateWeaponGroups();
-//
-//                destComplete = true;
-//            }
-//        }
+
     }
 
     @Override
-    public void destinationInit(LoadedDataStore dataStore) {
+    public void destinationInit(mpServerPlugin serverPlugin) {
+
+    }
+
+    @Override
+    public void destinationInit(mpClientPlugin clientPlugin) {
 
     }
 

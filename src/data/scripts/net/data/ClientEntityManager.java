@@ -1,7 +1,5 @@
-package data.scripts.net.connection.client;
+package data.scripts.net.data;
 
-import data.scripts.net.connection.InboundEntityManager;
-import data.scripts.net.data.BasePackable;
 import data.scripts.plugins.mpClientPlugin;
 
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ public class ClientEntityManager implements InboundEntityManager {
             BasePackable entity = entities.get(key);
             BasePackable newEntity = toProcess.get(key);
             if (entity == null) {
-                newEntity.destinationInit(clientPlugin.getDataStore());
+                newEntity.destinationInit(clientPlugin);
                 entities.put(key, newEntity);
             } else {
                 entity.updateFromDelta(newEntity);

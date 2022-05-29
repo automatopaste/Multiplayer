@@ -4,10 +4,11 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
- * Instantiate one per connection
+ * Manage data between game and network threads
  */
 public class DataDuplex {
     private final Map<Integer, BasePackable> inbound;
@@ -43,14 +44,14 @@ public class DataDuplex {
      * @return the packet
      * @throws IOException fuck up
      */
-    public PacketContainer getPacket(int tick) throws IOException {
+    public PacketContainer getPacket(int tick, InetSocketAddress dest) throws IOException {
         List<BasePackable> outEntities;
         synchronized (outbound) {
             outEntities = new ArrayList<>(outbound.values());
             outbound.clear();
         }
 
-        PacketContainer p = new PacketContainer(outEntities, tick, doFlush);
+        PacketContainer p = new PacketContainer(outEntities, tick, doFlush, dest);
         doFlush = false;
         return p;
     }
@@ -101,7 +102,7 @@ public class DataDuplex {
         doFlush = true;
     }
 
-    public synchronized void setCurrTick(int currTick) {
+    public synchronized void updateTick(int currTick) {
         this.currTick = currTick;
     }
 

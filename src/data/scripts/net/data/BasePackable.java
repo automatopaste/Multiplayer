@@ -1,6 +1,7 @@
 package data.scripts.net.data;
 
-import data.scripts.data.LoadedDataStore;
+import data.scripts.plugins.mpClientPlugin;
+import data.scripts.plugins.mpServerPlugin;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -50,9 +51,14 @@ public abstract class BasePackable {
     public abstract void destinationUpdate();
 
     /**
-     * Called when entity is initialised on dest
+     * Called when entity is initialised on server
      */
-    public abstract void destinationInit(LoadedDataStore loadedDataStore);
+    public abstract void destinationInit(mpServerPlugin serverPlugin);
+
+    /**
+     * Called when entity is initialised on client
+     */
+    public abstract void destinationInit(mpClientPlugin clientPlugin);
 
     /**
      * Called when entity is deleted on dest

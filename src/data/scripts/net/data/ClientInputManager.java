@@ -1,7 +1,5 @@
-package data.scripts.net.connection.client;
+package data.scripts.net.data;
 
-import data.scripts.net.connection.OutboundEntityManager;
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.InputAggregateData;
 
 import java.util.HashMap;

@@ -1,20 +1,22 @@
-package data.scripts.net.connection.udp;
+package data.scripts.net.connection.udp.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.client.ClientConnectionWrapper;
+import data.scripts.net.connection.BaseConnectionWrapper;
+import data.scripts.net.connection.ClientConnectionWrapper;
+import data.scripts.net.connection.Clock;
+import data.scripts.net.connection.udp.DatagramUnpacker;
+import data.scripts.net.io.PacketContainer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.util.CharsetUtil;
+import org.lazywizard.console.Console;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class DatagramClient implements Runnable {
@@ -22,62 +24,52 @@ public class DatagramClient implements Runnable {
 
     private final int port;
     private final String host;
-    private final EventLoopGroup workGroup;
     private final ClientConnectionWrapper connection;
 
     private EventLoopGroup workerGroup;
 
-    private Channel channel;
+    private NioDatagramChannel channel;
 
-    private Clock clock;
+    private final Clock clock;
 
     public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
         this.port = port;
         this.connection = connection;
-        workGroup = new NioEventLoopGroup();
 
         clock = new Clock(TICK_RATE);
     }
 
     @Override
     public void run() {
-        try {
-            runClient();
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (workerGroup != null) workerGroup.shutdownGracefully();
-        }
+        runClient();
     }
 
     public void runClient() {
         InetSocketAddress remoteAddress = new InetSocketAddress(host, port);
 
         ChannelFuture future = start();
-
-        String text = "test";
-        System.out.println("Sending test to server");
-
-        ByteBuf buf = Unpooled.copiedBuffer(text, CharsetUtil.UTF_8);
+        ChannelFuture closeFuture = future.channel().closeFuture();
+        Console.showMessage("UDP channel active on port " + port + " at " + TICK_RATE + "Hz");
 
         try {
-            write(new DatagramPacket(buf, remoteAddress));
-            future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+            // LOOP WRITE OPERATIONS ONLY
+            // Incoming messages handled by inbound channel adapter
+            while (connection.getConnectionState() != ClientConnectionWrapper.ConnectionState.CLOSED) {
+                clock.sleepUntilTick();
+
+                PacketContainer container = connection.getDatagram();
+                ByteBuf message = container.get();
+
+                write(new DatagramPacket(message, remoteAddress));
+            }
+
+            closeFuture.sync();
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
+            stop();
+            connection.setConnectionState(BaseConnectionWrapper.ConnectionState.CLOSED);
         }
-
-
-//        Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
-//        while (active) {
-//            clock.runUntilUpdate();
-//
-//            try {
-//                channel.writeAndFlush(new PacketContainer(new ArrayList<BasePackable>(), 69, false));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     private ChannelFuture start() {
@@ -86,13 +78,12 @@ public class DatagramClient implements Runnable {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup);
         bootstrap.channel(NioDatagramChannel.class);
-        bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
+        bootstrap.handler(new ChannelInitializer<NioDatagramChannel>() {
             @Override
-            protected void initChannel(DatagramChannel datagramChannel) throws Exception {
+            protected void initChannel(NioDatagramChannel datagramChannel) {
                 datagramChannel.pipeline().addLast(
-//                            new PacketContainerDecoder(),
-//                            new PacketDecoder(),
-                        new InboundHandler()
+                        new DatagramUnpacker(),
+                        new ClientInboundHandler(connection)
                 );
             }
         });
@@ -100,7 +91,7 @@ public class DatagramClient implements Runnable {
         ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(0));
         channelFuture.syncUninterruptibly();
 
-        channel = channelFuture.channel();
+        channel = (NioDatagramChannel) channelFuture.channel();
 
         return channelFuture;
     }
@@ -111,6 +102,6 @@ public class DatagramClient implements Runnable {
 
     public void stop() {
         if (channel != null) channel.close();
-        workerGroup.shutdownGracefully();
+        if (workerGroup != null) workerGroup.shutdownGracefully();
     }
 }

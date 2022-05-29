@@ -1,10 +1,8 @@
-package data.scripts.net.connection.server;
+package data.scripts.net.data;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.connection.OutboundEntityManager;
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ShipData;
 import data.scripts.plugins.mpServerPlugin;
 

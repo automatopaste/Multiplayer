@@ -4,17 +4,21 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.data.LoadedDataStore;
-import data.scripts.net.data.BasePackable;
 import data.scripts.data.DataGenManager;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.plugins.mpClientPlugin;
+import data.scripts.plugins.mpServerPlugin;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Client input commands
+ */
 public class InputAggregateData extends BasePackable {
     private static int typeID;
 
@@ -84,7 +88,12 @@ public class InputAggregateData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(LoadedDataStore dataStore) {
+    public void destinationInit(mpServerPlugin serverPlugin) {
+
+    }
+
+    @Override
+    public void destinationInit(mpClientPlugin clientPlugin) {
 
     }
 

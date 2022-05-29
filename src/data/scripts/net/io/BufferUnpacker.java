@@ -11,10 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Big boy decoder module. Uses polymorphic tricks to allow mod-defined APackable and ARecord types
- */
-public class PacketDecoder extends ByteToMessageDecoder {
+public class BufferUnpacker extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
         if (in.readableBytes() < 4) return;
@@ -23,7 +20,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
         Unpacked result;
         if (in.readableBytes() == 0) {
-            result = new Unpacked(new HashMap<Integer, BasePackable>(), tick);
+            result = new Unpacked(new HashMap<Integer, BasePackable>(), tick, null, null);
         } else {
             // integer keys are unique instance IDs
             Map<Integer, BasePackable> entities = new HashMap<>();
@@ -55,7 +52,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
             BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
             entities.put(entityInstanceID, entity);
-            result = new Unpacked(entities, tick);
+            result = new Unpacked(entities, tick, null, null);
         }
 
         if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in packet decoder frame");

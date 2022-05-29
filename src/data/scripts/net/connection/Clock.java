@@ -1,4 +1,6 @@
-package data.scripts.net.connection.udp;
+package data.scripts.net.connection;
+
+import java.util.concurrent.TimeUnit;
 
 public class Clock {
     private long initialTime;
@@ -10,7 +12,8 @@ public class Clock {
         timeU = 1000000000d / rate;
         deltaU = 1d;
     }
-    public void runUntilUpdate() {
+
+    public void runUntilTick() {
         long currentTime;
 
         while (deltaU < 1d) {
@@ -20,5 +23,15 @@ public class Clock {
         }
 
         deltaU--;
+    }
+
+    public void sleepUntilTick() {
+        try {
+            Thread.sleep(TimeUnit.NANOSECONDS.convert((long) (timeU * 0.95d), TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        runUntilTick();
     }
 }

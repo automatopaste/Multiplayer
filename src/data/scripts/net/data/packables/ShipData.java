@@ -3,14 +3,14 @@ package data.scripts.net.data.packables;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.combat.entities.Ship;
-import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.loading.ShipVariantData;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.plugins.mpClientPlugin;
+import data.scripts.plugins.mpServerPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
@@ -201,10 +201,15 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(LoadedDataStore dataStore) {
+    public void destinationInit(mpServerPlugin serverPlugin) {
+
+    }
+
+    @Override
+    public void destinationInit(mpClientPlugin clientPlugin) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        ShipVariantData variantData = dataStore.getVariantData().get(id.getRecord());
+        ShipVariantData variantData = clientPlugin.getDataStore().getVariantData().get(id.getRecord());
 
         // update variant
         String hullSpecId = specId.getRecord();

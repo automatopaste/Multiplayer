@@ -1,4 +1,6 @@
 {
+	"mpLocalPortTCP": 69,
+	"mpLocalPortUDP": 420,
 	"mpServerTickRate": 3,
 	"mpClientTickrate": 2,
 	"mpMaxConnections": 4,

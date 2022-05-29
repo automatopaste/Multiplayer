@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.loading.ShipVariantData;
+import data.scripts.net.data.packables.ShipVariantData;
 import data.scripts.plugins.mpServerPlugin;
 
 import java.util.ArrayList;

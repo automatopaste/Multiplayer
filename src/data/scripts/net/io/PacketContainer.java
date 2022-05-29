@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class PacketContainer {
 
 //    private final Queue<ByteBuf> sections;
 
-    public PacketContainer(List<BasePackable> packables, int tick, boolean flush) throws IOException {
+    public PacketContainer(List<BasePackable> packables, int tick, boolean flush, InetSocketAddress dest) throws IOException {
         this.tick = tick;
 
         List<byte[]> entities = new ArrayList<>();

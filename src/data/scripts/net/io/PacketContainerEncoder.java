@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.util.ArrayList;
-
 public class PacketContainerEncoder extends MessageToByteEncoder<PacketContainer> {
 
     @Override
@@ -20,8 +18,5 @@ public class PacketContainerEncoder extends MessageToByteEncoder<PacketContainer
 
         // there it goes :))))
         out.writeBytes(data);
-
-        // for debug
-        new PacketDecoder().decode(ctx, out, new ArrayList<>());
     }
 }

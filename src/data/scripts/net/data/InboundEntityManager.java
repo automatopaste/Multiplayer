@@ -1,6 +1,4 @@
-package data.scripts.net.connection;
-
-import data.scripts.net.data.BasePackable;
+package data.scripts.net.data;
 
 import java.util.Map;
 
