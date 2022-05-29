@@ -85,7 +85,7 @@ public class DatagramClient implements Runnable {
 //                            new PacketContainerDecoder(),
 //                            new PacketDecoder(),
                             new ClientDecoder(),
-                            new ClientInboundChannelHandler()
+                            new InboundHandler()
                     );
                 }
             });

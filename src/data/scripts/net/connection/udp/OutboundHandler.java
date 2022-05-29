@@ -7,10 +7,10 @@ import io.netty.channel.ChannelPromise;
 
 import java.nio.charset.StandardCharsets;
 
-public class ServerOutboundChannelHandler extends ChannelOutboundHandlerAdapter {
+public class OutboundHandler extends ChannelOutboundHandlerAdapter {
     //private final ServerConnectionWrapper connection;
 
-    public ServerOutboundChannelHandler() {
+    public OutboundHandler() {
         //this.connection = connection;
     }
 
