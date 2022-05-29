@@ -55,7 +55,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
-        if (!client.isActive()) {
+        if (!clientThread.isAlive()) {
             client.stop();
             clientThread = null;
             Global.getCombatEngine().removePlugin(this);
