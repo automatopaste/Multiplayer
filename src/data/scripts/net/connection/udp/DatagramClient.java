@@ -41,6 +41,8 @@ public class DatagramClient implements Runnable {
             runClient();
         } catch (Exception e) {
             e.printStackTrace();
+            active = false;
+            if (workerGroup != null) workerGroup.shutdownGracefully();
         }
     }
 
@@ -104,5 +106,9 @@ public class DatagramClient implements Runnable {
     public void stop() {
         active = false;
         workerGroup.shutdownGracefully();
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }

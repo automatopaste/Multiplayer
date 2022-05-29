@@ -40,6 +40,7 @@ public class DatagramServer implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            channelGroup.disconnect();
             channelGroup.close();
             bossLoopGroup.shutdownGracefully();
         }
@@ -47,6 +48,7 @@ public class DatagramServer implements Runnable {
 
     public void runServer() throws InterruptedException {
         ChannelFuture channelFuture = start();
+        channelFuture.sync();
 
         Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
         while (serverPlugin.isActive()) {
