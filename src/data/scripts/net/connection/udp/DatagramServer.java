@@ -42,56 +42,58 @@ public class DatagramServer implements Runnable {
             runServer();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public void runServer() {
-        try {
-            final Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(bossLoopGroup)
-                    .channel(NioDatagramChannel.class)
-                    .handler(new ChannelInitializer<DatagramChannel>() {
-                        private ServerConnectionWrapper connection;
-
-                        @Override
-                        protected void initChannel(DatagramChannel datagramChannel) throws InterruptedException {
-                            connection = serverPlugin.getNewConnection();
-
-                            if (connection == null) {
-                                throw new InterruptedException("Channel connection refused: max connections exceeded");
-                            }
-
-                            datagramChannel.pipeline().addLast(
-                                    new PacketContainerEncoder(),
-                                    new PacketContainerDecoder(),
-                                    new PacketDecoder(),
-                                    new ServerOutboundChannelHandler(connection)
-                            );
-                        }
-
-                        @Override
-                        public void channelUnregistered(ChannelHandlerContext ctx) {
-                            serverPlugin.removeConnection(connection);
-                        }
-                    })
-                    .option(ChannelOption.AUTO_CLOSE, true)
-                    .option(ChannelOption.SO_BROADCAST, true);
-
-            Channel channel = bootstrap.bind(port).sync().channel();
-            channelGroup.add(channel);
-
-            Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
-            while (serverPlugin.isActive()) {
-                // engages thread until time passed
-                clock.runUntilUpdate();
-
-                channelGroup.write(serverPlugin.getTick()).sync();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } finally {
             channelGroup.close();
             bossLoopGroup.shutdownGracefully();
         }
+    }
+
+    public void runServer() throws InterruptedException {
+        ChannelFuture channelFuture = start();
+
+        Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
+        while (serverPlugin.isActive()) {
+            // engages thread until time passed
+            clock.runUntilUpdate();
+
+            channelGroup.write(serverPlugin.getTick()).sync();
+        }
+    }
+
+    private ChannelFuture start() throws InterruptedException {
+        final Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(bossLoopGroup)
+                .channel(NioDatagramChannel.class)
+                .handler(new ChannelInitializer<DatagramChannel>() {
+                    private ServerConnectionWrapper connection;
+
+                    @Override
+                    protected void initChannel(DatagramChannel datagramChannel) throws InterruptedException {
+                        connection = serverPlugin.getNewConnection();
+
+                        if (connection == null) {
+                            throw new InterruptedException("Channel connection refused: max connections exceeded");
+                        }
+
+                        datagramChannel.pipeline().addLast(
+                                new PacketContainerEncoder(),
+                                new PacketContainerDecoder(),
+                                new PacketDecoder(),
+                                new ServerOutboundChannelHandler(connection)
+                        );
+                    }
+
+                    @Override
+                    public void channelUnregistered(ChannelHandlerContext ctx) {
+                        Console.showMessage("Channel unregisted " + connection.getId());
+                        serverPlugin.removeConnection(connection);
+                    }
+                })
+                .option(ChannelOption.SO_BROADCAST, true);
+
+        ChannelFuture future = bootstrap.bind(port).sync();
+        channelGroup.add(future.channel());
+
+        return future;
     }
 }
