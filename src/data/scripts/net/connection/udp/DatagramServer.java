@@ -2,9 +2,6 @@ package data.scripts.net.connection.udp;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.server.ServerConnectionWrapper;
-import data.scripts.net.io.PacketContainerDecoder;
-import data.scripts.net.io.PacketContainerEncoder;
-import data.scripts.net.io.PacketDecoder;
 import data.scripts.plugins.mpServerPlugin;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -69,24 +66,24 @@ public class DatagramServer implements Runnable {
 
                     @Override
                     protected void initChannel(DatagramChannel datagramChannel) throws InterruptedException {
-                        connection = serverPlugin.getNewConnection();
+                        //connection = serverPlugin.getNewConnection();
 
-                        if (connection == null) {
-                            throw new InterruptedException("Channel connection refused: max connections exceeded");
-                        }
+                        //if (connection == null) {
+                        //    throw new InterruptedException("Channel connection refused: max connections exceeded");
+                        //}
 
                         datagramChannel.pipeline().addLast(
-                                new PacketContainerEncoder(),
-                                new PacketContainerDecoder(),
-                                new PacketDecoder(),
-                                new ServerOutboundChannelHandler(connection)
+//                                new PacketContainerEncoder(),
+//                                new PacketContainerDecoder(),
+//                                new PacketDecoder(),
+                                new ServerOutboundChannelHandler()
                         );
                     }
 
                     @Override
                     public void channelUnregistered(ChannelHandlerContext ctx) {
-                        Console.showMessage("Channel unregisted " + connection.getId());
-                        serverPlugin.removeConnection(connection);
+                        //Console.showMessage("Channel unregisted " + connection.getId());
+                        //serverPlugin.removeConnection(connection);
                     }
                 })
                 .option(ChannelOption.SO_BROADCAST, true);

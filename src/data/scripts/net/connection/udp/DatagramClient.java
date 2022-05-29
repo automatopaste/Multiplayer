@@ -2,19 +2,14 @@ package data.scripts.net.connection.udp;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.client.ClientConnectionWrapper;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.io.PacketContainer;
-import data.scripts.net.io.PacketContainerDecoder;
-import data.scripts.net.io.PacketDecoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import org.lazywizard.console.Console;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class DatagramClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -51,17 +46,26 @@ public class DatagramClient implements Runnable {
 
     public void runClient() {
         ChannelFuture future = start();
-
-        Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
-        while (active) {
-            clock.runUntilUpdate();
-
-            try {
-                channel.writeAndFlush(new PacketContainer(new ArrayList<BasePackable>(), 69, false));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (future == null) {
+            throw new NullPointerException("Client failed to start: no channel future");
         }
+
+        try {
+            future.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
+//        while (active) {
+//            clock.runUntilUpdate();
+//
+//            try {
+//                channel.writeAndFlush(new PacketContainer(new ArrayList<BasePackable>(), 69, false));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private ChannelFuture start() {
@@ -76,9 +80,10 @@ public class DatagramClient implements Runnable {
                 @Override
                 protected void initChannel(DatagramChannel datagramChannel) throws Exception {
                     datagramChannel.pipeline().addLast(
-                            new PacketContainerDecoder(),
-                            new PacketDecoder(),
-                            new ClientInboundChannelHandler(connection)
+//                            new PacketContainerDecoder(),
+//                            new PacketDecoder(),
+                            new ClientDecoder(),
+                            new ClientInboundChannelHandler()
                     );
                 }
             });
