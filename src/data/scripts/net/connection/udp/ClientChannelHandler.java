@@ -1,6 +1,7 @@
-package data.scripts.net.connection.client;
+package data.scripts.net.connection.udp;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.net.connection.client.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
@@ -20,14 +21,12 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger;
 
-    private int clientTick;
-
     public ClientChannelHandler(ClientConnectionWrapper connection) {
         this.connection = connection;
 
         logger = Global.getLogger(ClientChannelHandler.class);
 
-        clientTick = 0;
+        int clientTick = 0;
     }
 
     @Override
@@ -37,8 +36,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info("Channel active on client");
-
         Console.showMessage("Channel active on client");
     }
 
@@ -50,21 +47,17 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         logger.info("Received unpacked with tick: " + serverTick);
 
         connection.getDuplex().setCurrTick(serverTick);
-
         Map<Integer, BasePackable> entities = unpacked.getUnpacked();
 
         // if getting -1 value tick from server, server is sending preload data
         connection.setLoading(serverTick == -1);
-
         connection.getDuplex().updateInbound(entities);
     }
 
     @Override
     public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
         int tick = connection.getDuplex().getCurrTick();
-
         PacketContainer container = connection.getDuplex().getPacket(tick);
-
         ctx.writeAndFlush(container);
     }
 

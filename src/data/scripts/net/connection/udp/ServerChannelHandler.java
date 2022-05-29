@@ -1,6 +1,7 @@
-package data.scripts.net.connection.server;
+package data.scripts.net.connection.udp;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.net.connection.server.ServerConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.Unpacked;
@@ -32,8 +33,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         initialTime = System.nanoTime();
         timeU = 1000000000d / TICK_RATE;
         deltaU = 1d;
-
-        // -1 indicates in process of loading, not sending remote simulation data yet
     }
 
     @Override

@@ -1,5 +1,6 @@
 package data.scripts.net.connection.client;
 
+import data.scripts.net.connection.udp.ClientChannelHandler;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import data.scripts.net.io.PacketDecoder;
