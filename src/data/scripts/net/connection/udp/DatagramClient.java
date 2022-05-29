@@ -9,7 +9,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
 public class DatagramClient implements Runnable{
@@ -43,10 +43,10 @@ public class DatagramClient implements Runnable{
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
             bootstrap.channel(NioDatagramChannel.class);
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
                 @Override
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-                    socketChannel.pipeline().addLast(
+                protected void initChannel(DatagramChannel datagramChannel) throws Exception {
+                    datagramChannel.pipeline().addLast(
                             new PacketContainerDecoder(),
                             new PacketDecoder(),
                             new ClientInboundChannelHandler(connection)
