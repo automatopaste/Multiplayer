@@ -11,7 +11,7 @@ import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.lazywizard.console.Console;
@@ -54,18 +54,18 @@ public class DatagramServer implements Runnable {
             final Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(bossLoopGroup)
                     .channel(NioDatagramChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
+                    .handler(new ChannelInitializer<DatagramChannel>() {
                         private ServerConnectionWrapper connection;
 
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
+                        protected void initChannel(DatagramChannel datagramChannel) throws InterruptedException {
                             connection = serverPlugin.getNewConnection();
 
                             if (connection == null) {
                                 throw new InterruptedException("Channel connection refused: max connections exceeded");
                             }
 
-                            socketChannel.pipeline().addLast(
+                            datagramChannel.pipeline().addLast(
                                     new PacketContainerEncoder(),
                                     new PacketContainerDecoder(),
                                     new PacketDecoder(),
