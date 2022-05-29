@@ -73,8 +73,7 @@ public class DatagramServer implements Runnable {
 //                                new PacketContainerEncoder(),
 //                                new PacketContainerDecoder(),
 //                                new PacketDecoder(),
-                                new InboundHandler(),
-                                new OutboundHandler()
+                                new InboundHandler()
                         );
                     }
 

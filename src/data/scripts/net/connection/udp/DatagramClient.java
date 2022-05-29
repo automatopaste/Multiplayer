@@ -3,13 +3,19 @@ package data.scripts.net.connection.udp;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.client.ClientConnectionWrapper;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.CharsetUtil;
+
+import java.net.InetSocketAddress;
 
 public class DatagramClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -22,7 +28,6 @@ public class DatagramClient implements Runnable {
     private EventLoopGroup workerGroup;
 
     private Channel channel;
-    private boolean active;
 
     private Clock clock;
 
@@ -41,22 +46,27 @@ public class DatagramClient implements Runnable {
             runClient();
         } catch (Exception e) {
             e.printStackTrace();
-            active = false;
             if (workerGroup != null) workerGroup.shutdownGracefully();
         }
     }
 
     public void runClient() {
+        InetSocketAddress remoteAddress = new InetSocketAddress(host, port);
+
         ChannelFuture future = start();
-        if (future == null) {
-            throw new NullPointerException("Client failed to start: no channel future");
-        }
+
+        String text = "test";
+        System.out.println("Sending test to server");
+
+        ByteBuf buf = Unpooled.copiedBuffer(text, CharsetUtil.UTF_8);
 
         try {
-            future.await();
+            write(new DatagramPacket(buf, remoteAddress));
+            future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
 //        Console.showMessage("UDP Server active on port " + port + " at " + TICK_RATE + "Hz");
 //        while (active) {
@@ -71,44 +81,36 @@ public class DatagramClient implements Runnable {
     }
 
     private ChannelFuture start() {
-        active = true;
         workerGroup = new NioEventLoopGroup();
 
-        try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(workerGroup);
-            bootstrap.channel(NioDatagramChannel.class);
-            bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
-                @Override
-                protected void initChannel(DatagramChannel datagramChannel) throws Exception {
-                    datagramChannel.pipeline().addLast(
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(workerGroup);
+        bootstrap.channel(NioDatagramChannel.class);
+        bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
+            @Override
+            protected void initChannel(DatagramChannel datagramChannel) throws Exception {
+                datagramChannel.pipeline().addLast(
 //                            new PacketContainerDecoder(),
 //                            new PacketDecoder(),
-                            new ClientDecoder(),
-                            new InboundHandler()
-                    );
-                }
-            });
+                        new InboundHandler()
+                );
+            }
+        });
 
-            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+        ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(0));
+        channelFuture.syncUninterruptibly();
 
-            this.channel = channelFuture.channel();
+        channel = channelFuture.channel();
 
-            return channelFuture;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            workerGroup.shutdownGracefully();
-        }
+        return channelFuture;
+    }
 
-        return null;
+    private ChannelFuture write(Object msg) throws InterruptedException {
+        return channel.writeAndFlush(msg).sync();
     }
 
     public void stop() {
-        active = false;
+        if (channel != null) channel.close();
         workerGroup.shutdownGracefully();
-    }
-
-    public boolean isActive() {
-        return active;
     }
 }
