@@ -33,6 +33,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final ServerInboundEntityManager serverEntityManager;
     private final ServerCombatEntityManager serverCombatEntityManager;
 
+    private final DatagramServer server;
+
     private int nextInstanceID = 1;
     private final Set<Integer> usedIDs = new HashSet<>();
 
@@ -54,7 +56,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         dataStore = new LoadedDataStore();
         dataStore.generate(Global.getCombatEngine(), this);
 
-        DatagramServer server = new DatagramServer(port, this);
+        server = new DatagramServer(port, this);
         serverThread = new Thread(server, "MP_SERVER_THREAD");
         serverThread.start();
     }
@@ -64,6 +66,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         if (!serverThread.isAlive() || serverThread.isInterrupted()) {
+            server.stop();
             active = false;
             serverThread = null;
             Global.getCombatEngine().removePlugin(this);
@@ -71,6 +74,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
+            server.stop();
             active = false;
             serverThread = null;
             Global.getCombatEngine().removePlugin(this);
