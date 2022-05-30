@@ -14,6 +14,8 @@ public abstract class BasePackable {
 
     private final int instanceID;
 
+    protected boolean initFlush = true;
+
     public BasePackable(int instanceID) {
         this.instanceID = instanceID;
 
@@ -28,7 +30,7 @@ public abstract class BasePackable {
         // so packer instance can be identified
         packer.putInt(getInstanceID());
 
-        if (flush) {
+        if (flush || initFlush) {
             write(true);
         } else {
             if (!write(false)) return null;
@@ -37,6 +39,8 @@ public abstract class BasePackable {
         packer.flip();
         byte[] out = new byte[packer.remaining()];
         packer.get(out);
+
+        initFlush = false;
 
         return out;
     }
