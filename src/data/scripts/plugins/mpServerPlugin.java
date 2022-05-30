@@ -30,12 +30,12 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     private final LoadedDataStore dataStore;
 
-    public mpServerPlugin(int port) {
+    public mpServerPlugin() {
 
         serverEntityManager = new ServerInboundEntityManager(this);
         serverCombatEntityManager = new ServerCombatEntityManager(this);
 
-        serverConnectionManager = new ServerConnectionManager(port);
+        serverConnectionManager = new ServerConnectionManager();
 
         dataStore = new LoadedDataStore();
         dataStore.generate(Global.getCombatEngine(), this);

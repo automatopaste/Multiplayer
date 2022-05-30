@@ -27,7 +27,7 @@ public class mpRunServer implements BaseCommand {
         int port = Integer.parseInt(ids[0]);
 
         Console.showMessage("Starting server on port " + port);
-        Global.getCombatEngine().addPlugin(new mpServerPlugin(port));
+        Global.getCombatEngine().addPlugin(new mpServerPlugin());
         Console.showMessage("Server started successfully");
 
         return CommandResult.SUCCESS;

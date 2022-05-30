@@ -15,7 +15,8 @@ import java.util.List;
 public class ServerConnectionManager {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
-    private final int port;
+    private final static int PORT = Global.getSettings().getInt("mpLocalPort");
+
     private final DataDuplex dataDuplex;
     private boolean active;
 
@@ -29,17 +30,16 @@ public class ServerConnectionManager {
 
     private int tick;
 
-    public ServerConnectionManager(int port) {
-        this.port = port;
+    public ServerConnectionManager() {
         dataDuplex = new DataDuplex();
         active = true;
 
         serverConnectionWrappers = new ArrayList<>();
 
-        datagramServer = new DatagramServer(port, this);
+        datagramServer = new DatagramServer(PORT, this);
         datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
 
-        socketServer = new SocketServer(port, this);
+        socketServer = new SocketServer(PORT, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
         socket.start();
@@ -82,7 +82,7 @@ public class ServerConnectionManager {
         synchronized (serverConnectionWrappers) {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
-        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(port, this);
+        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this);
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.add(serverConnectionWrapper);

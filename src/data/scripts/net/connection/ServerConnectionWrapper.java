@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
-    private final int port;
     private final ServerConnectionManager connectionManager;
 
-    public ServerConnectionWrapper(int port, ServerConnectionManager connectionManager) {
-        this.port = port;
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
 
         statusData = null;
