@@ -13,10 +13,11 @@ import java.util.Map;
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
 
-    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int instanceId) {
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId) {
         this.connectionManager = connectionManager;
+        this.connectionId = connectionId;
 
-        statusData = new ConnectionStatusData(instanceId);
+        statusData = new ConnectionStatusData(connectionId);
     }
 
     @Override
