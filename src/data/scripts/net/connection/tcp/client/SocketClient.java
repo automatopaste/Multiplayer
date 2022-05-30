@@ -11,7 +11,6 @@ import data.scripts.net.io.PacketContainerEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.lazywizard.console.Console;
@@ -61,7 +60,7 @@ public class SocketClient implements Runnable {
                 PacketContainer message = connection.getSocketMessage();
                 if (message == null) continue;
 
-                write(new DatagramPacket(message.get(), remoteAddress));
+                write(message);
             }
 
             // Wait for channel to close
