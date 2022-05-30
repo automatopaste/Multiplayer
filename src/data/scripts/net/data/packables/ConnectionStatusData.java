@@ -15,7 +15,7 @@ import java.util.Map;
 public class ConnectionStatusData extends BasePackable {
     private static int typeID;
 
-    public static final int UNASSIGNED = -10;
+    public static final int UNASSIGNED = -100;
 
     private final IntRecord id;
     private final IntRecord state;
