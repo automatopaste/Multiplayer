@@ -111,6 +111,8 @@ public class ServerConnectionManager implements Runnable {
     }
 
     public ServerConnectionWrapper getConnection(InetSocketAddress remoteAddress) {
+        if (remoteAddress == null) return null;
+
         synchronized (serverConnectionWrappers) {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }

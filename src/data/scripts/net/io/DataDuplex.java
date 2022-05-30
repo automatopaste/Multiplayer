@@ -2,9 +2,10 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.BasePackable;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manage data between game and network threads
@@ -32,24 +33,6 @@ public class DataDuplex {
             inbound.clear();
             return out;
         }
-    }
-
-    /**
-     * Create a packet to send over socket connection
-     * @param tick tick of current thread
-     * @return the packet
-     * @throws IOException fuck up
-     */
-    public PacketContainer getPacket(int tick, InetSocketAddress dest) throws IOException {
-        List<BasePackable> outEntities;
-        synchronized (outbound) {
-            outEntities = new ArrayList<>(outbound.values());
-            outbound.clear();
-        }
-
-        PacketContainer p = new PacketContainer(outEntities, tick, doFlush, dest);
-        doFlush = false;
-        return p;
     }
 
     /**
