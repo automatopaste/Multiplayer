@@ -42,7 +42,7 @@ public class ServerConnectionManager {
         socketServer = new SocketServer(PORT, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
-        socket.start();
+        //socket.start();
         datagram.start();
 
         tick = 0;
