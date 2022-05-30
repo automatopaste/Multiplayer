@@ -6,6 +6,7 @@ import data.scripts.net.connection.ServerConnectionManager;
 import data.scripts.net.connection.udp.DatagramUnpacker;
 import data.scripts.net.io.PacketContainer;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -54,7 +55,9 @@ public class DatagramServer implements Runnable {
                 List<PacketContainer> messages = serverConnectionManager.getDatagrams();
                 for (PacketContainer message : messages) {
                     if (message == null || message.isEmpty()) continue;
-                    write(new DatagramPacket(message.get(), message.getDest()));
+                    ByteBuf buf = message.get();
+                    write(new DatagramPacket(buf, message.getDest()));
+                    buf.release();
                 }
             }
 

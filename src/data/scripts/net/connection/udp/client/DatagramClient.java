@@ -63,6 +63,7 @@ public class DatagramClient implements Runnable {
 
                 ByteBuf message = container.get();
                 write(new DatagramPacket(message, remoteAddress));
+                message.release();
             }
 
             closeFuture.sync();

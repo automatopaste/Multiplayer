@@ -11,7 +11,7 @@ public class PacketContainerDecoder extends ReplayingDecoder<Object> {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         int length = in.readInt();
         if (in.readableBytes() < length) return;
-        else if (in.readableBytes() > length) throw new IndexOutOfBoundsException("Readable bytes exceeds header value");
+        //else if (in.readableBytes() > length) throw new IndexOutOfBoundsException("Readable bytes exceeds header value");
 
         ByteBuf frame = in.readBytes(length);
         out.add(frame);
