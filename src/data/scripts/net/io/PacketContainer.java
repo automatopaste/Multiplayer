@@ -47,6 +47,8 @@ public class PacketContainer {
 
         ByteBuf data = Unpooled.directBuffer(PACKET_SIZE);
 
+        data.writeInt(tick);
+
         for (byte[] entity : entities) {
             data.writeBytes(entity);
         }

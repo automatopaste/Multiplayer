@@ -12,11 +12,7 @@ public class PacketContainerEncoder extends MessageToByteEncoder<PacketContainer
         ByteBuf data = msg.get();
         int length = data.readableBytes();
 
-        int tick = msg.getTick();
-        length += Integer.SIZE / Byte.SIZE;
-
         out.writeInt(length);
-        out.writeInt(tick);
         out.writeBytes(data);
 
         data.release();

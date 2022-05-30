@@ -19,9 +19,6 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf in = datagram.content();
 
         if (in.readableBytes() < 4) return;
-        int length = in.readInt();
-
-        if (in.readableBytes() < 4) return;
         int tick = in.readInt();
 
         Unpacked result;

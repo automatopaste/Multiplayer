@@ -65,7 +65,7 @@ public class DatagramClient implements Runnable {
                 if (message.readableBytes() == 0) continue;
 
                 write(new DatagramPacket(message, remoteAddress));
-                message.release();
+                //message.release(); released by packet??? throws IllegalReferenceCountException
             }
 
             closeFuture.sync();
