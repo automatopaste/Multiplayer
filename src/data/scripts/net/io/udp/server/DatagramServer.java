@@ -1,10 +1,11 @@
-package data.scripts.net.connection.udp.server;
+package data.scripts.net.io.udp.server;
 
-import data.scripts.net.connection.ServerConnectionManager;
-import data.scripts.net.connection.udp.DatagramUnpacker;
 import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.ServerConnectionManager;
+import data.scripts.net.io.udp.DatagramUnpacker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -24,7 +25,8 @@ public class DatagramServer implements Runnable {
 
     private final Object sync;
     private EventLoopGroup workerLoopGroup;
-    private NioDatagramChannel channel;
+    private Channel channel;
+//    private final ChannelGroup channelGroup;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -32,11 +34,9 @@ public class DatagramServer implements Runnable {
 
         sync = new Object();
 
-//        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-//        clock = new Clock(TICK_RATE);
-
         messageQueue = new LinkedList<>();
+
+//        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class DatagramServer implements Runnable {
 
                     ByteBuf buf = message.get();
 
-                    write(new DatagramPacket(buf, message.getDest()));
+                    channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                 }
 
                 while (messageQueue.isEmpty()) {
@@ -73,28 +73,6 @@ public class DatagramServer implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-//        // LOOP WRITE OPERATIONS ONLY
-//        // Incoming messages handled by inbound channel adapter
-//        try {
-//            while (serverConnectionManager.isActive()) {
-//                clock.sleepUntilTick();
-//
-//                List<PacketContainer> messages = serverConnectionManager.getDatagrams();
-//                for (PacketContainer message : messages) {
-//                    if (message == null || message.isEmpty()) continue;
-//                    ByteBuf buf = message.get();
-//                    write(new DatagramPacket(buf, message.getDest()));
-//                    //buf.release(); released by packet??? throws IllegalReferenceCountException
-//                }
-//            }
-//
-//            closeFuture.sync();
-//        } catch (InterruptedException | IOException e) {
-//            e.printStackTrace();
-//            stop();
-//        }
     }
 
     private ChannelFuture start() {
@@ -114,7 +92,8 @@ public class DatagramServer implements Runnable {
                 });
 
         ChannelFuture future = bootstrap.bind(port).syncUninterruptibly();
-        channel = (NioDatagramChannel) future.channel();
+        channel = future.channel();
+//        channelGroup.add(channel);
 
         return future;
     }
@@ -127,10 +106,6 @@ public class DatagramServer implements Runnable {
         synchronized (sync) {
             sync.notify();
         }
-    }
-
-    private ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
     }
 
     public void stop() {

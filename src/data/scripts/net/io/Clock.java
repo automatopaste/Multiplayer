@@ -1,4 +1,4 @@
-package data.scripts.net.connection;
+package data.scripts.net.io;
 
 public class Clock {
     private long initialTime;

@@ -1,19 +1,22 @@
-package data.scripts.net.connection.tcp.server;
+package data.scripts.net.io.tcp.server;
 
-import data.scripts.net.connection.ServerConnectionManager;
-import data.scripts.net.connection.ServerConnectionWrapper;
-import data.scripts.net.io.BufferUnpacker;
 import data.scripts.net.io.PacketContainer;
-import data.scripts.net.io.PacketContainerDecoder;
-import data.scripts.net.io.PacketContainerEncoder;
+import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.ChannelMatcher;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -26,7 +29,8 @@ public class SocketServer implements Runnable {
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private Channel channel;
+    private Channel serverChannel;
+    private final DefaultChannelGroup channelGroup;
 
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -35,6 +39,8 @@ public class SocketServer implements Runnable {
         sync = new Object();
 
         messageQueue = new LinkedList<>();
+
+        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
 
     @Override
@@ -48,7 +54,17 @@ public class SocketServer implements Runnable {
         try {
             while (connectionManager.isActive()) {
                 while (!messageQueue.isEmpty()) {
-                    write(messageQueue.poll());
+                    final PacketContainer message = messageQueue.poll();
+
+                    channelGroup.writeAndFlush(message, new ChannelMatcher() {
+                        @Override
+                        public boolean matches(Channel channel) {
+                            SocketAddress address = channel.remoteAddress();
+                            InetSocketAddress messageAddress = message.getDest();
+
+                            return address == messageAddress;
+                        }
+                    });
                 }
 
                 while (messageQueue.isEmpty()) {
@@ -66,26 +82,6 @@ public class SocketServer implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-//        // LOOP WRITE OPERATIONS ONLY
-//        // Incoming messages handled by inbound channel adapter
-//        try {
-//            while (connectionManager.isActive()) {
-//                clock.sleepUntilTick();
-//
-//                List<PacketContainer> messages = connectionManager.getSocketMessages();
-//                for (PacketContainer message : messages) {
-//                    if (message == null || message.isEmpty()) continue;
-//                    write(message);
-//                }
-//            }
-//
-//            closeFuture.sync();
-//        } catch (InterruptedException | IOException e) {
-//            e.printStackTrace();
-//            stop();
-//        }
     }
 
     private ChannelFuture start() {
@@ -95,36 +91,13 @@ public class SocketServer implements Runnable {
         final ServerBootstrap server = new ServerBootstrap();
         server.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
-                        ServerConnectionWrapper connection = connectionManager.getConnection(socketChannel.remoteAddress());
-
-                        if (connection == null) {
-                            throw new InterruptedException("Channel connection refused: max connections exceeded");
-                        }
-
-                        socketChannel.remoteAddress();
-
-                        socketChannel.pipeline().addLast(
-                                new PacketContainerEncoder(),
-                                new PacketContainerDecoder(),
-                                new BufferUnpacker(),
-                                new ServerChannelHandler(connection)
-                        );
-                    }
-
-                    @Override
-                    public void channelUnregistered(ChannelHandlerContext ctx) {
-                        connectionManager.removeConnection((InetSocketAddress) channel.remoteAddress());
-                    }
-                })
+                .childHandler(new SocketChannelInitializer(this, connectionManager))
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         // Bind to TCP port and wait for channel from ready socket
         ChannelFuture future = server.bind(port).syncUninterruptibly();
-        channel = future.channel();
+        serverChannel = future.channel();
 
         return future;
     }
@@ -139,13 +112,13 @@ public class SocketServer implements Runnable {
         }
     }
 
-    private ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
-    }
-
     public void stop() {
-        if (channel != null) channel.close();
+        if (serverChannel != null) serverChannel.close();
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
+    }
+
+    public ChannelGroup getChannelGroup() {
+        return channelGroup;
     }
 }

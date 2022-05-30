@@ -1,5 +1,6 @@
-package data.scripts.net.io;
+package data.scripts.net.io.tcp;
 
+import data.scripts.net.io.PacketContainer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

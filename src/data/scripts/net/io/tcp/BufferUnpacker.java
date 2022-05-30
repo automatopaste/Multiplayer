@@ -1,8 +1,9 @@
-package data.scripts.net.io;
+package data.scripts.net.io.tcp;
 
 import data.scripts.data.DataGenManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.io.Unpacked;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

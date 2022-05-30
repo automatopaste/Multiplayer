@@ -1,7 +1,6 @@
-package data.scripts.net.connection;
+package data.scripts.net.io;
 
 import data.scripts.net.data.packables.ConnectionStatusData;
-import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
 

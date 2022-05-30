@@ -1,8 +1,7 @@
-package data.scripts.net.connection;
+package data.scripts.net.io;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ConnectionStatusData;
-import data.scripts.net.io.PacketContainer;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -28,7 +27,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case INITIALISING:
                 connectionState = ConnectionState.LOADING_READY;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), connectionManager.getTick(), true, null);
+                return new PacketContainer(
+                        Collections.singletonList((BasePackable) statusData),
+                        connectionManager.getTick(),
+                        true,
+                        connectionManager.getAddress(connectionId)
+                );
             case LOADING_READY:
                 return null;
             case LOADING:
@@ -42,7 +46,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 // if client requests data again, state will return back to INITIALISING and resend packet
                 connectionState = ConnectionState.SIMULATING;
 
-                return new PacketContainer(data, connectionManager.getTick(), true, null);
+                return new PacketContainer(
+                        data,
+                        connectionManager.getTick(),
+                        true,
+                        connectionManager.getAddress(connectionId)
+                );
             case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:
@@ -93,5 +102,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         if (key != null) entities.remove(key);
 
         connectionManager.getDuplex().updateInbound(entities);
+    }
+
+    public void close() {
+        connectionManager.removeConnection(connectionManager.getAddress(connectionId));
     }
 }

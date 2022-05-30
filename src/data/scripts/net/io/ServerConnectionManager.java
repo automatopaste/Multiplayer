@@ -1,9 +1,8 @@
-package data.scripts.net.connection;
+package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.tcp.server.SocketServer;
-import data.scripts.net.connection.udp.server.DatagramServer;
-import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.tcp.server.SocketServer;
+import data.scripts.net.io.udp.server.DatagramServer;
 import data.scripts.plugins.mpServerPlugin;
 import org.lazywizard.console.Console;
 

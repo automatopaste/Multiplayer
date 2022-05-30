@@ -1,10 +1,10 @@
-package data.scripts.net.connection.udp.client;
+package data.scripts.net.io.udp.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.BaseConnectionWrapper;
-import data.scripts.net.connection.ClientConnectionWrapper;
-import data.scripts.net.connection.Clock;
-import data.scripts.net.connection.udp.DatagramUnpacker;
+import data.scripts.net.io.BaseConnectionWrapper;
+import data.scripts.net.io.ClientConnectionWrapper;
+import data.scripts.net.io.Clock;
+import data.scripts.net.io.udp.DatagramUnpacker;
 import data.scripts.net.io.PacketContainer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;

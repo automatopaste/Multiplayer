@@ -6,7 +6,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.data.LoadedDataStore;
-import data.scripts.net.connection.ServerConnectionManager;
+import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.ServerCombatEntityManager;
 import data.scripts.net.data.ServerInboundEntityManager;

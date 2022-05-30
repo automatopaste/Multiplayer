@@ -1,4 +1,4 @@
-package data.scripts.net.connection.udp;
+package data.scripts.net.io.udp;
 
 import data.scripts.data.DataGenManager;
 import data.scripts.net.data.BasePackable;

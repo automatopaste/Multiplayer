@@ -1,13 +1,13 @@
-package data.scripts.net.connection.tcp.client;
+package data.scripts.net.io.tcp.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.BaseConnectionWrapper;
-import data.scripts.net.connection.ClientConnectionWrapper;
-import data.scripts.net.connection.Clock;
-import data.scripts.net.io.BufferUnpacker;
+import data.scripts.net.io.BaseConnectionWrapper;
+import data.scripts.net.io.ClientConnectionWrapper;
+import data.scripts.net.io.Clock;
+import data.scripts.net.io.tcp.BufferUnpacker;
 import data.scripts.net.io.PacketContainer;
-import data.scripts.net.io.PacketContainerDecoder;
-import data.scripts.net.io.PacketContainerEncoder;
+import data.scripts.net.io.tcp.PacketContainerDecoder;
+import data.scripts.net.io.tcp.PacketContainerEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

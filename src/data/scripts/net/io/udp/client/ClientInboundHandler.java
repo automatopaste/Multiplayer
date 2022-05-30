@@ -1,6 +1,6 @@
-package data.scripts.net.connection.udp.server;
+package data.scripts.net.io.udp.client;
 
-import data.scripts.net.connection.ServerConnectionWrapper;
+import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
@@ -9,10 +9,10 @@ import org.lazywizard.console.Console;
 
 import java.util.Map;
 
-public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
-    private final ServerConnectionWrapper connection;
+public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
+    private final ClientConnectionWrapper connection;
 
-    public ServerInboundHandler(ServerConnectionWrapper connection) {
+    public ClientInboundHandler(ClientConnectionWrapper connection) {
         this.connection = connection;
     }
 
@@ -24,8 +24,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
         // DISCARD WHILE DEBUG
         Map<Integer, BasePackable> entities = in.getUnpacked();
 
-        // if getting -1 value tick from server, server is sending preload data
-        connection.updateInbound(entities);
+        connection.updateInbound(entities, serverTick);
     }
 
     @Override

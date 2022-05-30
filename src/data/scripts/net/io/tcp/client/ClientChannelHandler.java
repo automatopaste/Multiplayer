@@ -1,6 +1,6 @@
-package data.scripts.net.connection.tcp.client;
+package data.scripts.net.io.tcp.client;
 
-import data.scripts.net.connection.ClientConnectionWrapper;
+import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;

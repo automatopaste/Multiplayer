@@ -1,7 +1,7 @@
-package data.scripts.net.connection.tcp.server;
+package data.scripts.net.io.tcp.server;
 
-import data.scripts.net.connection.ServerConnectionWrapper;
 import data.scripts.net.data.BasePackable;
+import data.scripts.net.io.ServerConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -12,9 +12,11 @@ import java.util.Map;
 
 public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> {
     private final ServerConnectionWrapper serverConnectionWrapper;
+    private final SocketServer socketServer;
 
-    public ServerChannelHandler(ServerConnectionWrapper serverConnectionWrapper) {
+    public ServerChannelHandler(ServerConnectionWrapper serverConnectionWrapper, SocketServer socketServer) {
         this.serverConnectionWrapper = serverConnectionWrapper;
+        this.socketServer = socketServer;
     }
 
     @Override
@@ -49,6 +51,13 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws IOException, InterruptedException {
         Console.showMessage("Channel active on server");
+
+        socketServer.getChannelGroup().add(ctx.channel());
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        serverConnectionWrapper.close();
     }
 
     /**

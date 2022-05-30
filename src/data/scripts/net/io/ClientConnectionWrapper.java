@@ -1,10 +1,9 @@
-package data.scripts.net.connection;
+package data.scripts.net.io;
 
-import data.scripts.net.connection.tcp.client.SocketClient;
-import data.scripts.net.connection.udp.client.DatagramClient;
+import data.scripts.net.io.tcp.client.SocketClient;
+import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ConnectionStatusData;
-import data.scripts.net.io.PacketContainer;
 import data.scripts.plugins.mpClientPlugin;
 import org.lazywizard.console.Console;
 

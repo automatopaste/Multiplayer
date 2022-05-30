@@ -1,6 +1,6 @@
 package data.scripts.net.data.packables;
 
-import data.scripts.net.connection.BaseConnectionWrapper;
+import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
