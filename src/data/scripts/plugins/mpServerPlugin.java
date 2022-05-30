@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
-    private final int port;
-
-    private int tick;
 
     private final ServerConnectionManager serverConnectionManager;
 
@@ -34,9 +31,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final LoadedDataStore dataStore;
 
     public mpServerPlugin(int port) {
-        this.port = port;
-
-        tick = 0;
 
         serverEntityManager = new ServerInboundEntityManager(this);
         serverCombatEntityManager = new ServerCombatEntityManager(this);
@@ -69,8 +63,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverConnectionManager.getDuplex().updateOutbound(entities);
 
         // move tick forward
-        tick++;
-        serverConnectionManager.updateTick(tick);
+        serverConnectionManager.update();
     }
 
     public int getNewInstanceID(ShipAPI ship) {
@@ -106,9 +99,5 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
     public LoadedDataStore getDataStore() {
         return dataStore;
-    }
-
-    public int getTick() {
-        return tick;
     }
 }

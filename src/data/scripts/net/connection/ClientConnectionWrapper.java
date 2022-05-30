@@ -37,17 +37,13 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
 
         tick = -1;
+
+        socket.start();
+        datagram.start();
     }
 
     @Override
     public void update() {
-        if (!socket.isAlive() && !socket.isInterrupted() && connectionState != ConnectionState.CLOSED) {
-            socket.start();
-        }
-        if (!datagram.isAlive() && !datagram.isInterrupted() && connectionState != ConnectionState.CLOSED) {
-            datagram.start();
-        }
-
         switch (connectionState) {
             case INITIAL:
 

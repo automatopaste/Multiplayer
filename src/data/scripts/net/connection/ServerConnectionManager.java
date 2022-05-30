@@ -42,17 +42,13 @@ public class ServerConnectionManager {
         socketServer = new SocketServer(port, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
+        socket.start();
+        datagram.start();
+
         tick = 0;
     }
 
     public void update() {
-        if (!socket.isAlive() && !socket.isInterrupted() && active) {
-            socket.start();
-        }
-        if (!datagram.isAlive() && !datagram.isInterrupted() && active) {
-            datagram.start();
-        }
-
         tick++;
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers) {
