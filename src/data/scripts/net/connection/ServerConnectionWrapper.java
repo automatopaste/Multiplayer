@@ -4,8 +4,6 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
@@ -15,6 +13,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public ServerConnectionWrapper(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
+
+        statusData = null;
     }
 
     @Override
@@ -24,9 +24,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
-        List<BasePackable> packables = new ArrayList<>();
-        packables.add(statusData);
-        return new PacketContainer(packables, 10, false, null);
+        return null;
+//        List<BasePackable> packables = new ArrayList<>();
+//        packables.add(statusData);
+//        return new PacketContainer(packables, 10, false, null);
 
 //        switch (connectionState) {
 //            case INITIAL:
@@ -39,9 +40,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getDatagram() throws IOException {
-        List<BasePackable> packables = new ArrayList<>();
-        packables.add(statusData);
-        return new PacketContainer(packables, 20, false, null);
+        return null;
+//        List<BasePackable> packables = new ArrayList<>();
+//        packables.add(statusData);
+//        return new PacketContainer(packables, 20, false, null);
 
 //        if (connectionState == ConnectionState.SIMULATION) {
 //            DataDuplex dataDuplex = connectionManager.getDuplex();
