@@ -55,8 +55,8 @@ public class SocketServer implements Runnable {
                     synchronized (sync) {
                         try {
                             sync.wait();
-                        } catch (InterruptedException ignored) {
-
+                        } catch (InterruptedException e) {
+                            break;
                         }
                     }
                 }

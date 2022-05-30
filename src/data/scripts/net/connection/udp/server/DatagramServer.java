@@ -62,8 +62,8 @@ public class DatagramServer implements Runnable {
                     synchronized (sync) {
                         try {
                             sync.wait();
-                        } catch (InterruptedException ignored) {
-
+                        } catch (InterruptedException e) {
+                            break;
                         }
                     }
                 }
