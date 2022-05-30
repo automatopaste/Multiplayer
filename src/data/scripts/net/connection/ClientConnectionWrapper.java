@@ -37,6 +37,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
         statusData.setConnection(this);
 
+        connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
 
         //socket.start();
