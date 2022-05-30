@@ -11,6 +11,7 @@ public abstract class BaseConnectionWrapper {
         INITIALISING,
         LOADING_READY,
         LOADING,
+        SIMULATION_READY,
         SIMULATING,
         CLOSED
     }

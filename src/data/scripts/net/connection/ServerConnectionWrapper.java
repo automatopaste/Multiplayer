@@ -7,6 +7,7 @@ import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public PacketContainer getSocketMessage() throws IOException {
         switch (connectionState) {
             case INITIALISATION_READY:
+                return null;
             case INITIALISING:
+                connectionState = ConnectionState.LOADING_READY;
+
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), connectionManager.getTick(), true, null);
             case LOADING_READY:
                 return null;
             case LOADING:
@@ -38,6 +43,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 connectionState = ConnectionState.SIMULATING;
 
                 return new PacketContainer(data, connectionManager.getTick(), true, null);
+            case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:
             default:
@@ -52,6 +58,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case INITIALISING:
             case LOADING_READY:
             case LOADING:
+            case SIMULATION_READY:
                 return null;
             case SIMULATING:
                 List<BasePackable> data = new ArrayList<>();
@@ -80,7 +87,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 statusData.updateFromDelta(packable);
                 key = statusData.getInstanceID();
 
-                // client determines status
                 connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
             }
         }

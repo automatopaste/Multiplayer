@@ -58,9 +58,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     public PacketContainer getSocketMessage() throws IOException {
         switch (connectionState) {
             case INITIALISATION_READY:
-                if (statusData.getId().getRecord() == ConnectionStatusData.UNASSIGNED) {
-                    Console.showMessage("Awaiting server acknowledgement");
-                }
+                Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
 
@@ -72,6 +70,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING:
+                return null;
+            case SIMULATION_READY:
                 clientPlugin.getDataStore().absorbVariants(dataDuplex.getDeltas());
 
                 connectionState = ConnectionState.SIMULATING;
@@ -91,6 +91,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             case INITIALISING:
             case LOADING_READY:
             case LOADING:
+            case SIMULATION_READY:
                 return null;
             case SIMULATING:
                 List<BasePackable> data = new ArrayList<>();
@@ -114,6 +115,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             if (packable instanceof ConnectionStatusData) {
                 statusData.updateFromDelta(packable);
                 key = statusData.getInstanceID();
+
+                connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
             }
         }
         if (key != null) entities.remove(key);
