@@ -27,7 +27,7 @@ public class SocketServer implements Runnable {
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private SocketChannel channel;
+    private Channel channel;
 
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -98,7 +98,7 @@ public class SocketServer implements Runnable {
 
         // Bind to TCP port and wait for channel from ready socket
         ChannelFuture future = server.bind(port).syncUninterruptibly();
-        channel = (SocketChannel) future.channel();
+        channel = future.channel();
 
         return future;
     }

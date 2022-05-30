@@ -9,10 +9,7 @@ import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.SocketChannel;
@@ -30,7 +27,7 @@ public class SocketClient implements Runnable {
 
     private EventLoopGroup workerGroup;
     private final ClientConnectionWrapper connection;
-    private SocketChannel channel;
+    private Channel channel;
 
     private final Clock clock;
 
@@ -101,7 +98,7 @@ public class SocketClient implements Runnable {
 
         // Get channel after connected socket
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
-        channel = (SocketChannel) channelFuture.channel();
+        channel = channelFuture.channel();
 
         return channelFuture;
     }
