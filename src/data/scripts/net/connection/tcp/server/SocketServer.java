@@ -110,11 +110,11 @@ public class SocketServer implements Runnable {
     }
 
     public ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.write(msg).sync();
+        return channel.writeAndFlush(msg).sync();
     }
 
     public void flush() {
-        channel.flush();
+        //channel.flush();
     }
 
     public void stop() {
