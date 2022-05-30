@@ -2,9 +2,14 @@ package data.scripts.net.connection;
 
 import data.scripts.net.connection.tcp.client.SocketClient;
 import data.scripts.net.connection.udp.client.DatagramClient;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.packables.ConnectionStatusData;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manages switching logic for inputting/sending data
@@ -18,6 +23,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     private final SocketClient socketClient;
     private final Thread socket;
 
+    private int tick;
+
     public ClientConnectionWrapper(String host, int port) {
         dataDuplex = new DataDuplex();
 
@@ -26,27 +33,76 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
+
+        statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
+
+        tick = -1;
+    }
+
+    @Override
+    public void update() {
+        if (!socket.isAlive() && !socket.isInterrupted() && connectionState != ConnectionState.CLOSED) {
+            socket.start();
+        }
+        if (!datagram.isAlive() && !datagram.isInterrupted() && connectionState != ConnectionState.CLOSED) {
+            datagram.start();
+        }
+
+        switch (connectionState) {
+            case INITIAL:
+
+                break;
+            case LOADING:
+                break;
+            case SIMULATION:
+                break;
+            case CLOSED:
+                break;
+        }
     }
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
-        switch (connectionState) {
-            case INITIAL:
-            case LOADING:
-                return dataDuplex.getPacket(dataDuplex.getCurrTick(), null);
-        }
-        return null;
+        List<BasePackable> packables = new ArrayList<>();
+        packables.add(statusData);
+        return new PacketContainer(packables, -10, false, null);
+
+//        switch (connectionState) {
+//            case INITIAL:
+//                List<BasePackable> packables = new ArrayList<>();
+//                packables.add(statusData);
+//                return new PacketContainer(packables, -1, false, null);
+//            case LOADING:
+//                return dataDuplex.getPacket(tick, null);
+//        }
+//        return null;
     }
 
     @Override
     public PacketContainer getDatagram() throws IOException {
-        if (connectionState == ConnectionState.SIMULATION) {
-            return dataDuplex.getPacket(dataDuplex.getCurrTick(), null);
-        }
-        return null;
+        List<BasePackable> packables = new ArrayList<>();
+        packables.add(statusData);
+        return new PacketContainer(packables, -20, false, null);
+
+//        if (connectionState == ConnectionState.SIMULATION) {
+//            return dataDuplex.getPacket(tick, null);
+//        }
+//        return null;
     }
 
-    public synchronized DataDuplex getDuplex() {
+    public void updateInbound(Map<Integer, BasePackable> entities, int tick) {
+        this.tick = tick;
+
+        for (BasePackable packable : entities.values()) {
+            if (packable instanceof ConnectionStatusData) {
+                statusData.updateFromDelta(packable);
+            }
+        }
+
+        dataDuplex.updateInbound(entities);
+    }
+
+    public DataDuplex getDuplex() {
         return dataDuplex;
     }
 
@@ -63,5 +119,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         datagramClient.stop();
         socket.interrupt();
         datagram.interrupt();
+    }
+
+    public int getTick() {
+        return tick;
     }
 }

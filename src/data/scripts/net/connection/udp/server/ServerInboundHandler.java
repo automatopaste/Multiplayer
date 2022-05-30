@@ -16,14 +16,13 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Unpacked in) throws Exception {
         int serverTick = in.getTick();
-        Console.showMessage("Received unpacked with tick: " + serverTick);
-//
-//        connection.getDuplex().setCurrTick(serverTick);
+        Console.showMessage("Received UDP unpacked with tick: " + serverTick);
+
+        // DISCARD WHILE DEBUG
 //        Map<Integer, BasePackable> entities = in.getUnpacked();
 //
 //        // if getting -1 value tick from server, server is sending preload data
-//        connection.setLoading(serverTick == -1);
-//        connection.getDuplex().updateInbound(entities);
+//        connection.getConnectionManager().getDuplex().updateInbound(entities);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package data.scripts.net.connection;
 
+import data.scripts.net.data.packables.ConnectionStatusData;
 import data.scripts.net.io.PacketContainer;
 
 import java.io.IOException;
@@ -12,6 +13,8 @@ public abstract class BaseConnectionWrapper {
         CLOSED
     }
     protected ConnectionState connectionState = ConnectionState.INITIAL;
+
+    protected ConnectionStatusData statusData;
 
     protected int connectionId;
 
@@ -34,4 +37,6 @@ public abstract class BaseConnectionWrapper {
     public abstract PacketContainer getSocketMessage() throws IOException;
 
     public abstract PacketContainer getDatagram() throws IOException;
+
+    public abstract void update();
 }

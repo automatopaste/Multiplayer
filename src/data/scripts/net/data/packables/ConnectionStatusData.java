@@ -15,6 +15,8 @@ import java.util.Map;
 public class ConnectionStatusData extends BasePackable {
     private static int typeID;
 
+    public static final int UNASSIGNED = -10;
+
     private final IntRecord id;
     private final IntRecord state;
 
@@ -105,12 +107,12 @@ public class ConnectionStatusData extends BasePackable {
 
     @Override
     public int getTypeId() {
-        return 0;
+        return typeID;
     }
 
     @Override
     public BasePackable unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
-        return null;
+        return new ConnectionStatusData(instanceID, records);
     }
 
     public void setConnection(BaseConnectionWrapper connection) {
@@ -123,5 +125,9 @@ public class ConnectionStatusData extends BasePackable {
 
     public IntRecord getState() {
         return state;
+    }
+
+    public static void setTypeID(int typeID) {
+        ConnectionStatusData.typeID = typeID;
     }
 }

@@ -57,8 +57,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed server");
         }
 
-        serverConnectionManager.getDuplex().updateOutbound(dataStore.getGenerated());
-
         // outbound data update
         serverCombatEntityManager.update();
         Map<Integer, BasePackable> entities = serverCombatEntityManager.getEntities();
@@ -72,7 +70,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         // move tick forward
         tick++;
-        serverConnectionManager.getDuplex().updateTick(tick);
+        serverConnectionManager.updateTick(tick);
     }
 
     public int getNewInstanceID(ShipAPI ship) {

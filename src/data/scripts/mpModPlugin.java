@@ -2,6 +2,7 @@ package data.scripts;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import data.scripts.data.DataGenManager;
+import data.scripts.net.data.packables.ConnectionStatusData;
 import data.scripts.net.data.packables.InputAggregateData;
 import data.scripts.net.data.packables.ShipData;
 import data.scripts.net.data.packables.ShipVariantData;
@@ -16,6 +17,7 @@ public class mpModPlugin extends BaseModPlugin {
         ShipData.setTypeID(DataGenManager.registerEntityType(ShipData.class, new ShipData(-1)));
         InputAggregateData.setTypeID(DataGenManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1)));
         ShipVariantData.setTypeID(DataGenManager.registerEntityType(ShipVariantData.class, new ShipVariantData(-1, null, "DEFAULT")));
+        ConnectionStatusData.setTypeID(DataGenManager.registerEntityType(ConnectionStatusData.class, new ConnectionStatusData(-1)));
 
         FloatRecord.setTypeID(DataGenManager.registerRecordType(FloatRecord.class, new FloatRecord(null)));
         IntRecord.setTypeID(DataGenManager.registerRecordType(IntRecord.class, new IntRecord(null)));

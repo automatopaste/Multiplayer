@@ -10,6 +10,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
@@ -52,7 +53,7 @@ public class DatagramServer implements Runnable {
 
                 List<PacketContainer> messages = serverConnectionManager.getDatagrams();
                 for (PacketContainer message : messages) {
-                    write(message);
+                    write(new DatagramPacket(message.get(), message.getDest()));
                 }
             }
 

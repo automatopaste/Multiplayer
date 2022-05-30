@@ -27,7 +27,7 @@ public class Clock {
 
     public void sleepUntilTick() {
         try {
-            Thread.sleep(TimeUnit.NANOSECONDS.convert((long) (timeU * 0.95d), TimeUnit.MILLISECONDS));
+            Thread.sleep(TimeUnit.MILLISECONDS.convert((long) (timeU * 0.95d), TimeUnit.NANOSECONDS));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

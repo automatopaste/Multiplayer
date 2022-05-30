@@ -112,7 +112,6 @@ public class InputAggregateData extends BasePackable {
         if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return;
 
         unmask(keysBitmask.getRecord(), shipUnderControl);
-
     }
 
     public static void setTypeID(int typeID) {

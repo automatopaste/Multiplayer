@@ -1,13 +1,10 @@
 package data.scripts.net.connection.tcp.client;
 
 import data.scripts.net.connection.ClientConnectionWrapper;
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
-
-import java.util.Map;
 
 /**
  * Main logic for handling network packet data
@@ -32,12 +29,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Unpacked unpacked) {
         int serverTick = unpacked.getTick();
-        Console.showMessage("Received unpacked with tick: " + serverTick);
+        Console.showMessage("Received TCP unpacked with tick: " + serverTick);
 
-        connection.getDuplex().updateTick(serverTick);
-        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
-
-        connection.getDuplex().updateInbound(entities);
+        // DISCARD WHILE DEBUG
+//        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
+//
+//        connection.updateInbound(entities, serverTick);
     }
 
     @Override

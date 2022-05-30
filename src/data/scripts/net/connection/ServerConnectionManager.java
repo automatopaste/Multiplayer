@@ -27,6 +27,8 @@ public class ServerConnectionManager {
 
     private final List<ServerConnectionWrapper> serverConnectionWrappers;
 
+    private int tick;
+
     public ServerConnectionManager(int port) {
         this.port = port;
         dataDuplex = new DataDuplex();
@@ -39,6 +41,23 @@ public class ServerConnectionManager {
 
         socketServer = new SocketServer(port, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
+
+        tick = 0;
+    }
+
+    public void update() {
+        if (!socket.isAlive() && !socket.isInterrupted() && active) {
+            socket.start();
+        }
+        if (!datagram.isAlive() && !datagram.isInterrupted() && active) {
+            datagram.start();
+        }
+
+        tick++;
+
+        for (ServerConnectionWrapper connection : serverConnectionWrappers) {
+            connection.update();
+        }
     }
 
     public List<PacketContainer> getSocketMessages() throws IOException {
@@ -87,6 +106,10 @@ public class ServerConnectionManager {
         datagramServer.stop();
         socket.interrupt();
         datagram.interrupt();
+    }
+
+    public int getTick() {
+        return tick;
     }
 
     public synchronized List<ServerConnectionWrapper> getConnections() {
