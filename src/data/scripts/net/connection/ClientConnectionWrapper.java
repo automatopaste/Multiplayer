@@ -40,7 +40,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
 
-        //socket.start();
+        socket.start();
         datagram.start();
     }
 
