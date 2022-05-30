@@ -1,6 +1,5 @@
 package data.scripts.net.connection.tcp.server;
 
-import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.ServerConnectionManager;
 import data.scripts.net.connection.ServerConnectionWrapper;
 import data.scripts.net.io.BufferUnpacker;
@@ -20,13 +19,10 @@ import java.util.List;
 import java.util.Queue;
 
 public class SocketServer implements Runnable {
-    public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
-
     private final int port;
     private final ServerConnectionManager connectionManager;
-//    private final Clock clock;
-
     private final Queue<PacketContainer> messageQueue;
+    private final Object sync;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -35,14 +31,15 @@ public class SocketServer implements Runnable {
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
-//        clock = new Clock(TICK_RATE);
+
+        sync = new Object();
 
         messageQueue = new LinkedList<>();
     }
 
     @Override
     public void run() {
-        Console.showMessage("Running TCP server on port " + port + " at " + TICK_RATE + "Hz");
+        Console.showMessage("Running TCP server on port " + port + " at " + ServerConnectionManager.TICK_RATE + "Hz");
 
         ChannelFuture channelFuture = start();
 
@@ -55,7 +52,9 @@ public class SocketServer implements Runnable {
                 }
 
                 while (messageQueue.isEmpty()) {
-                    wait();
+                    synchronized (sync) {
+                        sync.wait();
+                    }
                 }
             }
 
@@ -126,9 +125,11 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    public synchronized void queueMessages(List<PacketContainer> message) {
+    public void queueMessages(List<PacketContainer> message) {
         messageQueue.addAll(message);
-        notifyAll();
+        synchronized (sync) {
+            sync.notify();
+        }
     }
 
     private ChannelFuture write(Object msg) throws InterruptedException {

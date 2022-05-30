@@ -18,21 +18,19 @@ import java.util.List;
 import java.util.Queue;
 
 public class DatagramServer implements Runnable {
-//    public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
-
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private EventLoopGroup workerLoopGroup;
-    private NioDatagramChannel channel;
-//    private final ChannelGroup channelGroup;
-
     private final Queue<PacketContainer> messageQueue;
 
-//    private final Clock clock;
+    private final Object sync;
+    private EventLoopGroup workerLoopGroup;
+    private NioDatagramChannel channel;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
+
+        sync = new Object();
 
 //        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -61,7 +59,9 @@ public class DatagramServer implements Runnable {
                 }
 
                 while (messageQueue.isEmpty()) {
-                    wait();
+                    synchronized (sync) {
+                        sync.wait();
+                    }
                 }
             }
 
@@ -115,9 +115,11 @@ public class DatagramServer implements Runnable {
         return future;
     }
 
-    public synchronized void queueMessages(List<PacketContainer> message) {
+    public void queueMessages(List<PacketContainer> message) {
         messageQueue.addAll(message);
-        notifyAll();
+        synchronized (sync) {
+            sync.notify();
+        }
     }
 
     private ChannelFuture write(Object msg) throws InterruptedException {
