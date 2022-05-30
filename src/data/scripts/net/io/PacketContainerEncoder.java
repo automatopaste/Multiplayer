@@ -8,15 +8,15 @@ public class PacketContainerEncoder extends MessageToByteEncoder<PacketContainer
 
     @Override
     protected void encode(ChannelHandlerContext ctx, PacketContainer msg, ByteBuf out) throws Exception {
-        // encode length of buffer so completeness can be checked when reconstructed by client
+        // encode length of buffer so completeness can be checked when reconstructed by client.
         ByteBuf data = msg.get();
-
-        out.writeInt(data.readableBytes());
+        int length = data.readableBytes();
 
         int tick = msg.getTick();
-        out.writeInt(tick);
+        length += Integer.SIZE / Byte.SIZE;
 
-        // there it goes :))))
+        out.writeInt(length);
+        out.writeInt(tick);
         out.writeBytes(data);
     }
 }
