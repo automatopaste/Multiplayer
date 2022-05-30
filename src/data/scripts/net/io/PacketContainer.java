@@ -51,6 +51,8 @@ public class PacketContainer {
             data.writeBytes(entity);
         }
 
+        if (data.readableBytes() == 0) return null;
+
         return data;
     }
 

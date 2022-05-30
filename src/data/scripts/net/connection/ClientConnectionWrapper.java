@@ -35,6 +35,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
 
         statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
+        statusData.setConnection(this);
 
         tick = -1;
 
