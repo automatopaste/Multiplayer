@@ -72,7 +72,7 @@ public class ConnectionStatusData extends BasePackable {
     public void updateFromDelta(BasePackable delta) {
         ConnectionStatusData d = (ConnectionStatusData) delta;
         if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
-        if (d.getState() != null) state.forceUpdate(d.getId().getRecord());
+        if (d.getState() != null) state.forceUpdate(d.getState().getRecord());
     }
 
     @Override
