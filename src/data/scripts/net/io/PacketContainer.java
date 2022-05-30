@@ -34,6 +34,10 @@ public class PacketContainer {
         packables.addAll(toAdd);
     }
 
+    public boolean isEmpty() {
+        return packables.isEmpty();
+    }
+
     public ByteBuf get() {
         List<byte[]> entities = new ArrayList<>();
         for (BasePackable packable : packables) {

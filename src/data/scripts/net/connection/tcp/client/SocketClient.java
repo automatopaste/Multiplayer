@@ -57,10 +57,10 @@ public class SocketClient implements Runnable {
             while (connection.getConnectionState() != ClientConnectionWrapper.ConnectionState.CLOSED) {
                 clock.sleepUntilTick();
 
-                PacketContainer message = connection.getSocketMessage();
-                if (message == null) continue;
+                PacketContainer container = connection.getSocketMessage();
+                if (container == null || container.isEmpty()) continue;;
 
-                write(message);
+                write(container);
             }
 
             // Wait for channel to close

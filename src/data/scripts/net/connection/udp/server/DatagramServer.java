@@ -53,6 +53,7 @@ public class DatagramServer implements Runnable {
 
                 List<PacketContainer> messages = serverConnectionManager.getDatagrams();
                 for (PacketContainer message : messages) {
+                    if (message == null || message.isEmpty()) continue;
                     write(new DatagramPacket(message.get(), message.getDest()));
                 }
             }

@@ -59,8 +59,9 @@ public class DatagramClient implements Runnable {
                 clock.sleepUntilTick();
 
                 PacketContainer container = connection.getDatagram();
-                ByteBuf message = container.get();
+                if (container == null || container.isEmpty()) continue;;
 
+                ByteBuf message = container.get();
                 write(new DatagramPacket(message, remoteAddress));
             }
 

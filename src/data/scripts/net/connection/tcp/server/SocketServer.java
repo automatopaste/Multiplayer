@@ -51,6 +51,7 @@ public class SocketServer implements Runnable {
 
                 List<PacketContainer> messages = connectionManager.getSocketMessages();
                 for (PacketContainer message : messages) {
+                    if (message == null || message.isEmpty()) continue;
                     write(message);
                 }
             }
