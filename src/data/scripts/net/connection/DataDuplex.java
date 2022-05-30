@@ -54,6 +54,20 @@ public class DataDuplex {
     }
 
     /**
+     * Get outbound data and clear store
+     * @return outbound entities
+     */
+    public List<BasePackable> getOutbound() {
+        List<BasePackable> outEntities;
+        synchronized (outbound) {
+            outEntities = new ArrayList<>(outbound.values());
+            outbound.clear();
+        }
+
+        return outEntities;
+    }
+
+    /**
      * Synchronises update of current data store
      * @param entities new entities copy
      */

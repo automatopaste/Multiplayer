@@ -5,11 +5,15 @@ import data.scripts.net.connection.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ConnectionStatusData;
 import data.scripts.net.io.PacketContainer;
+import data.scripts.plugins.mpClientPlugin;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manages switching logic for inputting/sending data
@@ -24,12 +28,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     private final Thread socket;
     private final String host;
     private final int port;
+    private final mpClientPlugin clientPlugin;
 
     private int tick;
 
-    public ClientConnectionWrapper(String host, int port) {
+    public ClientConnectionWrapper(String host, int port, mpClientPlugin clientPlugin) {
         this.host = host;
         this.port = port;
+        this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();
 
         datagramClient = new DatagramClient(host, port, this);
@@ -60,13 +66,17 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case INITIALISING:
-                // don't need to send any further packets in this stage
                 return null;
             case LOADING_READY:
                 connectionState = ConnectionState.LOADING;
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING:
+                clientPlugin.getDataStore().absorbVariants(dataDuplex.getDeltas());
+
+                connectionState = ConnectionState.SIMULATING;
+
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case SIMULATING:
             case CLOSED:
             default:
@@ -86,7 +96,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
                 List<BasePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(dataDuplex.getDeltas().values());
+                data.addAll(dataDuplex.getOutbound());
 
                 return new PacketContainer(data, tick, false, new InetSocketAddress(host, port));
             case CLOSED:

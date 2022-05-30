@@ -29,7 +29,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     public mpClientPlugin(String host, int port) {
         dataStore = new LoadedDataStore();
 
-        connection = new ClientConnectionWrapper(host, port);
+        connection = new ClientConnectionWrapper(host, port, this);
 
         entityManager = new ClientEntityManager(this);
 
@@ -64,12 +64,8 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             case INITIALISATION_READY:
             case INITIALISING:
             case LOADING_READY:
-                // do nothing on main while waiting for connection to be ready
-                break;
             case LOADING:
-                dataStore.absorbVariants(entities);
-
-                connection.setConnectionState(BaseConnectionWrapper.ConnectionState.SIMULATING);
+            case CLOSED:
                 break;
             case SIMULATING:
                 entityManager.processDeltas(entities);
@@ -78,8 +74,6 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
                 Map<Integer, BasePackable> outbound = inputManager.getOutbound();
                 connection.getDuplex().updateOutbound(outbound);
-            case CLOSED:
-                break;
         }
     }
 

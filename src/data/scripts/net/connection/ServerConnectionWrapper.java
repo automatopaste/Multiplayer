@@ -57,7 +57,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 List<BasePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(connectionManager.getDuplex().getDeltas().values());
+                data.addAll(connectionManager.getDuplex().getOutbound());
 
                 return new PacketContainer(
                         data, connectionManager.getTick(), false, connectionManager.getAddress(connectionId)
