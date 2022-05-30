@@ -45,7 +45,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         tick = -1;
 
         socket.start();
-//        datagram.start();
+        datagram.start();
     }
 
     @Override

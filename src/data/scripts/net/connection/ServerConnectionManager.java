@@ -61,7 +61,7 @@ public class ServerConnectionManager implements Runnable {
         Console.showMessage("Starting main server...");
 
         socket.start();
-//        datagram.start();
+        datagram.start();
 
         try {
             while (active) {
@@ -70,7 +70,7 @@ public class ServerConnectionManager implements Runnable {
                 tickUpdate();
 
                 socketServer.queueMessages(getSocketMessages());
-//                datagramServer.queueMessages(getDatagrams());
+                datagramServer.queueMessages(getDatagrams());
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();

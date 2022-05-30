@@ -53,7 +53,11 @@ public class SocketServer implements Runnable {
 
                 while (messageQueue.isEmpty()) {
                     synchronized (sync) {
-                        sync.wait();
+                        try {
+                            sync.wait();
+                        } catch (InterruptedException ignored) {
+
+                        }
                     }
                 }
             }
