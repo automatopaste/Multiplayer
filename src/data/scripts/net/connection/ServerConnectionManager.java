@@ -5,8 +5,6 @@ import data.scripts.net.connection.tcp.server.SocketServer;
 import data.scripts.net.connection.udp.server.DatagramServer;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.plugins.mpServerPlugin;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.socket.DatagramPacket;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -71,20 +69,8 @@ public class ServerConnectionManager implements Runnable {
 
                 tickUpdate();
 
-                List<PacketContainer> socketMessages = getSocketMessages();
-                for (PacketContainer message : socketMessages) {
-                    if (message == null || message.isEmpty()) continue;
-                    socketServer.write(message);
-                }
-                socketServer.flush();
-
-                List<PacketContainer> datagrams = getDatagrams();
-                for (PacketContainer message : datagrams) {
-                    if (message == null || message.isEmpty()) continue;
-                    ByteBuf buf = message.get();
-                    datagramServer.write(new DatagramPacket(buf, message.getDest()));
-                }
-                datagramServer.flush();
+                socketServer.queueMessages(getSocketMessages());
+                datagramServer.queueMessages(getDatagrams());
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();

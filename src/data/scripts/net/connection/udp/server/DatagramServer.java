@@ -2,32 +2,43 @@ package data.scripts.net.connection.udp.server;
 
 import data.scripts.net.connection.ServerConnectionManager;
 import data.scripts.net.connection.udp.DatagramUnpacker;
+import data.scripts.net.io.PacketContainer;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class DatagramServer implements Runnable {
 //    public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final int port;
-    private final ServerConnectionManager serverConnectionManager;
+    private final ServerConnectionManager connectionManager;
     private EventLoopGroup workerLoopGroup;
     private NioDatagramChannel channel;
 //    private final ChannelGroup channelGroup;
 
+    private final Queue<PacketContainer> messageQueue;
+
 //    private final Clock clock;
 
-    public DatagramServer(int port, ServerConnectionManager serverConnectionManager) {
+    public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
-        this.serverConnectionManager = serverConnectionManager;
+        this.connectionManager = connectionManager;
 
 //        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
 //        clock = new Clock(TICK_RATE);
+
+        messageQueue = new LinkedList<>();
     }
 
     @Override
@@ -39,10 +50,26 @@ public class DatagramServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
+            while (connectionManager.isActive()) {
+                while (!messageQueue.isEmpty()) {
+                    PacketContainer message = messageQueue.poll();
+                    if (message == null || message.isEmpty()) continue;
+
+                    ByteBuf buf = message.get();
+
+                    write(new DatagramPacket(buf, message.getDest()));
+                }
+
+                while (messageQueue.isEmpty()) {
+                    wait();
+                }
+            }
+
             closeFuture.sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
 //        // LOOP WRITE OPERATIONS ONLY
 //        // Incoming messages handled by inbound channel adapter
@@ -77,7 +104,7 @@ public class DatagramServer implements Runnable {
                     protected void initChannel(NioDatagramChannel datagramChannel) {
                         datagramChannel.pipeline().addLast(
                                 new DatagramUnpacker(),
-                                new ServerInboundHandler(serverConnectionManager.getConnection(datagramChannel.remoteAddress()))
+                                new ServerInboundHandler(connectionManager.getConnection(datagramChannel.remoteAddress()))
                         );
                     }
                 });
@@ -88,12 +115,13 @@ public class DatagramServer implements Runnable {
         return future;
     }
 
-    public ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.write(msg).sync();
+    public synchronized void queueMessages(List<PacketContainer> message) {
+        messageQueue.addAll(message);
+        notifyAll();
     }
 
-    public void flush() {
-        channel.flush();
+    private ChannelFuture write(Object msg) throws InterruptedException {
+        return channel.writeAndFlush(msg).sync();
     }
 
     public void stop() {

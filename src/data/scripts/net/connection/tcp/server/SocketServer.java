@@ -1,10 +1,10 @@
 package data.scripts.net.connection.tcp.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.connection.Clock;
 import data.scripts.net.connection.ServerConnectionManager;
 import data.scripts.net.connection.ServerConnectionWrapper;
 import data.scripts.net.io.BufferUnpacker;
+import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,13 +15,18 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class SocketServer implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private final Clock clock;
+//    private final Clock clock;
+
+    private final Queue<PacketContainer> messageQueue;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -30,7 +35,9 @@ public class SocketServer implements Runnable {
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
-        clock = new Clock(TICK_RATE);
+//        clock = new Clock(TICK_RATE);
+
+        messageQueue = new LinkedList<>();
     }
 
     @Override
@@ -42,6 +49,16 @@ public class SocketServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
+            while (connectionManager.isActive()) {
+                while (!messageQueue.isEmpty()) {
+                    write(messageQueue.poll());
+                }
+
+                while (messageQueue.isEmpty()) {
+                    wait();
+                }
+            }
+
             closeFuture.sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -109,12 +126,13 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    public ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
+    public synchronized void queueMessages(List<PacketContainer> message) {
+        messageQueue.addAll(message);
+        notifyAll();
     }
 
-    public void flush() {
-        //channel.flush();
+    private ChannelFuture write(Object msg) throws InterruptedException {
+        return channel.writeAndFlush(msg).sync();
     }
 
     public void stop() {
