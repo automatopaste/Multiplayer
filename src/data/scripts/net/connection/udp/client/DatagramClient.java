@@ -62,6 +62,8 @@ public class DatagramClient implements Runnable {
                 if (container == null || container.isEmpty()) continue;;
 
                 ByteBuf message = container.get();
+                if (message.readableBytes() == 0) continue;
+
                 write(new DatagramPacket(message, remoteAddress));
                 message.release();
             }
