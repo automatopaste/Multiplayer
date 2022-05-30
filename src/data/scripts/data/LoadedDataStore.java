@@ -21,17 +21,6 @@ public class LoadedDataStore {
 
     private Map<Integer, BasePackable> generated;
 
-    public LoadedDataStore(Map<Integer, BasePackable> incoming) {
-        variantData = new HashMap<>();
-
-        for (BasePackable packable : incoming.values()) {
-            if (packable instanceof ShipVariantData) {
-                ShipVariantData variant = (ShipVariantData) packable;
-                variantData.put(variant.getShipId().getRecord(), variant);
-            }
-        }
-    }
-
     public LoadedDataStore() {
         variantData = new HashMap<>();
     }
@@ -44,7 +33,6 @@ public class LoadedDataStore {
      * Collects data that needs to be loaded on client side before combat entities can be updated or spawned
      * @param engine NNEEEEEOOOOOOOOOOWWW VVvvv VVvv VVvv NEEEEEEEEEEEEOOWOOOWOWOOW Vvv NEEEEEEEEOOOOO
      * @param plugin the plugin
-     * @return entities to load
      */
     public void generate(CombatEngineAPI engine, mpServerPlugin plugin) {
         List<FleetMemberAPI> members = new ArrayList<>();
@@ -64,6 +52,19 @@ public class LoadedDataStore {
             ShipVariantData variantData = new ShipVariantData(id, member.getVariant(), member.getId());
 
             generated.put(id, variantData);
+        }
+    }
+
+    /**
+     * Adds any ship variant data to store
+     * @param entities incoming
+     */
+    public void absorbVariants(Map<Integer, BasePackable> entities) {
+        for (BasePackable packable : entities.values()) {
+            if (packable instanceof ShipVariantData) {
+                ShipVariantData data = (ShipVariantData) packable;
+                variantData.put(data.getShipId().getRecord(), data);
+            }
         }
     }
 

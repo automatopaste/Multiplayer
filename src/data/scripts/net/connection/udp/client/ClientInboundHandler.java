@@ -1,10 +1,13 @@
 package data.scripts.net.connection.udp.client;
 
 import data.scripts.net.connection.ClientConnectionWrapper;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
+
+import java.util.Map;
 
 public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
     private final ClientConnectionWrapper connection;
@@ -19,9 +22,9 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
         Console.showMessage("Received UDP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
-//        Map<Integer, BasePackable> entities = in.getUnpacked();
-//
-//        connection.updateInbound(entities, serverTick);
+        Map<Integer, BasePackable> entities = in.getUnpacked();
+
+        connection.updateInbound(entities, serverTick);
     }
 
     @Override

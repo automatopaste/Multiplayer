@@ -5,7 +5,6 @@ import data.scripts.net.connection.Clock;
 import data.scripts.net.connection.ServerConnectionManager;
 import data.scripts.net.connection.ServerConnectionWrapper;
 import data.scripts.net.io.BufferUnpacker;
-import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.PacketContainerDecoder;
 import data.scripts.net.io.PacketContainerEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,8 +14,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.lazywizard.console.Console;
 
-import java.io.IOException;
-import java.util.List;
+import java.net.InetSocketAddress;
 
 public class SocketServer implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
@@ -37,30 +35,37 @@ public class SocketServer implements Runnable {
 
     @Override
     public void run() {
+        Console.showMessage("Running TCP server on port " + port + " at " + TICK_RATE + "Hz");
+
         ChannelFuture channelFuture = start();
 
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
-        Console.showMessage("TCP server socket active on port " + port + " at " + TICK_RATE + "Hz");
-
-        // LOOP WRITE OPERATIONS ONLY
-        // Incoming messages handled by inbound channel adapter
         try {
-            while (connectionManager.isActive()) {
-                clock.sleepUntilTick();
-
-                List<PacketContainer> messages = connectionManager.getSocketMessages();
-                for (PacketContainer message : messages) {
-                    if (message == null || message.isEmpty()) continue;
-                    write(message);
-                }
-            }
-
             closeFuture.sync();
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
-            stop();
         }
+
+
+//        // LOOP WRITE OPERATIONS ONLY
+//        // Incoming messages handled by inbound channel adapter
+//        try {
+//            while (connectionManager.isActive()) {
+//                clock.sleepUntilTick();
+//
+//                List<PacketContainer> messages = connectionManager.getSocketMessages();
+//                for (PacketContainer message : messages) {
+//                    if (message == null || message.isEmpty()) continue;
+//                    write(message);
+//                }
+//            }
+//
+//            closeFuture.sync();
+//        } catch (InterruptedException | IOException e) {
+//            e.printStackTrace();
+//            stop();
+//        }
     }
 
     private ChannelFuture start() {
@@ -71,15 +76,15 @@ public class SocketServer implements Runnable {
         server.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
-                    private ServerConnectionWrapper connection;
-
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
-                        connection = connectionManager.getNewConnection();
+                        ServerConnectionWrapper connection = connectionManager.getConnection(socketChannel.remoteAddress());
 
                         if (connection == null) {
                             throw new InterruptedException("Channel connection refused: max connections exceeded");
                         }
+
+                        socketChannel.remoteAddress();
 
                         socketChannel.pipeline().addLast(
                                 new PacketContainerEncoder(),
@@ -91,7 +96,7 @@ public class SocketServer implements Runnable {
 
                     @Override
                     public void channelUnregistered(ChannelHandlerContext ctx) {
-                        connectionManager.removeConnection(connection);
+                        connectionManager.removeConnection((InetSocketAddress) channel.remoteAddress());
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128)
@@ -104,8 +109,12 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    private ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
+    public ChannelFuture write(Object msg) throws InterruptedException {
+        return channel.write(msg).sync();
+    }
+
+    public void flush() {
+        channel.flush();
     }
 
     public void stop() {

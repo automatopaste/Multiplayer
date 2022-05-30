@@ -7,12 +7,14 @@ import java.io.IOException;
 
 public abstract class BaseConnectionWrapper {
     public enum ConnectionState {
-        INITIAL,
+        INITIALISATION_READY,
+        INITIALISING,
+        LOADING_READY,
         LOADING,
-        SIMULATION,
+        SIMULATING,
         CLOSED
     }
-    protected ConnectionState connectionState = ConnectionState.INITIAL;
+    protected ConnectionState connectionState = ConnectionState.INITIALISATION_READY;
 
     protected ConnectionStatusData statusData;
 
@@ -37,6 +39,4 @@ public abstract class BaseConnectionWrapper {
     public abstract PacketContainer getSocketMessage() throws IOException;
 
     public abstract PacketContainer getDatagram() throws IOException;
-
-    public abstract void update();
 }

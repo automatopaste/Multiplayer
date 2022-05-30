@@ -4,20 +4,26 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.connection.tcp.server.SocketServer;
 import data.scripts.net.connection.udp.server.DatagramServer;
 import data.scripts.net.io.PacketContainer;
+import data.scripts.plugins.mpServerPlugin;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.socket.DatagramPacket;
+import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Manages a collection of registered user connections
- */
-public class ServerConnectionManager {
+public class ServerConnectionManager implements Runnable {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
-    private final static int PORT = Global.getSettings().getInt("mpLocalPort");
+    public final static int PORT = Global.getSettings().getInt("mpLocalPort");
+    public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final DataDuplex dataDuplex;
+    private final mpServerPlugin serverPlugin;
     private boolean active;
 
     private final DatagramServer datagramServer;
@@ -26,15 +32,19 @@ public class ServerConnectionManager {
     private final SocketServer socketServer;
     private final Thread socket;
 
-    private final List<ServerConnectionWrapper> serverConnectionWrappers;
+    private final Map<InetSocketAddress, ServerConnectionWrapper> serverConnectionWrappers;
+
+    private final Map<Integer, InetSocketAddress> clientAddresses;
 
     private int tick;
+    private final Clock clock;
 
-    public ServerConnectionManager() {
+    public ServerConnectionManager(mpServerPlugin serverPlugin) {
+        this.serverPlugin = serverPlugin;
         dataDuplex = new DataDuplex();
         active = true;
 
-        serverConnectionWrappers = new ArrayList<>();
+        serverConnectionWrappers = new HashMap<>();
 
         datagramServer = new DatagramServer(PORT, this);
         datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
@@ -42,24 +52,61 @@ public class ServerConnectionManager {
         socketServer = new SocketServer(PORT, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
+        tick = 0;
+        clock = new Clock(TICK_RATE);
+
+        clientAddresses = new HashMap<>();
+    }
+
+    @Override
+    public void run() {
+        Console.showMessage("Starting main server...");
+
         socket.start();
         datagram.start();
 
-        tick = 0;
+        try {
+            while (active) {
+                clock.sleepUntilTick();
+
+                tickUpdate();
+
+                List<PacketContainer> socketMessages = getSocketMessages();
+                for (PacketContainer message : socketMessages) {
+                    if (message == null || message.isEmpty()) continue;
+                    socketServer.write(message);
+                }
+                socketServer.flush();
+
+                List<PacketContainer> datagrams = getDatagrams();
+                for (PacketContainer message : datagrams) {
+                    if (message == null || message.isEmpty()) continue;
+                    ByteBuf buf = message.get();
+                    datagramServer.write(new DatagramPacket(buf, message.getDest()));
+                }
+                datagramServer.flush();
+            }
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            stop();
+        }
     }
 
-    public void update() {
+    public void tickUpdate() {
         tick++;
 
-        for (ServerConnectionWrapper connection : serverConnectionWrappers) {
-            connection.update();
-        }
+//        synchronized (serverConnectionWrappers) {
+//            for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
+//                connection.update();
+//            }
+//        }
     }
 
     public List<PacketContainer> getSocketMessages() throws IOException {
         List<PacketContainer> output = new ArrayList<>();
 
-        for (ServerConnectionWrapper connection : serverConnectionWrappers) {
+        for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
             PacketContainer message = connection.getSocketMessage();
             if (message != null) output.add(message);
         }
@@ -70,7 +117,7 @@ public class ServerConnectionManager {
     public List<PacketContainer> getDatagrams() throws IOException {
         List<PacketContainer> output = new ArrayList<>();
 
-        for (ServerConnectionWrapper connection : serverConnectionWrappers) {
+        for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
             PacketContainer message = connection.getDatagram();
             if (message != null) output.add(message);
         }
@@ -78,38 +125,45 @@ public class ServerConnectionManager {
         return output;
     }
 
-    public ServerConnectionWrapper getNewConnection() {
+    public ServerConnectionWrapper getConnection(InetSocketAddress remoteAddress) {
         synchronized (serverConnectionWrappers) {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
-        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this);
+        int id = serverPlugin.getNewInstanceID();
+        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id);
+
+        clientAddresses.put(id, remoteAddress);
 
         synchronized (serverConnectionWrappers) {
-            serverConnectionWrappers.add(serverConnectionWrapper);
+            serverConnectionWrappers.put(remoteAddress, serverConnectionWrapper);
         }
 
         return serverConnectionWrapper;
     }
 
-    public void removeConnection(ServerConnectionWrapper serverConnectionWrapper) {
+    public void removeConnection(InetSocketAddress address) {
         synchronized (serverConnectionWrappers) {
-            serverConnectionWrappers.remove(serverConnectionWrapper);
+            serverConnectionWrappers.remove(address);
         }
     }
 
     public void stop() {
+        active = false;
+
         socketServer.stop();
         datagramServer.stop();
         socket.interrupt();
         datagram.interrupt();
     }
 
-    public int getTick() {
-        return tick;
+    public InetSocketAddress getAddress(int connectionId) {
+        synchronized (clientAddresses) {
+            return clientAddresses.get(connectionId);
+        }
     }
 
-    public synchronized List<ServerConnectionWrapper> getConnections() {
-        return serverConnectionWrappers;
+    public synchronized int getTick() {
+        return tick;
     }
 
     public synchronized DataDuplex getDuplex() {
@@ -120,7 +174,7 @@ public class ServerConnectionManager {
         return active;
     }
 
-    public synchronized void setActive(boolean active) {
-        this.active = active;
+    public mpServerPlugin getServerPlugin() {
+        return serverPlugin;
     }
 }

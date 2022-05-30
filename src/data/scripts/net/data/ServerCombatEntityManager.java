@@ -65,7 +65,7 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
         }
     }
 
-    public Map<Integer, BasePackable> getEntities() {
+    public Map<Integer, BasePackable> getOutbound() {
         Map<Integer, BasePackable> out = new HashMap<Integer, BasePackable>(ships);
 
         out.putAll(consumable);

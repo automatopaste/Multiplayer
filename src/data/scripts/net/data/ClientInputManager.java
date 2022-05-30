@@ -15,7 +15,7 @@ public class ClientInputManager implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Integer, BasePackable> getEntities() {
+    public Map<Integer, BasePackable> getOutbound() {
         Map<Integer, BasePackable> out = new HashMap<>();
         out.put(instanceID, input);
         return out;

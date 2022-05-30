@@ -115,6 +115,25 @@ public class ConnectionStatusData extends BasePackable {
         return new ConnectionStatusData(instanceID, records);
     }
 
+    public static BaseConnectionWrapper.ConnectionState ordinalToConnectionState(int state) {
+        switch (state) {
+            case 0:
+                return BaseConnectionWrapper.ConnectionState.INITIALISATION_READY;
+            case 1:
+                return BaseConnectionWrapper.ConnectionState.INITIALISING;
+            case 2:
+                return BaseConnectionWrapper.ConnectionState.LOADING_READY;
+            case 3:
+                return BaseConnectionWrapper.ConnectionState.LOADING;
+            case 4:
+                return BaseConnectionWrapper.ConnectionState.SIMULATING;
+            case 5:
+                return BaseConnectionWrapper.ConnectionState.CLOSED;
+            default:
+                return null;
+        }
+    }
+
     public void setConnection(BaseConnectionWrapper connection) {
         this.connection = connection;
     }

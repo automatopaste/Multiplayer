@@ -1,12 +1,14 @@
 package data.scripts.net.connection.tcp.server;
 
 import data.scripts.net.connection.ServerConnectionWrapper;
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> {
     private final ServerConnectionWrapper serverConnectionWrapper;
@@ -35,10 +37,9 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         int clientTick = unpacked.getTick();
         Console.showMessage("Received TCP client tick notice: " + clientTick);
 
-        // DISCARD WHILE DEBUG
-//        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
-//
-//        serverConnectionWrapper.updateInbound(entities);
+        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
+
+        serverConnectionWrapper.updateInbound(entities);
     }
 
     /**

@@ -24,14 +24,12 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
     private final ClientEntityManager entityManager;
     private final ClientInputManager inputManager;
 
-    private LoadedDataStore dataStore;
-    private boolean loaded = true;
+    private final LoadedDataStore dataStore;
 
     public mpClientPlugin(String host, int port) {
+        dataStore = new LoadedDataStore();
 
         connection = new ClientConnectionWrapper(host, port);
-
-
 
         entityManager = new ClientEntityManager(this);
 
@@ -57,28 +55,36 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed client");
         }
 
-        // do nothing until connection wrapper is ready for simulation
-        if (connection.getConnectionState() != BaseConnectionWrapper.ConnectionState.SIMULATION) {
-            return;
-        }
-
         CombatEngineAPI engine = Global.getCombatEngine();
 
+        // get inbound
         Map<Integer, BasePackable> entities = connection.getDuplex().getDeltas();
 
-        entityManager.processDeltas(entities);
-        entityManager.updateEntities();
+        switch (connection.getConnectionState()) {
+            case INITIALISATION_READY:
+            case INITIALISING:
+            case LOADING_READY:
+                // do nothing on main while waiting for connection to be ready
+                break;
+            case LOADING:
+                dataStore.absorbVariants(entities);
 
-        Map<Integer, BasePackable> outbound = inputManager.getEntities();
-        connection.getDuplex().updateOutbound(outbound);
+                connection.setConnectionState(BaseConnectionWrapper.ConnectionState.SIMULATING);
+                break;
+            case SIMULATING:
+                entityManager.processDeltas(entities);
+
+                entityManager.updateEntities();
+
+                Map<Integer, BasePackable> outbound = inputManager.getOutbound();
+                connection.getDuplex().updateOutbound(outbound);
+            case CLOSED:
+                break;
+        }
     }
 
     public ClientConnectionWrapper getConnection() {
         return connection;
-    }
-
-    public void setDataStore(LoadedDataStore dataStore) {
-        this.dataStore = dataStore;
     }
 
     public LoadedDataStore getDataStore() {

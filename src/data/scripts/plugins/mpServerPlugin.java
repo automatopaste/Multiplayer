@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
-
     private final ServerConnectionManager serverConnectionManager;
 
     private final ServerInboundEntityManager serverEntityManager;
@@ -31,14 +30,15 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     private final LoadedDataStore dataStore;
 
     public mpServerPlugin() {
-
         serverEntityManager = new ServerInboundEntityManager(this);
         serverCombatEntityManager = new ServerCombatEntityManager(this);
 
-        serverConnectionManager = new ServerConnectionManager();
-
         dataStore = new LoadedDataStore();
         dataStore.generate(Global.getCombatEngine(), this);
+
+        serverConnectionManager = new ServerConnectionManager(this);
+        Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
+        serverThread.start();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         // outbound data update
         serverCombatEntityManager.update();
-        Map<Integer, BasePackable> entities = serverCombatEntityManager.getEntities();
+        Map<Integer, BasePackable> entities = serverCombatEntityManager.getOutbound();
 
         serverEntityManager.processDeltas(serverConnectionManager.getDuplex().getDeltas());
 
@@ -61,9 +61,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
         serverEntityManager.updateEntities();
 
         serverConnectionManager.getDuplex().updateOutbound(entities);
-
-        // move tick forward
-        serverConnectionManager.update();
     }
 
     public int getNewInstanceID(ShipAPI ship) {
@@ -91,10 +88,6 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
 
         usedIDs.add(id);
         return id;
-    }
-
-    public ServerConnectionManager getServerConnectionManager() {
-        return serverConnectionManager;
     }
 
     public LoadedDataStore getDataStore() {

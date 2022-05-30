@@ -5,11 +5,11 @@ import data.scripts.net.connection.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.ConnectionStatusData;
 import data.scripts.net.io.PacketContainer;
+import org.lazywizard.console.Console;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.net.InetSocketAddress;
+import java.util.*;
 
 /**
  * Manages switching logic for inputting/sending data
@@ -22,10 +22,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
     private final SocketClient socketClient;
     private final Thread socket;
+    private final String host;
+    private final int port;
 
     private int tick;
 
     public ClientConnectionWrapper(String host, int port) {
+        this.host = host;
+        this.port = port;
         dataDuplex = new DataDuplex();
 
         datagramClient = new DatagramClient(host, port, this);
@@ -45,57 +49,64 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     }
 
     @Override
-    public void update() {
+    public PacketContainer getSocketMessage() throws IOException {
         switch (connectionState) {
-            case INITIAL:
+            case INITIALISATION_READY:
+                if (statusData.getId().getRecord() == ConnectionStatusData.UNASSIGNED) {
+                    Console.showMessage("Awaiting server acknowledgement");
+                }
 
-                break;
+                connectionState = ConnectionState.INITIALISING;
+
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+            case INITIALISING:
+                // don't need to send any further packets in this stage
+                return null;
+            case LOADING_READY:
+                connectionState = ConnectionState.LOADING;
+
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING:
-                break;
-            case SIMULATION:
-                break;
+            case SIMULATING:
             case CLOSED:
-                break;
+            default:
+                return null;
         }
     }
 
     @Override
-    public PacketContainer getSocketMessage() throws IOException {
-        List<BasePackable> packables = new ArrayList<>();
-        packables.add(statusData);
-        return new PacketContainer(packables, -10, false, null);
-
-//        switch (connectionState) {
-//            case INITIAL:
-//                List<BasePackable> packables = new ArrayList<>();
-//                packables.add(statusData);
-//                return new PacketContainer(packables, -1, false, null);
-//            case LOADING:
-//                return dataDuplex.getPacket(tick, null);
-//        }
-//        return null;
-    }
-
-    @Override
     public PacketContainer getDatagram() throws IOException {
-        List<BasePackable> packables = new ArrayList<>();
-        packables.add(statusData);
-        return new PacketContainer(packables, -20, false, null);
+        switch (connectionState) {
+            case INITIALISATION_READY:
+            case INITIALISING:
+            case LOADING_READY:
+            case LOADING:
+                return null;
+            case SIMULATING:
+                List<BasePackable> data = new ArrayList<>();
+                data.add(statusData);
 
-//        if (connectionState == ConnectionState.SIMULATION) {
-//            return dataDuplex.getPacket(tick, null);
-//        }
-//        return null;
+                data.addAll(dataDuplex.getDeltas().values());
+
+                return new PacketContainer(data, tick, false, new InetSocketAddress(host, port));
+            case CLOSED:
+            default:
+                return null;
+        }
     }
 
     public void updateInbound(Map<Integer, BasePackable> entities, int tick) {
         this.tick = tick;
 
+        // grab connection data
+        Integer key = null;
         for (BasePackable packable : entities.values()) {
             if (packable instanceof ConnectionStatusData) {
                 statusData.updateFromDelta(packable);
+                key = statusData.getInstanceID();
             }
         }
+        if (key != null) entities.remove(key);
 
         dataDuplex.updateInbound(entities);
     }

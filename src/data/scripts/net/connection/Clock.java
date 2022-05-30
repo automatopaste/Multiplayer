@@ -1,7 +1,5 @@
 package data.scripts.net.connection;
 
-import java.util.concurrent.TimeUnit;
-
 public class Clock {
     private long initialTime;
     private final double timeU;
@@ -13,25 +11,17 @@ public class Clock {
         deltaU = 1d;
     }
 
-    public void runUntilTick() {
+    public void sleepUntilTick() throws InterruptedException {
         long currentTime;
 
         while (deltaU < 1d) {
+            Thread.sleep(0);
+
             currentTime = System.nanoTime();
             deltaU += (currentTime - initialTime) / timeU;
             initialTime = currentTime;
         }
 
         deltaU--;
-    }
-
-    public void sleepUntilTick() {
-        try {
-            Thread.sleep(TimeUnit.MILLISECONDS.convert((long) (timeU * 0.95d), TimeUnit.NANOSECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        runUntilTick();
     }
 }
