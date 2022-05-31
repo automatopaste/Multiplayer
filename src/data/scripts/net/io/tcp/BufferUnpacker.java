@@ -7,6 +7,7 @@ import data.scripts.net.io.Unpacked;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.lazywizard.console.Console;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ public class BufferUnpacker extends ByteToMessageDecoder {
                     records.put(uniqueID, read);
                 }
             }
-            if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
+            if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityID);
             BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
             entities.put(entityInstanceID, entity);
             result = new Unpacked(entities, tick, null, null);
