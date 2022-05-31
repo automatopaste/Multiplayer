@@ -18,6 +18,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.connectionId = connectionId;
 
         statusData = new ConnectionStatusData(connectionId);
+        statusData.setConnection(this);
     }
 
     @Override
