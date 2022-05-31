@@ -86,7 +86,7 @@ public class DatagramServer implements Runnable {
                     protected void initChannel(NioDatagramChannel datagramChannel) {
                         datagramChannel.pipeline().addLast(
                                 new DatagramUnpacker(),
-                                new ServerInboundHandler(connectionManager.getConnection(datagramChannel.remoteAddress()))
+                                new ServerInboundHandler(connectionManager)
                         );
                     }
                 });
