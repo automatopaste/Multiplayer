@@ -128,8 +128,10 @@ public class ConnectionStatusData extends BasePackable {
             case 3:
                 return BaseConnectionWrapper.ConnectionState.LOADING;
             case 4:
-                return BaseConnectionWrapper.ConnectionState.SIMULATING;
+                return BaseConnectionWrapper.ConnectionState.SIMULATION_READY;
             case 5:
+                return BaseConnectionWrapper.ConnectionState.SIMULATING;
+            case 6:
                 return BaseConnectionWrapper.ConnectionState.CLOSED;
             default:
                 return null;
