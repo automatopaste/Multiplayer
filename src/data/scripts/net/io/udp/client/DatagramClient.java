@@ -67,8 +67,7 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
-                write(new DatagramPacket(message, remoteAddress));
-                //message.release(); released by packet??? throws IllegalReferenceCountException
+                channel.writeAndFlush(new DatagramPacket(message, remoteAddress)).sync();
             }
 
             closeFuture.sync();
@@ -101,10 +100,6 @@ public class DatagramClient implements Runnable {
         channel = (NioDatagramChannel) channelFuture.channel();
 
         return channelFuture;
-    }
-
-    private ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
     }
 
     public void stop() {

@@ -2,18 +2,22 @@ package data.scripts.net.io.udp.server;
 
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
-import data.scripts.net.io.udp.DatagramUnpacker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.ChannelMatcher;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.lazywizard.console.Console;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -26,7 +30,7 @@ public class DatagramServer implements Runnable {
     private final Object sync;
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
-//    private final ChannelGroup channelGroup;
+    private final ChannelGroup channelGroup;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -36,7 +40,7 @@ public class DatagramServer implements Runnable {
 
         messageQueue = new LinkedList<>();
 
-//        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
 
     @Override
@@ -50,7 +54,7 @@ public class DatagramServer implements Runnable {
         try {
             while (connectionManager.isActive()) {
                 while (!messageQueue.isEmpty()) {
-                    PacketContainer message = messageQueue.poll();
+                    final PacketContainer message = messageQueue.poll();
                     if (message == null || message.isEmpty()) continue;
 
                     ByteBuf buf = message.get();
@@ -59,7 +63,15 @@ public class DatagramServer implements Runnable {
                         continue;
                     }
 
-                    channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
+                    channelGroup.writeAndFlush(new DatagramPacket(buf, message.getDest()), new ChannelMatcher() {
+                        @Override
+                        public boolean matches(Channel channel) {
+                            SocketAddress address = channel.remoteAddress();
+                            InetSocketAddress messageAddress = message.getDest();
+
+                            return  address == messageAddress;
+                        }
+                    });
                 }
 
                 while (messageQueue.isEmpty()) {
@@ -85,15 +97,8 @@ public class DatagramServer implements Runnable {
         final Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerLoopGroup)
                 .channel(NioDatagramChannel.class)
-                .handler(new ChannelInitializer<NioDatagramChannel>() {
-                    @Override
-                    protected void initChannel(NioDatagramChannel datagramChannel) {
-                        datagramChannel.pipeline().addLast(
-                                new DatagramUnpacker(),
-                                new ServerInboundHandler(connectionManager)
-                        );
-                    }
-                });
+                .handler(new DatagramChannelInitializer(this, connectionManager)
+                );
 
         ChannelFuture future = bootstrap.bind(port).syncUninterruptibly();
         channel = future.channel();
@@ -115,5 +120,9 @@ public class DatagramServer implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerLoopGroup != null) workerLoopGroup.shutdownGracefully();
+    }
+
+    public ChannelGroup getChannelGroup() {
+        return channelGroup;
     }
 }
