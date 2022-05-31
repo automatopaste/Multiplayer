@@ -7,17 +7,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.ChannelMatcher;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.lazywizard.console.Console;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -30,7 +24,6 @@ public class DatagramServer implements Runnable {
     private final Object sync;
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
-    private final ChannelGroup channelGroup;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -39,8 +32,6 @@ public class DatagramServer implements Runnable {
         sync = new Object();
 
         messageQueue = new LinkedList<>();
-
-        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
 
     @Override
@@ -63,15 +54,7 @@ public class DatagramServer implements Runnable {
                         continue;
                     }
 
-                    channelGroup.writeAndFlush(new DatagramPacket(buf, message.getDest()), new ChannelMatcher() {
-                        @Override
-                        public boolean matches(Channel channel) {
-                            SocketAddress address = channel.remoteAddress();
-                            InetSocketAddress messageAddress = message.getDest();
-
-                            return  address == messageAddress;
-                        }
-                    });
+                    channel.writeAndFlush(new DatagramPacket(buf, message.getDest()));
                 }
 
                 while (messageQueue.isEmpty()) {
@@ -120,9 +103,5 @@ public class DatagramServer implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerLoopGroup != null) workerLoopGroup.shutdownGracefully();
-    }
-
-    public ChannelGroup getChannelGroup() {
-        return channelGroup;
     }
 }
