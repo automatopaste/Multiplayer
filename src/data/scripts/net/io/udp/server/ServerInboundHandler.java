@@ -1,14 +1,13 @@
 package data.scripts.net.io.udp.server;
 
+import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.ServerConnectionWrapper;
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 
 public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
@@ -22,7 +21,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Unpacked in) throws Exception {
         if (connectionWrapper == null) {
-            connectionWrapper = serverConnectionManager.getConnection((InetSocketAddress) ctx.channel().remoteAddress());
+            connectionWrapper = serverConnectionManager.getConnection(in.getSender());
         }
 
         int serverTick = in.getTick();

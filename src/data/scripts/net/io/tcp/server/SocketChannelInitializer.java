@@ -18,7 +18,7 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
-        ServerConnectionWrapper connection = serverConnectionManager.getConnection(socketChannel.remoteAddress());
+        ServerConnectionWrapper connection = serverConnectionManager.getNewConnection(socketChannel.remoteAddress());
 
         if (connection == null) {
             throw new InterruptedException("Channel connection refused: max connections exceeded");

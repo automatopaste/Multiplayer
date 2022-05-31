@@ -8,10 +8,7 @@ import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ServerConnectionManager implements Runnable {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
@@ -111,6 +108,15 @@ public class ServerConnectionManager implements Runnable {
     }
 
     public ServerConnectionWrapper getConnection(InetSocketAddress remoteAddress) {
+        for (InetSocketAddress address : serverConnectionWrappers.keySet()) {
+            if (Arrays.equals(address.getAddress().getAddress(), remoteAddress.getAddress().getAddress())) {
+                return serverConnectionWrappers.get(address);
+            }
+        }
+        return null;
+    }
+
+    public ServerConnectionWrapper getNewConnection(InetSocketAddress remoteAddress) {
         if (remoteAddress == null) return null;
 
         synchronized (serverConnectionWrappers) {
