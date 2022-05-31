@@ -169,6 +169,8 @@ public class ShipData extends BasePackable {
     }
 
     private void flushWrite() {
+        if (ship == null) throw new NullPointerException("Attempted flush write with null entity!");
+
         id.forceUpdate(ship.getFleetMemberId());
         id.write(packer, SHIP_ID);
 

@@ -98,6 +98,8 @@ public class ConnectionStatusData extends BasePackable {
     }
 
     private void flushWrite() {
+        if (connection == null) throw new NullPointerException("Attempted flush write with null connection!");
+
         id.forceUpdate(connection.getConnectionId());
         id.write(packer, ID);
 
