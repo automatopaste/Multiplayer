@@ -65,6 +65,7 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             case INITIALISING:
             case LOADING_READY:
             case LOADING:
+            case SIMULATION_READY:
             case CLOSED:
                 break;
             case SIMULATING:
