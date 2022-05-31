@@ -92,27 +92,27 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(Map<Integer, BasePackable> entities) {
         // grab connection data
-        ConnectionStatusData data = (ConnectionStatusData) entities.get(connectionId);
+        BasePackable data = entities.get(connectionId);
         if (data != null) {
-            statusData.updateFromDelta(data);
-
-            connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
-
+            updateConnectionStatusData(data);
             entities.remove(connectionId);
         } else {
             Integer key = null;
             for (BasePackable packable : entities.values()) {
                 if (packable instanceof ConnectionStatusData) {
-                    statusData.updateFromDelta(packable);
-                    key = statusData.getInstanceID();
-
-                    connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
+                    key = packable.getInstanceID();
+                    updateConnectionStatusData(packable);
                 }
             }
             if (key != null) entities.remove(key);
         }
 
         connectionManager.getDuplex().updateInbound(entities);
+    }
+
+    private void updateConnectionStatusData(BasePackable packable) {
+        statusData.updateFromDelta(packable);
+        connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
     }
 
     public void close() {
