@@ -54,7 +54,10 @@ public class DatagramServer implements Runnable {
                     if (message == null || message.isEmpty()) continue;
 
                     ByteBuf buf = message.get();
-                    if (buf.readableBytes() <= 4) continue;
+                    if (buf.readableBytes() <= 4) {
+                        buf.release();
+                        continue;
+                    }
 
                     channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                 }

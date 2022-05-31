@@ -62,7 +62,10 @@ public class DatagramClient implements Runnable {
                 if (container == null || container.isEmpty()) continue;;
 
                 ByteBuf message = container.get();
-                if (message.readableBytes() <= 4) continue;
+                if (message.readableBytes() <= 4) {
+                    message.release();
+                    continue;
+                }
 
                 write(new DatagramPacket(message, remoteAddress));
                 //message.release(); released by packet??? throws IllegalReferenceCountException
