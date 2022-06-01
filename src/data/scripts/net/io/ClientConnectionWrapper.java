@@ -37,11 +37,11 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();
 
-        datagramClient = new DatagramClient(host, port, this);
-        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
+
 
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
+        socket.start();
 
         statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
         statusData.setConnection(this);
@@ -49,7 +49,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
 
-        socket.start();
+        datagramClient = new DatagramClient(host, ((InetSocketAddress) socketClient.getChannel().localAddress()).getPort(), this);
+        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
         datagram.start();
     }
 

@@ -93,7 +93,6 @@ public class SocketClient implements Runnable {
         });
 
         // Get channel after connected socket
-        bootstrap.bind(port).sync();
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
         channel = channelFuture.channel();
 
@@ -103,5 +102,9 @@ public class SocketClient implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerGroup != null) workerGroup.shutdownGracefully();
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }
