@@ -4,8 +4,8 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
-import data.scripts.net.io.tcp.BufferUnpacker;
 import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.tcp.BufferUnpacker;
 import data.scripts.net.io.tcp.PacketContainerDecoder;
 import data.scripts.net.io.tcp.PacketContainerEncoder;
 import io.netty.bootstrap.Bootstrap;
@@ -16,7 +16,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 
 public class SocketClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -44,8 +43,6 @@ public class SocketClient implements Runnable {
     }
 
     public void runClient() {
-        InetSocketAddress remoteAddress = new InetSocketAddress(host, port);
-
         try {
             ChannelFuture channelFuture = start();
             ChannelFuture closeFuture = channelFuture.channel().closeFuture();
@@ -96,6 +93,7 @@ public class SocketClient implements Runnable {
         });
 
         // Get channel after connected socket
+        bootstrap.bind(port).sync();
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
         channel = channelFuture.channel();
 

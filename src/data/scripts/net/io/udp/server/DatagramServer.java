@@ -45,11 +45,11 @@ public class DatagramServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
-            while (connectionManager.isActive())
-            {
-                synchronized (messageQueue) {
-                    while (!messageQueue.isEmpty()) {
+            while (connectionManager.isActive()) {
+                while (!messageQueue.isEmpty()) {
+                    synchronized (messageQueue) {
                         final PacketContainer message = messageQueue.poll();
+
                         if (message == null || message.isEmpty()) continue;
 
                         ByteBuf buf = message.get();
@@ -62,14 +62,14 @@ public class DatagramServer implements Runnable {
 
                         channel.writeAndFlush(new DatagramPacket(test, message.getDest())).sync();
                     }
+                }
 
-                    while (messageQueue.isEmpty()) {
-                        synchronized (sync) {
-                            try {
-                                sync.wait();
-                            } catch (InterruptedException e) {
-                                break;
-                            }
+                while (messageQueue.isEmpty()) {
+                    synchronized (sync) {
+                        try {
+                            sync.wait();
+                        } catch (InterruptedException e) {
+                            break;
                         }
                     }
                 }
