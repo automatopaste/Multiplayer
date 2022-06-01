@@ -29,6 +29,7 @@ public class ServerConnectionManager implements Runnable {
     private final Map<InetSocketAddress, ServerConnectionWrapper> serverConnectionWrappers;
 
     private final Map<Integer, InetSocketAddress> clientAddresses;
+    private final Map<Integer, InetSocketAddress> clientDatagramAddresses;
 
     private int tick;
     private final Clock clock;
@@ -50,6 +51,7 @@ public class ServerConnectionManager implements Runnable {
         clock = new Clock(TICK_RATE);
 
         clientAddresses = new HashMap<>();
+        clientDatagramAddresses = new HashMap<>();
     }
 
     @Override
@@ -120,6 +122,7 @@ public class ServerConnectionManager implements Runnable {
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id);
 
         clientAddresses.put(id, remoteAddress);
+        clientAddresses.put(id, new InetSocketAddress(remoteAddress.getHostName(), remoteAddress.getPort() + 1));
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.put(remoteAddress, serverConnectionWrapper);
@@ -146,6 +149,12 @@ public class ServerConnectionManager implements Runnable {
     public InetSocketAddress getAddress(int connectionId) {
         synchronized (clientAddresses) {
             return clientAddresses.get(connectionId);
+        }
+    }
+
+    public InetSocketAddress getDatagramAddress(int connectionId) {
+        synchronized (clientDatagramAddresses) {
+            return clientDatagramAddresses.get(connectionId);
         }
     }
 
