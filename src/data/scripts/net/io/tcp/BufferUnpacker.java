@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.lazywizard.console.Console;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,11 @@ public class BufferUnpacker extends ByteToMessageDecoder {
 
         Unpacked result;
         if (in.readableBytes() == 0) {
-            result = new Unpacked(new HashMap<Integer, BasePackable>(), tick, null, null);
+            result = new Unpacked(new HashMap<Integer, BasePackable>(),
+                    tick,
+                    (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+            );
         } else {
             // integer keys are unique instance IDs
             Map<Integer, BasePackable> entities = new HashMap<>();
@@ -54,7 +59,11 @@ public class BufferUnpacker extends ByteToMessageDecoder {
             if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityID);
             BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
             entities.put(entityInstanceID, entity);
-            result = new Unpacked(entities, tick, null, null);
+            result = new Unpacked(entities,
+                    tick,
+                    (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+            );
         }
 
         if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in packet decoder frame");

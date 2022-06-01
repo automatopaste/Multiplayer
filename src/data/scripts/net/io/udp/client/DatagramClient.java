@@ -95,7 +95,7 @@ public class DatagramClient implements Runnable {
         });
 
         // use same port as server to avoid sending datagrams to ephemeral ports
-        ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(port));
+        ChannelFuture channelFuture = bootstrap.bind(port);
         channelFuture.syncUninterruptibly();
 
         channel = (NioDatagramChannel) channelFuture.channel();
