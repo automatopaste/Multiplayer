@@ -13,16 +13,6 @@ public class mpRunServer implements BaseCommand {
             Console.showMessage("Command only usable in simulation");
             return CommandResult.ERROR;
         }
-        if (args.trim().isEmpty()) {
-            Console.showMessage("Specify port");
-            return CommandResult.BAD_SYNTAX;
-        }
-
-        String[] ids = args.split(" ");
-        if (ids.length != 1) {
-            Console.showMessage("Syntax error");
-            return CommandResult.BAD_SYNTAX;
-        }
 
         Console.showMessage("Starting server");
         Global.getCombatEngine().addPlugin(new mpServerPlugin());

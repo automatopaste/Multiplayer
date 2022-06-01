@@ -122,7 +122,7 @@ public class ServerConnectionManager implements Runnable {
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id);
 
         clientAddresses.put(id, remoteAddress);
-        clientAddresses.put(id, new InetSocketAddress(remoteAddress.getHostName(), remoteAddress.getPort() + 1));
+        clientDatagramAddresses.put(id, new InetSocketAddress(remoteAddress.getHostName(), remoteAddress.getPort() + 1));
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.put(remoteAddress, serverConnectionWrapper);
