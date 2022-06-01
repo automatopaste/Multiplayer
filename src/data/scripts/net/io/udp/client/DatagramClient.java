@@ -34,7 +34,8 @@ public class DatagramClient implements Runnable {
 
     public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
-        this.port = port;
+        // use next port for UDP traffic
+        this.port = port + 1;
         this.connection = connection;
 
         clock = new Clock(TICK_RATE);

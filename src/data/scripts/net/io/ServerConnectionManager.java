@@ -13,7 +13,7 @@ import java.util.*;
 public class ServerConnectionManager implements Runnable {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
-    public final static int PORT = Global.getSettings().getInt("mpLocalPort");
+    public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final DataDuplex dataDuplex;
@@ -40,11 +40,11 @@ public class ServerConnectionManager implements Runnable {
 
         serverConnectionWrappers = new HashMap<>();
 
-        datagramServer = new DatagramServer(PORT, this);
-        datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
-
         socketServer = new SocketServer(PORT, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
+
+        datagramServer = new DatagramServer(PORT + 1, this);
+        datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
 
         tick = 0;
         clock = new Clock(TICK_RATE);
@@ -77,12 +77,6 @@ public class ServerConnectionManager implements Runnable {
 
     public void tickUpdate() {
         tick++;
-
-//        synchronized (serverConnectionWrappers) {
-//            for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
-//                connection.update();
-//            }
-//        }
     }
 
     public List<PacketContainer> getSocketMessages() throws IOException {
