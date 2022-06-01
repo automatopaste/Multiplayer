@@ -45,28 +45,31 @@ public class DatagramServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
-            while (connectionManager.isActive()) {
-                while (!messageQueue.isEmpty()) {
-                    final PacketContainer message = messageQueue.poll();
-                    if (message == null || message.isEmpty()) continue;
+            while (connectionManager.isActive())
+            {
+                synchronized (messageQueue) {
+                    while (!messageQueue.isEmpty()) {
+                        final PacketContainer message = messageQueue.poll();
+                        if (message == null || message.isEmpty()) continue;
 
-                    ByteBuf buf = message.get();
-                    if (buf.readableBytes() <= 4) {
-                        buf.release();
-                        continue;
+                        ByteBuf buf = message.get();
+                        if (buf.readableBytes() <= 4) {
+                            buf.release();
+                            continue;
+                        }
+
+                        ByteBuf test = Unpooled.wrappedBuffer("jesse we need to cook".getBytes(StandardCharsets.UTF_8));
+
+                        channel.writeAndFlush(new DatagramPacket(test, message.getDest())).sync();
                     }
 
-                    ByteBuf test = Unpooled.wrappedBuffer("jesse we need to cook".getBytes(StandardCharsets.UTF_8));
-
-                    channel.writeAndFlush(new DatagramPacket(test, message.getDest())).sync();
-                }
-
-                while (messageQueue.isEmpty()) {
-                    synchronized (sync) {
-                        try {
-                            sync.wait();
-                        } catch (InterruptedException e) {
-                            break;
+                    while (messageQueue.isEmpty()) {
+                        synchronized (sync) {
+                            try {
+                                sync.wait();
+                            } catch (InterruptedException e) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -97,7 +100,9 @@ public class DatagramServer implements Runnable {
     public void queueMessages(List<PacketContainer> messages) {
         if (messages.isEmpty()) return;
 
-        messageQueue.addAll(messages);
+        synchronized (messageQueue) {
+            messageQueue.addAll(messages);
+        }
 
         synchronized (sync) {
             sync.notify();
