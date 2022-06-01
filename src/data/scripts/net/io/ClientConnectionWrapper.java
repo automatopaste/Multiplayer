@@ -26,14 +26,12 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
-    private final int port;
     private final mpClientPlugin clientPlugin;
 
     private int tick;
 
     public ClientConnectionWrapper(String host, int port, mpClientPlugin clientPlugin) {
         this.host = host;
-        this.port = port;
         this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();
 
@@ -46,8 +44,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
         connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
-
-
     }
 
     @Override
@@ -116,7 +112,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
                 data.addAll(dataDuplex.getOutbound());
 
-                return new PacketContainer(data, tick, false, new InetSocketAddress(host, port));
+                return new PacketContainer(data, tick, false, null);
             case CLOSED:
             default:
                 return null;
