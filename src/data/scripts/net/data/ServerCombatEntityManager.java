@@ -73,4 +73,10 @@ public class ServerCombatEntityManager implements OutboundEntityManager {
 
         return out;
     }
+
+    public List<BasePackable> getEntities() {
+        List<BasePackable> out = new ArrayList<BasePackable>(ships.values());
+
+        return out;
+    }
 }

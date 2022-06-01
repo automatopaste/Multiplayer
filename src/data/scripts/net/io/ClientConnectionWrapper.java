@@ -62,13 +62,25 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             case INITIALISING:
                 return null;
             case LOADING_READY:
+                Console.showMessage("Waiting for prerequisite data");
+
                 connectionState = ConnectionState.LOADING;
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING:
                 return null;
-            case SIMULATION_READY:
+            case SPAWNING_READY:
+                Console.showMessage("Loading variants");
                 clientPlugin.getDataStore().absorbVariants(dataDuplex.getDeltas());
+
+                Console.showMessage("Spawning entities");
+                connectionState = ConnectionState.SPAWNING;
+
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+            case SPAWNING:
+                return null;
+            case SIMULATION_READY:
+                Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
                 startDatagramClient();
@@ -95,6 +107,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             case LOADING_READY:
             case LOADING:
             case SIMULATION_READY:
+            case SPAWNING_READY:
+            case SPAWNING:
                 return null;
             case SIMULATING:
                 List<BasePackable> data = new ArrayList<>();
@@ -145,7 +159,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
     private void updateConnectionStatusData(BasePackable packable) {
         statusData.updateFromDelta(packable);
-        connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(statusData.getState().getRecord());
     }
 
     public void stop() {

@@ -93,4 +93,8 @@ public class mpServerPlugin extends BaseEveryFrameCombatPlugin {
     public LoadedDataStore getDataStore() {
         return dataStore;
     }
+
+    public ServerCombatEntityManager getServerCombatEntityManager() {
+        return serverCombatEntityManager;
+    }
 }

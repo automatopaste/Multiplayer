@@ -23,6 +23,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
+        List<BasePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
                 return null;
@@ -40,12 +41,28 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case LOADING:
                 Console.showMessage("Sending client " + connectionId + " data over socket");
 
-                List<BasePackable> data = new ArrayList<>();
+                data = new ArrayList<>();
                 data.add(statusData);
 
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated().values());
 
                 // if client requests data again, state will return back to INITIALISING and resend packet
+                connectionState = ConnectionState.SPAWNING_READY;
+
+                return new PacketContainer(
+                        data,
+                        connectionManager.getTick(),
+                        true,
+                        connectionManager.getAddress(connectionId)
+                );
+            case SPAWNING_READY:
+                return null;
+            case SPAWNING:
+                data = new ArrayList<>();
+                data.add(statusData);
+
+                data.addAll(connectionManager.getServerPlugin().getServerCombatEntityManager().getEntities());
+
                 connectionState = ConnectionState.SIMULATION_READY;
 
                 return new PacketContainer(
@@ -69,6 +86,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case INITIALISING:
             case LOADING_READY:
             case LOADING:
+            case SPAWNING_READY:
+            case SPAWNING:
             case SIMULATION_READY:
                 return null;
             case SIMULATING:
@@ -112,7 +131,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     private void updateConnectionStatusData(BasePackable packable) {
         statusData.updateFromDelta(packable);
-        connectionState = ConnectionStatusData.ordinalToConnectionState(statusData.getState().getRecord());
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(statusData.getState().getRecord());
     }
 
     public void close() {
