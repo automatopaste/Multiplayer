@@ -129,14 +129,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         // grab connection data
         BasePackable data = entities.get(connectionId);
         if (data != null) {
-            updateConnectionStatusData(data);
+            updateConnectionStatusData((ConnectionStatusData) data);
             entities.remove(connectionId);
         } else {
             Integer key = null;
             for (BasePackable packable : entities.values()) {
                 if (packable instanceof ConnectionStatusData) {
                     key = packable.getInstanceID();
-                    updateConnectionStatusData(packable);
+                    updateConnectionStatusData((ConnectionStatusData) packable);
                 }
             }
             if (key != null) entities.remove(key);
@@ -157,9 +157,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         this.connectionState = connectionState;
     }
 
-    private void updateConnectionStatusData(BasePackable packable) {
-        statusData.updateFromDelta(packable);
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(statusData.getState().getRecord());
+    private void updateConnectionStatusData(ConnectionStatusData data) {
+        int state = data.getState().getRecord();
+        if (state < connectionState.ordinal()) {
+            return;
+        }
+
+        statusData.updateFromDelta(data);
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
     }
 
     public void stop() {
