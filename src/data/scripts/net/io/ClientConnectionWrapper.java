@@ -66,9 +66,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             case LOADING:
                 return null;
             case SPAWNING_READY:
-                Console.showMessage("Loading variants");
-                clientPlugin.getDataStore().absorbVariants(dataDuplex.getDeltas());
-
                 Console.showMessage("Spawning entities");
                 connectionState = ConnectionState.SPAWNING;
 
@@ -121,6 +118,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
     public void updateInbound(Map<Integer, BasePackable> entities, int tick) {
         this.tick = tick;
+
+        if (connectionState != ConnectionState.SIMULATING) {
+            clientPlugin.getDataStore().absorbVariants(entities);
+        }
 
         // grab connection data
         BasePackable data = entities.get(connectionId);

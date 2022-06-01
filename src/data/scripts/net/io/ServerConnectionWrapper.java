@@ -97,7 +97,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getDuplex().getOutbound());
 
                 return new PacketContainer(
-                        data, connectionManager.getTick(), false, connectionManager.getDatagramAddress(connectionId)
+                        data, connectionManager.getTick(), true, connectionManager.getDatagramAddress(connectionId)
                 );
             case CLOSED: // *shuts briefcase*
             default:
