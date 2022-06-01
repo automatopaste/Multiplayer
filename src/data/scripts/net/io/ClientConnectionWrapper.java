@@ -20,8 +20,8 @@ import java.util.Map;
 public class ClientConnectionWrapper extends BaseConnectionWrapper{
     private final DataDuplex dataDuplex;
 
-    private final DatagramClient datagramClient;
-    private final Thread datagram;
+    private DatagramClient datagramClient;
+    private Thread datagram;
 
     private final SocketClient socketClient;
     private final Thread socket;
@@ -37,8 +37,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();
 
-
-
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
@@ -49,9 +47,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
         connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
 
-        datagramClient = new DatagramClient(host, ((InetSocketAddress) socketClient.getChannel().localAddress()).getPort(), this);
-        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
-        datagram.start();
+
     }
 
     @Override
@@ -75,6 +71,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
                 clientPlugin.getDataStore().absorbVariants(dataDuplex.getDeltas());
 
                 connectionState = ConnectionState.SIMULATING;
+                startDatagramClient();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case SIMULATING:
@@ -82,6 +79,12 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
             default:
                 return null;
         }
+    }
+
+    private void startDatagramClient() {
+        datagramClient = new DatagramClient(host, ((InetSocketAddress) socketClient.getChannel().localAddress()).getPort(), this);
+        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
+        datagram.start();
     }
 
     @Override
