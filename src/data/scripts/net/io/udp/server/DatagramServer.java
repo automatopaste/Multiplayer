@@ -58,9 +58,7 @@ public class DatagramServer implements Runnable {
                             continue;
                         }
 
-                        ByteBuf test = Unpooled.wrappedBuffer("jesse we need to cook".getBytes(StandardCharsets.UTF_8));
-
-                        channel.writeAndFlush(new DatagramPacket(test, message.getDest())).sync();
+                        channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                     }
                 }
 

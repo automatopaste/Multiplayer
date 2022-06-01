@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.lazywizard.console.Console;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,8 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
 
                 if (DataGenManager.entityTypeIDs.containsValue(type)) {
                     // reached new entity
-                    if (records.isEmpty())
-                        throw new NullPointerException("Entity read zero records: " + entityInstanceID);
+                    if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityInstanceID);
+
                     BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
                     entities.put(entityInstanceID, entity);
 
@@ -52,13 +53,13 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
                     records.put(uniqueID, read);
                 }
             }
-            if (records.isEmpty()) throw new NullPointerException("Entity read zero records: " + entityInstanceID);
+            if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityInstanceID);
             BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
             entities.put(entityInstanceID, entity);
             result = new Unpacked(entities, tick, datagram.sender(), datagram.recipient());
         }
 
-        if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in packet decoder frame");
+        if (in.readableBytes() > 0) Console.showMessage(in.readableBytes() + " bytes left in packet decoder frame");
 
         out.add(result);
     }

@@ -2,6 +2,7 @@ package data.scripts.data;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
+import org.lazywizard.console.Console;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class DataGenManager {
      */
     public static BasePackable entityFactory(int typeID) {
         BasePackable out = entityInstances.get(typeID);
-        if (out == null) throw new NullPointerException("No entity packable type found at ID: " + typeID);
+        if (out == null) Console.showMessage("No entity packable type found at ID: " + typeID);
         return out;
     }
 
@@ -52,7 +53,7 @@ public class DataGenManager {
      */
     public static BaseRecord<?> recordFactory(int typeID) {
         BaseRecord<?> out = recordInstances.get(typeID);
-        if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
+        if (out == null) Console.showMessage("No record type found at ID: " + typeID);
         return out;
     }
 }

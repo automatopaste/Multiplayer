@@ -150,9 +150,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
     public void stop() {
         socketClient.stop();
-        datagramClient.stop();
+        if (datagramClient != null) datagramClient.stop();
         socket.interrupt();
-        datagram.interrupt();
+        if (datagram != null) datagram.interrupt();
     }
 
     public int getTick() {
