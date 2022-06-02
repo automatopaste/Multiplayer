@@ -215,20 +215,23 @@ public class ShipData extends BasePackable {
 
         // update variant
         String hullSpecId = specId.getRecord();
+        ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
         ShipVariantAPI empty = Global.getSettings().createEmptyVariant(
                 hullSpecId + "_Hull",
-                Global.getSettings().getHullSpec(hullSpecId)
+                hullSpec
         );
 
-        empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
-        empty.setNumFluxVents(variantData.getVents().getRecord());
+        if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
+            empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
+            empty.setNumFluxVents(variantData.getVents().getRecord());
 
-        List<StringRecord> weaponSlots = variantData.getWeaponSlots();
-        List<StringRecord> weaponIds = variantData.getWeaponIds();
-        for (int i = 0; i < weaponSlots.size(); i++) {
-            String slot = weaponSlots.get(i).getRecord();
+            List<StringRecord> weaponSlots = variantData.getWeaponSlots();
+            List<StringRecord> weaponIds = variantData.getWeaponIds();
+            for (int i = 0; i < weaponSlots.size(); i++) {
+                String slot = weaponSlots.get(i).getRecord();
 
-            empty.addWeapon(slot, weaponIds.get(i).getRecord());
+                empty.addWeapon(slot, weaponIds.get(i).getRecord());
+            }
         }
 
         empty.autoGenerateWeaponGroups();
