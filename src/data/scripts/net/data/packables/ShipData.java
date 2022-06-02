@@ -211,17 +211,21 @@ public class ShipData extends BasePackable {
     public void destinationInit(mpClientPlugin clientPlugin) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        ShipVariantData variantData = clientPlugin.getDataStore().getVariantData().get(id.getRecord());
 
         // update variant
         String hullSpecId = specId.getRecord();
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
-        ShipVariantAPI empty = Global.getSettings().createEmptyVariant(
-                hullSpecId + "_Hull",
-                hullSpec
-        );
 
+        String hullVariantId;
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
+            hullVariantId = hullSpecId + "_Hull";
+            ShipVariantAPI empty = Global.getSettings().createEmptyVariant(
+                    hullVariantId,
+                    hullSpec
+            );
+
+            ShipVariantData variantData = clientPlugin.getDataStore().getVariantData().get(id.getRecord());
+
             empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
             empty.setNumFluxVents(variantData.getVents().getRecord());
 
@@ -232,11 +236,13 @@ public class ShipData extends BasePackable {
 
                 empty.addWeapon(slot, weaponIds.get(i).getRecord());
             }
+
+            empty.autoGenerateWeaponGroups();
+        } else {
+            hullVariantId = hullSpecId + "_wing";
         }
 
-        empty.autoGenerateWeaponGroups();
-
-        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(empty.getHullVariantId(), loc.getRecord(), ang.getRecord());
+        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(hullVariantId, loc.getRecord(), ang.getRecord());
 
         // set fleetmember id to sync with server
         Ship s = (Ship) ship;
