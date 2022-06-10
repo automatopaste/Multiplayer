@@ -5,6 +5,7 @@ import data.scripts.net.data.packables.ConnectionStatusData;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +14,11 @@ import java.util.Map;
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
 
-    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId) {
+    private final InetSocketAddress remoteAddress;
+
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress) {
         this.connectionManager = connectionManager;
+        this.remoteAddress = remoteAddress;
         this.connectionId = connectionId;
 
         statusData = new ConnectionStatusData(connectionId);
@@ -34,7 +38,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         Collections.singletonList((BasePackable) statusData),
                         connectionManager.getTick(),
                         true,
-                        connectionManager.getAddress(connectionId)
+                        remoteAddress
                 );
             case LOADING_READY:
                 return null;
@@ -53,7 +57,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         data,
                         connectionManager.getTick(),
                         true,
-                        connectionManager.getAddress(connectionId)
+                        remoteAddress
                 );
             case SPAWNING_READY:
                 return null;
@@ -69,7 +73,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         data,
                         connectionManager.getTick(),
                         true,
-                        connectionManager.getAddress(connectionId)
+                        remoteAddress
                 );
             case SIMULATION_READY:
             case SIMULATING:
@@ -97,7 +101,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getDuplex().getOutbound());
 
                 return new PacketContainer(
-                        data, connectionManager.getTick(), false, connectionManager.getDatagramAddress(connectionId)
+                        data, connectionManager.getTick(), false, remoteAddress
                 );
             case CLOSED: // *shuts briefcase*
             default:
@@ -140,6 +144,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void close() {
-        connectionManager.removeConnection(connectionManager.getAddress(connectionId));
+        connectionManager.removeConnection(remoteAddress);
     }
 }

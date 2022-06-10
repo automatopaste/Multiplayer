@@ -26,6 +26,7 @@ public class mpConnectToHost implements BaseCommand {
 
         String[] address = ids[0].split(":");
         String host = "192.168.1." + address[0];
+//        String host = address[0];
         int port = Integer.parseInt(address[1]);
 
         Console.showMessage("Starting client on port " + port);

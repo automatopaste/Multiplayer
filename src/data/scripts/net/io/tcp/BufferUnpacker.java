@@ -66,7 +66,7 @@ public class BufferUnpacker extends ByteToMessageDecoder {
             );
         }
 
-        if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in packet decoder frame");
+        if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in buffer decoder frame");
 
         out.add(result);
     }

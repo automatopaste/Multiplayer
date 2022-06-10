@@ -28,9 +28,6 @@ public class ServerConnectionManager implements Runnable {
 
     private final Map<InetSocketAddress, ServerConnectionWrapper> serverConnectionWrappers;
 
-    private final Map<Integer, InetSocketAddress> clientAddresses;
-    private final Map<Integer, InetSocketAddress> clientDatagramAddresses;
-
     private int tick;
     private final Clock clock;
 
@@ -44,14 +41,11 @@ public class ServerConnectionManager implements Runnable {
         socketServer = new SocketServer(PORT, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
-        datagramServer = new DatagramServer(PORT + 1, this);
+        datagramServer = new DatagramServer(PORT, this);
         datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
 
         tick = 0;
         clock = new Clock(TICK_RATE);
-
-        clientAddresses = new HashMap<>();
-        clientDatagramAddresses = new HashMap<>();
     }
 
     @Override
@@ -118,11 +112,9 @@ public class ServerConnectionManager implements Runnable {
         synchronized (serverConnectionWrappers) {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
-        int id = serverPlugin.getNewInstanceID();
-        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id);
 
-        clientAddresses.put(id, remoteAddress);
-        clientDatagramAddresses.put(id, new InetSocketAddress(remoteAddress.getHostName(), remoteAddress.getPort() + 1));
+        int id = serverPlugin.getNewInstanceID();
+        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress);
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.put(remoteAddress, serverConnectionWrapper);
@@ -144,18 +136,6 @@ public class ServerConnectionManager implements Runnable {
         datagramServer.stop();
         socket.interrupt();
         datagram.interrupt();
-    }
-
-    public InetSocketAddress getAddress(int connectionId) {
-        synchronized (clientAddresses) {
-            return clientAddresses.get(connectionId);
-        }
-    }
-
-    public InetSocketAddress getDatagramAddress(int connectionId) {
-        synchronized (clientDatagramAddresses) {
-            return clientDatagramAddresses.get(connectionId);
-        }
     }
 
     public synchronized int getTick() {
