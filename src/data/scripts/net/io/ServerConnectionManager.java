@@ -130,9 +130,9 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
         return serverConnectionWrapper;
     }
 
-    public void removeConnection(InetSocketAddress address) {
+    public void removeConnection(int id) {
         synchronized (serverConnectionWrappers) {
-            serverConnectionWrappers.remove(address);
+            serverConnectionWrappers.remove(id);
         }
     }
 

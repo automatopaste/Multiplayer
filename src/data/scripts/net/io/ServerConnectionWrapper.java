@@ -143,7 +143,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void close() {
-        connectionManager.removeConnection(remoteAddress);
+        connectionManager.removeConnection(connectionId);
     }
 
     public InetSocketAddress getRemoteAddress() {
