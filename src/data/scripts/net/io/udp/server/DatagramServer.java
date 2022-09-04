@@ -1,5 +1,6 @@
 package data.scripts.net.io.udp.server;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.Bootstrap;
@@ -56,6 +57,7 @@ public class DatagramServer implements Runnable {
                             continue;
                         }
 
+                        Global.getLogger(DatagramServer.class).info("Sending datagram to " + message.getDest().getAddress().toString());
                         channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                     }
                 }

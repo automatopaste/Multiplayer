@@ -15,7 +15,7 @@ public class Clock {
         long currentTime;
 
         while (deltaU < 1d) {
-            Thread.sleep(0);
+            Thread.yield();
 
             currentTime = System.nanoTime();
             deltaU += (currentTime - initialTime) / timeU;

@@ -60,7 +60,7 @@ public class DatagramClient implements Runnable {
                 clock.sleepUntilTick();
 
                 PacketContainer container = connection.getDatagram();
-                if (container == null || container.isEmpty()) continue;;
+                if (container == null || container.isEmpty()) continue;
 
                 ByteBuf message = container.get();
                 if (message.readableBytes() <= 4) {
@@ -68,6 +68,7 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
+                Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());
                 channel.writeAndFlush(new DatagramPacket(message, remoteAddress)).sync();
             }
 
