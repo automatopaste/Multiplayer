@@ -48,7 +48,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated().values());
+                data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 // if client requests data again, state will return back to INITIALISING and resend packet
                 connectionState = ConnectionState.SPAWNING_READY;

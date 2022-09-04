@@ -19,7 +19,7 @@ import java.util.Map;
 public class LoadedDataStore {
     private final Map<String, ShipVariantData> variantData;
 
-    private Map<Integer, BasePackable> generated;
+    private List<ShipVariantData> generated;
 
     public LoadedDataStore() {
         variantData = new HashMap<>();
@@ -45,13 +45,11 @@ public class LoadedDataStore {
         members.addAll(manager1.getDeployedCopy());
         members.addAll(manager1.getReservesCopy());
 
-        generated = new HashMap<>();
-
+        generated = new ArrayList<>();
+        int index = 0;
         for (FleetMemberAPI member : members) {
-            int id = plugin.getNewInstanceID();
-            ShipVariantData variantData = new ShipVariantData(id, member.getVariant(), member.getId());
-
-            generated.put(id, variantData);
+            generated.add(new ShipVariantData(index, member.getVariant(), member.getId()));
+            index++;
         }
     }
 
@@ -68,7 +66,7 @@ public class LoadedDataStore {
         }
     }
 
-    public Map<Integer, BasePackable> getGenerated() {
+    public List<ShipVariantData> getGenerated() {
         return generated;
     }
 }
