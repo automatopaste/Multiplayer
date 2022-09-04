@@ -1,8 +1,12 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
+import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
 import org.lazywizard.console.Console;
 
@@ -10,7 +14,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
-public class ServerConnectionManager implements Runnable {
+public class ServerConnectionManager implements Runnable, InboundEntityManager {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
     public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
@@ -26,7 +30,7 @@ public class ServerConnectionManager implements Runnable {
     private final SocketServer socketServer;
     private final Thread socket;
 
-    private final Map<InetSocketAddress, ServerConnectionWrapper> serverConnectionWrappers;
+    private final Map<Integer, ServerConnectionWrapper> serverConnectionWrappers;
     private int nextConnectionId = 0;
 
     private int tick;
@@ -99,9 +103,10 @@ public class ServerConnectionManager implements Runnable {
     }
 
     public ServerConnectionWrapper getConnection(InetSocketAddress remoteAddress) {
-        for (InetSocketAddress address : serverConnectionWrappers.keySet()) {
-            if (Arrays.equals(address.getAddress().getAddress(), remoteAddress.getAddress().getAddress())) {
-                return serverConnectionWrappers.get(address);
+        for (Integer id : serverConnectionWrappers.keySet()) {
+            ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
+            if (Arrays.equals(wrapper.getRemoteAddress().getAddress().getAddress(), remoteAddress.getAddress().getAddress())) {
+                return wrapper;
             }
         }
         return null;
@@ -119,7 +124,7 @@ public class ServerConnectionManager implements Runnable {
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress);
 
         synchronized (serverConnectionWrappers) {
-            serverConnectionWrappers.put(remoteAddress, serverConnectionWrapper);
+            serverConnectionWrappers.put(id, serverConnectionWrapper);
         }
 
         return serverConnectionWrapper;
@@ -138,6 +143,17 @@ public class ServerConnectionManager implements Runnable {
         datagramServer.stop();
         socket.interrupt();
         datagram.interrupt();
+    }
+
+    @Override
+    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
+        ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
+        serverConnectionWrappers.get(connectionStatusData.getId().getRecord()).updateConnectionStatusData(connectionStatusData);
+    }
+
+    @Override
+    public void updateEntities() {
+
     }
 
     public synchronized int getTick() {

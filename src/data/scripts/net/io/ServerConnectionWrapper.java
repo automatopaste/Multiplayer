@@ -13,7 +13,6 @@ import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
-
     private final InetSocketAddress remoteAddress;
 
     public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress) {
@@ -115,25 +114,25 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(Map<Integer, BasePackable> entities) {
         // grab connection data
-        BasePackable data = entities.get(connectionId);
-        if (data != null) {
-            updateConnectionStatusData((ConnectionStatusData) data);
-            entities.remove(connectionId);
-        } else {
-            Integer key = null;
-            for (BasePackable packable : entities.values()) {
-                if (packable instanceof ConnectionStatusData) {
-                    key = packable.getInstanceID();
-                    updateConnectionStatusData((ConnectionStatusData) packable);
-                }
-            }
-            if (key != null) entities.remove(key);
-        }
+//        BasePackable data = entities.get(connectionId);
+//        if (data != null) {
+//            updateConnectionStatusData((ConnectionStatusData) data);
+//            entities.remove(connectionId);
+//        } else {
+//            Integer key = null;
+//            for (BasePackable packable : entities.values()) {
+//                if (packable instanceof ConnectionStatusData) {
+//                    key = packable.getInstanceID();
+//                    updateConnectionStatusData((ConnectionStatusData) packable);
+//                }
+//            }
+//            if (key != null) entities.remove(key);
+//        }
 
         connectionManager.getDuplex().updateInbound(entities);
     }
 
-    private void updateConnectionStatusData(ConnectionStatusData data) {
+    public void updateConnectionStatusData(ConnectionStatusData data) {
         int state = data.getState().getRecord();
         if (state < connectionState.ordinal()) {
             return;
@@ -145,5 +144,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     public void close() {
         connectionManager.removeConnection(remoteAddress);
+    }
+
+    public InetSocketAddress getRemoteAddress() {
+        return remoteAddress;
     }
 }

@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.data.DataGenManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Client input commands
  */
-public class InputAggregateData extends BasePackable {
+public class PilotCommandData extends BasePackable {
     public static int TYPE_ID;
 
     // must be below 32
@@ -29,16 +29,16 @@ public class InputAggregateData extends BasePackable {
     private static final int BITMASK = 0;
 
     static {
-        DataGenManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
+        DataGenManager.registerEntityType(PilotCommandData.class, new PilotCommandData(-1));
     }
 
-    public InputAggregateData(int instanceID) {
+    public PilotCommandData(int instanceID) {
         super(instanceID);
 
         keysBitmask = new IntRecord(0);
     }
 
-    public InputAggregateData(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public PilotCommandData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
         IntRecord keysBitmask1 = (IntRecord) records.get(BITMASK);
@@ -109,7 +109,7 @@ public class InputAggregateData extends BasePackable {
     }
 
     public static void setTypeId(int typeId) {
-        InputAggregateData.TYPE_ID = typeId;
+        PilotCommandData.TYPE_ID = typeId;
     }
 
     @Override
@@ -197,13 +197,13 @@ public class InputAggregateData extends BasePackable {
     }
 
     @Override
-    public InputAggregateData unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
-        return new InputAggregateData(instanceID, records);
+    public PilotCommandData unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
+        return new PilotCommandData(instanceID, records);
     }
 
     @Override
     public void updateFromDelta(BasePackable delta) {
-        InputAggregateData d = (InputAggregateData) delta;
+        PilotCommandData d = (PilotCommandData) delta;
         if (d.getKeysBitmask() != null) keysBitmask.forceUpdate(d.getKeysBitmask().getRecord());
     }
 

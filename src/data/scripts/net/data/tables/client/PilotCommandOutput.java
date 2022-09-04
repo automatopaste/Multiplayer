@@ -1,17 +1,17 @@
 package data.scripts.net.data.tables.client;
 
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.trans.InputAggregateData;
+import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.tables.OutboundEntityManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClientPilotCommandManager implements OutboundEntityManager {
-    private final InputAggregateData input;
+public class PilotCommandOutput implements OutboundEntityManager {
+    private final PilotCommandData input;
     private final int instanceID;
 
-    public ClientPilotCommandManager(int instanceID, InputAggregateData input) {
+    public PilotCommandOutput(int instanceID, PilotCommandData input) {
         this.input = input;
         this.instanceID = instanceID;
     }

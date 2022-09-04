@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ShipVariantData extends BasePackable {
+public class VariantData extends BasePackable {
     public static int TYPE_ID;
 
     private final IntRecord capacitors;
@@ -25,7 +25,7 @@ public class ShipVariantData extends BasePackable {
     private static final int SHIP_ID = 3;
     private static final int WEAPONS = 69;
 
-    public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
+    public VariantData(int instanceID, ShipVariantAPI variant, String id) {
         super(instanceID);
 
         int c = (variant == null) ? 0 : variant.getNumFluxCapacitors();
@@ -50,7 +50,7 @@ public class ShipVariantData extends BasePackable {
         }
     }
 
-    public ShipVariantData(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public VariantData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
         BaseRecord<?> temp;
@@ -109,7 +109,7 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public void updateFromDelta(BasePackable delta) {
-        ShipVariantData d = (ShipVariantData) delta;
+        VariantData d = (VariantData) delta;
         if (d.getCapacitors() != null) capacitors.forceUpdate(d.getCapacitors().getRecord());
         if (d.getVents() != null) vents.forceUpdate(d.getVents().getRecord());
         if (d.getShipId() != null) shipId.forceUpdate(d.getShipId().getRecord());
@@ -149,7 +149,7 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public BasePackable unpack(int instanceID, Map<Integer, BaseRecord<?>> records) {
-        return new ShipVariantData(instanceID, records);
+        return new VariantData(instanceID, records);
     }
 
     public IntRecord getCapacitors() {
@@ -173,6 +173,6 @@ public class ShipVariantData extends BasePackable {
     }
 
     public static void setTypeId(int typeId) {
-        ShipVariantData.TYPE_ID = typeId;
+        VariantData.TYPE_ID = typeId;
     }
 }

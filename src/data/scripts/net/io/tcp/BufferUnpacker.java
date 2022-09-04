@@ -1,6 +1,6 @@
 package data.scripts.net.io.tcp;
 
-import data.scripts.data.DataGenManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.io.Unpacked;

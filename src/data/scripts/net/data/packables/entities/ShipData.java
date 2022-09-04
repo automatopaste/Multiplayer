@@ -223,7 +223,7 @@ public class ShipData extends BasePackable {
                     hullSpec
             );
 
-            ShipVariantData variantData = clientPlugin.getDataStore().getVariantData().get(id.getRecord());
+            VariantData variantData = clientPlugin.getVariantDataMap().getVariantData().get(id.getRecord());
 
             empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
             empty.setNumFluxVents(variantData.getVents().getRecord());

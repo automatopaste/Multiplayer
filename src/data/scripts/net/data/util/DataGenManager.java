@@ -1,4 +1,4 @@
-package data.scripts.data;
+package data.scripts.net.data.util;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;

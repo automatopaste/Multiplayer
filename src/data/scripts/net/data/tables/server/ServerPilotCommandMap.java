@@ -1,24 +1,24 @@
 package data.scripts.net.data.tables.server;
 
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.trans.InputAggregateData;
+import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerPilotCommandManager implements InboundEntityManager {
-    private final Map<Integer, InputAggregateData> inputs;
+public class ServerPilotCommandMap implements InboundEntityManager {
+    private final Map<Integer, PilotCommandData> inputs;
 
-    public ServerPilotCommandManager() {
+    public ServerPilotCommandMap() {
         inputs = new HashMap<>();
     }
 
     @Override
     public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        InputAggregateData delta = (InputAggregateData) toProcess;
-        InputAggregateData data = inputs.get(id);
+        PilotCommandData delta = (PilotCommandData) toProcess;
+        PilotCommandData data = inputs.get(id);
 
         if (data == null) {
             delta.destinationInit(plugin);
@@ -33,7 +33,7 @@ public class ServerPilotCommandManager implements InboundEntityManager {
 
     }
 
-    public Map<Integer, InputAggregateData> getInputs() {
+    public Map<Integer, PilotCommandData> getInputs() {
         return inputs;
     }
 }

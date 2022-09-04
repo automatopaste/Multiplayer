@@ -1,10 +1,12 @@
 package data.scripts.net.io;
 
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import data.scripts.plugins.MPClientPlugin;
+import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.util.Map;
 /**
  * Manages switching logic for inputting/sending data
  */
-public class ClientConnectionWrapper extends BaseConnectionWrapper{
+public class ClientConnectionWrapper extends BaseConnectionWrapper implements InboundEntityManager {
     private final DataDuplex dataDuplex;
 
     private DatagramClient datagramClient;
@@ -119,25 +121,21 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     public void updateInbound(Map<Integer, BasePackable> entities, int tick) {
         this.tick = tick;
 
-        if (connectionState != ConnectionState.SIMULATING) {
-            clientPlugin.getDataStore().absorbVariants(entities);
-        }
-
         // grab connection data
-        BasePackable data = entities.get(connectionId);
-        if (data != null) {
-            updateConnectionStatusData((ConnectionStatusData) data);
-            entities.remove(connectionId);
-        } else {
-            Integer key = null;
-            for (BasePackable packable : entities.values()) {
-                if (packable instanceof ConnectionStatusData) {
-                    key = packable.getInstanceID();
-                    updateConnectionStatusData((ConnectionStatusData) packable);
-                }
-            }
-            if (key != null) entities.remove(key);
-        }
+//        BasePackable data = entities.get(connectionId);
+//        if (data != null) {
+//            updateConnectionStatusData((ConnectionStatusData) data);
+//            entities.remove(connectionId);
+//        } else {
+//            Integer key = null;
+//            for (BasePackable packable : entities.values()) {
+//                if (packable instanceof ConnectionStatusData) {
+//                    key = packable.getInstanceID();
+//                    updateConnectionStatusData((ConnectionStatusData) packable);
+//                }
+//            }
+//            if (key != null) entities.remove(key);
+//        }
 
         dataDuplex.updateInbound(entities);
     }
@@ -173,5 +171,16 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
 
     public int getTick() {
         return tick;
+    }
+
+    @Override
+    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
+        ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
+        updateConnectionStatusData(connectionStatusData);
+    }
+
+    @Override
+    public void updateEntities() {
+
     }
 }

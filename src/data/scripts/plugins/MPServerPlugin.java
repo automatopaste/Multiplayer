@@ -3,46 +3,45 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.data.DataGenManager;
-import data.scripts.data.LoadedDataStore;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.trans.InputAggregateData;
-import data.scripts.net.data.tables.server.ServerPilotCommandManager;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.packables.trans.PilotCommandData;
+import data.scripts.net.data.tables.server.ServerPilotCommandMap;
 import data.scripts.net.data.tables.server.ServerShipTable;
+import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.ServerConnectionManager;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlugin {
-    private final ServerConnectionManager serverConnectionManager;
 
     //inbound
-    private final ServerPilotCommandManager serverPilotCommandManager;
+    private final ServerConnectionManager serverConnectionManager;
+    private final ServerPilotCommandMap serverPilotCommandMap;
+
     //outbound
     private final ServerShipTable serverShipTable;
 
-    private int nextInstanceID = 1;
-    private final Set<Integer> usedIDs = new HashSet<>();
-
-    private final LoadedDataStore dataStore;
+    private final VariantDataGenerator dataStore;
 
     public MPServerPlugin() {
+        dataStore = new VariantDataGenerator();
+        dataStore.generate(Global.getCombatEngine(), this);
+
+        serverConnectionManager = new ServerConnectionManager(this);
+
         // inbound init
-        serverPilotCommandManager = new ServerPilotCommandManager();
-        DataGenManager.registerEntityManager(InputAggregateData.TYPE_ID, serverPilotCommandManager);
+        serverPilotCommandMap = new ServerPilotCommandMap();
+        DataGenManager.registerEntityManager(PilotCommandData.TYPE_ID, serverPilotCommandMap);
+        DataGenManager.registerEntityManager(ConnectionStatusData.TYPE_ID, serverConnectionManager);
 
         //outbound init
         serverShipTable = new ServerShipTable();
 
-        dataStore = new LoadedDataStore();
-        dataStore.generate(Global.getCombatEngine(), this);
-
-        serverConnectionManager = new ServerConnectionManager(this);
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
     }
@@ -67,7 +66,7 @@ public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
         serverConnectionManager.getDuplex().updateOutbound(entities);
     }
 
-    public LoadedDataStore getDataStore() {
+    public VariantDataGenerator getDataStore() {
         return dataStore;
     }
 
