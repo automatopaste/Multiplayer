@@ -1,7 +1,7 @@
 package data.scripts.console.commands;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.plugins.mpClientPlugin;
+import data.scripts.plugins.MPClientPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
 import org.lazywizard.console.Console;
@@ -30,7 +30,7 @@ public class mpConnectToHost implements BaseCommand {
         int port = Integer.parseInt(address[1]);
 
         Console.showMessage("Starting client on port " + port);
-        Global.getCombatEngine().addPlugin(new mpClientPlugin(host, port));
+        Global.getCombatEngine().addPlugin(new MPClientPlugin(host, port));
         Console.showMessage("Client started successfully");
 
         return CommandResult.SUCCESS;

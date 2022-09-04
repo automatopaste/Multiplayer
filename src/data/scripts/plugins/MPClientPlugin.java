@@ -2,44 +2,50 @@ package data.scripts.plugins;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
+import data.scripts.data.DataGenManager;
 import data.scripts.data.LoadedDataStore;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.tables.client.ClientPilotCommandManager;
+import data.scripts.net.data.packables.entities.ShipData;
+import data.scripts.net.data.packables.trans.InputAggregateData;
+import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.ClientEntityManager;
-import data.scripts.net.data.ClientInputManager;
-import data.scripts.net.data.packables.InputAggregateData;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 import java.util.Map;
 
-public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
+public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlugin {
     private final ClientConnectionWrapper connection;
 
-    private final ClientEntityManager entityManager;
-    private final ClientInputManager inputManager;
+    //inbound
+    private final ClientShipTable shipTable;
+
+    //outbound
+    private final ClientPilotCommandManager inputManager;
 
     private final LoadedDataStore dataStore;
 
-    public mpClientPlugin(String host, int port) {
+    public MPClientPlugin(String host, int port) {
+        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+            Global.getCombatEngine().removeEntity(ship);
+        }
+
         dataStore = new LoadedDataStore();
 
         connection = new ClientConnectionWrapper(host, port, this);
 
-        entityManager = new ClientEntityManager(this);
+        // inbound init
+        shipTable = new ClientShipTable();
+        DataGenManager.registerEntityManager(ShipData.TYPE_ID, shipTable);
 
-        // placeholder id
-        int id = -10;
-        inputManager = new ClientInputManager(id, new InputAggregateData(id));
-
-        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-            Global.getCombatEngine().removeEntity(ship);
-        }
+        // outbound init
+        int id = -10; // placeholder id
+        inputManager = new ClientPilotCommandManager(id, new InputAggregateData(id));
     }
 
     @Override
@@ -55,10 +61,9 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             Console.showMessage("Closed client");
         }
 
-        CombatEngineAPI engine = Global.getCombatEngine();
-
         // get inbound
         Map<Integer, BasePackable> entities = connection.getDuplex().getDeltas();
+        DataGenManager.distributeInboundDeltas(entities, this);
 
         switch (connection.getConnectionState()) {
             case INITIALISATION_READY:
@@ -69,12 +74,11 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
             case CLOSED:
                 break;
             case SIMULATING:
-                entityManager.processDeltas(entities);
-
-                entityManager.updateEntities();
+                shipTable.updateEntities();
 
                 Map<Integer, BasePackable> outbound = inputManager.getOutbound();
                 connection.getDuplex().updateOutbound(outbound);
+                break;
         }
     }
 
@@ -84,5 +88,10 @@ public class mpClientPlugin extends BaseEveryFrameCombatPlugin {
 
     public LoadedDataStore getDataStore() {
         return dataStore;
+    }
+
+    @Override
+    public PluginType getType() {
+        return PluginType.CLIENT;
     }
 }

@@ -1,11 +1,10 @@
-package data.scripts.net.data.packables;
+package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.plugins.mpClientPlugin;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.net.io.BaseConnectionWrapper;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import java.util.Map;
  * Used to transfer data regarding connection state
  */
 public class ConnectionStatusData extends BasePackable {
-    private static int typeID;
+    public static int TYPE_ID;
 
     public static final int UNASSIGNED = -100;
 
@@ -49,12 +48,7 @@ public class ConnectionStatusData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(mpServerPlugin serverPlugin) {
-
-    }
-
-    @Override
-    public void destinationInit(mpClientPlugin clientPlugin) {
+    public void destinationInit(MPPlugin plugin) {
 
     }
 
@@ -64,7 +58,7 @@ public class ConnectionStatusData extends BasePackable {
     }
 
     @Override
-    public boolean shouldDeleteOnDestination() {
+    public boolean isTransient() {
         return false;
     }
 
@@ -109,7 +103,7 @@ public class ConnectionStatusData extends BasePackable {
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
     }
 
     @Override
@@ -129,7 +123,7 @@ public class ConnectionStatusData extends BasePackable {
         return state;
     }
 
-    public static void setTypeID(int typeID) {
-        ConnectionStatusData.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        ConnectionStatusData.TYPE_ID = typeId;
     }
 }

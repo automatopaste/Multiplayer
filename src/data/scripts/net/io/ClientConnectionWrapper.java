@@ -3,8 +3,8 @@ package data.scripts.net.io;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.ConnectionStatusData;
-import data.scripts.plugins.mpClientPlugin;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.plugins.MPClientPlugin;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -26,11 +26,11 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper{
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
-    private final mpClientPlugin clientPlugin;
+    private final MPClientPlugin clientPlugin;
 
     private int tick;
 
-    public ClientConnectionWrapper(String host, int port, mpClientPlugin clientPlugin) {
+    public ClientConnectionWrapper(String host, int port, MPClientPlugin clientPlugin) {
         this.host = host;
         this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();

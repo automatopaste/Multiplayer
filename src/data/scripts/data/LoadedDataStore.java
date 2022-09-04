@@ -4,8 +4,8 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.ShipVariantData;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.net.data.packables.entities.ShipVariantData;
+import data.scripts.plugins.MPServerPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class LoadedDataStore {
      * @param engine NNEEEEEOOOOOOOOOOWWW VVvvv VVvv VVvv NEEEEEEEEEEEEOOWOOOWOWOOW Vvv NEEEEEEEEOOOOO
      * @param plugin the plugin
      */
-    public void generate(CombatEngineAPI engine, mpServerPlugin plugin) {
+    public void generate(CombatEngineAPI engine, MPServerPlugin plugin) {
         List<FleetMemberAPI> members = new ArrayList<>();
 
         CombatFleetManagerAPI manager0 = engine.getFleetManager(0);

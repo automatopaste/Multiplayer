@@ -3,7 +3,7 @@ package data.scripts.net.io;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPServerPlugin;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class ServerConnectionManager implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final DataDuplex dataDuplex;
-    private final mpServerPlugin serverPlugin;
+    private final MPServerPlugin serverPlugin;
     private boolean active;
 
     private final DatagramServer datagramServer;
@@ -27,11 +27,12 @@ public class ServerConnectionManager implements Runnable {
     private final Thread socket;
 
     private final Map<InetSocketAddress, ServerConnectionWrapper> serverConnectionWrappers;
+    private int nextConnectionId = 0;
 
     private int tick;
     private final Clock clock;
 
-    public ServerConnectionManager(mpServerPlugin serverPlugin) {
+    public ServerConnectionManager(MPServerPlugin serverPlugin) {
         this.serverPlugin = serverPlugin;
         dataDuplex = new DataDuplex();
         active = true;
@@ -113,7 +114,8 @@ public class ServerConnectionManager implements Runnable {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
 
-        int id = serverPlugin.getNewInstanceID();
+        int id = nextConnectionId;
+        nextConnectionId++;
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress);
 
         synchronized (serverConnectionWrappers) {
@@ -150,7 +152,7 @@ public class ServerConnectionManager implements Runnable {
         return active;
     }
 
-    public mpServerPlugin getServerPlugin() {
+    public MPServerPlugin getServerPlugin() {
         return serverPlugin;
     }
 }

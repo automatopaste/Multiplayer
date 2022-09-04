@@ -1,19 +1,18 @@
-package data.scripts.net.data.packables;
+package data.scripts.net.data.packables.entities;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
-import data.scripts.plugins.mpClientPlugin;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ShipVariantData extends BasePackable {
-    private static int typeID;
+    public static int TYPE_ID;
 
     private final IntRecord capacitors;
     private final IntRecord vents;
@@ -25,8 +24,6 @@ public class ShipVariantData extends BasePackable {
     private static final int VENTS = 2;
     private static final int SHIP_ID = 3;
     private static final int WEAPONS = 69;
-
-//    private boolean destComplete = false;
 
     public ShipVariantData(int instanceID, ShipVariantAPI variant, String id) {
         super(instanceID);
@@ -96,12 +93,7 @@ public class ShipVariantData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(mpServerPlugin serverPlugin) {
-
-    }
-
-    @Override
-    public void destinationInit(mpClientPlugin clientPlugin) {
+    public void destinationInit(MPPlugin plugin) {
 
     }
 
@@ -111,7 +103,7 @@ public class ShipVariantData extends BasePackable {
     }
 
     @Override
-    public boolean shouldDeleteOnDestination() {
+    public boolean isTransient() {
         return false;
     }
 
@@ -152,7 +144,7 @@ public class ShipVariantData extends BasePackable {
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
     }
 
     @Override
@@ -180,7 +172,7 @@ public class ShipVariantData extends BasePackable {
         return weaponSlots;
     }
 
-    public static void setTypeID(int typeID) {
-        ShipVariantData.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        ShipVariantData.TYPE_ID = typeId;
     }
 }

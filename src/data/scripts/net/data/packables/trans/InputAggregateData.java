@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables;
+package data.scripts.net.data.packables.trans;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
@@ -8,8 +8,7 @@ import data.scripts.data.DataGenManager;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.plugins.mpClientPlugin;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPPlugin;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -20,7 +19,7 @@ import java.util.Map;
  * Client input commands
  */
 public class InputAggregateData extends BasePackable {
-    private static int typeID;
+    public static int TYPE_ID;
 
     // must be below 32
     private static final int NUM_CONTROLS = 21;
@@ -28,8 +27,6 @@ public class InputAggregateData extends BasePackable {
     private final IntRecord keysBitmask;
 
     private static final int BITMASK = 0;
-
-    private ShipAPI shipUnderControl;
 
     static {
         DataGenManager.registerEntityType(InputAggregateData.class, new InputAggregateData(-1));
@@ -88,12 +85,7 @@ public class InputAggregateData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(mpServerPlugin serverPlugin) {
-
-    }
-
-    @Override
-    public void destinationInit(mpClientPlugin clientPlugin) {
+    public void destinationInit(MPPlugin plugin) {
 
     }
 
@@ -103,28 +95,32 @@ public class InputAggregateData extends BasePackable {
     }
 
     @Override
-    public boolean shouldDeleteOnDestination() {
-        return false;
+    public boolean isTransient() {
+        return true;
+    }
+
+    public void setShipUnderControl(ShipAPI ship) {
+
     }
 
     @Override
     public void destinationUpdate() {
-        if (shipUnderControl == null || !shipUnderControl.isAlive() || !Global.getCombatEngine().isEntityInPlay(shipUnderControl)) return;
 
-        unmask(keysBitmask.getRecord(), shipUnderControl);
     }
 
-    public static void setTypeID(int typeID) {
-        InputAggregateData.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        InputAggregateData.TYPE_ID = typeId;
     }
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
     }
 
     // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
-    private void unmask(int bitmask, ShipAPI ship) {
+    public void unmask(ShipAPI ship) {
+        int bitmask = keysBitmask.getRecord();
+
         boolean[] controls = new boolean[NUM_CONTROLS];
         for (int i = 0; i < controls.length; i++) {
             if ((bitmask & 1 << i) != 0) controls[i] = true;

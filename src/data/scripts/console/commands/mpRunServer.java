@@ -1,7 +1,7 @@
 package data.scripts.console.commands;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPServerPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
 import org.lazywizard.console.Console;
@@ -15,7 +15,7 @@ public class mpRunServer implements BaseCommand {
         }
 
         Console.showMessage("Starting server");
-        Global.getCombatEngine().addPlugin(new mpServerPlugin());
+        Global.getCombatEngine().addPlugin(new MPServerPlugin());
 
         return CommandResult.SUCCESS;
     }

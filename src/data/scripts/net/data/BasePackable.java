@@ -1,7 +1,6 @@
 package data.scripts.net.data;
 
-import data.scripts.plugins.mpClientPlugin;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPPlugin;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -55,14 +54,9 @@ public abstract class BasePackable {
     public abstract void destinationUpdate();
 
     /**
-     * Called when entity is initialised on server
+     * Called when entity is initialised at destination
      */
-    public abstract void destinationInit(mpServerPlugin serverPlugin);
-
-    /**
-     * Called when entity is initialised on client
-     */
-    public abstract void destinationInit(mpClientPlugin clientPlugin);
+    public abstract void destinationInit(MPPlugin plugin);
 
     /**
      * Called when entity is deleted on dest
@@ -73,7 +67,7 @@ public abstract class BasePackable {
      * Useful when a packable is used for a consumable single-use task
      * @return if it should be deleted from the destination outbound entity manager
      */
-    public abstract boolean shouldDeleteOnDestination();
+    public abstract boolean isTransient();
 
     /**
      * Update stored data with changes from a delta

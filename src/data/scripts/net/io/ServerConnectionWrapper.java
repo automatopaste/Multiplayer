@@ -1,7 +1,7 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.ConnectionStatusData;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(connectionManager.getServerPlugin().getServerCombatEntityManager().getEntities());
+                data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
 

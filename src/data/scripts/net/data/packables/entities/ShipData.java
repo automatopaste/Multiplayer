@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables;
+package data.scripts.net.data.packables.entities;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
@@ -9,8 +9,8 @@ import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
-import data.scripts.plugins.mpClientPlugin;
-import data.scripts.plugins.mpServerPlugin;
+import data.scripts.plugins.MPClientPlugin;
+import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
  * Container for tracking network data about a ship
  */
 public class ShipData extends BasePackable {
-    private static int typeID;
+    public static int TYPE_ID;
 
     private final StringRecord id;
     private final Vector2fRecord loc;
@@ -46,7 +46,7 @@ public class ShipData extends BasePackable {
     private static final int OWNER = 9;
     private static final int SPEC_ID = 10;
 
-    public ShipData(int instanceID) {
+    public ShipData(int instanceID, ShipAPI ship) {
         super(instanceID);
 
         id = new StringRecord("DEFAULT_ID_STRING");
@@ -59,6 +59,8 @@ public class ShipData extends BasePackable {
         cursor = new Vector2fRecord(new Vector2f(0f, 0f));
         owner = new IntRecord(0);
         specId = new StringRecord("DEFAULT_SPEC_ID");
+
+        this.ship = ship;
     }
 
     public ShipData(int instanceID, Map<Integer, BaseRecord<?>> records) {
@@ -203,14 +205,11 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public void destinationInit(mpServerPlugin serverPlugin) {
+    public void destinationInit(MPPlugin plugin) {
+        if (plugin.getType() != MPPlugin.PluginType.CLIENT) return;
+        MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
 
-    }
-
-    @Override
-    public void destinationInit(mpClientPlugin clientPlugin) {
         CombatEngineAPI engine = Global.getCombatEngine();
-
 
         // update variant
         String hullSpecId = specId.getRecord();
@@ -293,7 +292,7 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public boolean shouldDeleteOnDestination() {
+    public boolean isTransient() {
         return false;
     }
 
@@ -320,13 +319,13 @@ public class ShipData extends BasePackable {
         ship.setOwner(owner.getRecord());
     }
 
-    public static void setTypeID(int typeID) {
-        ShipData.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        ShipData.TYPE_ID = typeId;
     }
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
     }
 
     public void setShip(ShipAPI ship) {
