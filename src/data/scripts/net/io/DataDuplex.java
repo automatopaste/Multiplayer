@@ -55,6 +55,11 @@ public class DataDuplex {
                 Map<Integer, BasePackable> inboundEntities = inbound.get(type);
                 Map<Integer, BasePackable> deltas = entities.get(type);
 
+                if (inboundEntities == null) {
+                    inboundEntities = new HashMap<>();
+                    inbound.put(type, inboundEntities);
+                }
+
                 for (Integer instance : deltas.keySet()) {
                     BasePackable p = inboundEntities.get(instance);
                     BasePackable d = deltas.get(instance);
@@ -76,15 +81,20 @@ public class DataDuplex {
     public void updateOutbound(Map<Integer, Map<Integer, BasePackable>> entities) {
         synchronized (this.outbound) {
             for (Integer type : entities.keySet()) {
-                Map<Integer, BasePackable> inboundEntities = outbound.get(type);
+                Map<Integer, BasePackable> outboundEntities = outbound.get(type);
                 Map<Integer, BasePackable> deltas = entities.get(type);
 
+                if (outboundEntities == null) {
+                    outboundEntities = new HashMap<>();
+                    outbound.put(type, outboundEntities);
+                }
+
                 for (Integer instance : deltas.keySet()) {
-                    BasePackable p = inboundEntities.get(instance);
+                    BasePackable p = outboundEntities.get(instance);
                     BasePackable d = deltas.get(instance);
 
                     if (p == null) {
-                        inboundEntities.put(instance, d);
+                        outboundEntities.put(instance, d);
                     } else {
                         p.updateFromDelta(d);
                     }
