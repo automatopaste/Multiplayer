@@ -30,13 +30,13 @@ public class ConnectionStatusData extends BasePackable {
         state = new IntRecord(0);
     }
 
-    public ConnectionStatusData(int instanceID, Map<Integer, BaseRecord<?>> records) {
-        super(instanceID);
+    public ConnectionStatusData(int connectionID, Map<Integer, BaseRecord<?>> records) {
+        super(connectionID);
 
         BaseRecord<?> temp;
 
         temp = records.get(ID);
-        id = (temp == null) ? new IntRecord(instanceID) : (IntRecord) temp;
+        id = (temp == null) ? new IntRecord(connectionID) : (IntRecord) temp;
         temp = records.get(STATE);
         state = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
     }
