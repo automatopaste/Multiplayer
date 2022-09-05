@@ -42,8 +42,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         true,
                         remoteAddress
                 );
-            case LOADING_READY:
-                return null;
             case LOADING:
                 Console.showMessage("Sending client " + connectionId + " data over socket");
 
@@ -61,8 +59,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         true,
                         remoteAddress
                 );
-            case SPAWNING_READY:
-                return null;
             case SPAWNING:
                 data = new ArrayList<>();
                 data.add(statusData);
@@ -82,7 +78,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SIMULATING:
             case CLOSED:
             default:
-                return null;
+                return new PacketContainer(
+                        Collections.singletonList((BasePackable) statusData),
+                        connectionManager.getTick(),
+                        true,
+                        remoteAddress
+                );
         }
     }
 

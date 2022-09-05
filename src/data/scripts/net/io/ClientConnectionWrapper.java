@@ -60,8 +60,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
-            case INITIALISING:
-                return null;
             case LOADING_READY:
                 Console.showMessage("Waiting for prerequisite data");
 
@@ -69,8 +67,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
-            case LOADING:
-                return null;
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
 
@@ -78,8 +74,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
-            case SPAWNING:
-                return null;
             case SIMULATION_READY:
                 Console.showMessage("Starting simulation");
 
@@ -91,7 +85,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SIMULATING:
             case CLOSED:
             default:
-                return null;
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
         }
     }
 
