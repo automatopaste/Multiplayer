@@ -39,20 +39,18 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
 
-        InetSocketAddress address;
-        do {
-             address = socketClient.getLocal();
-        } while (address == null);
-
-        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(address));
-        statusData.setConnection(this);
-
         tick = -1;
     }
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
-        if (statusData == null) return null;
+        if (statusData == null) {
+            InetSocketAddress address = socketClient.getLocal();
+            if (address == null) return null;
+
+            statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(address));
+            statusData.setConnection(this);
+        }
 
         switch (connectionState) {
             case INITIALISATION_READY:
