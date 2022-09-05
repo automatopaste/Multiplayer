@@ -16,12 +16,14 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 public class SocketClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
 
     private final String host;
     private final int port;
+    private final InetSocketAddress local;
 
     private EventLoopGroup workerGroup;
     private final ClientConnectionWrapper connection;
@@ -34,7 +36,13 @@ public class SocketClient implements Runnable {
         this.port = port;
         this.connection = connection;
 
+        local = new InetSocketAddress(host, port);
+
         clock = new Clock(TICK_RATE);
+    }
+
+    public InetSocketAddress getLocal() {
+        return local;
     }
 
     @Override

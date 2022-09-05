@@ -38,7 +38,7 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
 
         dataStore = new VariantDataGenerator();
 
-        connection = new ClientConnectionWrapper(host, port, this);
+        connection = new ClientConnectionWrapper(host, port);
         connection.register();
 
         // inbound init

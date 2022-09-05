@@ -1,12 +1,11 @@
 package data.scripts.net.io;
 
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
-import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
@@ -29,20 +28,18 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
-    private final MPClientPlugin clientPlugin;
 
     private int tick;
 
-    public ClientConnectionWrapper(String host, int port, MPClientPlugin clientPlugin) {
+    public ClientConnectionWrapper(String host, int port) {
         this.host = host;
-        this.clientPlugin = clientPlugin;
         dataDuplex = new DataDuplex();
 
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
 
-        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId((InetSocketAddress) socketClient.getChannel().localAddress()));
+        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(socketClient.getLocal()));
         statusData.setConnection(this);
 
         tick = -1;
