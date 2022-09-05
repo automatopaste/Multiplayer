@@ -1,11 +1,10 @@
 package data.scripts.net.io.udp.client;
 
-import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
+import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.lazywizard.console.Console;
 
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Unpacked in) throws Exception {
         int serverTick = in.getTick();
-        Console.showMessage("Received UDP unpacked with tick: " + serverTick);
+        //Console.showMessage("Received UDP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
         Map<Integer, Map<Integer, BasePackable>> entities = in.getUnpacked();

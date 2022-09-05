@@ -6,7 +6,6 @@ import data.scripts.net.io.ServerConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.lazywizard.console.Console;
 
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
         }
 
         int serverTick = in.getTick();
-        Console.showMessage("Received UDP unpacked with tick: " + serverTick);
+        //Console.showMessage("Received UDP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
         Map<Integer, Map<Integer, BasePackable>> entities = in.getUnpacked();

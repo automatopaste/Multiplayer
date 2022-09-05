@@ -37,7 +37,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Unpacked unpacked) {
         int clientTick = unpacked.getTick();
-        Console.showMessage("Received TCP client tick notice: " + clientTick);
+        //Console.showMessage("Received TCP client tick notice: " + clientTick);
 
         Map<Integer, Map<Integer, BasePackable>> entities = unpacked.getUnpacked();
 

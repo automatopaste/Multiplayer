@@ -7,7 +7,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +32,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Unpacked unpacked) {
         int serverTick = unpacked.getTick();
-        Console.showMessage("Received TCP unpacked with tick: " + serverTick);
+        //Console.showMessage("Received TCP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
         Map<Integer, Map<Integer, BasePackable>> entities = unpacked.getUnpacked();
