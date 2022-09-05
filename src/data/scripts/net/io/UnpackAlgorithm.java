@@ -23,39 +23,14 @@ public class UnpackAlgorithm {
                     local
             );
         } else {
-            // integer keys are unique type IDs
-            Map<Integer, Map<Integer, BasePackable>> types = new HashMap<>();
-            // integer keys are unique record IDs
-            Map<Integer, BaseRecord<?>> records = new HashMap<>();
+            Map<Integer, Map<Integer, BasePackable>> data = new HashMap<>();
 
-            int entityTypeID = in.readInt();
-            int entityInstanceID = in.readInt();
-
-            while (in.readableBytes() > 0) {
-                int type = in.readInt();
-
-                if (DataGenManager.entityTypeIDs.containsValue(type)) {
-                    // reached new entity
-                    entityTypeID = type;
-
-                    insertEntity(types, entityTypeID, entityInstanceID, records);
-
-                    entityInstanceID = in.readInt();
-                    records = new HashMap<>();
-                } else {
-                    int recordTypeID = type;
-                    int recordUniqueID = in.readInt();
-
-                    BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID);
-                    BaseRecord<?> read = record.read(in);
-
-                    records.put(recordUniqueID, read);
-                }
+            int nextID = in.readInt();
+            while (nextID != Integer.MIN_VALUE) {
+                nextID = readNextEntity(data, in, nextID);
             }
 
-            insertEntity(types, entityTypeID, entityInstanceID, records);
-
-            result = new Unpacked(types,
+            result = new Unpacked(data,
                     tick,
                     remote,
                     local
@@ -75,5 +50,39 @@ public class UnpackAlgorithm {
         if (entities == null) entities = new HashMap<>();
         entities.put(entityInstanceID, entity);
         types.put(entityTypeID, entities);
+    }
+
+    private static int readNextEntity(Map<Integer, Map<Integer, BasePackable>> data, ByteBuf in, int entityTypeID) {
+        int entityInstanceID = in.readInt();
+
+        Map<Integer, BaseRecord<?>> records = new HashMap<>();
+
+        int n = in.readInt();
+        while (DataGenManager.recordTypeIDs.containsValue(n)) {
+            // type
+            int recordTypeID = n;
+            // unique
+            int recordUniqueID = in.readInt();
+
+            //data
+            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in);
+            records.put(recordUniqueID, record);
+
+            if (in.readableBytes() > 0) {
+                n = in.readInt();
+            } else {
+                n = Integer.MIN_VALUE;
+                break;
+            }
+        }
+
+        Map<Integer, BasePackable> entities = data.get(entityTypeID);
+        if (entities == null) entities = new HashMap<>();
+
+        BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
+        entities.put(entityInstanceID, entity);
+        data.put(entityTypeID, entities);
+
+        return n;
     }
 }
