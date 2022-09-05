@@ -23,10 +23,10 @@ public class ConnectionStatusData extends BasePackable {
 
     private BaseConnectionWrapper connection;
 
-    public ConnectionStatusData(int instanceID) {
-        super(instanceID);
+    public ConnectionStatusData(int connectionID) {
+        super(connectionID);
 
-        id = new IntRecord(0);
+        id = new IntRecord(connectionID);
         state = new IntRecord(0);
     }
 
