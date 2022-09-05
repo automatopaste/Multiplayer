@@ -40,7 +40,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     @Override
     public void updateEntities() {
         for (BasePackable p : table) {
-            p.destinationUpdate();
+            if (p != null) p.destinationUpdate();
         }
     }
 
