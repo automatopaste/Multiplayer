@@ -23,7 +23,7 @@ public class SocketClient implements Runnable {
 
     private final String host;
     private final int port;
-    private final InetSocketAddress local;
+    private InetSocketAddress local;
 
     private EventLoopGroup workerGroup;
     private final ClientConnectionWrapper connection;
@@ -35,8 +35,6 @@ public class SocketClient implements Runnable {
         this.host = host;
         this.port = port;
         this.connection = connection;
-
-        local = new InetSocketAddress(host, port);
 
         clock = new Clock(TICK_RATE);
     }
@@ -103,6 +101,7 @@ public class SocketClient implements Runnable {
         // Get channel after connected socket
         ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
         channel = channelFuture.channel();
+        local = (InetSocketAddress) channel.localAddress();
 
         return channelFuture;
     }

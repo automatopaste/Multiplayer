@@ -133,7 +133,7 @@ public class ConnectionStatusData extends BasePackable {
         byte o = 0x0;
         for (int i = 0; i < 4; i++) {
             byte d = ids[i];
-            id <<= 0x04;
+            id <<= (4 - i) * 4;
             id += o ^ d;
             o = d;
         }
