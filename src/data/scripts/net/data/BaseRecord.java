@@ -31,9 +31,11 @@ public abstract class BaseRecord<T> {
     protected abstract boolean check(T curr);
 
     public void forceUpdate(T curr) {
-        record = curr;
+        record = getCopy(curr);
         undefined = false;
     }
+
+    protected abstract T getCopy(T curr);
 
     public abstract int getTypeId();
 

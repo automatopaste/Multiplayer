@@ -31,6 +31,11 @@ public class IntRecord extends BaseRecord<Integer> {
         return new IntRecord(value);
     }
 
+    @Override
+    protected Integer getCopy(Integer curr) {
+        return curr;
+    }
+
     public static void setTypeID(int typeID) {
         IntRecord.typeID = typeID;
     }

@@ -42,6 +42,11 @@ public class StringRecord extends BaseRecord<String> {
         return new StringRecord(value);
     }
 
+    @Override
+    protected String getCopy(String curr) {
+        return curr;
+    }
+
     public static void setTypeID(int typeID) {
         StringRecord.typeID = typeID;
     }

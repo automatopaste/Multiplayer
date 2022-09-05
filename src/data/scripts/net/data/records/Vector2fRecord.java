@@ -41,6 +41,11 @@ public class Vector2fRecord extends BaseRecord<Vector2f> {
     }
 
     @Override
+    protected Vector2f getCopy(Vector2f curr) {
+        return new Vector2f(curr);
+    }
+
+    @Override
     public Vector2fRecord read(ByteBuf input) {
         float x = input.readFloat();
         float y = input.readFloat();

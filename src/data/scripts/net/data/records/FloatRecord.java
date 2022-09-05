@@ -34,6 +34,11 @@ public class FloatRecord extends BaseRecord<Float> {
     }
 
     @Override
+    protected Float getCopy(Float curr) {
+        return curr;
+    }
+
+    @Override
     public void doWrite(ByteBuffer output) {
         output.putFloat(record);
     }
