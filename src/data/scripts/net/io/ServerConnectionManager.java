@@ -32,7 +32,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     private final Thread socket;
 
     private final Map<Integer, ServerConnectionWrapper> serverConnectionWrappers;
-    private int nextConnectionId = 0;
 
     private int tick;
     private final Clock clock;
@@ -120,8 +119,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
 
-        int id = nextConnectionId;
-        nextConnectionId++;
+        int id = ConnectionStatusData.getConnectionId(remoteAddress);
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress);
 
         synchronized (serverConnectionWrappers) {
@@ -148,8 +146,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
 
     @Override
     public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        if (id == ConnectionStatusData.UNASSIGNED) return;
-
         ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
         serverConnectionWrappers.get(connectionStatusData.getId().getRecord()).updateConnectionStatusData(connectionStatusData);
     }

@@ -6,6 +6,7 @@ import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPPlugin;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 
 /**
@@ -13,8 +14,6 @@ import java.util.Map;
  */
 public class ConnectionStatusData extends BasePackable {
     public static int TYPE_ID;
-
-    public static final int UNASSIGNED = -100;
 
     private final IntRecord id;
     private final IntRecord state;
@@ -125,5 +124,18 @@ public class ConnectionStatusData extends BasePackable {
 
     public static void setTypeId(int typeId) {
         ConnectionStatusData.TYPE_ID = typeId;
+    }
+
+    public static int getConnectionId(InetSocketAddress address) {
+        byte[] ids = address.getAddress().getAddress();
+
+        int id = 0;
+        for (int i = 0; i < 4; i++) {
+            id += ids[i];
+            id <<= 8;
+            id ^= id;
+        }
+
+        return id;
     }
 }

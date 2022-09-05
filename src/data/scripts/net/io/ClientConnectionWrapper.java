@@ -42,10 +42,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
 
-        statusData = new ConnectionStatusData(ConnectionStatusData.UNASSIGNED);
+        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId((InetSocketAddress) socketClient.getChannel().localAddress()));
         statusData.setConnection(this);
 
-        connectionId = ConnectionStatusData.UNASSIGNED;
         tick = -1;
     }
 
