@@ -12,8 +12,6 @@ import java.util.List;
 public class BufferUnpacker extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
-        if (in.readableBytes() < 4) return;
-
         Unpacked result = UnpackAlgorithm.unpack(
                 in,
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
