@@ -39,7 +39,12 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
 
-        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(socketClient.getLocal()));
+        InetSocketAddress address;
+        do {
+             address = socketClient.getLocal();
+        } while (address == null);
+
+        statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(address));
         statusData.setConnection(this);
 
         tick = -1;
