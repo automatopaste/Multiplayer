@@ -36,7 +36,7 @@ public class ConnectionStatusData extends BasePackable {
         BaseRecord<?> temp;
 
         temp = records.get(ID);
-        id = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
+        id = (temp == null) ? new IntRecord(instanceID) : (IntRecord) temp;
         temp = records.get(STATE);
         state = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
     }

@@ -147,7 +147,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     @Override
     public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
         ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
-        serverConnectionWrappers.get(connectionStatusData.getId().getRecord()).updateConnectionStatusData(connectionStatusData);
+        serverConnectionWrappers.get(id).updateConnectionStatusData(connectionStatusData);
     }
 
     @Override
