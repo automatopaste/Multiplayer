@@ -61,7 +61,7 @@ public class SocketClient implements Runnable {
                 clock.sleepUntilTick();
 
                 PacketContainer container = connection.getSocketMessage();
-                if (container == null || container.isEmpty()) continue;;
+                if (container == null || container.isEmpty()) continue;
 
                 write(container);
             }

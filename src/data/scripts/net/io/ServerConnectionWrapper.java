@@ -26,6 +26,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
+        if (statusData == null) return null;
+
         List<BasePackable> data;
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -84,6 +86,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getDatagram() throws IOException {
+        if (statusData == null) return null;
+
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
