@@ -85,7 +85,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SIMULATING:
             case CLOSED:
             default:
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+                return null;
         }
     }
 

@@ -78,12 +78,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SIMULATING:
             case CLOSED:
             default:
-                return new PacketContainer(
-                        Collections.singletonList((BasePackable) statusData),
-                        connectionManager.getTick(),
-                        true,
-                        remoteAddress
-                );
+                return null;
         }
     }
 
