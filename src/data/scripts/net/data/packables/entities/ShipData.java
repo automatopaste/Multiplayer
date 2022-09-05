@@ -76,7 +76,7 @@ public class ShipData extends BasePackable {
         vel = (temp == null) ? new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false) : (Vector2fRecord) temp;
         temp = records.get(SHIP_ANG);
         ang = (temp == null) ? new FloatRecord(0f).setUseDecimalPrecision(false) : (FloatRecord) temp;
-        temp = records.get(SHIP_ANG);
+        temp = records.get(SHIP_ANGVEL);
         angVel = (temp == null) ? new FloatRecord(0f).setUseDecimalPrecision(false) : (FloatRecord) temp;
         temp = records.get(SHIP_HULL);
         hull = (temp == null) ? new FloatRecord(0f) : (FloatRecord) temp;

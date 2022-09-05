@@ -2,15 +2,15 @@ package data.scripts;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.util.DataGenManager;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
-import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.packables.entities.ShipData;
 import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.net.data.util.DataGenManager;
 
 public class mpModPlugin extends BaseModPlugin {
     @Override

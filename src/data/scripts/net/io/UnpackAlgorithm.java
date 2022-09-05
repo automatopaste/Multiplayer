@@ -30,7 +30,8 @@ public class UnpackAlgorithm {
                 nextID = readNextEntity(data, in, nextID);
             }
 
-            result = new Unpacked(data,
+            result = new Unpacked(
+                    data,
                     tick,
                     remote,
                     local
