@@ -23,6 +23,7 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
                 (InetSocketAddress) channelHandlerContext.channel().localAddress()
         );
 
+        in.release();
         out.add(result);
     }
 }

@@ -38,8 +38,6 @@ public class UnpackAlgorithm {
             );
         }
 
-        if (in.readableBytes() > 0) throw new IndexOutOfBoundsException(in.readableBytes() + " bytes left in buffer decoder frame");
-
         return result;
     }
 
