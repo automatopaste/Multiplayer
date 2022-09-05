@@ -129,11 +129,11 @@ public class ConnectionStatusData extends BasePackable {
     public static int getConnectionId(InetSocketAddress address) {
         byte[] ids = address.getAddress().getAddress();
 
-        int id = 0;
+        int id = 0x00;
         for (int i = 0; i < 4; i++) {
             id += ids[i];
-            id <<= 8;
-            id ^= id;
+            id <<= 0x04;
+            if (i > 0) id ^= ids[i - 1];
         }
 
         return id;
