@@ -22,6 +22,7 @@ public class ConnectionStatusData extends BasePackable {
     private static final int STATE = 2;
 
     private BaseConnectionWrapper connection;
+    private boolean canUpdateState = true;
 
     public ConnectionStatusData(int connectionID) {
         super(connectionID);
@@ -65,7 +66,10 @@ public class ConnectionStatusData extends BasePackable {
     public void updateFromDelta(BasePackable delta) {
         ConnectionStatusData d = (ConnectionStatusData) delta;
         if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
-        if (d.getState() != null) state.forceUpdate(d.getState().getRecord());
+        if (d.getState() != null && canUpdateState) {
+            state.forceUpdate(d.getState().getRecord());
+            canUpdateState = false;
+        }
     }
 
     @Override
@@ -141,5 +145,9 @@ public class ConnectionStatusData extends BasePackable {
         id =~ id;
 
         return id;
+    }
+
+    public void updateState() {
+        canUpdateState = true;
     }
 }

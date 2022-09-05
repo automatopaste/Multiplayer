@@ -34,6 +34,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 return null;
             case INITIALISING:
                 connectionState = ConnectionState.LOADING_READY;
+                statusData.updateState();
 
                 return new PacketContainer(
                         Collections.singletonList((BasePackable) statusData),
@@ -51,8 +52,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
-                // if client requests data again, state will return back to INITIALISING and resend packet
                 connectionState = ConnectionState.SPAWNING_READY;
+                statusData.updateState();
 
                 return new PacketContainer(
                         data,
@@ -69,6 +70,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
+                statusData.updateState();
 
                 return new PacketContainer(
                         data,

@@ -57,6 +57,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
+                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case INITIALISING:
@@ -65,13 +66,16 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
+                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING:
                 return null;
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
+
                 connectionState = ConnectionState.SPAWNING;
+                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case SPAWNING:
@@ -80,6 +84,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
+                statusData.updateState();
                 startDatagramClient();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
