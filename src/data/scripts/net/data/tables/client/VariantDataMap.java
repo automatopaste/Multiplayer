@@ -3,6 +3,7 @@ package data.scripts.net.data.tables.client;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.entities.VariantData;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -28,5 +29,10 @@ public class VariantDataMap implements InboundEntityManager {
 
     public Map<String, VariantData> getVariantData() {
         return variantData;
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerInboundEntityManager(VariantData.TYPE_ID, this);
     }
 }

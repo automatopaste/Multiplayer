@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.net.data.BasePackable;
@@ -109,7 +110,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 List<BasePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(dataDuplex.getOutbound());
+                for (Map<Integer, BasePackable> type : dataDuplex.getOutbound().values()) {
+                    data.addAll(type.values());
+                }
 
                 return new PacketContainer(data, tick, false, null);
             case CLOSED:
@@ -118,25 +121,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         }
     }
 
-    public void updateInbound(Map<Integer, BasePackable> entities, int tick) {
+    public void updateInbound(Map<Integer, Map<Integer, BasePackable>> entities, int tick) {
         this.tick = tick;
-
-        // grab connection data
-//        BasePackable data = entities.get(connectionId);
-//        if (data != null) {
-//            updateConnectionStatusData((ConnectionStatusData) data);
-//            entities.remove(connectionId);
-//        } else {
-//            Integer key = null;
-//            for (BasePackable packable : entities.values()) {
-//                if (packable instanceof ConnectionStatusData) {
-//                    key = packable.getInstanceID();
-//                    updateConnectionStatusData((ConnectionStatusData) packable);
-//                }
-//            }
-//            if (key != null) entities.remove(key);
-//        }
-
         dataDuplex.updateInbound(entities);
     }
 
@@ -182,5 +168,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public void updateEntities() {
 
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerInboundEntityManager(ConnectionStatusData.TYPE_ID, this);
     }
 }

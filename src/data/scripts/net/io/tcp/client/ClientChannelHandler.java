@@ -1,12 +1,13 @@
 package data.scripts.net.io.tcp.client;
 
-import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.data.BasePackable;
+import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.lazywizard.console.Console;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         Console.showMessage("Received TCP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
-        Map<Integer, BasePackable> entities = unpacked.getUnpacked();
+        Map<Integer, Map<Integer, BasePackable>> entities = unpacked.getUnpacked();
 
         connection.updateInbound(entities, serverTick);
     }

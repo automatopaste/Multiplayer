@@ -3,6 +3,7 @@ package data.scripts.net.data.tables.server;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -35,5 +36,10 @@ public class ServerPilotCommandMap implements InboundEntityManager {
 
     public Map<Integer, PilotCommandData> getInputs() {
         return inputs;
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerInboundEntityManager(PilotCommandData.TYPE_ID, this);
     }
 }

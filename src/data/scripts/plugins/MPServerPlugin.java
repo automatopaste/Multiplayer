@@ -4,8 +4,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
-import data.scripts.net.data.packables.trans.PilotCommandData;
 import data.scripts.net.data.tables.server.ServerPilotCommandMap;
 import data.scripts.net.data.tables.server.ServerShipTable;
 import data.scripts.net.data.util.DataGenManager;
@@ -33,14 +31,15 @@ public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
         dataStore.generate(Global.getCombatEngine(), this);
 
         serverConnectionManager = new ServerConnectionManager(this);
+        serverConnectionManager.register();
 
         // inbound init
         serverPilotCommandMap = new ServerPilotCommandMap();
-        DataGenManager.registerEntityManager(PilotCommandData.TYPE_ID, serverPilotCommandMap);
-        DataGenManager.registerEntityManager(ConnectionStatusData.TYPE_ID, serverConnectionManager);
+        serverPilotCommandMap.register();
 
         //outbound init
         serverShipTable = new ServerShipTable();
+        serverShipTable.register();
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
@@ -55,15 +54,15 @@ public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
         }
 
         // inbound data update
-        Map<Integer, BasePackable> inbound = serverConnectionManager.getDuplex().getDeltas();
+        Map<Integer, Map<Integer, BasePackable>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this);
 
         // simulation update
         serverShipTable.update();
 
         // outbound data update
-        Map<Integer, BasePackable> entities = serverShipTable.getOutbound();
-        serverConnectionManager.getDuplex().updateOutbound(entities);
+        Map<Integer, Map<Integer, BasePackable>> outbound = DataGenManager.collectOutboundDeltas();
+        serverConnectionManager.getDuplex().updateOutbound(outbound);
     }
 
     public VariantDataGenerator getDataStore() {

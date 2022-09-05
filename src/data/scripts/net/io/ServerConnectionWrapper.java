@@ -26,7 +26,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
-        List<BasePackable> data = new ArrayList<>();
+        List<BasePackable> data;
         switch (connectionState) {
             case INITIALISATION_READY:
                 return null;
@@ -97,7 +97,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 List<BasePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                data.addAll(connectionManager.getDuplex().getOutbound());
+                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutbound().values()) {
+                    data.addAll(type.values());
+                }
 
                 return new PacketContainer(
                         data, connectionManager.getTick(), false, remoteAddress
@@ -112,23 +114,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void updateInbound(Map<Integer, BasePackable> entities) {
-        // grab connection data
-//        BasePackable data = entities.get(connectionId);
-//        if (data != null) {
-//            updateConnectionStatusData((ConnectionStatusData) data);
-//            entities.remove(connectionId);
-//        } else {
-//            Integer key = null;
-//            for (BasePackable packable : entities.values()) {
-//                if (packable instanceof ConnectionStatusData) {
-//                    key = packable.getInstanceID();
-//                    updateConnectionStatusData((ConnectionStatusData) packable);
-//                }
-//            }
-//            if (key != null) entities.remove(key);
-//        }
-
+    public void updateInbound(Map<Integer, Map<Integer, BasePackable>> entities) {
         connectionManager.getDuplex().updateInbound(entities);
     }
 

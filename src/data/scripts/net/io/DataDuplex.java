@@ -2,34 +2,30 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.BasePackable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manage data between game and network threads
  */
 public class DataDuplex {
-    private final Map<Integer, BasePackable> inbound;
-    private final Map<Integer, BasePackable> outbound;
-
-    private boolean doFlush;
+    /**
+     * Map Type ID to
+     */
+    private final Map<Integer, Map<Integer, BasePackable>> inbound;
+    private final Map<Integer, Map<Integer, BasePackable>> outbound;
 
     public DataDuplex() {
         inbound = new HashMap<>();
         outbound = new HashMap<>();
-
-        doFlush = true;
     }
 
     /**
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public Map<Integer, BasePackable> getDeltas() {
+    public Map<Integer, Map<Integer, BasePackable>> getDeltas() {
         synchronized (inbound) {
-            Map<Integer, BasePackable> out = new HashMap<>(inbound);
+            Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>(inbound);
             inbound.clear();
             return out;
         }
@@ -39,10 +35,10 @@ public class DataDuplex {
      * Get outbound data and clear store
      * @return outbound entities
      */
-    public List<BasePackable> getOutbound() {
-        List<BasePackable> outEntities;
+    public Map<Integer, Map<Integer, BasePackable>> getOutbound() {
+        Map<Integer, Map<Integer, BasePackable>> outEntities;
         synchronized (outbound) {
-            outEntities = new ArrayList<>(outbound.values());
+            outEntities = new HashMap<>(outbound);
             outbound.clear();
         }
 
@@ -53,18 +49,21 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateInbound(Map<Integer, BasePackable> entities) {
+    public void updateInbound(Map<Integer, Map<Integer, BasePackable>> entities) {
         synchronized (this.inbound) {
-            for (Integer key : entities.keySet()) {
-                BasePackable p = inbound.get(key);
-                BasePackable e = entities.get(key);
+            for (Integer type : entities.keySet()) {
+                Map<Integer, BasePackable> inboundEntities = inbound.get(type);
+                Map<Integer, BasePackable> deltas = entities.get(type);
 
-                if (p != null) {
-                    if (p.equals(e)) continue;
+                for (Integer instance : deltas.keySet()) {
+                    BasePackable p = inboundEntities.get(instance);
+                    BasePackable d = deltas.get(instance);
 
-                    p.updateFromDelta(e);
-                } else {
-                    inbound.put(key, e);
+                    if (p == null) {
+                        inboundEntities.put(instance, d);
+                    } else {
+                        p.updateFromDelta(d);
+                    }
                 }
             }
         }
@@ -74,24 +73,23 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateOutbound(Map<Integer, BasePackable> entities) {
+    public void updateOutbound(Map<Integer, Map<Integer, BasePackable>> entities) {
         synchronized (this.outbound) {
-            for (Integer key : entities.keySet()) {
-                BasePackable p = outbound.get(key);
-                BasePackable e = entities.get(key);
+            for (Integer type : entities.keySet()) {
+                Map<Integer, BasePackable> inboundEntities = outbound.get(type);
+                Map<Integer, BasePackable> deltas = entities.get(type);
 
-                if (p != null) {
-                    if (p.equals(e)) continue;
+                for (Integer instance : deltas.keySet()) {
+                    BasePackable p = inboundEntities.get(instance);
+                    BasePackable d = deltas.get(instance);
 
-                    p.updateFromDelta(e);
-                } else {
-                    outbound.put(key, e);
+                    if (p == null) {
+                        inboundEntities.put(instance, d);
+                    } else {
+                        p.updateFromDelta(d);
+                    }
                 }
             }
         }
-    }
-
-    public void flush() {
-        doFlush = true;
     }
 }

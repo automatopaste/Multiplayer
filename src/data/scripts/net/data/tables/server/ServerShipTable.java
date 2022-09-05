@@ -7,6 +7,7 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.entities.ShipData;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
+import data.scripts.net.data.util.DataGenManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,5 +74,10 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
     @Override
     protected int getSize() {
         return MAX_ENTITIES;
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerOutboundEntityManager(ShipData.TYPE_ID, this);
     }
 }

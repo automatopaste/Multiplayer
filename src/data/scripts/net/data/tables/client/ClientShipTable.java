@@ -5,6 +5,7 @@ import data.scripts.net.data.packables.entities.ShipData;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.server.ServerShipTable;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 public class ClientShipTable extends EntityTable implements InboundEntityManager {
@@ -46,5 +47,10 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     @Override
     protected int getSize() {
         return ServerShipTable.MAX_ENTITIES;
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
     }
 }

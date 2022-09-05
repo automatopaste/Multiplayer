@@ -10,6 +10,7 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import org.lazywizard.console.Console;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +25,19 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
 
         Unpacked result;
         if (in.readableBytes() == 0) {
-            result = new Unpacked(new HashMap<Integer, BasePackable>(), tick, datagram.sender(), datagram.recipient());
+            result = new Unpacked(
+                    new HashMap<Integer, Map<Integer, BasePackable>>(),
+                    tick,
+                    (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+            );
         } else {
-            // integer keys are unique instance IDs
-            Map<Integer, BasePackable> entities = new HashMap<>();
+// integer keys are unique type IDs
+            Map<Integer, Map<Integer, BasePackable>> types = new HashMap<>();
             // integer keys are unique record IDs
             Map<Integer, BaseRecord<?>> records = new HashMap<>();
-            int entityID = in.readInt();
+
+            int entityTypeID = in.readInt();
             int entityInstanceID = in.readInt();
 
             while (in.readableBytes() > 0) {
@@ -38,25 +45,33 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
 
                 if (DataGenManager.entityTypeIDs.containsValue(type)) {
                     // reached new entity
-                    if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityInstanceID);
+                    entityTypeID = type;
 
-                    BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
-                    entities.put(entityInstanceID, entity);
+                    if (records.isEmpty())
+                        throw new NullPointerException("Entity read zero records: " + entityInstanceID);
+                    BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
+                    types.get(entityTypeID).put(entityInstanceID, entity);
 
-                    entityID = type;
                     entityInstanceID = in.readInt();
                     records = new HashMap<>();
                 } else {
-                    int uniqueID = in.readInt();
-                    BaseRecord<?> record = DataGenManager.recordFactory(type);
+                    int recordTypeID = type;
+                    int recordUniqueID = in.readInt();
+
+                    BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID);
                     BaseRecord<?> read = record.read(in);
-                    records.put(uniqueID, read);
+
+                    records.put(recordUniqueID, read);
                 }
             }
-            if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityInstanceID);
-            BasePackable entity = DataGenManager.entityFactory(entityID).unpack(entityInstanceID, records);
-            entities.put(entityInstanceID, entity);
-            result = new Unpacked(entities, tick, datagram.sender(), datagram.recipient());
+            if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityTypeID);
+            BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
+            types.get(entityTypeID).put(entityInstanceID, entity);
+            result = new Unpacked(types,
+                    tick,
+                    (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+            );
         }
 
         if (in.readableBytes() > 0) Console.showMessage(in.readableBytes() + " bytes left in packet decoder frame");

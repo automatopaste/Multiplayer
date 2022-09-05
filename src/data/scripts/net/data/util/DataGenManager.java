@@ -3,6 +3,7 @@ package data.scripts.net.data.util;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
@@ -20,6 +21,7 @@ public class DataGenManager {
     public static Map<Integer, BaseRecord<?>> recordInstances = new HashMap<>();
 
     public static Map<Integer, InboundEntityManager> inboundDataDestinations = new HashMap<>();
+    public static Map<Integer, OutboundEntityManager> outboundDataSources = new HashMap<>();
 
     private static int idIncrementer = 1;
 
@@ -39,21 +41,34 @@ public class DataGenManager {
         return id;
     }
 
-    public static void registerEntityManager(int dataTypeID, InboundEntityManager manager) {
+    public static void registerInboundEntityManager(int dataTypeID, InboundEntityManager manager) {
         inboundDataDestinations.put(dataTypeID, manager);
     }
 
-    public static void distributeInboundDeltas(Map<Integer, BasePackable> inbound, MPPlugin plugin) {
-        for (Integer id : inbound.keySet()) {
-            BasePackable delta = inbound.get(id);
+    public static void registerOutboundEntityManager(int dataTypeID, OutboundEntityManager manager) {
+        outboundDataSources.put(dataTypeID, manager);
+    }
 
-            if (delta.isTransient()) {
-                delta.destinationInit(plugin);
-                continue;
+    public static void distributeInboundDeltas(Map<Integer, Map<Integer, BasePackable>> inbound, MPPlugin plugin) {
+        for (Integer type : inbound.keySet()) {
+            Map<Integer, BasePackable> entities = inbound.get(type);
+            InboundEntityManager manager = inboundDataDestinations.get(type);
+
+            for (Integer instance : entities.keySet()) {
+                manager.processDelta(instance, entities.get(instance), plugin);
             }
-
-            inboundDataDestinations.get(delta.getTypeId()).processDelta(id, delta, plugin);
         }
+    }
+
+    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltas() {
+        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
+
+        for (Integer source : outboundDataSources.keySet()) {
+            Map<Integer, BasePackable> entities = outboundDataSources.get(source).getOutbound();
+            out.put(source, entities);
+        }
+
+        return out;
     }
 
     /**

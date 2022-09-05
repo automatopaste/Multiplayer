@@ -4,16 +4,13 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.packables.entities.VariantData;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.packables.trans.PilotCommandData;
+import data.scripts.net.data.tables.client.ClientShipTable;
+import data.scripts.net.data.tables.client.PilotCommandOutput;
 import data.scripts.net.data.tables.client.VariantDataMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.tables.client.PilotCommandOutput;
-import data.scripts.net.data.packables.entities.ShipData;
-import data.scripts.net.data.packables.trans.PilotCommandData;
-import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import org.lazywizard.console.Console;
@@ -42,17 +39,18 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
         dataStore = new VariantDataGenerator();
 
         connection = new ClientConnectionWrapper(host, port, this);
+        connection.register();
 
         // inbound init
         shipTable = new ClientShipTable();
-        DataGenManager.registerEntityManager(ShipData.TYPE_ID, shipTable);
+        shipTable.register();
         variantDataMap = new VariantDataMap();
-        DataGenManager.registerEntityManager(VariantData.TYPE_ID, variantDataMap);
-        DataGenManager.registerEntityManager(ConnectionStatusData.TYPE_ID, connection);
+        variantDataMap.register();
 
         // outbound init
         int id = -10; // placeholder id
         inputManager = new PilotCommandOutput(id, new PilotCommandData(id));
+        inputManager.register();
     }
 
     @Override
@@ -69,7 +67,7 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
         }
 
         // get inbound
-        Map<Integer, BasePackable> entities = connection.getDuplex().getDeltas();
+        Map<Integer, Map<Integer, BasePackable>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
         switch (connection.getConnectionState()) {
@@ -83,7 +81,7 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
             case SIMULATING:
                 shipTable.updateEntities();
 
-                Map<Integer, BasePackable> outbound = inputManager.getOutbound();
+                Map<Integer, Map<Integer, BasePackable>> outbound = DataGenManager.collectOutboundDeltas();
                 connection.getDuplex().updateOutbound(outbound);
                 break;
         }

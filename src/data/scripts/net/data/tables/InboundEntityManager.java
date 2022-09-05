@@ -7,4 +7,6 @@ public interface InboundEntityManager {
     void processDelta(int id, BasePackable toProcess, MPPlugin plugin);
 
     void updateEntities();
+
+    void register();
 }

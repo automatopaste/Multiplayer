@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
 import data.scripts.plugins.MPPlugin;
@@ -172,5 +173,10 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
 
     public MPServerPlugin getServerPlugin() {
         return serverPlugin;
+    }
+
+    @Override
+    public void register() {
+        DataGenManager.registerInboundEntityManager(ConnectionStatusData.TYPE_ID, this);
     }
 }
