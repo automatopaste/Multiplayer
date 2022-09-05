@@ -68,12 +68,16 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 connectionState = ConnectionState.SIMULATION_READY;
                 statusData.updateState();
 
-                return new PacketContainer(
+                PacketContainer p = new PacketContainer(
                         data,
                         connectionManager.getTick(),
                         true,
                         remoteAddress
                 );
+
+                Unpacked u = UnpackAlgorithm.unpack(p.get(), new InetSocketAddress("0", 0), new InetSocketAddress("0", 0));
+
+                return p;
             case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:

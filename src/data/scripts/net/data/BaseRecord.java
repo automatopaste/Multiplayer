@@ -15,6 +15,10 @@ public abstract class BaseRecord<T> {
         output.putInt(getTypeId());
         output.putInt(uniqueId);
 
+        if (record == null) {
+            throw new NullPointerException(this.getClass().getSimpleName() + " had null value");
+        }
+
         doWrite(output);
     }
 

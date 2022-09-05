@@ -43,7 +43,7 @@ public class IntRecord extends BaseRecord<Integer> {
     @Override
     public String toString() {
         return "IntRecord{" +
-                "record=" + Integer.toBinaryString(record) +
+                "record=" + record +
                 '}';
     }
 }
