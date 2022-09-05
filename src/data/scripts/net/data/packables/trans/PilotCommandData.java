@@ -35,14 +35,14 @@ public class PilotCommandData extends BasePackable {
     public PilotCommandData(int instanceID) {
         super(instanceID);
 
-        keysBitmask = new IntRecord(0);
+        keysBitmask = (IntRecord) new IntRecord(0).setUndefined(true);
     }
 
     public PilotCommandData(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
 
         IntRecord keysBitmask1 = (IntRecord) records.get(BITMASK);
-        if (keysBitmask1 == null) keysBitmask1 = new IntRecord(0);
+        if (keysBitmask1 == null) keysBitmask1 = (IntRecord) new IntRecord(0).setUndefined(true);
         keysBitmask = keysBitmask1;
     }
 

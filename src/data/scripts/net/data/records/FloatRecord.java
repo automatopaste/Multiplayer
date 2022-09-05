@@ -20,7 +20,7 @@ public class FloatRecord extends BaseRecord<Float> {
     }
 
     @Override
-    public boolean checkUpdate(Float curr) {
+    public boolean check(Float curr) {
         boolean isUpdated;
 
         if (useDecimalPrecision) {

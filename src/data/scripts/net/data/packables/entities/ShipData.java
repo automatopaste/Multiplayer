@@ -49,16 +49,16 @@ public class ShipData extends BasePackable {
     public ShipData(int instanceID, ShipAPI ship) {
         super(instanceID);
 
-        id = new StringRecord("DEFAULT_ID_STRING");
-        loc = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
-        vel = new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false);
-        ang = new FloatRecord(0f).setUseDecimalPrecision(false);
-        angVel = new FloatRecord(0f).setUseDecimalPrecision(false);
-        hull = new FloatRecord(0f);
-        flux = new FloatRecord(0f);
-        cursor = new Vector2fRecord(new Vector2f(0f, 0f));
-        owner = new IntRecord(0);
-        specId = new StringRecord("DEFAULT_SPEC_ID");
+        id = (StringRecord) new StringRecord("DEFAULT_ID_STRING").setUndefined(true);
+        loc = (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false).setUndefined(true);
+        vel = (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false).setUndefined(true);
+        ang = (FloatRecord) new FloatRecord(0f).setUseDecimalPrecision(false).setUndefined(true);
+        angVel = (FloatRecord) new FloatRecord(0f).setUseDecimalPrecision(false).setUndefined(true);
+        hull = (FloatRecord) new FloatRecord(0f).setUndefined(true);
+        flux = (FloatRecord) new FloatRecord(0f).setUndefined(true);
+        cursor = (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUndefined(true);
+        owner = (IntRecord) new IntRecord(0).setUndefined(true);
+        specId = (StringRecord) new StringRecord("DEFAULT_SPEC_ID").setUndefined(true);
 
         this.ship = ship;
     }
@@ -69,25 +69,25 @@ public class ShipData extends BasePackable {
         BaseRecord<?> temp;
 
         temp = records.get(SHIP_ID);
-        id = (temp == null) ? new StringRecord("DEFAULT_ID_STRING") : (StringRecord) temp;
+        id = (temp == null) ? (StringRecord) new StringRecord("DEFAULT_ID_STRING").setUndefined(true) : (StringRecord) temp;
         temp = records.get(SHIP_LOC);
-        loc = (temp == null) ? new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false) : (Vector2fRecord) temp;
+        loc = (temp == null) ? (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false).setUndefined(true) : (Vector2fRecord) temp;
         temp = records.get(SHIP_VEL);
-        vel = (temp == null) ? new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false) : (Vector2fRecord) temp;
+        vel = (temp == null) ? (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUseDecimalPrecision(false).setUndefined(true) : (Vector2fRecord) temp;
         temp = records.get(SHIP_ANG);
-        ang = (temp == null) ? new FloatRecord(0f).setUseDecimalPrecision(false) : (FloatRecord) temp;
+        ang = (temp == null) ? (FloatRecord) new FloatRecord(0f).setUseDecimalPrecision(false).setUndefined(true) : (FloatRecord) temp;
         temp = records.get(SHIP_ANGVEL);
-        angVel = (temp == null) ? new FloatRecord(0f).setUseDecimalPrecision(false) : (FloatRecord) temp;
+        angVel = (temp == null) ? (FloatRecord) new FloatRecord(0f).setUseDecimalPrecision(false).setUndefined(true) : (FloatRecord) temp;
         temp = records.get(SHIP_HULL);
-        hull = (temp == null) ? new FloatRecord(0f) : (FloatRecord) temp;
+        hull = (temp == null) ? (FloatRecord) new FloatRecord(0f).setUndefined(true) : (FloatRecord) temp;
         temp = records.get(SHIP_FLUX);
-        flux = (temp == null) ? new FloatRecord(0f) : (FloatRecord) temp;
+        flux = (temp == null) ? (FloatRecord) new FloatRecord(0f).setUndefined(true) : (FloatRecord) temp;
         temp = records.get(CURSOR);
-        cursor = (temp == null) ? new Vector2fRecord(new Vector2f(0f, 0f)) : (Vector2fRecord) temp;
+        cursor = (temp == null) ? (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUndefined(true) : (Vector2fRecord) temp;
         temp = records.get(OWNER);
-        owner = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
+        owner = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
         temp = records.get(SPEC_ID);
-        specId = (temp == null) ? new StringRecord("DEFAULT_SPEC_ID") : (StringRecord) temp;
+        specId = (temp == null) ? (StringRecord) new StringRecord("DEFAULT_SPEC_ID").setUndefined(true) : (StringRecord) temp;
 
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             if (ship.getFleetMemberId().equals(id.getRecord())) {
@@ -99,16 +99,16 @@ public class ShipData extends BasePackable {
     @Override
     public void updateFromDelta(BasePackable delta) {
         ShipData d = (ShipData) delta;
-        if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
-        if (d.getLoc() != null) loc.forceUpdate(d.getLoc().getRecord());
-        if (d.getVel() != null) vel.forceUpdate(d.getVel().getRecord());
-        if (d.getAng() != null) ang.forceUpdate(d.getAng().getRecord());
-        if (d.getAngVel() != null) angVel.forceUpdate(d.getAngVel().getRecord());
-        if (d.getFlux() != null) flux.forceUpdate(d.getFlux().getRecord());
-        if (d.getHull() != null) hull.forceUpdate(d.getHull().getRecord());
-        if (d.getCursor() != null) cursor.forceUpdate(d.getCursor().getRecord());
-        if (d.getOwner() != null) cursor.forceUpdate(d.getCursor().getRecord());
-        if (d.getSpecId() != null) specId.forceUpdate(d.getSpecId().getRecord());
+        if (d.getId().isDefined()) id.forceUpdate(d.getId().getRecord());
+        if (d.getLoc().isDefined()) loc.forceUpdate(d.getLoc().getRecord());
+        if (d.getVel().isDefined()) vel.forceUpdate(d.getVel().getRecord());
+        if (d.getAng().isDefined()) ang.forceUpdate(d.getAng().getRecord());
+        if (d.getAngVel().isDefined()) angVel.forceUpdate(d.getAngVel().getRecord());
+        if (d.getFlux().isDefined()) flux.forceUpdate(d.getFlux().getRecord());
+        if (d.getHull().isDefined()) hull.forceUpdate(d.getHull().getRecord());
+        if (d.getCursor().isDefined()) cursor.forceUpdate(d.getCursor().getRecord());
+        if (d.getOwner().isDefined()) cursor.forceUpdate(d.getCursor().getRecord());
+        if (d.getSpecId().isDefined()) specId.forceUpdate(d.getSpecId().getRecord());
     }
 
     @Override

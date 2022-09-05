@@ -17,7 +17,7 @@ public class StringRecord extends BaseRecord<String> {
     }
 
     @Override
-    public boolean checkUpdate(String curr) {
+    public boolean check(String curr) {
         boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
 

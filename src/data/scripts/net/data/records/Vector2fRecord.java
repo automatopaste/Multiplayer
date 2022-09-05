@@ -21,7 +21,7 @@ public class Vector2fRecord extends BaseRecord<Vector2f> {
     }
 
     @Override
-    public boolean checkUpdate(Vector2f curr) {
+    public boolean check(Vector2f curr) {
         boolean isUpdated;
 
         if (useDecimalPrecision) {

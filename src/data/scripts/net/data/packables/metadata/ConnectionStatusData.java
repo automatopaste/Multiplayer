@@ -37,9 +37,9 @@ public class ConnectionStatusData extends BasePackable {
         BaseRecord<?> temp;
 
         temp = records.get(ID);
-        id = (temp == null) ? new IntRecord(connectionID) : (IntRecord) temp;
+        id = (temp == null) ? (IntRecord) new IntRecord(connectionID).setUndefined(true) : (IntRecord) temp;
         temp = records.get(STATE);
-        state = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
+        state = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
     }
 
     @Override
@@ -65,8 +65,8 @@ public class ConnectionStatusData extends BasePackable {
     @Override
     public void updateFromDelta(BasePackable delta) {
         ConnectionStatusData d = (ConnectionStatusData) delta;
-        if (d.getId() != null) id.forceUpdate(d.getId().getRecord());
-        if (d.getState() != null) state.forceUpdate(d.getState().getRecord());
+        if (d.getId().isDefined()) id.forceUpdate(d.getId().getRecord());
+        if (d.getState().isDefined()) state.forceUpdate(d.getState().getRecord());
 //        if (d.getState() != null && canUpdateState) {
 //            state.forceUpdate(d.getState().getRecord());
 //            canUpdateState = false;

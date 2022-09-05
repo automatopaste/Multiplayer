@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 
 public abstract class BaseRecord<T> {
     protected T record;
+    protected boolean undefined = false;
 
     public BaseRecord(T record) {
         this.record = record;
@@ -15,10 +16,6 @@ public abstract class BaseRecord<T> {
         output.putInt(getTypeId());
         output.putInt(uniqueId);
 
-        if (record == null) {
-            throw new NullPointerException(this.getClass().getSimpleName() + " had null value");
-        }
-
         doWrite(output);
     }
 
@@ -26,15 +23,30 @@ public abstract class BaseRecord<T> {
 
     public abstract void doWrite(ByteBuffer output);
 
-    public abstract boolean checkUpdate(T curr);
+    public boolean checkUpdate(T curr) {
+        undefined = false;
+        return check(curr);
+    }
+
+    protected abstract boolean check(T curr);
 
     public void forceUpdate(T curr) {
         record = curr;
+        undefined = false;
     }
 
     public abstract int getTypeId();
 
     public T getRecord() {
         return record;
+    }
+
+    public boolean isDefined() {
+        return !undefined;
+    }
+
+    public BaseRecord<T> setUndefined(boolean undefined) {
+        this.undefined = undefined;
+        return this;
     }
 }

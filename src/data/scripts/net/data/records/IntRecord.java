@@ -13,7 +13,7 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    public boolean checkUpdate(Integer curr) {
+    public boolean check(Integer curr) {
         boolean isUpdated = !record.equals(curr);
         if (isUpdated) record = curr;
 

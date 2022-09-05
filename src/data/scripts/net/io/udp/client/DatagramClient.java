@@ -68,7 +68,7 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
-                Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());
+                //Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());
                 channel.writeAndFlush(new DatagramPacket(message, remoteAddress)).sync();
             }
 

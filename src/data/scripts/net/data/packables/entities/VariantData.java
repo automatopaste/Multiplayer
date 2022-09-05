@@ -55,11 +55,11 @@ public class VariantData extends BasePackable {
 
         BaseRecord<?> temp;
         temp = records.get(CAPACITORS);
-        capacitors = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
+        capacitors = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
         temp = records.get(VENTS);
-        vents = (temp == null) ? new IntRecord(0) : (IntRecord) temp;
+        vents = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
         temp = records.get(SHIP_ID);
-        shipId = (temp == null) ? new StringRecord("DEFAULT_SHIP_ID_FOR_VARIANT") : (StringRecord) temp;
+        shipId = (temp == null) ? (StringRecord) new StringRecord("DEFAULT_SHIP_ID_FOR_VARIANT").setUndefined(true) : (StringRecord) temp;
 
         List<StringRecord> tempWeapons = new ArrayList<>();
 
@@ -110,9 +110,9 @@ public class VariantData extends BasePackable {
     @Override
     public void updateFromDelta(BasePackable delta) {
         VariantData d = (VariantData) delta;
-        if (d.getCapacitors() != null) capacitors.forceUpdate(d.getCapacitors().getRecord());
-        if (d.getVents() != null) vents.forceUpdate(d.getVents().getRecord());
-        if (d.getShipId() != null) shipId.forceUpdate(d.getShipId().getRecord());
+        if (d.getCapacitors().isDefined()) capacitors.forceUpdate(d.getCapacitors().getRecord());
+        if (d.getVents().isDefined()) vents.forceUpdate(d.getVents().getRecord());
+        if (d.getShipId().isDefined()) shipId.forceUpdate(d.getShipId().getRecord());
         if (d.getWeaponIds() != null && !d.getWeaponIds().isEmpty()) {
             weaponIds.clear();
             weaponIds.addAll(d.getWeaponIds());
