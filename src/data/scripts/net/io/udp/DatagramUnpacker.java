@@ -15,15 +15,13 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramPacket> {
     protected void decode(ChannelHandlerContext channelHandlerContext, DatagramPacket datagram, List<Object> out) throws Exception {
         ByteBuf in = datagram.content();
 
-        if (in.readableBytes() < 4) return;
-
         Unpacked result = UnpackAlgorithm.unpack(
                 in,
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
                 (InetSocketAddress) channelHandlerContext.channel().localAddress()
         );
 
-        in.release();
+        //in.release();
         out.add(result);
     }
 }
