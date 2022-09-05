@@ -130,10 +130,12 @@ public class ConnectionStatusData extends BasePackable {
         byte[] ids = address.getAddress().getAddress();
 
         int id = 0x00;
+        byte o = 0x0;
         for (int i = 0; i < 4; i++) {
-            id += ids[i];
+            byte d = ids[i];
             id <<= 0x04;
-            if (i > 0) id ^= ids[i - 1];
+            id += o ^ d;
+            o = d;
         }
 
         return id;
