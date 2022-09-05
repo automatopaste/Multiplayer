@@ -138,6 +138,8 @@ public class ConnectionStatusData extends BasePackable {
             o = d;
         }
 
+        id =~ id;
+
         return id;
     }
 }
