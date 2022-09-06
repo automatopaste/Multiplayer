@@ -1,4 +1,5 @@
 command,class,tags,syntax,help
 mpC,data.scripts.console.commands.mpConnectToHost,"combat,multiplayer",mpConnectToHost <ip:port>,Connect to a remote server
+mpCC,data.scripts.console.commands.mpConnectToHostCached,"combat,multiplayer",mpConnectToHostCached <ip:port>,Connect to a remote server
 mpH,data.scripts.console.commands.mpRunServer,"combat,multiplayer",mpRunServer <port>,Host a server
 mpF,data.scripts.console.commands.mpFlush,"combat,multiplayer",mpFlush,Flush sent packets
