@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
 import org.lazywizard.console.Console;
 
-public class MpConnectToHostCached implements BaseCommand {
+public class mpConnectToHostCached implements BaseCommand {
     @Override
     public CommandResult runCommand(@NotNull String args, @NotNull CommandContext context) {
         if (context != CommandContext.COMBAT_SIMULATION) {
