@@ -15,11 +15,9 @@ import java.util.Map;
 public class ConnectionStatusData extends BasePackable {
     public static int TYPE_ID;
 
-    private final IntRecord id;
     private final IntRecord state;
 
-    private static final int ID = 1;
-    private static final int STATE = 2;
+    private static final int STATE = 1;
 
     private BaseConnectionWrapper connection;
     private boolean canUpdateState = true;
@@ -27,7 +25,6 @@ public class ConnectionStatusData extends BasePackable {
     public ConnectionStatusData(int connectionID) {
         super(connectionID);
 
-        id = new IntRecord(connectionID);
         state = new IntRecord(0);
     }
 
@@ -36,8 +33,6 @@ public class ConnectionStatusData extends BasePackable {
 
         BaseRecord<?> temp;
 
-        temp = records.get(ID);
-        id = (temp == null) ? (IntRecord) new IntRecord(connectionID).setUndefined(true) : (IntRecord) temp;
         temp = records.get(STATE);
         state = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
     }
@@ -65,7 +60,6 @@ public class ConnectionStatusData extends BasePackable {
     @Override
     public void updateFromDelta(BasePackable delta) {
         ConnectionStatusData d = (ConnectionStatusData) delta;
-        if (d.getId().isDefined()) id.forceUpdate(d.getId().getRecord());
         if (d.getState().isDefined()) state.forceUpdate(d.getState().getRecord());
 //        if (d.getState() != null && canUpdateState) {
 //            state.forceUpdate(d.getState().getRecord());
@@ -83,10 +77,6 @@ public class ConnectionStatusData extends BasePackable {
         if (connection == null) return false;
 
         boolean update = false;
-        if (id.checkUpdate(connection.getConnectionId())) {
-            id.write(packer, ID);
-            update = true;
-        }
         if (state.checkUpdate(connection.getConnectionState().ordinal())) {
             state.write(packer, STATE);
             update = true;
@@ -97,9 +87,6 @@ public class ConnectionStatusData extends BasePackable {
 
     private void flushWrite() {
         if (connection == null) throw new NullPointerException("Attempted flush write with null connection!");
-
-        id.forceUpdate(connection.getConnectionId());
-        id.write(packer, ID);
 
         state.forceUpdate(connection.getConnectionState().ordinal());
         state.write(packer, STATE);
@@ -117,10 +104,6 @@ public class ConnectionStatusData extends BasePackable {
 
     public void setConnection(BaseConnectionWrapper connection) {
         this.connection = connection;
-    }
-
-    public IntRecord getId() {
-        return id;
     }
 
     public IntRecord getState() {

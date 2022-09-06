@@ -7,6 +7,8 @@ import data.scripts.net.io.tcp.PacketContainerEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
+import java.net.InetSocketAddress;
+
 public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final SocketServer socketServer;
     private final ServerConnectionManager serverConnectionManager;
@@ -18,6 +20,7 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws InterruptedException {
+        InetSocketAddress a = socketChannel.remoteAddress();
         ServerConnectionWrapper connection = serverConnectionManager.getNewConnection(socketChannel.remoteAddress());
 
         if (connection == null) {
