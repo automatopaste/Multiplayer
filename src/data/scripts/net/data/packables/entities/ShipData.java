@@ -310,7 +310,7 @@ public class ShipData extends BasePackable {
 
         if (ship == null) return;
         ship.getLocation().set(loc.getRecord());
-        ship.getVelocity().set(loc.getRecord());
+        ship.getVelocity().set(vel.getRecord());
         ship.setFacing(ang.getRecord());
         ship.setAngularVelocity(angVel.getRecord());
         ship.setHitpoints(ship.getMaxHitpoints() * hull.getRecord());
