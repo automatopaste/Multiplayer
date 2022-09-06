@@ -24,11 +24,14 @@ public class mpConnectToHost implements BaseCommand {
             return CommandResult.BAD_SYNTAX;
         }
 
-        String[] address = ids[0].split(":");
-//        String host = "192.168.1." + address[0];
+//        String[] address = ids[0].split(":");
 //        String host = address[0];
-        String host = Global.getSettings().getString("mpHost");
-        int port = Integer.parseInt(address[1]);
+//        int port = Integer.parseInt(address[1]);
+
+        String a = Global.getSettings().getString("mpHost");
+        String[] b = a.split(":");
+        String host = b[0];
+        int port = Integer.parseInt(b[1]);
 
         Console.showMessage("Starting client on port " + port);
         Global.getCombatEngine().addPlugin(new MPClientPlugin(host, port));
