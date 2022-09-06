@@ -63,13 +63,13 @@ public class VariantData extends BasePackable {
 
         List<StringRecord> tempWeapons = new ArrayList<>();
 
-        int gaming = WEAPONS;
-        temp = records.get(gaming);
+        int gamig = WEAPONS;
+        temp = records.get(gamig);
         while (temp != null) {
             tempWeapons.add((StringRecord) temp);
-            gaming++;
+            gamig++;
 
-            temp = records.get(gaming);
+            temp = records.get(gamig);
         }
 
         int num = tempWeapons.size();

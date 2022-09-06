@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VariantDataMap implements InboundEntityManager {
-    private final Map<String, VariantData> variantData;
+    private final Map<Integer, VariantData> variantData;
 
     public VariantDataMap() {
         variantData = new HashMap<>();
@@ -18,8 +18,15 @@ public class VariantDataMap implements InboundEntityManager {
 
     @Override
     public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        VariantData data = (VariantData) toProcess;
-        variantData.put(data.getShipId().getRecord(), data);
+        VariantData delta = (VariantData) toProcess;
+        VariantData data = variantData.get(id);
+
+        if (data == null) {
+            variantData.put(id, delta);
+            delta.destinationInit(plugin);
+        } else {
+            data.updateFromDelta(delta);
+        }
     }
 
     @Override
@@ -27,7 +34,7 @@ public class VariantDataMap implements InboundEntityManager {
 
     }
 
-    public Map<String, VariantData> getVariantData() {
+    public Map<Integer, VariantData> getVariantData() {
         return variantData;
     }
 
