@@ -3,4 +3,5 @@
 	"mpServerTickRate": 30,
 	"mpClientTickrate": 15,
 	"mpMaxConnections": 4,
+	"mpHost": "10.0.0.7:20303",
 }
