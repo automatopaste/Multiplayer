@@ -231,11 +231,9 @@ public class ShipData extends BasePackable {
         String hullSpecId = specId.getRecord();
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
 
-        String hullVariantId;
-        ShipVariantAPI variant;
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
-            hullVariantId = hullSpecId + "_Hull";
-            variant = Global.getSettings().createEmptyVariant(
+            String hullVariantId = hullSpecId + "_Hull";
+            ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
                     hullVariantId,
                     hullSpec
             );
@@ -254,18 +252,17 @@ public class ShipData extends BasePackable {
             }
 
             variant.autoGenerateWeaponGroups();
+
+            FleetMemberType fleetMemberType = FleetMemberType.SHIP;
+            FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
+
+            CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
+            fleetManager.addToReserves(fleetMember);
+            ship = fleetManager.spawnFleetMember(fleetMember, loc.getRecord(), ang.getRecord(), 0f);
+            ship.setCurrentCR(combatReadiness.getRecord());
         } else {
-            hullVariantId = hullSpecId + "_wing";
-            variant = Global.getSettings().getVariant(hullVariantId);
+            engine.getFleetManager(owner.getRecord()).spawnShipOrWing(hullSpecId + "_wing", loc.getRecord(), ang.getRecord());
         }
-
-        FleetMemberType fleetMemberType = hullSpec.getHullSize() == ShipAPI.HullSize.FIGHTER ? FleetMemberType.FIGHTER_WING : FleetMemberType.SHIP;
-        FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
-
-        CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
-        fleetManager.addToReserves(fleetMember);
-        ship = fleetManager.spawnFleetMember(fleetMember, loc.getRecord(), ang.getRecord(), 0f);
-        ship.setCurrentCR(combatReadiness.getRecord());
 
         // set fleetmember id to sync with server
         Ship s = (Ship) ship;
