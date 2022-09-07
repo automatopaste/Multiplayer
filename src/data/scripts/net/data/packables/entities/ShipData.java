@@ -34,6 +34,7 @@ public class ShipData extends BasePackable {
     private final Vector2fRecord cursor;
     private final IntRecord owner;
     private final StringRecord specId;
+    private final FloatRecord combatReadiness;
 
     private ShipAPI ship;
     
@@ -47,6 +48,7 @@ public class ShipData extends BasePackable {
     private static final int CURSOR = 8;
     private static final int OWNER = 9;
     private static final int SPEC_ID = 10;
+    private static final int COMBAT_READINESS = 11;
 
     public ShipData(int instanceID, ShipAPI ship) {
         super(instanceID);
@@ -61,6 +63,8 @@ public class ShipData extends BasePackable {
         cursor = (Vector2fRecord) new Vector2fRecord(new Vector2f(0f, 0f)).setUndefined(true);
         owner = (IntRecord) new IntRecord(0).setUndefined(true);
         specId = (StringRecord) new StringRecord("DEFAULT_SPEC_ID").setUndefined(true);
+        combatReadiness = (FloatRecord) new FloatRecord(0.7f).setUndefined(true);
+
 
         this.ship = ship;
     }
@@ -90,6 +94,8 @@ public class ShipData extends BasePackable {
         owner = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
         temp = records.get(SPEC_ID);
         specId = (temp == null) ? (StringRecord) new StringRecord("DEFAULT_SPEC_ID").setUndefined(true) : (StringRecord) temp;
+        temp = records.get(COMBAT_READINESS);
+        combatReadiness = (temp == null) ? (FloatRecord) new FloatRecord(0.7f).setUndefined(true) : (FloatRecord) temp;
 
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             if (ship.getFleetMemberId().equals(id.getRecord())) {
@@ -111,6 +117,7 @@ public class ShipData extends BasePackable {
         if (d.getCursor().isDefined()) cursor.forceUpdate(d.getCursor().getRecord());
         if (d.getOwner().isDefined()) cursor.forceUpdate(d.getCursor().getRecord());
         if (d.getSpecId().isDefined()) specId.forceUpdate(d.getSpecId().getRecord());
+        if (d.getCombatReadiness().isDefined()) combatReadiness.forceUpdate(d.getCombatReadiness().getRecord());
     }
 
     @Override
@@ -168,6 +175,10 @@ public class ShipData extends BasePackable {
             specId.write(packer, SPEC_ID);
             update = true;
         }
+        if (combatReadiness.checkUpdate(ship.getCurrentCR())) {
+            combatReadiness.write(packer, COMBAT_READINESS);
+            update = true;
+        }
 
         return update;
     }
@@ -204,6 +215,9 @@ public class ShipData extends BasePackable {
 
         specId.forceUpdate(ship.getHullSpec().getHullId());
         specId.write(packer, SPEC_ID);
+
+        combatReadiness.forceUpdate(ship.getCurrentCR());
+        combatReadiness.write(packer, COMBAT_READINESS);
     }
 
     @Override
@@ -251,6 +265,7 @@ public class ShipData extends BasePackable {
         CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
         fleetManager.addToReserves(fleetMember);
         ship = fleetManager.spawnFleetMember(fleetMember, loc.getRecord(), ang.getRecord(), 0f);
+        ship.setCurrentCR(combatReadiness.getRecord());
 
         // set fleetmember id to sync with server
         Ship s = (Ship) ship;
@@ -326,6 +341,7 @@ public class ShipData extends BasePackable {
         ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux.getRecord());
         ship.getMouseTarget().set(cursor.getRecord());
         ship.setOwner(owner.getRecord());
+        ship.setCurrentCR(combatReadiness.getRecord());
     }
 
     public static void setTypeId(int typeId) {
@@ -383,5 +399,9 @@ public class ShipData extends BasePackable {
 
     public StringRecord getSpecId() {
         return specId;
+    }
+
+    public FloatRecord getCombatReadiness() {
+        return combatReadiness;
     }
 }
