@@ -1,7 +1,6 @@
 package data.scripts.plugins;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.tables.server.ServerPilotCommandMap;
@@ -15,7 +14,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.List;
 import java.util.Map;
 
-public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlugin {
+public class MPServerPlugin extends MPPlugin {
 
     //inbound
     private final ServerConnectionManager serverConnectionManager;
@@ -76,5 +75,9 @@ public class MPServerPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
 
     public ServerShipTable getServerShipTable() {
         return serverShipTable;
+    }
+
+    public ServerPilotCommandMap getServerPilotCommandMap() {
+        return serverPilotCommandMap;
     }
 }

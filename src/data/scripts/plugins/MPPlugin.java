@@ -1,10 +1,12 @@
 package data.scripts.plugins;
 
-public interface MPPlugin {
-    enum PluginType {
+import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
+
+public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
+    public enum PluginType {
         SERVER,
         CLIENT
     }
 
-    PluginType getType();
+    public abstract PluginType getType();
 }

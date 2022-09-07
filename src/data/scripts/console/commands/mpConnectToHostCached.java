@@ -1,6 +1,7 @@
 package data.scripts.console.commands;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.mpModPlugin;
 import data.scripts.plugins.MPClientPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
@@ -20,7 +21,7 @@ public class mpConnectToHostCached implements BaseCommand {
         int port = Integer.parseInt(b[1]);
 
         Console.showMessage("Starting client on port " + port);
-        Global.getCombatEngine().addPlugin(new MPClientPlugin(host, port));
+        mpModPlugin.setPlugin(new MPClientPlugin(host, port));
         Console.showMessage("Client started successfully");
 
         return CommandResult.SUCCESS;

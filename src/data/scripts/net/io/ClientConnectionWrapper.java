@@ -31,7 +31,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     private int tick;
 
-    public ClientConnectionWrapper(String host, int port) {
+    public ClientConnectionWrapper(String host, int port, MPPlugin plugin) {
+        super(plugin);
+
         this.host = host;
         dataDuplex = new DataDuplex();
 
@@ -57,28 +59,24 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
-                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case LOADING_READY:
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
-                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
-                statusData.updateState();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
             case SIMULATION_READY:
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
-                statusData.updateState();
                 startDatagramClient();
 
                 return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);

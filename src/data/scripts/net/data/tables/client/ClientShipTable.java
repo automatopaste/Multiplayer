@@ -1,5 +1,8 @@
 package data.scripts.net.data.tables.client;
 
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.entities.ShipData;
 import data.scripts.net.data.tables.EntityTable;
@@ -9,20 +12,7 @@ import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 public class ClientShipTable extends EntityTable implements InboundEntityManager {
-//    @Override
-//    public void processDeltas(Map<Integer, BasePackable> toProcess) {
-//        for (Integer id : toProcess.keySet()) {
-//            ShipData delta = (ShipData) toProcess.get(id);
-//            ShipData data = (ShipData) table[id];
-//
-//            if (data == null) {
-//                table[id] = delta;
-//                delta.destinationInit(clientPlugin);
-//            } else {
-//                data.updateFromDelta(delta);
-//            }
-//        }
-//    }
+    private ShipAPI clientActive;
 
     @Override
     public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
@@ -42,6 +32,11 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
         for (BasePackable p : table) {
             if (p != null) p.destinationUpdate();
         }
+
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (clientActive != null && engine.getPlayerShip() != null && clientActive != engine.getPlayerShip()) {
+            engine.setPlayerShipExternal(clientActive);
+        }
     }
 
     @Override
@@ -52,5 +47,13 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
+    }
+
+    public void setClientActive(ShipAPI clientActive) {
+        this.clientActive = clientActive;
+    }
+
+    public ShipAPI getClientActive() {
+        return clientActive;
     }
 }

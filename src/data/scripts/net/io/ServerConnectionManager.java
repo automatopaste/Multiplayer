@@ -120,7 +120,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
         }
 
         int id = ConnectionStatusData.getConnectionId(remoteAddress);
-        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress);
+        ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.put(id, serverConnectionWrapper);

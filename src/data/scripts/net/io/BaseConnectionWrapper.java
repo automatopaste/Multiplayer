@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
 
@@ -22,6 +23,12 @@ public abstract class BaseConnectionWrapper {
 
     protected int connectionId;
 
+    protected MPPlugin localPlugin;
+
+    public BaseConnectionWrapper(MPPlugin localPlugin) {
+        this.localPlugin = localPlugin;
+    }
+
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
     }
@@ -41,7 +48,6 @@ public abstract class BaseConnectionWrapper {
     public abstract PacketContainer getSocketMessage() throws IOException;
 
     public abstract PacketContainer getDatagram() throws IOException;
-
 
     public static BaseConnectionWrapper.ConnectionState ordinalToConnectionState(int state) {
         switch (state) {
@@ -66,5 +72,9 @@ public abstract class BaseConnectionWrapper {
             default:
                 return null;
         }
+    }
+
+    public MPPlugin getLocalPlugin() {
+        return localPlugin;
     }
 }

@@ -1,7 +1,6 @@
 package data.scripts.plugins;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BasePackable;
@@ -19,7 +18,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.List;
 import java.util.Map;
 
-public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlugin {
+public class MPClientPlugin extends MPPlugin {
 
     //inbound
     private final ClientConnectionWrapper connection;
@@ -38,7 +37,7 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
 
         dataStore = new VariantDataGenerator();
 
-        connection = new ClientConnectionWrapper(host, port);
+        connection = new ClientConnectionWrapper(host, port, this);
         connection.register();
 
         // inbound init
@@ -93,6 +92,10 @@ public class MPClientPlugin extends BaseEveryFrameCombatPlugin implements MPPlug
 
     public VariantDataGenerator getDataStore() {
         return dataStore;
+    }
+
+    public ClientShipTable getShipTable() {
+        return shipTable;
     }
 
     public VariantDataMap getVariantDataMap() {

@@ -3,7 +3,9 @@ package data.scripts.net.data.packables.metadata;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
+import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 
 import java.net.InetSocketAddress;
@@ -16,16 +18,18 @@ public class ConnectionStatusData extends BasePackable {
     public static int TYPE_ID;
 
     private final IntRecord state;
+    private final StringRecord clientActiveShipId;
 
     private static final int STATE = 1;
+    private static final int CLIENT_ACTIVE_SHIP_ID = 2;
 
     private BaseConnectionWrapper connection;
-    private boolean canUpdateState = true;
 
     public ConnectionStatusData(int connectionID) {
         super(connectionID);
 
         state = new IntRecord(0);
+        clientActiveShipId = new StringRecord("DEFAULT");
     }
 
     public ConnectionStatusData(int connectionID, Map<Integer, BaseRecord<?>> records) {
@@ -35,6 +39,8 @@ public class ConnectionStatusData extends BasePackable {
 
         temp = records.get(STATE);
         state = (temp == null) ? (IntRecord) new IntRecord(0).setUndefined(true) : (IntRecord) temp;
+        temp = records.get(CLIENT_ACTIVE_SHIP_ID);
+        clientActiveShipId = (temp == null) ? (StringRecord) new StringRecord("DEFAULT").setUndefined(true) : (StringRecord) temp;
     }
 
     @Override
@@ -61,10 +67,7 @@ public class ConnectionStatusData extends BasePackable {
     public void updateFromDelta(BasePackable delta) {
         ConnectionStatusData d = (ConnectionStatusData) delta;
         if (d.getState().isDefined()) state.forceUpdate(d.getState().getRecord());
-//        if (d.getState() != null && canUpdateState) {
-//            state.forceUpdate(d.getState().getRecord());
-//            canUpdateState = false;
-//        }
+        if (d.getClientActiveShipId().isDefined()) clientActiveShipId.forceUpdate(d.getClientActiveShipId().getRecord());
     }
 
     @Override
@@ -81,6 +84,15 @@ public class ConnectionStatusData extends BasePackable {
             state.write(packer, STATE);
             update = true;
         }
+        MPPlugin plugin = connection.getLocalPlugin();
+        if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
+            MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+
+            if (clientActiveShipId.checkUpdate(clientPlugin.getShipTable().getClientActive().getFleetMemberId())) {
+                clientActiveShipId.write(packer, CLIENT_ACTIVE_SHIP_ID);
+                update = true;
+            }
+        }
 
         return update;
     }
@@ -90,6 +102,13 @@ public class ConnectionStatusData extends BasePackable {
 
         state.forceUpdate(connection.getConnectionState().ordinal());
         state.write(packer, STATE);
+
+        MPPlugin plugin = connection.getLocalPlugin();
+        if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
+            MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+            clientActiveShipId.forceUpdate(clientPlugin.getShipTable().getClientActive().getFleetMemberId());
+        }
+        clientActiveShipId.write(packer, CLIENT_ACTIVE_SHIP_ID);
     }
 
     @Override
@@ -108,6 +127,10 @@ public class ConnectionStatusData extends BasePackable {
 
     public IntRecord getState() {
         return state;
+    }
+
+    public StringRecord getClientActiveShipId() {
+        return clientActiveShipId;
     }
 
     public static void setTypeId(int typeId) {
@@ -129,9 +152,5 @@ public class ConnectionStatusData extends BasePackable {
         id =~ id;
 
         return id;
-    }
-
-    public void updateState() {
-        canUpdateState = true;
     }
 }

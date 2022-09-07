@@ -2,6 +2,7 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -15,7 +16,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
     private final InetSocketAddress remoteAddress;
 
-    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress) {
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
+        super(plugin);
+
         this.connectionManager = connectionManager;
         this.remoteAddress = remoteAddress;
         this.connectionId = connectionId;
@@ -34,7 +37,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 return null;
             case INITIALISING:
                 connectionState = ConnectionState.LOADING_READY;
-                statusData.updateState();
 
                 return new PacketContainer(
                         Collections.singletonList((BasePackable) statusData),
@@ -51,7 +53,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 connectionState = ConnectionState.SPAWNING_READY;
-                statusData.updateState();
 
                 return new PacketContainer(
                         data,
@@ -66,7 +67,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
-                statusData.updateState();
 
                 return new PacketContainer(
                         data,
