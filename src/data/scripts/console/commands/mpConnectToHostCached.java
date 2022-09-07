@@ -9,8 +9,8 @@ import org.lazywizard.console.Console;
 public class mpConnectToHostCached implements BaseCommand {
     @Override
     public CommandResult runCommand(@NotNull String args, @NotNull CommandContext context) {
-        if (context != CommandContext.COMBAT_SIMULATION) {
-            Console.showMessage("Command only usable in simulation");
+        if (!(context == CommandContext.COMBAT_CAMPAIGN || context == CommandContext.COMBAT_SIMULATION || context == CommandContext.COMBAT_MISSION)) {
+            Console.showMessage("Command only usable in combat");
             return CommandResult.ERROR;
         }
 
