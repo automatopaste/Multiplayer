@@ -29,7 +29,7 @@ public class VariantDataGenerator {
         members.addAll(manager0.getDeployedCopy());
         members.addAll(manager0.getReservesCopy());
 
-        CombatFleetManagerAPI manager1 = engine.getFleetManager(0);
+        CombatFleetManagerAPI manager1 = engine.getFleetManager(1);
         members.addAll(manager1.getDeployedCopy());
         members.addAll(manager1.getReservesCopy());
 
