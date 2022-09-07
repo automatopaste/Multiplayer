@@ -3,3 +3,4 @@ mpC,data.scripts.console.commands.mpConnectToHost,"combat,multiplayer",mpConnect
 mpCC,data.scripts.console.commands.mpConnectToHostCached,"combat,multiplayer",mpConnectToHostCached <ip:port>,Connect to a remote server
 mpH,data.scripts.console.commands.mpRunServer,"combat,multiplayer",mpRunServer <port>,Host a server
 mpF,data.scripts.console.commands.mpFlush,"combat,multiplayer",mpFlush,Flush sent packets
+mpP,data.scripts.console.commands.mpPilotShip,"combat,multiplayer",mpPilotShip,Pilot nearest ship
