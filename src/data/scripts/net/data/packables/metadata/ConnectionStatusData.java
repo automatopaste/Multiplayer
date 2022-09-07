@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
@@ -87,10 +88,13 @@ public class ConnectionStatusData extends BasePackable {
         MPPlugin plugin = connection.getLocalPlugin();
         if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
             MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+            ShipAPI active = clientPlugin.getShipTable().getClientActive();
 
-            if (clientActiveShipId.checkUpdate(clientPlugin.getShipTable().getClientActive().getFleetMemberId())) {
-                clientActiveShipId.write(packer, CLIENT_ACTIVE_SHIP_ID);
-                update = true;
+            if (active != null) {
+                if (clientActiveShipId.checkUpdate(active.getFleetMemberId())) {
+                    clientActiveShipId.write(packer, CLIENT_ACTIVE_SHIP_ID);
+                    update = true;
+                }
             }
         }
 
@@ -106,7 +110,11 @@ public class ConnectionStatusData extends BasePackable {
         MPPlugin plugin = connection.getLocalPlugin();
         if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
             MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-            clientActiveShipId.forceUpdate(clientPlugin.getShipTable().getClientActive().getFleetMemberId());
+            ShipAPI active = clientPlugin.getShipTable().getClientActive();
+
+            if (active != null) {
+                clientActiveShipId.forceUpdate(active.getFleetMemberId());
+            }
         }
         clientActiveShipId.write(packer, CLIENT_ACTIVE_SHIP_ID);
     }
