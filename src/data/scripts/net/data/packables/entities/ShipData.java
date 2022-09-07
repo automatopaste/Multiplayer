@@ -2,6 +2,8 @@ package data.scripts.net.data.packables.entities;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
@@ -216,32 +218,39 @@ public class ShipData extends BasePackable {
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
 
         String hullVariantId;
+        ShipVariantAPI variant;
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
             hullVariantId = hullSpecId + "_Hull";
-            ShipVariantAPI empty = Global.getSettings().createEmptyVariant(
+            variant = Global.getSettings().createEmptyVariant(
                     hullVariantId,
                     hullSpec
             );
 
             VariantData variantData = clientPlugin.getVariantDataMap().getVariantData().get(id.getRecord());
 
-            empty.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
-            empty.setNumFluxVents(variantData.getVents().getRecord());
+            variant.setNumFluxCapacitors(variantData.getCapacitors().getRecord());
+            variant.setNumFluxVents(variantData.getVents().getRecord());
 
             List<StringRecord> weaponSlots = variantData.getWeaponSlots();
             List<StringRecord> weaponIds = variantData.getWeaponIds();
             for (int i = 0; i < weaponSlots.size(); i++) {
                 String slot = weaponSlots.get(i).getRecord();
 
-                empty.addWeapon(slot, weaponIds.get(i).getRecord());
+                variant.addWeapon(slot, weaponIds.get(i).getRecord());
             }
 
-            empty.autoGenerateWeaponGroups();
+            variant.autoGenerateWeaponGroups();
         } else {
             hullVariantId = hullSpecId + "_wing";
+            variant = Global.getSettings().getVariant(hullVariantId);
         }
 
-        ship = engine.getFleetManager(owner.getRecord()).spawnShipOrWing(hullVariantId, loc.getRecord(), ang.getRecord());
+        FleetMemberType fleetMemberType = hullSpec.getHullSize() == ShipAPI.HullSize.FIGHTER ? FleetMemberType.FIGHTER_WING : FleetMemberType.SHIP;
+        FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
+
+        CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
+        fleetManager.addToReserves(fleetMember);
+        ship = fleetManager.spawnFleetMember(fleetMember, loc.getRecord(), ang.getRecord(), 0f);
 
         // set fleetmember id to sync with server
         Ship s = (Ship) ship;
