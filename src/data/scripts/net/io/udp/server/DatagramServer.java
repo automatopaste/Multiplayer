@@ -57,7 +57,7 @@ public class DatagramServer implements Runnable {
                         }
 
                         //Global.getLogger(DatagramServer.class).info("Sending datagram to " + message.getDest().getAddress() + ":" + message.getDest().getPort());
-                        channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
+                       channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                     }
                 }
 

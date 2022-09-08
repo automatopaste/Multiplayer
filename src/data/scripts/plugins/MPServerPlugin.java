@@ -1,5 +1,7 @@
 package data.scripts.plugins;
 
+import cmu.CMUtils;
+import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BasePackable;
@@ -62,6 +64,15 @@ public class MPServerPlugin extends MPPlugin {
         // outbound data update
         Map<Integer, Map<Integer, BasePackable>> outbound = DataGenManager.collectOutboundDeltas();
         serverConnectionManager.getDuplex().updateOutbound(outbound);
+
+        debug();
+    }
+
+    private void debug() {
+        GUIDebug guiDebug = CMUtils.getGuiDebug();
+
+        guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
+        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + serverShipTable.getRegistered().size() + " ships in local table");
     }
 
     public VariantDataGenerator getDataStore() {

@@ -71,6 +71,10 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
         markVacant(index);
     }
 
+    public Map<String, Integer> getRegistered() {
+        return registered;
+    }
+
     @Override
     protected int getSize() {
         return MAX_ENTITIES;

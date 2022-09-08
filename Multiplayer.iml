@@ -14,5 +14,6 @@
     <orderEntry type="library" name="lw_Console" level="project" />
     <orderEntry type="library" name="LazyLib-Kotlin" level="project" />
     <orderEntry type="library" name="netty-buffer-4.1.69.Final" level="project" />
+    <orderEntry type="library" name="CMUtils" level="project" />
   </component>
 </module>

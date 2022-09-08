@@ -178,4 +178,8 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     public void register() {
         DataGenManager.registerInboundEntityManager(ConnectionStatusData.TYPE_ID, this);
     }
+
+    public Map<Integer, ServerConnectionWrapper> getServerConnectionWrappers() {
+        return serverConnectionWrappers;
+    }
 }
