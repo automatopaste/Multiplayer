@@ -12,8 +12,6 @@ import java.util.Map;
 
 public class UnpackAlgorithm {
     public static Unpacked unpack(ByteBuf in, InetSocketAddress remote, InetSocketAddress local) {
-        int r = in.readerIndex();
-
         int tick = in.readInt();
 
         Unpacked result;

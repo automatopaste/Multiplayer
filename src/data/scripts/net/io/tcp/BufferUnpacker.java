@@ -18,7 +18,6 @@ public class BufferUnpacker extends ByteToMessageDecoder {
                 (InetSocketAddress) channelHandlerContext.channel().localAddress()
         );
 
-        //in.release();
         out.add(result);
     }
 }

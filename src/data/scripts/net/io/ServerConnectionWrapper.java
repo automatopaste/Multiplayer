@@ -31,6 +31,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public PacketContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
 
+        socketBuffer.clear();
+
         List<BasePackable> data;
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -42,7 +44,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         Collections.singletonList((BasePackable) statusData),
                         connectionManager.getTick(),
                         true,
-                        remoteAddress
+                        remoteAddress,
+                        socketBuffer
                 );
             case LOADING:
                 Console.showMessage("Sending client " + connectionId + " data over socket");
@@ -58,7 +61,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         data,
                         connectionManager.getTick(),
                         true,
-                        remoteAddress
+                        remoteAddress,
+                        socketBuffer
                 );
             case SPAWNING:
                 data = new ArrayList<>();
@@ -72,7 +76,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         data,
                         connectionManager.getTick(),
                         true,
-                        remoteAddress
+                        remoteAddress,
+                        socketBuffer
                 );
             case SIMULATION_READY:
             case SIMULATING:
@@ -85,6 +90,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     @Override
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
+
+        datagramBuffer.clear();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -104,7 +111,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 }
 
                 return new PacketContainer(
-                        data, connectionManager.getTick(), false, remoteAddress
+                        data, connectionManager.getTick(), false, remoteAddress, datagramBuffer
                 );
             case CLOSED: // *shuts briefcase*
             default:

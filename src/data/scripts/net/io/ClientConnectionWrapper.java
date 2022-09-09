@@ -54,32 +54,34 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             statusData.setConnection(this);
         }
 
+        socketBuffer.clear();
+
         switch (connectionState) {
             case INITIALISATION_READY:
                 Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
             case LOADING_READY:
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATION_READY:
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
                 startDatagramClient();
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null);
+                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATING:
             case CLOSED:
             default:
@@ -96,6 +98,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
+
+        datagramBuffer.clear();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -114,7 +118,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                     data.addAll(type.values());
                 }
 
-                return new PacketContainer(data, tick, false, null);
+                return new PacketContainer(data, tick, false, null, datagramBuffer);
             case CLOSED:
             default:
                 return null;

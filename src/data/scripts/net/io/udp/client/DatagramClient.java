@@ -4,6 +4,8 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
+import data.scripts.net.io.udp.DatagramDecoder;
+import data.scripts.net.io.udp.DatagramEncoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
 import data.scripts.net.io.PacketContainer;
 import io.netty.bootstrap.Bootstrap;
@@ -90,8 +92,10 @@ public class DatagramClient implements Runnable {
             @Override
             protected void initChannel(NioDatagramChannel datagramChannel) {
                 datagramChannel.pipeline().addLast(
+                        new DatagramDecoder(),
                         new DatagramUnpacker(),
-                        new ClientInboundHandler(connection)
+                        new ClientInboundHandler(connection),
+                        new DatagramEncoder()
                 );
             }
         });

@@ -1,6 +1,8 @@
 package data.scripts.net.io.udp.server;
 
 import data.scripts.net.io.ServerConnectionManager;
+import data.scripts.net.io.udp.DatagramDecoder;
+import data.scripts.net.io.udp.DatagramEncoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioDatagramChannel;
@@ -17,8 +19,10 @@ public class DatagramChannelInitializer extends ChannelInitializer<NioDatagramCh
     @Override
     protected void initChannel(NioDatagramChannel datagramChannel) {
         datagramChannel.pipeline().addLast(
+                new DatagramDecoder(),
                 new DatagramUnpacker(),
-                new ServerInboundHandler(serverConnectionManager)
+                new ServerInboundHandler(serverConnectionManager),
+                new DatagramEncoder()
         );
     }
 }

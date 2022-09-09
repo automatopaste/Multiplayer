@@ -2,6 +2,8 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import data.scripts.plugins.MPPlugin;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 
 import java.io.IOException;
 
@@ -25,8 +27,14 @@ public abstract class BaseConnectionWrapper {
 
     protected MPPlugin localPlugin;
 
+    protected final ByteBuf socketBuffer;
+    protected final ByteBuf datagramBuffer;
+
     public BaseConnectionWrapper(MPPlugin localPlugin) {
         this.localPlugin = localPlugin;
+
+        socketBuffer = PooledByteBufAllocator.DEFAULT.buffer();
+        datagramBuffer = PooledByteBufAllocator.DEFAULT.buffer();
     }
 
     public void setConnectionState(ConnectionState connectionState) {

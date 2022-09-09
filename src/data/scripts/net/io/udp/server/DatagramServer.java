@@ -17,6 +17,7 @@ import org.lazywizard.console.Console;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.zip.Deflater;
 
 public class DatagramServer implements Runnable {
     private final int port;
@@ -27,7 +28,10 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
+    private final Deflater compressor;
+
     private final DebugGraphContainer dataGraph;
+    private final DebugGraphContainer dataGraphCompressed;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -37,7 +41,10 @@ public class DatagramServer implements Runnable {
 
         messageQueue = new LinkedList<>();
 
-        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE * 2, 100f);
+        compressor = new Deflater(Deflater.BEST_SPEED);
+
+        dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
+        dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
     }
 
     @Override
@@ -51,6 +58,8 @@ public class DatagramServer implements Runnable {
         try {
             while (connectionManager.isActive()) {
                 int size = 0;
+                int sizeCompressed = 0;
+
                 while (!messageQueue.isEmpty()) {
                     synchronized (messageQueue) {
                         final PacketContainer message = messageQueue.poll();
@@ -64,13 +73,26 @@ public class DatagramServer implements Runnable {
                         }
 
                         size += message.getBufSize();
+                        byte[] bytes = buf.array();
+                        compressor.setInput(bytes);
+                        compressor.finish();
+                        byte[] compressed = new byte[bytes.length];
+                        int length = compressor.deflate(compressed);
 
-                       channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
+                        buf.clear();
+                        buf.writerIndex(0);
+                        buf.writeBytes(compressed, 0, length - 1);
+
+                        sizeCompressed += length;
+
+                        channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                     }
                 }
 
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                dataGraphCompressed.increment(sizeCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
 
                 while (messageQueue.isEmpty()) {
                     synchronized (sync) {
@@ -120,5 +142,7 @@ public class DatagramServer implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerLoopGroup != null) workerLoopGroup.shutdownGracefully();
+        dataGraph.expire();
+        dataGraphCompressed.expire();
     }
 }
