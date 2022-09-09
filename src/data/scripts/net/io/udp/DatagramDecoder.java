@@ -27,7 +27,7 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         decompressor.end();
 
         ByteBuf output = PooledByteBufAllocator.DEFAULT.buffer();
-        output.writeBytes(decompressed, 0, length - 1);
+        output.writeBytes(decompressed);
 
         DatagramUnpacker.DatagramWrapper wrapper = new DatagramUnpacker.DatagramWrapper(output);
         out.add(wrapper);
