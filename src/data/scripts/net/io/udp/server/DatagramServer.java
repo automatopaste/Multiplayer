@@ -37,7 +37,7 @@ public class DatagramServer implements Runnable {
 
         messageQueue = new LinkedList<>();
 
-        dataGraph = new DebugGraphContainer("Packet Size", 64, ServerConnectionManager.TICK_RATE * 2, 100f);
+        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE * 2, 100f);
     }
 
     @Override
