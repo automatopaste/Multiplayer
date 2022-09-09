@@ -11,7 +11,6 @@ import java.util.zip.Inflater;
 
 public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
-
     @Override
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
         ByteBuf content = in.content();
@@ -29,5 +28,8 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
         ByteBuf output = PooledByteBufAllocator.DEFAULT.buffer();
         output.writeBytes(decompressed, 0, length - 1);
+
+        DatagramUnpacker.DatagramWrapper wrapper = new DatagramUnpacker.DatagramWrapper(output);
+        out.add(wrapper);
     }
 }

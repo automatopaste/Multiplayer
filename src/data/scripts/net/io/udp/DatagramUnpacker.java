@@ -9,16 +9,28 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class DatagramUnpacker extends MessageToMessageDecoder<ByteBuf> {
+public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUnpacker.DatagramWrapper> {
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, DatagramWrapper in, List<Object> out) throws Exception {
         Unpacked result = UnpackAlgorithm.unpack(
-                in,
+                in.getBuf(),
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
                 (InetSocketAddress) channelHandlerContext.channel().localAddress()
         );
 
         out.add(result);
-        in.release();
+        in.getBuf().release();
+    }
+
+    public static class DatagramWrapper {
+        private final ByteBuf buf;
+
+        public DatagramWrapper(ByteBuf buf) {
+            this.buf = buf;
+        }
+
+        public ByteBuf getBuf() {
+            return buf;
+        }
     }
 }
