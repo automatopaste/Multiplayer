@@ -68,7 +68,6 @@ public class DatagramServer implements Runnable {
 
                         ByteBuf buf = message.get();
                         if (buf.readableBytes() <= 4) {
-                            buf.release();
                             continue;
                         }
 

@@ -66,7 +66,6 @@ public class DatagramClient implements Runnable {
 
                 ByteBuf message = container.get();
                 if (message.readableBytes() <= 4) {
-                    message.release();
                     continue;
                 }
 
