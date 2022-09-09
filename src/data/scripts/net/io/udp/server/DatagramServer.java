@@ -6,6 +6,7 @@ import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -81,13 +82,12 @@ public class DatagramServer implements Runnable {
                         byte[] compressed = new byte[bytes.length];
                         int length = compressor.deflate(compressed);
 
-                        buf.clear();
-                        buf.writerIndex(0);
-                        buf.writeBytes(compressed, 0, length - 1);
+                        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+                        out.writeBytes(compressed);
 
                         sizeCompressed += length;
 
-                        channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
+                        channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
                     }
                 }
 

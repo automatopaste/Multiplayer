@@ -10,6 +10,7 @@ import data.scripts.net.io.udp.DatagramEncoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -20,6 +21,7 @@ import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.zip.Deflater;
 
 public class DatagramClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -34,6 +36,8 @@ public class DatagramClient implements Runnable {
 
     private final Clock clock;
 
+    private final Deflater compressor;
+
     public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
         // use next port for UDP traffic
@@ -41,6 +45,8 @@ public class DatagramClient implements Runnable {
         this.connection = connection;
 
         clock = new Clock(TICK_RATE);
+
+        compressor = new Deflater(Deflater.BEST_SPEED);
     }
 
     @Override
@@ -64,13 +70,24 @@ public class DatagramClient implements Runnable {
                 PacketContainer container = connection.getDatagram();
                 if (container == null || container.isEmpty()) continue;
 
-                ByteBuf message = container.get();
-                if (message.readableBytes() <= 4) {
+                ByteBuf buf = container.get();
+                if (buf.readableBytes() <= 4) {
                     continue;
                 }
 
+                byte[] bytes = new byte[buf.readableBytes()];
+                buf.readBytes(bytes);
+
+                compressor.setInput(bytes);
+                compressor.finish();
+                byte[] compressed = new byte[bytes.length];
+                int length = compressor.deflate(compressed);
+
+                ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+                out.writeBytes(compressed);
+
                 //Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());
-                channel.writeAndFlush(new DatagramPacket(message, remoteAddress)).sync();
+                channel.writeAndFlush(new DatagramPacket(out, remoteAddress)).sync();
             }
 
             closeFuture.sync();
