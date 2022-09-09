@@ -75,8 +75,8 @@ public class SocketClient implements Runnable {
         }
     }
 
-    private ChannelFuture write(Object msg) throws InterruptedException {
-        return channel.writeAndFlush(msg).sync();
+    private void write(Object msg) throws InterruptedException {
+        channel.writeAndFlush(msg).sync();
     }
 
     private ChannelFuture start() throws InterruptedException {

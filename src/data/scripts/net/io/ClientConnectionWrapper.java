@@ -54,8 +54,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             statusData.setConnection(this);
         }
 
-        socketBuffer.clear();
-
         switch (connectionState) {
             case INITIALISATION_READY:
                 Console.showMessage("Awaiting server acknowledgement");
@@ -98,8 +96,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
-
-        datagramBuffer.clear();
 
         switch (connectionState) {
             case INITIALISATION_READY:

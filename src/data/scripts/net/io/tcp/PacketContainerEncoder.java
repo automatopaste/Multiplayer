@@ -10,7 +10,7 @@ public class PacketContainerEncoder extends MessageToByteEncoder<PacketContainer
     @Override
     protected void encode(ChannelHandlerContext ctx, PacketContainer msg, ByteBuf out) throws Exception {
         // encode length of buffer so completeness can be checked when reconstructed
-        ByteBuf data = msg.get().copy();
+        ByteBuf data = msg.get();
         int length = data.readableBytes();
 
         out.writeInt(length);

@@ -12,7 +12,7 @@ public class DatagramEncoder extends MessageToMessageEncoder<DatagramPacket> {
 
     @Override
     protected void encode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
-        ByteBuf buf = in.content().copy();
+        ByteBuf buf = in.content();
         int length = buf.readableBytes();
 
         ByteBuf content = PooledByteBufAllocator.DEFAULT.buffer();
