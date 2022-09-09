@@ -81,7 +81,7 @@ public class DatagramServer implements Runnable {
                         compressor.finish();
                         byte[] compressed = new byte[bytes.length];
                         int length = compressor.deflate(compressed);
-                        compressor.finish();
+                        compressor.end();
 
                         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
                         out.writeBytes(compressed);
