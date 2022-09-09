@@ -39,6 +39,9 @@ public class PacketContainer {
     }
 
     public ByteBuf get() {
+        // prevent ref count exception
+        output.retain();
+
         output.clear();
 
         List<byte[]> entities = new ArrayList<>();

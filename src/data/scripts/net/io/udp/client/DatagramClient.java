@@ -69,9 +69,6 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
-                // prevent ref count exception
-                message.retain();
-
                 //Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());
                 channel.writeAndFlush(new DatagramPacket(message, remoteAddress)).sync();
             }
