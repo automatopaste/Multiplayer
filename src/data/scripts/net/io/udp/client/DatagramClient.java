@@ -36,8 +36,6 @@ public class DatagramClient implements Runnable {
 
     private final Clock clock;
 
-    private final Deflater compressor;
-
     public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
         this.host = host;
         // use next port for UDP traffic
@@ -45,8 +43,6 @@ public class DatagramClient implements Runnable {
         this.connection = connection;
 
         clock = new Clock(TICK_RATE);
-
-        compressor = new Deflater(Deflater.BEST_SPEED);
     }
 
     @Override
@@ -78,6 +74,7 @@ public class DatagramClient implements Runnable {
                 byte[] bytes = new byte[buf.readableBytes()];
                 buf.readBytes(bytes);
 
+                Deflater compressor = new Deflater(Deflater.BEST_SPEED);
                 compressor.setInput(bytes);
                 compressor.finish();
                 byte[] compressed = new byte[bytes.length];

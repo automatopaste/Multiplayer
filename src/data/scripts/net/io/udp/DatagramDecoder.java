@@ -11,11 +11,6 @@ import java.util.zip.Inflater;
 
 public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
-    private final Inflater decompressor;
-
-    public DatagramDecoder() {
-        decompressor = new Inflater();
-    }
 
     @Override
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
@@ -26,6 +21,7 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         byte[] bytes = new byte[data.readableBytes()];
         data.readBytes(bytes);
 
+        Inflater decompressor = new Inflater();
         decompressor.setInput(bytes);
         byte[] decompressed = new byte[size * 2];
         int length = decompressor.inflate(decompressed);

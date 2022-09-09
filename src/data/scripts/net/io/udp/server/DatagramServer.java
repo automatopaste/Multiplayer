@@ -29,8 +29,6 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
-    private final Deflater compressor;
-
     private final DebugGraphContainer dataGraph;
     private final DebugGraphContainer dataGraphCompressed;
 
@@ -41,8 +39,6 @@ public class DatagramServer implements Runnable {
         sync = new Object();
 
         messageQueue = new LinkedList<>();
-
-        compressor = new Deflater(Deflater.BEST_SPEED);
 
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
@@ -77,6 +73,7 @@ public class DatagramServer implements Runnable {
                         byte[] bytes = new byte[buf.readableBytes()];
                         buf.readBytes(bytes);
 
+                        Deflater compressor = new Deflater(Deflater.BEST_SPEED);
                         compressor.setInput(bytes);
                         compressor.finish();
                         byte[] compressed = new byte[bytes.length];
