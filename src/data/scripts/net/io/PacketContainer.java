@@ -39,6 +39,8 @@ public class PacketContainer {
     }
 
     public ByteBuf get() {
+        output.clear();
+
         List<byte[]> entities = new ArrayList<>();
         for (BasePackable packable : packables) {
             byte[] written = packable.pack(flush);
