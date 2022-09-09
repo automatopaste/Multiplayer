@@ -3,6 +3,8 @@ package data.scripts.net.io;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
 import data.scripts.plugins.MPPlugin;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -30,6 +32,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     @Override
     public PacketContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
+
+        ByteBuf socketBuffer = PooledByteBufAllocator.DEFAULT.buffer();
 
         List<BasePackable> data;
         switch (connectionState) {
@@ -88,6 +92,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     @Override
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
+
+        ByteBuf datagramBuffer = PooledByteBufAllocator.DEFAULT.buffer();
 
         switch (connectionState) {
             case INITIALISATION_READY:

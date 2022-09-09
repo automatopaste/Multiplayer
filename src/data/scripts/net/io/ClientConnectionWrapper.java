@@ -7,6 +7,8 @@ import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import org.lazywizard.console.Console;
 
 import java.io.IOException;
@@ -54,6 +56,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             statusData.setConnection(this);
         }
 
+        ByteBuf socketBuffer = PooledByteBufAllocator.DEFAULT.buffer();
+
         switch (connectionState) {
             case INITIALISATION_READY:
                 Console.showMessage("Awaiting server acknowledgement");
@@ -96,6 +100,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
+
+        ByteBuf datagramBuffer = PooledByteBufAllocator.DEFAULT.buffer();
 
         switch (connectionState) {
             case INITIALISATION_READY:

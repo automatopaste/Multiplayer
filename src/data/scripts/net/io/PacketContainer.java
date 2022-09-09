@@ -39,15 +39,11 @@ public class PacketContainer {
     }
 
     public ByteBuf get() {
-        output.clear();
-
         List<byte[]> entities = new ArrayList<>();
         for (BasePackable packable : packables) {
             byte[] written = packable.pack(flush);
             if (written != null && written.length > 0) entities.add(written);
         }
-
-        //ByteBuf output = Unpooled.directBuffer(PACKET_SIZE);
 
         output.writeInt(tick);
 

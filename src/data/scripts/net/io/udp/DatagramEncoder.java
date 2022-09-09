@@ -20,5 +20,6 @@ public class DatagramEncoder extends MessageToMessageEncoder<DatagramPacket> {
         content.writeBytes(buf.readBytes(length));
 
         out.add(new DatagramPacket(content, in.recipient()));
+        buf.release();
     }
 }
