@@ -17,6 +17,8 @@ public class DatagramEncoder extends MessageToMessageEncoder<DatagramPacket> {
 
         ByteBuf content = PooledByteBufAllocator.DEFAULT.buffer();
         content.writeInt(length);
+
+        buf.readerIndex(0);
         content.writeBytes(buf.readBytes(length));
 
         out.add(new DatagramPacket(content, in.recipient()));

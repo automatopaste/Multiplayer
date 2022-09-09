@@ -82,6 +82,7 @@ public class DatagramClient implements Runnable {
                 compressor.finish();
                 byte[] compressed = new byte[bytes.length];
                 int length = compressor.deflate(compressed);
+                compressor.finish();
 
                 ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
                 out.writeBytes(compressed);
