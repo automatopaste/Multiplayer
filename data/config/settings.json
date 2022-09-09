@@ -3,5 +3,5 @@
 	"mpServerTickRate": 30,
 	"mpClientTickrate": 15,
 	"mpMaxConnections": 4,
-	"mpHost": "192.168.1.4:20303",
+	"mpHost": "192.168.1.111:20303",
 }

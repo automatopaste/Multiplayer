@@ -16,6 +16,7 @@ public class PacketContainer {
     private final List<BasePackable> packables;
     private final boolean flush;
     private final InetSocketAddress dest;
+    private int bufSize;
 
 //    private final Queue<ByteBuf> sections;
 
@@ -53,6 +54,8 @@ public class PacketContainer {
             data.writeBytes(entity);
         }
 
+        bufSize = data.writerIndex();
+
         return data;
     }
 
@@ -62,5 +65,9 @@ public class PacketContainer {
 
     public int getTick() {
         return tick;
+    }
+
+    public int getBufSize() {
+        return bufSize;
     }
 }
