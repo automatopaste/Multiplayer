@@ -72,7 +72,10 @@ public class DatagramServer implements Runnable {
                         }
 
                         size += message.getBufSize();
-                        byte[] bytes = buf.array();
+
+                        byte[] bytes = new byte[buf.readableBytes()];
+                        buf.readBytes(bytes);
+
                         compressor.setInput(bytes);
                         compressor.finish();
                         byte[] compressed = new byte[bytes.length];

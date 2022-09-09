@@ -23,8 +23,10 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         int size = content.readInt();
         ByteBuf data = content.readBytes(size);
 
-        byte[] compressed = data.array();
-        decompressor.setInput(compressed);
+        byte[] bytes = new byte[data.readableBytes()];
+        data.readBytes(bytes);
+
+        decompressor.setInput(bytes);
         byte[] decompressed = new byte[size << 1];
         int length = decompressor.inflate(decompressed);
 
