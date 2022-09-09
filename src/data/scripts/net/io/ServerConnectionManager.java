@@ -56,7 +56,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
         tick = 0;
         clock = new Clock(TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Packet Size", 1024, TICK_RATE * 2, 100f);
+        dataGraph = new DebugGraphContainer("Packet Size", 64, TICK_RATE * 2, 100f);
     }
 
     @Override

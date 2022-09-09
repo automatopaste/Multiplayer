@@ -73,6 +73,7 @@ public class MPServerPlugin extends MPPlugin {
 
         guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
         guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + serverShipTable.getRegistered().size() + " ships in local table");
+        guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
     public VariantDataGenerator getDataStore() {
