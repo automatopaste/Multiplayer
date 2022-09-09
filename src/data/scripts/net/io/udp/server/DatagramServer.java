@@ -1,5 +1,7 @@
 package data.scripts.net.io.udp.server;
 
+import cmu.CMUtils;
+import cmu.plugins.debug.DebugGraphContainer;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.Bootstrap;
@@ -25,6 +27,8 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
+    private final DebugGraphContainer dataGraph;
+
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
@@ -32,6 +36,8 @@ public class DatagramServer implements Runnable {
         sync = new Object();
 
         messageQueue = new LinkedList<>();
+
+        dataGraph = new DebugGraphContainer("Packet Size", 64, ServerConnectionManager.TICK_RATE * 2, 100f);
     }
 
     @Override
@@ -44,6 +50,7 @@ public class DatagramServer implements Runnable {
 
         try {
             while (connectionManager.isActive()) {
+                int size = 0;
                 while (!messageQueue.isEmpty()) {
                     synchronized (messageQueue) {
                         final PacketContainer message = messageQueue.poll();
@@ -56,10 +63,14 @@ public class DatagramServer implements Runnable {
                             continue;
                         }
 
-                        //Global.getLogger(DatagramServer.class).info("Sending datagram to " + message.getDest().getAddress() + ":" + message.getDest().getPort());
+                        size += message.getBufSize();
+
                        channel.writeAndFlush(new DatagramPacket(buf, message.getDest())).sync();
                     }
                 }
+
+                dataGraph.increment(size);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
 
                 while (messageQueue.isEmpty()) {
                     synchronized (sync) {

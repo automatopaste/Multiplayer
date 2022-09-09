@@ -1,7 +1,5 @@
 package data.scripts.net.io;
 
-import cmu.CMUtils;
-import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.packables.metadata.ConnectionStatusData;
@@ -38,8 +36,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     private int tick;
     private final Clock clock;
 
-    private final DebugGraphContainer dataGraph;
-
     public ServerConnectionManager(MPServerPlugin serverPlugin) {
         this.serverPlugin = serverPlugin;
         dataDuplex = new DataDuplex();
@@ -56,7 +52,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
         tick = 0;
         clock = new Clock(TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Packet Size", 64, TICK_RATE * 2, 100f);
     }
 
     @Override
@@ -73,14 +68,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
                 tickUpdate();
 
                 socketServer.queueMessages(getSocketMessages());
-                List<PacketContainer> p = getDatagrams();
-                datagramServer.queueMessages(p);
-
-                // debug
-                int size = 0;
-                for (PacketContainer pc : p) size += pc.getBufSize();
-                dataGraph.increment(size);
-                CMUtils.getGuiDebug().putContainer(ServerConnectionManager.class, "dataGraph", dataGraph);
+                datagramServer.queueMessages(getDatagrams());
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
