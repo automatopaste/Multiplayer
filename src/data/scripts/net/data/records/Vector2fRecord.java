@@ -1,6 +1,7 @@
 package data.scripts.net.data.records;
 
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -49,6 +50,13 @@ public class Vector2fRecord extends BaseRecord<Vector2f> {
     public Vector2fRecord read(ByteBuf input) {
         float x = input.readFloat();
         float y = input.readFloat();
+        return new Vector2fRecord(new Vector2f(x, y));
+    }
+
+    @Override
+    public BaseRecord<Vector2f> readArray(ByteArrayReader reader) {
+        float x = reader.readFloat();
+        float y = reader.readFloat();
         return new Vector2fRecord(new Vector2f(x, y));
     }
 

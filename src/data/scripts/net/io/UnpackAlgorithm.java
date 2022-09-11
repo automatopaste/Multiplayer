@@ -4,7 +4,6 @@ import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
-import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -41,16 +40,6 @@ public class UnpackAlgorithm {
         return result;
     }
 
-    private static void insertEntity(Map<Integer, Map<Integer, BasePackable>> types, int entityTypeID, int entityInstanceID, Map<Integer, BaseRecord<?>> records) {
-        if (records.isEmpty()) Console.showMessage("Entity read zero records: " + entityTypeID);
-        BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
-
-        Map<Integer, BasePackable> entities = types.get(entityTypeID);
-        if (entities == null) entities = new HashMap<>();
-        entities.put(entityInstanceID, entity);
-        types.put(entityTypeID, entities);
-    }
-
     private static int readNextEntity(Map<Integer, Map<Integer, BasePackable>> data, ByteBuf in, int entityTypeID) {
         int entityInstanceID = in.readInt();
 
@@ -84,4 +73,71 @@ public class UnpackAlgorithm {
 
         return n;
     }
+
+    public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {
+        ByteArrayReader reader = new ByteArrayReader(in);
+
+        int tick = reader.readInt();
+
+        Unpacked result;
+        if (reader.numBytes() == 0) {
+            result = new Unpacked(
+                    new HashMap<Integer, Map<Integer, BasePackable>>(),
+                    tick,
+                    remote,
+                    local
+            );
+        } else {
+            Map<Integer, Map<Integer, BasePackable>> data = new HashMap<>();
+
+            int nextID = reader.readInt();
+            while (nextID != Integer.MIN_VALUE) {
+                nextID = readNextEntity(data, reader, nextID);
+            }
+
+            result = new Unpacked(
+                    data,
+                    tick,
+                    remote,
+                    local
+            );
+        }
+
+        return result;
+    }
+
+    private static int readNextEntity(Map<Integer, Map<Integer, BasePackable>> data, ByteArrayReader reader, int entityTypeID) {
+        int entityInstanceID = reader.readInt();
+
+        Map<Integer, BaseRecord<?>> records = new HashMap<>();
+
+        int n = reader.readInt();
+        while (DataGenManager.recordTypeIDs.containsValue(n)) {
+            // type
+            int recordTypeID = n;
+            // unique
+            int recordUniqueID = reader.readInt();
+
+            //data
+            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).readArray(reader);
+            records.put(recordUniqueID, record);
+
+            if (reader.numBytes() > 0) {
+                n = reader.readInt();
+            } else {
+                n = Integer.MIN_VALUE;
+                break;
+            }
+        }
+
+        Map<Integer, BasePackable> entities = data.get(entityTypeID);
+        if (entities == null) entities = new HashMap<>();
+
+        BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
+        entities.put(entityInstanceID, entity);
+        data.put(entityTypeID, entities);
+
+        return n;
+    }
+
 }

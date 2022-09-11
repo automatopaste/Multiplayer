@@ -1,5 +1,6 @@
 package data.scripts.net.data;
 
+import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
@@ -20,6 +21,8 @@ public abstract class BaseRecord<T> {
     }
 
     public abstract BaseRecord<T> read(ByteBuf in);
+
+    public abstract BaseRecord<T> readArray(ByteArrayReader reader);
 
     public abstract void doWrite(ByteBuffer output);
 

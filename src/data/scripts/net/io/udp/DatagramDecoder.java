@@ -1,7 +1,6 @@
 package data.scripts.net.io.udp;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -26,10 +25,6 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         int length = decompressor.inflate(decompressed);
         decompressor.end();
 
-        ByteBuf output = PooledByteBufAllocator.DEFAULT.buffer();
-        output.writeBytes(decompressed);
-
-        DatagramUnpacker.DatagramWrapper wrapper = new DatagramUnpacker.DatagramWrapper(output);
-        out.add(wrapper);
+        out.add(decompressed);
     }
 }

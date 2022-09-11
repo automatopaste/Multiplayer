@@ -1,6 +1,7 @@
 package data.scripts.net.data.records;
 
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
@@ -38,6 +39,14 @@ public class StringRecord extends BaseRecord<String> {
     public StringRecord read(ByteBuf input) {
         int length = input.readInt();
         String value = input.readCharSequence(length, CHARSET).toString();
+
+        return new StringRecord(value);
+    }
+
+    @Override
+    public BaseRecord<String> readArray(ByteArrayReader reader) {
+        int length = reader.readInt();
+        String value = reader.readString(length, CHARSET);
 
         return new StringRecord(value);
     }

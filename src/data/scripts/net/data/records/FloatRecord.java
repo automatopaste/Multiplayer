@@ -1,6 +1,7 @@
 package data.scripts.net.data.records;
 
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
@@ -46,6 +47,12 @@ public class FloatRecord extends BaseRecord<Float> {
     @Override
     public FloatRecord read(ByteBuf input) {
         float value = input.readFloat();
+        return new FloatRecord(value);
+    }
+
+    @Override
+    public BaseRecord<Float> readArray(ByteArrayReader reader) {
+        float value = reader.readFloat();
         return new FloatRecord(value);
     }
 
