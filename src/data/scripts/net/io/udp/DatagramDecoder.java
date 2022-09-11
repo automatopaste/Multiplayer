@@ -14,14 +14,13 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
         ByteBuf content = in.content();
         int size = content.readInt();
-        ByteBuf data = content.readBytes(size);
 
-        byte[] bytes = new byte[data.readableBytes()];
-        data.readBytes(bytes);
+        byte[] bytes = new byte[size];
+        content.readBytes(bytes, 0, size);
 
         Inflater decompressor = new Inflater();
         decompressor.setInput(bytes);
-        byte[] decompressed = new byte[size * 2];
+        byte[] decompressed = new byte[size];
         int length = decompressor.inflate(decompressed);
         decompressor.end();
 

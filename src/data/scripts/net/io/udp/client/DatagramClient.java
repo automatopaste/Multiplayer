@@ -6,7 +6,6 @@ import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.udp.DatagramDecoder;
-import data.scripts.net.io.udp.DatagramEncoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -111,8 +110,8 @@ public class DatagramClient implements Runnable {
                 datagramChannel.pipeline().addLast(
                         new DatagramDecoder(),
                         new DatagramUnpacker(),
-                        new ClientInboundHandler(connection),
-                        new DatagramEncoder()
+                        new ClientInboundHandler(connection)
+                        //new DatagramEncoder()
                 );
             }
         });
