@@ -31,6 +31,7 @@ public class DatagramServer implements Runnable {
 
     private final DebugGraphContainer dataGraph;
     private final DebugGraphContainer dataGraphCompressed;
+    private final DebugGraphContainer dataGraphRatio;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -40,8 +41,9 @@ public class DatagramServer implements Runnable {
 
         messageQueue = new LinkedList<>();
 
-        dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
-        dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 80f);
+        dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
+        dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
+        dataGraphRatio = new DebugGraphContainer("Compressio Ratio", ServerConnectionManager.TICK_RATE * 2, 50f);
     }
 
     @Override
@@ -94,7 +96,9 @@ public class DatagramServer implements Runnable {
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
                 dataGraphCompressed.increment(sizeCompressed);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);                dataGraphCompressed.increment(sizeCompressed);
+                dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 
                 while (messageQueue.isEmpty()) {
                     synchronized (sync) {
