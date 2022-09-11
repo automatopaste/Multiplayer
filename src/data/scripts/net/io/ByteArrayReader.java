@@ -30,9 +30,8 @@ public class ByteArrayReader {
     }
 
     public String readString(int length, Charset charset) {
-        int i2 = index + length;
-        String out = new String(a, index, i2, charset);
-        index = i2;
+        String out = new String(a, index, length, charset);
+        index += length;
         return out;
     }
 
