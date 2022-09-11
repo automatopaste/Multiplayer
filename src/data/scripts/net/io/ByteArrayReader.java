@@ -37,6 +37,6 @@ public class ByteArrayReader {
     }
 
     public int numBytes() {
-        return a.length;
+        return a.length - index;
     }
 }
