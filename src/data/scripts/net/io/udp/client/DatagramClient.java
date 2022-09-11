@@ -71,6 +71,8 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
+                int bufSize = container.getBufSize();
+
                 byte[] bytes = new byte[buf.readableBytes()];
                 buf.readBytes(bytes);
 
@@ -82,6 +84,7 @@ public class DatagramClient implements Runnable {
                 compressor.end();
 
                 ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+                out.writeInt(bufSize);
                 out.writeBytes(compressed);
 
                 //Global.getLogger(DatagramClient.class).info("Sending datagram to " + remoteAddress.getAddress().toString());

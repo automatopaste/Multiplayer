@@ -68,7 +68,8 @@ public class DatagramServer implements Runnable {
                             continue;
                         }
 
-                        size += message.getBufSize();
+                        int bufSize = message.getBufSize();
+                        size += bufSize;
 
                         byte[] bytes = new byte[buf.readableBytes()];
                         buf.readBytes(bytes);
@@ -81,6 +82,7 @@ public class DatagramServer implements Runnable {
                         compressor.end();
 
                         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+                        out.writeInt(bufSize);
                         out.writeBytes(compressed);
 
                         sizeCompressed += length;
