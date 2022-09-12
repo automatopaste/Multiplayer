@@ -36,8 +36,6 @@ public class ShipData extends BasePackable {
     private final StringRecord specId;
     private final FloatRecord combatReadiness;
 
-    private ShipAPI ship;
-    
     private static final int SHIP_LOC = 1;
     private static final int SHIP_VEL = 2;
     private static final int SHIP_ANG = 3;
@@ -49,6 +47,10 @@ public class ShipData extends BasePackable {
     private static final int OWNER = 9;
     private static final int SPEC_ID = 10;
     private static final int COMBAT_READINESS = 11;
+
+    // dest variables
+    private ShipAPI ship;
+    private ShipHullSpecAPI hullSpec;
 
     public ShipData(int instanceID, ShipAPI ship) {
         super(instanceID);
@@ -64,7 +66,6 @@ public class ShipData extends BasePackable {
         owner = (IntRecord) new IntRecord(0).setUndefined(true);
         specId = (StringRecord) new StringRecord("DEFAULT_SPEC_ID").setUndefined(true);
         combatReadiness = (FloatRecord) new FloatRecord(0.7f).setUndefined(true);
-
 
         this.ship = ship;
     }
@@ -229,7 +230,9 @@ public class ShipData extends BasePackable {
 
         // update variant
         String hullSpecId = specId.getRecord();
-        ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
+        hullSpec = Global.getSettings().getHullSpec(hullSpecId);
+
+        CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
 
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
             String hullVariantId = hullSpecId + "_Hull";
@@ -256,17 +259,16 @@ public class ShipData extends BasePackable {
             FleetMemberType fleetMemberType = FleetMemberType.SHIP;
             FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
 
-            CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner.getRecord());
             fleetManager.addToReserves(fleetMember);
             ship = fleetManager.spawnFleetMember(fleetMember, loc.getRecord(), ang.getRecord(), 0f);
             ship.setCurrentCR(combatReadiness.getRecord());
-        } else {
-            engine.getFleetManager(owner.getRecord()).spawnShipOrWing(hullSpecId + "_wing", loc.getRecord(), ang.getRecord());
-        }
 
-        // set fleetmember id to sync with server
-        Ship s = (Ship) ship;
-        s.setFleetMemberId(id.getRecord());
+            // set fleetmember id to sync with server
+            Ship s = (Ship) ship;
+            s.setFleetMemberId(id.getRecord());
+        } else {
+            ship = fleetManager.spawnShipOrWing(hullSpecId, loc.getRecord(), ang.getRecord(), 0f);
+        }
 
         ship.setShipAI(new ShipAIPlugin() {
             @Override
@@ -320,6 +322,10 @@ public class ShipData extends BasePackable {
     @Override
     public void destinationUpdate() {
         CombatEngineAPI engine = Global.getCombatEngine();
+
+        if (hullSpec.getHullSize() == ShipAPI.HullSize.FIGHTER) {
+
+        }
 
         if (ship == null || !engine.isEntityInPlay(ship)) {
             for (ShipAPI ship : engine.getShips()) {
