@@ -2,6 +2,7 @@ package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
+import data.scripts.net.io.CompressionUtils;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.Bootstrap;
@@ -18,7 +19,6 @@ import org.lazywizard.console.Console;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.zip.Deflater;
 
 public class DatagramServer implements Runnable {
     private final int port;
@@ -75,19 +75,12 @@ public class DatagramServer implements Runnable {
 
                         byte[] bytes = new byte[buf.readableBytes()];
                         buf.readBytes(bytes);
-
-                        Deflater compressor = new Deflater(Deflater.BEST_SPEED);
-                        compressor.setInput(bytes);
-                        compressor.finish();
-                        byte[] compressed = new byte[bytes.length];
-                        int length = compressor.deflate(compressed);
-                        compressor.end();
+                        byte[] compressed = CompressionUtils.deflate(bytes);
+                        sizeCompressed +=  compressed.length;
 
                         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
                         out.writeInt(bufSize);
                         out.writeBytes(compressed);
-
-                        sizeCompressed += length;
 
                         channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
                     }
@@ -96,7 +89,7 @@ public class DatagramServer implements Runnable {
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
                 dataGraphCompressed.increment(sizeCompressed);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);                dataGraphCompressed.increment(sizeCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
                 dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 

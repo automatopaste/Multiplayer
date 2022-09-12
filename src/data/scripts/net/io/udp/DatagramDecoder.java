@@ -1,12 +1,12 @@
 package data.scripts.net.io.udp;
 
+import data.scripts.net.io.CompressionUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
@@ -18,12 +18,6 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         byte[] bytes = new byte[size];
         content.readBytes(bytes, 0, size);
 
-        Inflater decompressor = new Inflater();
-        decompressor.setInput(bytes);
-        byte[] decompressed = new byte[size];
-        int length = decompressor.inflate(decompressed);
-        decompressor.end();
-
-        out.add(decompressed);
+        out.add(CompressionUtils.inflate(bytes, size));
     }
 }
