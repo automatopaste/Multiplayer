@@ -25,6 +25,7 @@ import java.util.Map;
 public class ShipDest extends DestPackable {
 
     private ShipAPI ship;
+    private MPPlugin plugin;
 
     public ShipDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID, records);
@@ -46,10 +47,50 @@ public class ShipDest extends DestPackable {
 
     @Override
     public void init(MPPlugin plugin) {
+        this.plugin = plugin;
+        initShip(plugin);
+    }
+
+    @Override
+    public void update(float amount) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
+
+        if (ship == null) {
+            initShip(plugin);
+        } else {
+            Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
+            ship.getLocation().set(loc);
+            Vector2f vel = (Vector2f) getRecord(ShipIDs.SHIP_VEL).getValue();
+            ship.getVelocity().set(vel);
+            float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
+            ship.setFacing(ang);
+            float angVel = (float) getRecord(ShipIDs.SHIP_ANGVEL).getValue();
+            ship.setAngularVelocity(angVel);
+            float hull = (float) getRecord(ShipIDs.SHIP_HULL).getValue();
+            ship.setHitpoints(ship.getMaxHitpoints() * hull);
+            float flux = (float) getRecord(ShipIDs.SHIP_FLUX).getValue();
+            ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux);
+            Vector2f cursor = (Vector2f) getRecord(ShipIDs.CURSOR).getValue();
+            ship.getMouseTarget().set(cursor);
+            int owner = (int) getRecord(ShipIDs.OWNER).getValue();
+            ship.setOwner(owner);
+            float cr = (float) getRecord(ShipIDs.COMBAT_READINESS).getValue();
+            ship.setCurrentCR(cr);
+        }
+    }
+
+    private void initShip(MPPlugin plugin) {
         if (plugin.getType() != MPPlugin.PluginType.CLIENT) return;
         MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
 
         CombatEngineAPI engine = Global.getCombatEngine();
+
+        String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
+
+        VariantDest variantDest = clientPlugin.getVariantDataMap().getVariantData().get(id);
+        if (variantDest == null) return;
 
         // update variant
         String hullSpecId = (String) getRecord(ShipIDs.SPEC_ID).getValue();
@@ -63,9 +104,6 @@ public class ShipDest extends DestPackable {
                     hullVariantId,
                     hullSpec
             );
-
-            String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
-            VariantDest variantDest = clientPlugin.getVariantDataMap().getVariantData().get(id);
 
             int numCapacitors = (int) variantDest.getRecord(VariantIDs.CAPACITORS).getValue();
             variant.setNumFluxCapacitors(numCapacitors);
@@ -100,41 +138,6 @@ public class ShipDest extends DestPackable {
         }
 
         ship.setShipAI(new DefaultShipAIPlugin());
-    }
-
-    @Override
-    public void update(float amount) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
-
-        if (ship == null || !engine.isEntityInPlay(ship)) {
-            for (ShipAPI ship : engine.getShips()) {
-                if (ship.getFleetMemberId().equals(id)) {
-                    this.ship = ship;
-                }
-            }
-        }
-
-        if (ship == null) return;
-        Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
-        ship.getLocation().set(loc);
-        Vector2f vel = (Vector2f) getRecord(ShipIDs.SHIP_VEL).getValue();
-        ship.getVelocity().set(vel);
-        float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
-        ship.setFacing(ang);
-        float angVel = (float) getRecord(ShipIDs.SHIP_ANGVEL).getValue();
-        ship.setAngularVelocity(angVel);
-        float hull = (float) getRecord(ShipIDs.SHIP_HULL).getValue();
-        ship.setHitpoints(ship.getMaxHitpoints() * hull);
-        float flux = (float) getRecord(ShipIDs.SHIP_FLUX).getValue();
-        ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux);
-        Vector2f cursor = (Vector2f) getRecord(ShipIDs.CURSOR).getValue();
-        ship.getMouseTarget().set(cursor);
-        int owner = (int) getRecord(ShipIDs.OWNER).getValue();
-        ship.setOwner(owner);
-        float cr = (float) getRecord(ShipIDs.COMBAT_READINESS).getValue();
-        ship.setCurrentCR(cr);
     }
 
     @Override
