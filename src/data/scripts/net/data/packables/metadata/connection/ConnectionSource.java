@@ -9,6 +9,8 @@ import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 
+import java.util.Map;
+
 public class ConnectionSource extends SourcePackable {
 
     public ConnectionSource(int connectionID, final BaseConnectionWrapper connection) {
@@ -38,5 +40,12 @@ public class ConnectionSource extends SourcePackable {
     @Override
     public int getTypeId() {
         return ConnectionIDs.TYPE_ID;
+    }
+
+    @Override
+    public void updateFromDelta(Map<Integer, BaseRecord<?>> deltas) {
+        for (int k : deltas.keySet()) {
+            records.get(k).updateFromDelta(deltas.get(k));
+        }
     }
 }
