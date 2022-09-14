@@ -6,7 +6,6 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.io.*;
 import data.scripts.net.io.udp.DatagramDecoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
-import data.scripts.net.io.udp.server.DatagramServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -89,10 +88,11 @@ public class DatagramClient implements Runnable {
                 byte[] bytes = new byte[buf.readableBytes()];
                 buf.readBytes(bytes);
                 byte[] compressed = CompressionUtils.deflate(bytes);
-                sizeCompressed +=  compressed.length;
+                int length = compressed.length;
+                sizeCompressed += length;
 
                 ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
-                out.writeInt(bufSize);
+                out.writeInt(length);
                 out.writeBytes(compressed);
 
                 channel.writeAndFlush(new DatagramPacket(out, remoteAddress)).sync();
