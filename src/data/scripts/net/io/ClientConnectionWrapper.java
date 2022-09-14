@@ -1,5 +1,6 @@
 package data.scripts.net.io;
 
+import cmu.CMUtils;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
@@ -10,7 +11,6 @@ import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
-import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -59,31 +59,31 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
-                Console.showMessage("Awaiting server acknowledgement");
+                CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "initialising connection...");
 
-                connectionState = ConnectionState.INITIALISING;
+                connectionState = ConnectionState.LOADING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case LOADING_READY:
             case LOADING:
-                Console.showMessage("Waiting for prerequisite data");
+                CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Receiving data over socket...");
 
-                connectionState = ConnectionState.LOADING;
+                connectionState = ConnectionState.SPAWNING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SPAWNING_READY:
             case SPAWNING:
-                Console.showMessage("Spawning entities");
+                CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Spawning entities...");
 
-                connectionState = ConnectionState.SPAWNING;
+                connectionState = ConnectionState.SIMULATION_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATION_READY:
             case SIMULATING:
-                Console.showMessage("Starting simulation");
+                CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Starting simulation...");
 
                 connectionState = ConnectionState.SIMULATING;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));

@@ -1,12 +1,12 @@
 package data.scripts.net.io;
 
+import cmu.CMUtils;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.plugins.MPPlugin;
-import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -33,9 +33,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public PacketContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
 
-        List<SourcePackable> data;
+        List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
+            case INITIALISATION_READY:
             case INITIALISING:
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": initialising connection...");
+
                 connectionState = ConnectionState.LOADING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
@@ -46,8 +49,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         remoteAddress,
                         socketBuffer
                 );
+            case LOADING_READY:
             case LOADING:
-                Console.showMessage("Sending client " + connectionId + " data over socket");
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": sending client data over socket...");
 
                 data = new ArrayList<>();
                 data.add(statusData);
@@ -56,15 +60,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 connectionState = ConnectionState.SPAWNING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
-
-                return new PacketContainer(
-                        data,
-                        connectionManager.getTick(),
-                        true,
-                        remoteAddress,
-                        socketBuffer
-                );
+            case SPAWNING_READY:
             case SPAWNING:
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": spawning ships on client...");
+
                 data = new ArrayList<>();
                 data.add(statusData);
 
@@ -72,20 +71,19 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 connectionState = ConnectionState.SIMULATION_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
-
-                return new PacketContainer(
-                        data,
-                        connectionManager.getTick(),
-                        true,
-                        remoteAddress,
-                        socketBuffer
-                );
             case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:
             default:
-                return null;
         }
+
+        return new PacketContainer(
+                data,
+                connectionManager.getTick(),
+                true,
+                remoteAddress,
+                socketBuffer
+        );
     }
 
     @Override
