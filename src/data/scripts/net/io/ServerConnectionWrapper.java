@@ -4,6 +4,7 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
@@ -38,6 +39,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 return null;
             case INITIALISING:
                 connectionState = ConnectionState.LOADING_READY;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(
                         Collections.singletonList((SourcePackable) statusData),
@@ -55,6 +57,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 connectionState = ConnectionState.SPAWNING_READY;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(
                         data,
@@ -70,6 +73,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(
                         data,

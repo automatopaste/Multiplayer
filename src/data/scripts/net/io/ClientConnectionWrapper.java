@@ -4,6 +4,7 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
@@ -60,24 +61,29 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case LOADING_READY:
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATION_READY:
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+
                 startDatagramClient();
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
