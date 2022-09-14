@@ -24,7 +24,7 @@ public abstract class BaseRecord<T> {
     }
 
     public void write(boolean force, ByteBuf dest) {
-        if (force || check()) {
+        if (value != null && (force || check())) {
             dest.writeInt(getTypeId());
             dest.writeInt(uniqueID);
 
