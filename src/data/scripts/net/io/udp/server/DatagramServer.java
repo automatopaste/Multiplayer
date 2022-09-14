@@ -29,6 +29,8 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
+    private boolean running;
+
     private final DebugGraphContainer dataGraph;
     private final DebugGraphContainer dataGraphCompressed;
     private final DebugGraphContainer dataGraphRatio;
@@ -44,10 +46,14 @@ public class DatagramServer implements Runnable {
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
         dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE * 2, 50f);
+
+        running = false;
     }
 
     @Override
     public void run() {
+        running = true;
+
         Console.showMessage("Running UDP server on port " + port + " at " + ServerConnectionManager.TICK_RATE + "Hz");
 
         ChannelFuture channelFuture = start();
@@ -141,8 +147,14 @@ public class DatagramServer implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerLoopGroup != null) workerLoopGroup.shutdownGracefully();
+        running = false;
+
         dataGraph.expire();
         dataGraphCompressed.expire();
         dataGraphRatio.expire();
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

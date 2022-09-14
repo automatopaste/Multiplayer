@@ -85,7 +85,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 connectionState = ConnectionState.SIMULATING;
 
-                startDatagramClient();
+                if (!datagramClient.isRunning()) startDatagramClient();
 
                 break;
             default:

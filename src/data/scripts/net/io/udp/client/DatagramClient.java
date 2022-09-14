@@ -33,6 +33,7 @@ public class DatagramClient implements Runnable {
     private NioDatagramChannel channel;
 
     private final Clock clock;
+    private boolean running;
 
     private final DebugGraphContainer dataGraph;
     private final DebugGraphContainer dataGraphCompressed;
@@ -47,6 +48,8 @@ public class DatagramClient implements Runnable {
 
         dataGraph = new DebugGraphContainer("Bits Out", TICK_RATE * 2, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", TICK_RATE * 2, 50f);
+
+        running = false;
     }
 
     @Override
@@ -55,6 +58,8 @@ public class DatagramClient implements Runnable {
     }
 
     public void runClient() {
+        running = true;
+
         InetSocketAddress remoteAddress = new InetSocketAddress(host, port);
 
         ChannelFuture future = start();
@@ -136,5 +141,10 @@ public class DatagramClient implements Runnable {
     public void stop() {
         if (channel != null) channel.close();
         if (workerGroup != null) workerGroup.shutdownGracefully();
+        running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }
