@@ -44,7 +44,7 @@ public class StringRecord extends BaseRecord<String> {
     @Override
     public boolean check() {
         String delta = func.get();
-        boolean isUpdated = !value.equals(delta);
+        boolean isUpdated = value != null && !value.equals(delta);
         if (isUpdated) value = delta;
 
         return isUpdated;
