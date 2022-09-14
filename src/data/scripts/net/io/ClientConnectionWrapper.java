@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
@@ -61,6 +62,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case INITIALISATION_READY:
             //case INITIALISING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "initialising connection...");
+                Global.getLogger(ClientConnectionWrapper.class).info("initialising connection");
 
                 connectionState = ConnectionState.LOADING_READY;
 
@@ -68,6 +70,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case LOADING_READY:
             //case LOADING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Receiving data over socket...");
+                Global.getLogger(ClientConnectionWrapper.class).info("receiving data");
 
                 connectionState = ConnectionState.SPAWNING_READY;
 
@@ -75,6 +78,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SPAWNING_READY:
             //case SPAWNING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Spawning entities...");
+                Global.getLogger(ClientConnectionWrapper.class).info("spawning entities");
 
                 connectionState = ConnectionState.SIMULATION_READY;
 
@@ -82,6 +86,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SIMULATION_READY:
             //case SIMULATING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Starting simulation...");
+                Global.getLogger(ClientConnectionWrapper.class).info("starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
 

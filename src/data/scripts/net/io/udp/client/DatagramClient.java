@@ -98,9 +98,9 @@ public class DatagramClient implements Runnable {
                 channel.writeAndFlush(new DatagramPacket(out, remoteAddress)).sync();
 
                 dataGraph.increment(size);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraph", dataGraph);
                 dataGraphCompressed.increment(sizeCompressed);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphCompressed", dataGraphCompressed);
             }
 
             closeFuture.sync();
