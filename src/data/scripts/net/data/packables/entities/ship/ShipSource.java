@@ -23,13 +23,13 @@ public class ShipSource extends SourcePackable {
         putRecord(new Vector2fRecord(new BaseRecord.DeltaFunc<Vector2f>() {
             @Override
             public Vector2f get() {
-                return ship.getLocation();
+                return new Vector2f(ship.getLocation());
             }
         }, ShipIDs.SHIP_LOC).setUseDecimalPrecision(false));
         putRecord(new Vector2fRecord(new BaseRecord.DeltaFunc<Vector2f>() {
             @Override
             public Vector2f get() {
-                return ship.getVelocity();
+                return new Vector2f(ship.getVelocity());
             }
         }, ShipIDs.SHIP_VEL).setUseDecimalPrecision(false));
         putRecord(new FloatRecord(new BaseRecord.DeltaFunc<Float>() {
@@ -59,7 +59,7 @@ public class ShipSource extends SourcePackable {
         putRecord(new Vector2fRecord(new BaseRecord.DeltaFunc<Vector2f>() {
             @Override
             public Vector2f get() {
-                return ship.getMouseTarget();
+                return new Vector2f(ship.getMouseTarget());
             }
         }, ShipIDs.CURSOR).setUseDecimalPrecision(false));
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {

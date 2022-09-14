@@ -26,7 +26,7 @@ public class Vector2fRecord extends BaseRecord<Vector2f> {
     @Override
     public boolean check() {
         boolean isUpdated;
-        Vector2f delta = new Vector2f(func.get());
+        Vector2f delta = func.get();
 
         if (useDecimalPrecision) {
             isUpdated = (value.x != delta.x) || (value.y != delta.y);
