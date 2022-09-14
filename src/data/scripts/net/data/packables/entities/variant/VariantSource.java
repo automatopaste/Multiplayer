@@ -6,6 +6,7 @@ import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.StringRecord;
+import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,5 +67,12 @@ public class VariantSource extends SourcePackable {
     @Override
     public int getTypeId() {
         return VariantIDs.TYPE_ID;
+    }
+
+    @Override
+    public void write(boolean force, ByteBuf dest) {
+        initialForce = true;
+
+        super.write(force, dest);
     }
 }

@@ -20,17 +20,16 @@ public abstract class SourcePackable extends BasePackable {
      * Ouput data to a byte buffer
      */
     public void write(boolean force, ByteBuf dest) {
+        if (this instanceof VariantSource) {
+            int i = 0;
+        }
+
         ByteBuf temp = PooledByteBufAllocator.DEFAULT.buffer();
 
         boolean f = force || initialForce;
-        initialForce = false;
 
         for (BaseRecord<?> record : records.values()) {
             record.write(f, temp);
-        }
-
-        if (this instanceof VariantSource) {
-            int i = 0;
         }
 
         if (temp.readableBytes() > 0) {
@@ -43,5 +42,6 @@ public abstract class SourcePackable extends BasePackable {
         }
 
         temp.release();
+        initialForce = false;
     }
 }
