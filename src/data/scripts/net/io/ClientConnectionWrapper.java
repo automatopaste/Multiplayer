@@ -58,6 +58,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
         switch (connectionState) {
             case INITIALISATION_READY:
+            case INITIALISING:
                 Console.showMessage("Awaiting server acknowledgement");
 
                 connectionState = ConnectionState.INITIALISING;
@@ -65,6 +66,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case LOADING_READY:
+            case LOADING:
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
@@ -72,6 +74,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SPAWNING_READY:
+            case SPAWNING:
                 Console.showMessage("Spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
@@ -79,6 +82,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATION_READY:
+            case SIMULATING:
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
@@ -158,7 +162,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
-            return;
+            //return;
         }
 
         statusData.updateFromDelta(toProcess);

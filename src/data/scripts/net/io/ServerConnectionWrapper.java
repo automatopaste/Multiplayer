@@ -35,8 +35,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
         List<SourcePackable> data;
         switch (connectionState) {
-            case INITIALISATION_READY:
-                return null;
             case INITIALISING:
                 connectionState = ConnectionState.LOADING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
@@ -131,7 +129,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public void updateConnectionStatus(Map<Integer, BaseRecord<?>> data) {
         int state = (int) data.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
-            return;
+            //return;
         }
 
         statusData.updateFromDelta(data);
