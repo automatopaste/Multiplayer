@@ -82,10 +82,11 @@ public class DatagramServer implements Runnable {
                         byte[] bytes = new byte[buf.readableBytes()];
                         buf.readBytes(bytes);
                         byte[] compressed = CompressionUtils.deflate(bytes);
-                        sizeCompressed +=  compressed.length;
+                        int length = compressed.length;
+                        sizeCompressed += length;
 
                         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
-                        out.writeInt(bufSize);
+                        out.writeInt(length);
                         out.writeBytes(compressed);
 
                         channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();

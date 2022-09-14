@@ -1,5 +1,6 @@
 package data.scripts.net.io;
 
+import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -14,7 +15,7 @@ public class CompressionUtils {
         int length = compressor.deflate(compressed);
         compressor.end();
 
-        return compressed;
+        return Arrays.copyOfRange(compressed, 0, length);
     }
 
     public static byte[] inflate(byte[] bytes, int size) throws DataFormatException {
