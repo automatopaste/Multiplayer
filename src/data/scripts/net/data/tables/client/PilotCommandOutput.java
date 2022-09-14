@@ -26,12 +26,17 @@ public class PilotCommandOutput implements OutboundEntityManager {
     }
 
     @Override
-    public void update() {
+    public void update(float amount) {
 
     }
 
     @Override
     public void register() {
         DataGenManager.registerOutboundEntityManager(PilotIDs.TYPE_ID, this);
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.DATAGRAM;
     }
 }

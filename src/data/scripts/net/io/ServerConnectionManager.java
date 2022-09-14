@@ -2,8 +2,10 @@ package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
@@ -15,7 +17,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 
-public class ServerConnectionManager implements Runnable, InboundEntityManager {
+public class ServerConnectionManager implements Runnable, InboundEntityManager, OutboundEntityManager {
     private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
 
     public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
@@ -155,7 +157,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
 
     }
 
@@ -182,5 +184,21 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
 
     public Map<Integer, ServerConnectionWrapper> getServerConnectionWrappers() {
         return serverConnectionWrappers;
+    }
+
+    @Override
+    public Map<Integer, SourcePackable> getOutbound() {
+        Map<Integer, SourcePackable> out = new HashMap<>();
+
+        for (int id : serverConnectionWrappers.keySet()) {
+            out.put(id, serverConnectionWrappers.get(id).statusData);
+        }
+
+        return out;
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.SOCKET;
     }
 }

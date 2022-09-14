@@ -32,7 +32,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
 
     }
 

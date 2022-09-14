@@ -31,7 +31,7 @@ public class ServerPilotCommandMap implements InboundEntityManager {
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
 
     }
 

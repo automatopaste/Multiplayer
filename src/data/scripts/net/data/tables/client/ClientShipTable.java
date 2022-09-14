@@ -32,7 +32,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
         for (BasePackable p : table) {
             ShipDest ship = (ShipDest) p;
             if (ship != null) ship.update(amount);

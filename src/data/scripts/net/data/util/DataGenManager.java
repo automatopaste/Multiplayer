@@ -7,7 +7,6 @@ import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
-import org.lazywizard.console.Console;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,25 +61,42 @@ public class DataGenManager {
         }
     }
 
-    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltas() {
+    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltasSocket() {
         Map<Integer, Map<Integer, SourcePackable>> out = new HashMap<>();
 
         for (Integer source : outboundDataSources.keySet()) {
-            Map<Integer, SourcePackable> entities = outboundDataSources.get(source).getOutbound();
-            out.put(source, entities);
+            OutboundEntityManager manager = outboundDataSources.get(source);
+            if (manager.getPacketType() == OutboundEntityManager.PacketType.SOCKET) {
+                Map<Integer, SourcePackable> entities = manager.getOutbound();
+                out.put(source, entities);
+            }
+        }
+
+        return out;
+    }
+
+    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltasDatagram() {
+        Map<Integer, Map<Integer, SourcePackable>> out = new HashMap<>();
+
+        for (Integer source : outboundDataSources.keySet()) {
+            OutboundEntityManager manager = outboundDataSources.get(source);
+            if (manager.getPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
+                Map<Integer, SourcePackable> entities = manager.getOutbound();
+                out.put(source, entities);
+            }
         }
 
         return out;
     }
 
     /**
-     * Hacky workaround to avoid reflection
+     * workaround to avoid reflection
      * @param typeID id
      * @return new empty instance
      */
     public static BaseRecord<?> recordFactory(int typeID) {
         BaseRecord<?> out = recordInstances.get(typeID);
-        if (out == null) Console.showMessage("No record type found at ID: " + typeID);
+        if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
         return out;
     }
 }

@@ -14,11 +14,13 @@ public class DataDuplex {
      * Map Type ID to
      */
     private final Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> inbound;
-    private final Map<Integer, Map<Integer, SourcePackable>> outbound;
+    private final Map<Integer, Map<Integer, SourcePackable>> outboundSocket;
+    private final Map<Integer, Map<Integer, SourcePackable>> outboundDatagram;
 
     public DataDuplex() {
         inbound = new HashMap<>();
-        outbound = new HashMap<>();
+        outboundSocket = new HashMap<>();
+        outboundDatagram = new HashMap<>();
     }
 
     /**
@@ -37,11 +39,21 @@ public class DataDuplex {
      * Get outbound data and clear store
      * @return outbound entities
      */
-    public Map<Integer, Map<Integer, SourcePackable>> getOutbound() {
+    public Map<Integer, Map<Integer, SourcePackable>> getOutboundSocket() {
         Map<Integer, Map<Integer, SourcePackable>> outEntities;
-        synchronized (outbound) {
-            outEntities = new HashMap<>(outbound);
-            outbound.clear();
+        synchronized (outboundSocket) {
+            outEntities = new HashMap<>(outboundSocket);
+            outboundSocket.clear();
+        }
+
+        return outEntities;
+    }
+
+    public Map<Integer, Map<Integer, SourcePackable>> getOutboundDatagram() {
+        Map<Integer, Map<Integer, SourcePackable>> outEntities;
+        synchronized (outboundDatagram) {
+            outEntities = new HashMap<>(outboundDatagram);
+            outboundDatagram.clear();
         }
 
         return outEntities;
@@ -83,15 +95,40 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateOutbound(Map<Integer, Map<Integer, SourcePackable>> entities) {
-        synchronized (this.outbound) {
+    public void updateOutboundSocket(Map<Integer, Map<Integer, SourcePackable>> entities) {
+        synchronized (this.outboundSocket) {
             for (Integer type : entities.keySet()) {
-                Map<Integer, SourcePackable> outboundEntities = outbound.get(type);
+                Map<Integer, SourcePackable> outboundEntities = outboundSocket.get(type);
                 Map<Integer, SourcePackable> deltas = entities.get(type);
 
                 if (outboundEntities == null) {
                     outboundEntities = new HashMap<>();
-                    outbound.put(type, outboundEntities);
+                    outboundSocket.put(type, outboundEntities);
+                }
+
+                for (Integer instance : deltas.keySet()) {
+                    SourcePackable p = outboundEntities.get(instance);
+                    SourcePackable d = deltas.get(instance);
+
+                    if (p == null) {
+                        outboundEntities.put(instance, d);
+                    } else {
+                        p.updateFromDelta(d.getRecords());
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateOutboundDatagram(Map<Integer, Map<Integer, SourcePackable>> entities) {
+        synchronized (this.outboundDatagram) {
+            for (Integer type : entities.keySet()) {
+                Map<Integer, SourcePackable> outboundEntities = outboundDatagram.get(type);
+                Map<Integer, SourcePackable> deltas = entities.get(type);
+
+                if (outboundEntities == null) {
+                    outboundEntities = new HashMap<>();
+                    outboundDatagram.put(type, outboundEntities);
                 }
 
                 for (Integer instance : deltas.keySet()) {

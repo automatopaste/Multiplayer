@@ -13,7 +13,7 @@ public class ClientProjectileTable implements InboundEntityManager {
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
 
     }
 

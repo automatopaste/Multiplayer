@@ -12,12 +12,17 @@ public class ServerProjectileTable implements OutboundEntityManager {
     }
 
     @Override
-    public void update() {
+    public void update(float amount) {
 
     }
 
     @Override
     public void register() {
 
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.DATAGRAM;
     }
 }

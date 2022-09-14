@@ -39,18 +39,19 @@ public class MPClientPlugin extends MPPlugin {
         dataStore = new VariantDataGenerator();
 
         connection = new ClientConnectionWrapper(host, port, this);
-        connection.register();
+        initEntityManager(connection);
 
         // inbound init
         shipTable = new ClientShipTable();
-        shipTable.register();
+        initEntityManager(shipTable);
+
         variantDataMap = new VariantDataMap();
-        variantDataMap.register();
+        initEntityManager(variantDataMap);
 
         // outbound init
         int id = -10; // placeholder id
         inputManager = new PilotCommandOutput(id, new PilotSource(id));
-        inputManager.register();
+        initEntityManager(inputManager);
     }
 
     @Override
@@ -70,23 +71,14 @@ public class MPClientPlugin extends MPPlugin {
         Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
-        Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
-        connection.getDuplex().updateOutbound(outbound);
+        updateEntityManagers(amount);
 
-//        switch (connection.getConnectionState()) {
-//            case INITIALISATION_READY:
-//            case INITIALISING:
-//            case LOADING_READY:
-//            case LOADING:
-//            case SIMULATION_READY:
-//            case CLOSED:
-//                break;
-//            case SIMULATING:
-//                shipTable.updateEntities(amount);
-//
-//
-//                break;
-//        }
+        // outbound data update
+        Map<Integer, Map<Integer, SourcePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        connection.getDuplex().updateOutboundSocket(outboundSocket);
+
+        Map<Integer, Map<Integer, SourcePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        connection.getDuplex().updateOutboundDatagram(outboundDatagram);
     }
 
     public ClientConnectionWrapper getConnection() {

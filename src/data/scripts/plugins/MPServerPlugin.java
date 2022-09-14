@@ -33,15 +33,15 @@ public class MPServerPlugin extends MPPlugin {
         dataStore.generate(Global.getCombatEngine(), this);
 
         serverConnectionManager = new ServerConnectionManager(this);
-        serverConnectionManager.register();
+        initEntityManager(serverConnectionManager);
 
         // inbound init
         serverPilotCommandMap = new ServerPilotCommandMap();
-        serverPilotCommandMap.register();
+        initEntityManager(serverPilotCommandMap);
 
         //outbound init
         serverShipTable = new ServerShipTable();
-        serverShipTable.register();
+        initEntityManager(serverShipTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
@@ -60,11 +60,14 @@ public class MPServerPlugin extends MPPlugin {
         DataGenManager.distributeInboundDeltas(inbound, this);
 
         // simulation update
-        serverShipTable.update();
+        updateEntityManagers(amount);
 
         // outbound data update
-        Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
-        serverConnectionManager.getDuplex().updateOutbound(outbound);
+        Map<Integer, Map<Integer, SourcePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
+
+        Map<Integer, Map<Integer, SourcePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();
     }

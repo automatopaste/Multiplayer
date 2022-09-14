@@ -38,7 +38,7 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
     }
 
     @Override
-    public void update() {
+    public void update(float amount) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         Set<String> diff = new HashSet<>(registered.keySet());
@@ -84,5 +84,10 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
     @Override
     public void register() {
         DataGenManager.registerOutboundEntityManager(ShipIDs.TYPE_ID, this);
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.DATAGRAM;
     }
 }

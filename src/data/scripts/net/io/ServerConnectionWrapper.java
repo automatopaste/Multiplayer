@@ -11,7 +11,6 @@ import data.scripts.plugins.MPPlugin;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,40 +41,34 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 connectionState = ConnectionState.LOADING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
-                return new PacketContainer(
-                        Collections.singletonList((SourcePackable) statusData),
-                        connectionManager.getTick(),
-                        true,
-                        remoteAddress,
-                        socketBuffer
-                );
+                break;
             case LOADING_READY:
             case LOADING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": sending client data over socket...");
-
-                data = new ArrayList<>();
-                data.add(statusData);
 
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 connectionState = ConnectionState.SPAWNING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+
+                break;
             case SPAWNING_READY:
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": spawning ships on client...");
-
-                data = new ArrayList<>();
-                data.add(statusData);
 
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+
+                break;
             case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:
             default:
         }
+
+        data.add(statusData);
 
         return new PacketContainer(
                 data,
@@ -90,6 +83,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
+        List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -98,22 +92,21 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING_READY:
             case SPAWNING:
             case SIMULATION_READY:
-                return null;
+                break;
             case SIMULATING:
-                List<SourcePackable> data = new ArrayList<>();
-                data.add(statusData);
-
-                for (Map<Integer, SourcePackable> type : connectionManager.getDuplex().getOutbound().values()) {
+                for (Map<Integer, SourcePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 
-                return new PacketContainer(
-                        data, connectionManager.getTick(), false, remoteAddress, datagramBuffer
-                );
+                break;
             case CLOSED: // *shuts briefcase*
             default:
-                return null;
+                break;
         }
+
+        return new PacketContainer(
+                data, connectionManager.getTick(), false, remoteAddress, datagramBuffer
+        );
     }
 
     public void setConnectionState(ConnectionState connectionState) {

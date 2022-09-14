@@ -5,8 +5,8 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
-import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
@@ -15,14 +15,14 @@ import data.scripts.plugins.MPPlugin;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Manages switching logic for inputting/sending data
  */
-public class ClientConnectionWrapper extends BaseConnectionWrapper implements InboundEntityManager {
+public class ClientConnectionWrapper extends BaseConnectionWrapper implements InboundEntityManager, OutboundEntityManager {
     private final DataDuplex dataDuplex;
 
     private DatagramClient datagramClient;
@@ -56,44 +56,45 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             statusData = new ConnectionSource(ConnectionIDs.getConnectionId(address), this);
         }
 
+        List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
-                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
+                break;
             case LOADING_READY:
             case LOADING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Receiving data over socket...");
 
                 connectionState = ConnectionState.SPAWNING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
-                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
+                break;
             case SPAWNING_READY:
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Spawning entities...");
 
                 connectionState = ConnectionState.SIMULATION_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
-                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
+                break;
             case SIMULATION_READY:
             case SIMULATING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Starting simulation...");
 
                 connectionState = ConnectionState.SIMULATING;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 startDatagramClient();
 
-                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
+                break;
             default:
-                return null;
+                break;
         }
+
+        data.add(statusData);
+
+        return new PacketContainer(data, tick, true, null, socketBuffer);
     }
 
     private void startDatagramClient() {
@@ -106,6 +107,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     public PacketContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
+        List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -114,20 +116,19 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SIMULATION_READY:
             case SPAWNING_READY:
             case SPAWNING:
-                return null;
+                break;
             case SIMULATING:
-                List<SourcePackable> data = new ArrayList<>();
-                data.add(statusData);
-
-                for (Map<Integer, SourcePackable> type : dataDuplex.getOutbound().values()) {
+                for (Map<Integer, SourcePackable> type : dataDuplex.getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 
-                return new PacketContainer(data, tick, false, null, datagramBuffer);
+                break;
             case CLOSED:
             default:
-                return null;
+                break;
         }
+
+        return new PacketContainer(data, tick, false, null, datagramBuffer);
     }
 
     public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities, int tick) {
@@ -170,12 +171,25 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public void updateEntities(float amount) {
+    public void update(float amount) {
 
+    }
+
+    @Override
+    public Map<Integer, SourcePackable> getOutbound() {
+        Map<Integer, SourcePackable> out = new HashMap<>();
+        out.put(connectionId, statusData);
+        return out;
     }
 
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ConnectionIDs.TYPE_ID, this);
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.SOCKET;
     }
 }
