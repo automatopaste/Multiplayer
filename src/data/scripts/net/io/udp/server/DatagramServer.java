@@ -43,7 +43,7 @@ public class DatagramServer implements Runnable {
 
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
-        dataGraphRatio = new DebugGraphContainer("Compressio Ratio", ServerConnectionManager.TICK_RATE * 2, 50f);
+        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE * 2, 50f);
     }
 
     @Override
@@ -143,5 +143,6 @@ public class DatagramServer implements Runnable {
         if (workerLoopGroup != null) workerLoopGroup.shutdownGracefully();
         dataGraph.expire();
         dataGraphCompressed.expire();
+        dataGraphRatio.expire();
     }
 }

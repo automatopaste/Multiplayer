@@ -3,7 +3,6 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.pilot.PilotSource;
@@ -71,21 +70,23 @@ public class MPClientPlugin extends MPPlugin {
         Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
-        switch (connection.getConnectionState()) {
-            case INITIALISATION_READY:
-            case INITIALISING:
-            case LOADING_READY:
-            case LOADING:
-            case SIMULATION_READY:
-            case CLOSED:
-                break;
-            case SIMULATING:
-                shipTable.updateEntities(amount);
+        Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
+        connection.getDuplex().updateOutbound(outbound);
 
-                Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
-                connection.getDuplex().updateOutbound(outbound);
-                break;
-        }
+//        switch (connection.getConnectionState()) {
+//            case INITIALISATION_READY:
+//            case INITIALISING:
+//            case LOADING_READY:
+//            case LOADING:
+//            case SIMULATION_READY:
+//            case CLOSED:
+//                break;
+//            case SIMULATING:
+//                shipTable.updateEntities(amount);
+//
+//
+//                break;
+//        }
     }
 
     public ClientConnectionWrapper getConnection() {
