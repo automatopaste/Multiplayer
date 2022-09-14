@@ -1,5 +1,6 @@
 package data.scripts.net.data;
 
+import data.scripts.net.data.packables.entities.variant.VariantSource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 
@@ -26,6 +27,10 @@ public abstract class SourcePackable extends BasePackable {
 
         for (BaseRecord<?> record : records.values()) {
             record.write(f, temp);
+        }
+
+        if (this instanceof VariantSource) {
+            int i = 0;
         }
 
         if (temp.readableBytes() > 0) {
