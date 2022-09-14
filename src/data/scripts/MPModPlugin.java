@@ -40,7 +40,7 @@ public class MPModPlugin extends BaseModPlugin {
 
     @Override
     public PluginPick<AutofireAIPlugin> pickWeaponAutofireAI(WeaponAPI weapon) {
-        if (getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
+        if (getPlugin() != null && getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
             return new PluginPick<>((AutofireAIPlugin) new DefaultAutofireAIPlugin(weapon), CampaignPlugin.PickPriority.HIGHEST);
         }
         return null;
