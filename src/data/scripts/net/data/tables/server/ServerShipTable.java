@@ -3,8 +3,9 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.entities.ShipData;
+import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.entities.ship.ShipIDs;
+import data.scripts.net.data.packables.entities.ship.ShipSource;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -23,11 +24,11 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Integer, SourcePackable> getOutbound() {
+        Map<Integer, SourcePackable> out = new HashMap<>();
 
         for (int i = 0; i < table.length; i++) {
-            ShipData data = (ShipData) table[i];
+            ShipSource data = (ShipSource) table[i];
             if (data != null) {
                 out.put(i, data);
             }
@@ -59,7 +60,7 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
         int id = getVacant();
 
         registered.put(ship.getId(), id);
-        table[id] = new ShipData(id, ship);
+        table[id] = new ShipSource(id, ship);
     }
 
     private void deleteEntry(String id) {
@@ -82,6 +83,6 @@ public class ServerShipTable extends EntityTable implements OutboundEntityManage
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(ShipData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ShipIDs.TYPE_ID, this);
     }
 }

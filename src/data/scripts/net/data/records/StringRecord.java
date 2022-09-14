@@ -4,71 +4,69 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class StringRecord extends BaseRecord<String> {
-    private static int typeID;
+    public static int TYPE_ID;
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-    public StringRecord(String record) {
-        super(record);
+    public StringRecord(DeltaFunc<String> deltaFunc, int uniqueID) {
+        super(deltaFunc, uniqueID);
+    }
+
+    public StringRecord(String value, int uniqueID) {
+        super(value, uniqueID);
     }
 
     @Override
-    public boolean check(String curr) {
-        boolean isUpdated = !record.equals(curr);
-        if (isUpdated) record = curr;
+    public void get(ByteBuf dest) {
+        dest.writeCharSequence(value, CHARSET);
+    }
+
+    @Override
+    public BaseRecord<String> read(ByteBuf in, int uniqueID) {
+        int length = in.readInt();
+        String value = in.readCharSequence(length, CHARSET).toString();
+
+        return new StringRecord(value, uniqueID);
+    }
+
+    @Override
+    public BaseRecord<String> read(ByteArrayReader in, int uniqueID) {
+        int length = in.readInt();
+        String value = in.readString(length, CHARSET);
+
+        return new StringRecord(value, uniqueID);
+    }
+
+    @Override
+    public boolean check() {
+        String delta = func.get();
+        boolean isUpdated = !value.equals(delta);
+        if (isUpdated) value = delta;
 
         return isUpdated;
     }
 
-    @Override
-    public void doWrite(ByteBuffer output) {
-        byte[] bytes = record.getBytes(CHARSET);
-
-        output.putInt(bytes.length);
-        for (byte b : bytes) {
-            output.put(b);
-        }
-    }
-
-    @Override
-    public StringRecord read(ByteBuf input) {
-        int length = input.readInt();
-        String value = input.readCharSequence(length, CHARSET).toString();
-
-        return new StringRecord(value);
-    }
-
-    @Override
-    public BaseRecord<String> readArray(ByteArrayReader reader) {
-        int length = reader.readInt();
-        String value = reader.readString(length, CHARSET);
-
-        return new StringRecord(value);
-    }
-
-    @Override
-    protected String getCopy(String curr) {
-        return curr;
-    }
-
-    public static void setTypeID(int typeID) {
-        StringRecord.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        StringRecord.TYPE_ID = typeId;
     }
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
+    }
+
+    public static StringRecord getDefault(int uniqueID) {
+        return new StringRecord("DEFAULT", uniqueID);
     }
 
     @Override
     public String toString() {
         return "StringRecord{" +
-                "record='" + record + '\'' +
+                "record='" + value + '\'' +
                 '}';
     }
 }

@@ -1,6 +1,6 @@
 package data.scripts.console.commands;
 
-import data.scripts.mpModPlugin;
+import data.scripts.MPModPlugin;
 import data.scripts.plugins.MPServerPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
@@ -15,7 +15,7 @@ public class mpRunServer implements BaseCommand {
         }
 
         Console.showMessage("Starting server");
-        mpModPlugin.setPlugin(new MPServerPlugin());
+        MPModPlugin.setPlugin(new MPServerPlugin());
 
         return CommandResult.SUCCESS;
     }

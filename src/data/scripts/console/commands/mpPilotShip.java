@@ -3,7 +3,7 @@ package data.scripts.console.commands;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.mpModPlugin;
+import data.scripts.MPModPlugin;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +24,8 @@ public class mpPilotShip  implements BaseCommand {
         ShipAPI ship = getClosest(loc, Global.getCombatEngine());
 
         if (ship != null) {
-            if (mpModPlugin.getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
-                MPClientPlugin plugin = (MPClientPlugin) mpModPlugin.getPlugin();
+            if (MPModPlugin.getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
+                MPClientPlugin plugin = (MPClientPlugin) MPModPlugin.getPlugin();
                 plugin.getShipTable().setClientActive(ship);
             }
 

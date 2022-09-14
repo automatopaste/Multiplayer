@@ -4,33 +4,38 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.entities.ShipData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.packables.entities.ship.ShipDest;
+import data.scripts.net.data.packables.entities.ship.ShipIDs;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.server.ServerShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
+import java.util.Map;
+
 public class ClientShipTable extends EntityTable implements InboundEntityManager {
     private ShipAPI clientActive;
 
     @Override
-    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        ShipData delta = (ShipData) toProcess;
-        ShipData data = (ShipData) table[id];
+    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+        ShipDest data = (ShipDest) table[id];
 
         if (data == null) {
-            table[id] = delta;
-            delta.destinationInit(plugin);
+            ShipDest shipDest = new ShipDest(id, toProcess);
+            table[id] = shipDest;
+            shipDest.init(plugin);
         } else {
-            data.updateFromDelta(delta);
+            data.updateFromDelta(toProcess);
         }
     }
 
     @Override
-    public void updateEntities() {
+    public void updateEntities(float amount) {
         for (BasePackable p : table) {
-            if (p != null) p.destinationUpdate();
+            ShipDest ship = (ShipDest) p;
+            if (ship != null) ship.update(amount);
         }
 
         CombatEngineAPI engine = Global.getCombatEngine();
@@ -46,7 +51,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ShipIDs.TYPE_ID, this);
     }
 
     public void setClientActive(ShipAPI clientActive) {

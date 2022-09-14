@@ -1,13 +1,13 @@
 package data.scripts.net.data.tables.server;
 
-import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 
 import java.util.Map;
 
 public class ServerProjectileTable implements OutboundEntityManager {
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
+    public Map<Integer, SourcePackable> getOutbound() {
         return null;
     }
 

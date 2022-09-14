@@ -4,7 +4,9 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.trans.PilotCommandData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.metadata.pilot.PilotSource;
 import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.data.tables.client.PilotCommandOutput;
 import data.scripts.net.data.tables.client.VariantDataMap;
@@ -48,7 +50,7 @@ public class MPClientPlugin extends MPPlugin {
 
         // outbound init
         int id = -10; // placeholder id
-        inputManager = new PilotCommandOutput(id, new PilotCommandData(id));
+        inputManager = new PilotCommandOutput(id, new PilotSource(id));
         inputManager.register();
     }
 
@@ -66,7 +68,7 @@ public class MPClientPlugin extends MPPlugin {
         }
 
         // get inbound
-        Map<Integer, Map<Integer, BasePackable>> entities = connection.getDuplex().getDeltas();
+        Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
         switch (connection.getConnectionState()) {
@@ -78,9 +80,9 @@ public class MPClientPlugin extends MPPlugin {
             case CLOSED:
                 break;
             case SIMULATING:
-                shipTable.updateEntities();
+                shipTable.updateEntities(amount);
 
-                Map<Integer, Map<Integer, BasePackable>> outbound = DataGenManager.collectOutboundDeltas();
+                Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
                 connection.getDuplex().updateOutbound(outbound);
                 break;
         }

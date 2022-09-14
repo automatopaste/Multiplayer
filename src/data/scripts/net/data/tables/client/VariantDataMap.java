@@ -1,7 +1,8 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.packables.entities.variant.VariantDest;
+import data.scripts.net.data.packables.entities.variant.VariantIDs;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
@@ -10,36 +11,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VariantDataMap implements InboundEntityManager {
-    private final Map<String, VariantData> variantData;
+    private final Map<String, VariantDest> variantData;
 
     public VariantDataMap() {
         variantData = new HashMap<>();
     }
 
     @Override
-    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        VariantData delta = (VariantData) toProcess;
-        VariantData data = variantData.get(delta.getShipId().getRecord());
+    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+        String shipID = (String) toProcess.get(VariantIDs.SHIP_ID).getValue();
+        VariantDest data = variantData.get(shipID);
 
         if (data == null) {
-            variantData.put(delta.getShipId().getRecord(), delta);
-            delta.destinationInit(plugin);
+            VariantDest variantDest = new VariantDest(id, toProcess);
+            variantData.put(shipID, variantDest);
+            variantDest.init(plugin);
         } else {
-            data.updateFromDelta(delta);
+            data.updateFromDelta(toProcess);
         }
     }
 
     @Override
-    public void updateEntities() {
+    public void updateEntities(float amount) {
 
     }
 
-    public Map<String, VariantData> getVariantData() {
+    public Map<String, VariantDest> getVariantData() {
         return variantData;
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(VariantData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(VariantIDs.TYPE_ID, this);
     }
 }

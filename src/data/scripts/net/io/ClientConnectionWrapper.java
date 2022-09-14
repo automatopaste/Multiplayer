@@ -1,7 +1,9 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
+import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
@@ -50,8 +52,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
 
-            statusData = new ConnectionStatusData(ConnectionStatusData.getConnectionId(address));
-            statusData.setConnection(this);
+            statusData = new ConnectionSource(ConnectionIDs.getConnectionId(address), this);
         }
 
         switch (connectionState) {
@@ -60,26 +61,26 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 connectionState = ConnectionState.INITIALISING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
+                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case LOADING_READY:
                 Console.showMessage("Waiting for prerequisite data");
 
                 connectionState = ConnectionState.LOADING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
+                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SPAWNING_READY:
                 Console.showMessage("Spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
+                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATION_READY:
                 Console.showMessage("Starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
                 startDatagramClient();
 
-                return new PacketContainer(Collections.singletonList((BasePackable) statusData), -1, true, null, socketBuffer);
+                return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
             case SIMULATING:
             case CLOSED:
             default:
@@ -107,10 +108,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SPAWNING:
                 return null;
             case SIMULATING:
-                List<BasePackable> data = new ArrayList<>();
+                List<SourcePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                for (Map<Integer, BasePackable> type : dataDuplex.getOutbound().values()) {
+                for (Map<Integer, SourcePackable> type : dataDuplex.getOutbound().values()) {
                     data.addAll(type.values());
                 }
 
@@ -121,7 +122,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         }
     }
 
-    public void updateInbound(Map<Integer, Map<Integer, BasePackable>> entities, int tick) {
+    public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities, int tick) {
         this.tick = tick;
         dataDuplex.updateInbound(entities);
     }
@@ -138,16 +139,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         this.connectionState = connectionState;
     }
 
-    private void updateConnectionStatusData(ConnectionStatusData data) {
-        int state = data.getState().getRecord();
-        if (state < connectionState.ordinal()) {
-            return;
-        }
-
-        statusData.updateFromDelta(data);
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
-    }
-
     public void stop() {
         socketClient.stop();
         if (datagramClient != null) datagramClient.stop();
@@ -160,18 +151,23 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
-        updateConnectionStatusData(connectionStatusData);
+    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+        int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
+        if (state < connectionState.ordinal()) {
+            return;
+        }
+
+        statusData.updateFromDelta(toProcess);
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
     }
 
     @Override
-    public void updateEntities() {
+    public void updateEntities(float amount) {
 
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionStatusData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
     }
 }

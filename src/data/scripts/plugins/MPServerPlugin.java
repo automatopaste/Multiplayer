@@ -4,7 +4,8 @@ import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.tables.server.ServerPilotCommandMap;
 import data.scripts.net.data.tables.server.ServerShipTable;
 import data.scripts.net.data.util.DataGenManager;
@@ -55,14 +56,14 @@ public class MPServerPlugin extends MPPlugin {
         }
 
         // inbound data update
-        Map<Integer, Map<Integer, BasePackable>> inbound = serverConnectionManager.getDuplex().getDeltas();
+        Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this);
 
         // simulation update
         serverShipTable.update();
 
         // outbound data update
-        Map<Integer, Map<Integer, BasePackable>> outbound = DataGenManager.collectOutboundDeltas();
+        Map<Integer, Map<Integer, SourcePackable>> outbound = DataGenManager.collectOutboundDeltas();
         serverConnectionManager.getDuplex().updateOutbound(outbound);
 
         debug();

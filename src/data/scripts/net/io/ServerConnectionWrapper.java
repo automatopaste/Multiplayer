@@ -1,7 +1,9 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
+import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.console.Console;
 
@@ -23,15 +25,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.remoteAddress = remoteAddress;
         this.connectionId = connectionId;
 
-        statusData = new ConnectionStatusData(connectionId);
-        statusData.setConnection(this);
+        statusData = new ConnectionSource(connectionId, this);
     }
 
     @Override
     public PacketContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
 
-        List<BasePackable> data;
+        List<SourcePackable> data;
         switch (connectionState) {
             case INITIALISATION_READY:
                 return null;
@@ -39,7 +40,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 connectionState = ConnectionState.LOADING_READY;
 
                 return new PacketContainer(
-                        Collections.singletonList((BasePackable) statusData),
+                        Collections.singletonList((SourcePackable) statusData),
                         connectionManager.getTick(),
                         true,
                         remoteAddress,
@@ -99,10 +100,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SIMULATION_READY:
                 return null;
             case SIMULATING:
-                List<BasePackable> data = new ArrayList<>();
+                List<SourcePackable> data = new ArrayList<>();
                 data.add(statusData);
 
-                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutbound().values()) {
+                for (Map<Integer, SourcePackable> type : connectionManager.getDuplex().getOutbound().values()) {
                     data.addAll(type.values());
                 }
 
@@ -119,12 +120,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void updateInbound(Map<Integer, Map<Integer, BasePackable>> entities) {
+    public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities) {
         connectionManager.getDuplex().updateInbound(entities);
     }
 
-    public void updateConnectionStatusData(ConnectionStatusData data) {
-        int state = data.getState().getRecord();
+    public void updateConnectionStatus(Map<Integer, BaseRecord<?>> data) {
+        int state = (int) data.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
             return;
         }

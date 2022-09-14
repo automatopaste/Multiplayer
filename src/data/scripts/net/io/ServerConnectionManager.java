@@ -1,8 +1,8 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.packables.metadata.ConnectionStatusData;
+import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.server.SocketServer;
@@ -120,7 +120,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
 
-        int id = ConnectionStatusData.getConnectionId(remoteAddress);
+        int id = ConnectionIDs.getConnectionId(remoteAddress);
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
 
         synchronized (serverConnectionWrappers) {
@@ -146,16 +146,16 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
     }
 
     @Override
-    public void processDelta(int id, BasePackable toProcess, MPPlugin plugin) {
-        ConnectionStatusData connectionStatusData = (ConnectionStatusData) toProcess;
+    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
+
         if (wrapper != null) {
-            wrapper.updateConnectionStatusData(connectionStatusData);
+            wrapper.updateConnectionStatus(toProcess);
         }
     }
 
     @Override
-    public void updateEntities() {
+    public void updateEntities(float amount) {
 
     }
 
@@ -177,7 +177,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionStatusData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
     }
 
     public Map<Integer, ServerConnectionWrapper> getServerConnectionWrappers() {

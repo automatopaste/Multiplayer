@@ -1,6 +1,5 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
@@ -16,13 +15,13 @@ public class UnpackAlgorithm {
         Unpacked result;
         if (in.readableBytes() == 0) {
             result = new Unpacked(
-                    new HashMap<Integer, Map<Integer, BasePackable>>(),
+                    new HashMap<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>>(),
                     tick,
                     remote,
                     local
             );
         } else {
-            Map<Integer, Map<Integer, BasePackable>> data = new HashMap<>();
+            Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data = new HashMap<>();
 
             int nextID = in.readInt();
             while (nextID != Integer.MIN_VALUE) {
@@ -40,7 +39,7 @@ public class UnpackAlgorithm {
         return result;
     }
 
-    private static int readNextEntity(Map<Integer, Map<Integer, BasePackable>> data, ByteBuf in, int entityTypeID) {
+    private static int readNextEntity(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data, ByteBuf in, int entityTypeID) {
         int entityInstanceID = in.readInt();
 
         Map<Integer, BaseRecord<?>> records = new HashMap<>();
@@ -53,7 +52,7 @@ public class UnpackAlgorithm {
             int recordUniqueID = in.readInt();
 
             //data
-            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in);
+            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in, recordUniqueID);
             records.put(recordUniqueID, record);
 
             if (in.readableBytes() > 0) {
@@ -64,11 +63,10 @@ public class UnpackAlgorithm {
             }
         }
 
-        Map<Integer, BasePackable> entities = data.get(entityTypeID);
+        Map<Integer, Map<Integer, BaseRecord<?>>> entities = data.get(entityTypeID);
         if (entities == null) entities = new HashMap<>();
 
-        BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
-        entities.put(entityInstanceID, entity);
+        entities.put(entityInstanceID, records);
         data.put(entityTypeID, entities);
 
         return n;
@@ -82,13 +80,13 @@ public class UnpackAlgorithm {
         Unpacked result;
         if (reader.numBytes() == 0) {
             result = new Unpacked(
-                    new HashMap<Integer, Map<Integer, BasePackable>>(),
+                    new HashMap<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>>(),
                     tick,
                     remote,
                     local
             );
         } else {
-            Map<Integer, Map<Integer, BasePackable>> data = new HashMap<>();
+            Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data = new HashMap<>();
 
             int nextID = reader.readInt();
             while (nextID != Integer.MIN_VALUE) {
@@ -106,7 +104,7 @@ public class UnpackAlgorithm {
         return result;
     }
 
-    private static int readNextEntity(Map<Integer, Map<Integer, BasePackable>> data, ByteArrayReader reader, int entityTypeID) {
+    private static int readNextEntity(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data, ByteArrayReader reader, int entityTypeID) {
         int entityInstanceID = reader.readInt();
 
         Map<Integer, BaseRecord<?>> records = new HashMap<>();
@@ -119,7 +117,7 @@ public class UnpackAlgorithm {
             int recordUniqueID = reader.readInt();
 
             //data
-            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).readArray(reader);
+            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(reader, recordUniqueID);
             records.put(recordUniqueID, record);
 
             if (reader.numBytes() > 0) {
@@ -130,11 +128,10 @@ public class UnpackAlgorithm {
             }
         }
 
-        Map<Integer, BasePackable> entities = data.get(entityTypeID);
+        Map<Integer, Map<Integer, BaseRecord<?>>> entities = data.get(entityTypeID);
         if (entities == null) entities = new HashMap<>();
 
-        BasePackable entity = DataGenManager.entityFactory(entityTypeID).unpack(entityInstanceID, records);
-        entities.put(entityInstanceID, entity);
+        entities.put(entityInstanceID, records);
         data.put(entityTypeID, entities);
 
         return n;

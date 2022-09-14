@@ -90,7 +90,7 @@ public class DatagramClient implements Runnable {
                 out.writeInt(bufSize);
                 out.writeBytes(compressed);
 
-                channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
+                channel.writeAndFlush(new DatagramPacket(out, remoteAddress)).sync();
 
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);

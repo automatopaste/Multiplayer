@@ -1,12 +1,14 @@
 package data.scripts.net.data.tables;
 
-import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.BaseRecord;
 import data.scripts.plugins.MPPlugin;
 
-public interface InboundEntityManager {
-    void processDelta(int id, BasePackable toProcess, MPPlugin plugin);
+import java.util.Map;
 
-    void updateEntities();
+public interface InboundEntityManager {
+    void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin);
+
+    void updateEntities(float amount);
 
     void register();
 }

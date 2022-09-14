@@ -16,6 +16,6 @@
 		"jars/netty/netty-resolver-4.1.69.Final.jar",
 		"jars/netty/netty-resolver-dns-4.1.69.Final.jar"
 	],
-	"modPlugin":"data.scripts.mpModPlugin",
+	"modPlugin":"data.scripts.MPModPlugin",
 	"utility": true
 }

@@ -4,15 +4,17 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteBuffer;
-
 public class FloatRecord extends BaseRecord<Float> {
-    private static int typeID;
+    public static int TYPE_ID;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public FloatRecord(Float record) {
-        super(record);
+    public FloatRecord(Float record, int uniqueID) {
+        super(record, uniqueID);
+    }
+
+    public FloatRecord(DeltaFunc<Float> deltaFunc, int uniqueID) {
+        super(deltaFunc, uniqueID);
     }
 
     public FloatRecord setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -21,54 +23,54 @@ public class FloatRecord extends BaseRecord<Float> {
     }
 
     @Override
-    public boolean check(Float curr) {
+    public boolean check() {
         boolean isUpdated;
+        Float delta = func.get();
 
         if (useDecimalPrecision) {
-            isUpdated = record.intValue() != curr.intValue();
+            isUpdated = value.intValue() != delta.intValue();
         } else {
-            isUpdated = !record.equals(curr);
+            isUpdated = !value.equals(delta);
         }
-        if (isUpdated) record = curr;
+        if (isUpdated) value = delta;
 
         return isUpdated;
     }
 
     @Override
-    protected Float getCopy(Float curr) {
-        return curr;
+    public void get(ByteBuf dest) {
+        dest.writeFloat(value);
     }
 
     @Override
-    public void doWrite(ByteBuffer output) {
-        output.putFloat(record);
+    public BaseRecord<Float> read(ByteBuf in, int uniqueID) {
+        float value = in.readFloat();
+        return new FloatRecord(value, uniqueID);
     }
 
     @Override
-    public FloatRecord read(ByteBuf input) {
-        float value = input.readFloat();
-        return new FloatRecord(value);
+    public BaseRecord<Float> read(ByteArrayReader in, int uniqueID) {
+        float value = in.readFloat();
+        return new FloatRecord(value, uniqueID);
     }
 
-    @Override
-    public BaseRecord<Float> readArray(ByteArrayReader reader) {
-        float value = reader.readFloat();
-        return new FloatRecord(value);
-    }
-
-    public static void setTypeID(int typeID) {
-        FloatRecord.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        FloatRecord.TYPE_ID = typeId;
     }
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
+    }
+
+    public static BaseRecord<Float> getDefault(int uniqueID) {
+        return new FloatRecord(0f, uniqueID);
     }
 
     @Override
     public String toString() {
         return "FloatRecord{" +
-                "record=" + record +
+                "record=" + value +
                 '}';
     }
 }

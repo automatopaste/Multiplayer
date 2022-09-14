@@ -2,6 +2,8 @@ package data.scripts.net.data.util;
 
 import data.scripts.net.data.BasePackable;
 import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.DestPackable;
+import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -15,9 +17,9 @@ import java.util.Map;
  */
 public class DataGenManager {
     public static Map<Class<? extends BasePackable>, Integer> entityTypeIDs = new HashMap<>();
-    public static Map<Integer, BasePackable> entityInstances = new HashMap<>();
+    public static Map<Integer, DestPackable> entityInstances = new HashMap<>();
 
-    public static Map<Class<? extends BaseRecord<?>>, Integer> recordTypeIDs = new HashMap<>();
+    public static Map<String, Integer> recordTypeIDs = new HashMap<>();
     public static Map<Integer, BaseRecord<?>> recordInstances = new HashMap<>();
 
     public static Map<Integer, InboundEntityManager> inboundDataDestinations = new HashMap<>();
@@ -25,7 +27,7 @@ public class DataGenManager {
 
     private static int idIncrementer = 1;
 
-    public static int registerEntityType(Class<? extends BasePackable> clazz, BasePackable instance) {
+    public static int registerEntityType(Class<? extends BasePackable> clazz, DestPackable instance) {
         int id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         entityInstances.put(id, instance);
@@ -33,9 +35,9 @@ public class DataGenManager {
         return id;
     }
 
-    public static int registerRecordType(Class<? extends BaseRecord<?>> clazz, BaseRecord<?> instance) {
+    public static int registerRecordType(String c, BaseRecord<?> instance) {
         int id = idIncrementer;
-        recordTypeIDs.put(clazz, id);
+        recordTypeIDs.put(c, id);
         recordInstances.put(id, instance);
         idIncrementer++;
         return id;
@@ -49,9 +51,9 @@ public class DataGenManager {
         outboundDataSources.put(dataTypeID, manager);
     }
 
-    public static void distributeInboundDeltas(Map<Integer, Map<Integer, BasePackable>> inbound, MPPlugin plugin) {
+    public static void distributeInboundDeltas(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> inbound, MPPlugin plugin) {
         for (Integer type : inbound.keySet()) {
-            Map<Integer, BasePackable> entities = inbound.get(type);
+            Map<Integer, Map<Integer, BaseRecord<?>>> entities = inbound.get(type);
             InboundEntityManager manager = inboundDataDestinations.get(type);
 
             for (Integer instance : entities.keySet()) {
@@ -60,25 +62,14 @@ public class DataGenManager {
         }
     }
 
-    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltas() {
-        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
+    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltas() {
+        Map<Integer, Map<Integer, SourcePackable>> out = new HashMap<>();
 
         for (Integer source : outboundDataSources.keySet()) {
-            Map<Integer, BasePackable> entities = outboundDataSources.get(source).getOutbound();
+            Map<Integer, SourcePackable> entities = outboundDataSources.get(source).getOutbound();
             out.put(source, entities);
         }
 
-        return out;
-    }
-
-    /**
-     * Hacky workaround to avoid reflection
-     * @param typeID id
-     * @return new empty instance
-     */
-    public static BasePackable entityFactory(int typeID) {
-        BasePackable out = entityInstances.get(typeID);
-        if (out == null) Console.showMessage("No entity packable type found at ID: " + typeID);
         return out;
     }
 

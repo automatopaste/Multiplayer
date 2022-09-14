@@ -1,24 +1,22 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.SourcePackable;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PacketContainer {
-    private static final int PACKET_SIZE = 1024;
 
     private final int tick;
-    private final List<BasePackable> packables;
+    private final List<SourcePackable> packables;
     private final boolean flush;
     private final InetSocketAddress dest;
     private final ByteBuf output;
     private int bufSize;
 
-    public PacketContainer(List<BasePackable> packables, int tick, boolean flush, InetSocketAddress dest, ByteBuf output) throws IOException {
+    public PacketContainer(List<SourcePackable> packables, int tick, boolean flush, InetSocketAddress dest, ByteBuf output) throws IOException {
         this.tick = tick;
         this.packables = packables;
         this.flush = flush;
@@ -26,11 +24,11 @@ public class PacketContainer {
         this.output = output;
     }
 
-    public void addPackable(BasePackable toAdd) {
+    public void addPackable(SourcePackable toAdd) {
         packables.add(toAdd);
     }
 
-    public void addPackables(List<BasePackable> toAdd) {
+    public void addPackables(List<SourcePackable> toAdd) {
         packables.addAll(toAdd);
     }
 
@@ -44,16 +42,11 @@ public class PacketContainer {
 
         output.clear();
 
-        List<byte[]> entities = new ArrayList<>();
-        for (BasePackable packable : packables) {
-            byte[] written = packable.pack(flush);
-            if (written != null && written.length > 0) entities.add(written);
-        }
-
+        // write data
         output.writeInt(tick);
 
-        for (byte[] entity : entities) {
-            output.writeBytes(entity);
+        for (SourcePackable packable : packables) {
+            packable.write(flush, output);
         }
 
         bufSize = output.writerIndex();

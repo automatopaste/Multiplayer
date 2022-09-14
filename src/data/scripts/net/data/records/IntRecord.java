@@ -4,58 +4,60 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteBuffer;
-
 public class IntRecord extends BaseRecord<Integer> {
-    private static int typeID;
+    public static int TYPE_ID;
 
-    public IntRecord(Integer record) {
-        super(record);
+    public IntRecord(Integer record, int uniqueID) {
+        super(record, uniqueID);
+    }
+
+    public IntRecord(DeltaFunc<Integer> deltaFunc, int uniqueID) {
+        super(deltaFunc, uniqueID);
     }
 
     @Override
-    public boolean check(Integer curr) {
-        boolean isUpdated = !record.equals(curr);
-        if (isUpdated) record = curr;
+    public boolean check() {
+        int delta = func.get();
+        boolean isUpdated = !value.equals(delta);
+        if (isUpdated) value = delta;
 
         return isUpdated;
     }
 
     @Override
-    public void doWrite(ByteBuffer output) {
-        output.putInt(record);
+    public void get(ByteBuf dest) {
+        dest.writeInt(value);
     }
 
     @Override
-    public IntRecord read(ByteBuf input) {
-        int value = input.readInt();
-        return new IntRecord(value);
+    public BaseRecord<Integer> read(ByteBuf in, int uniqueID) {
+        int value = in.readInt();
+        return new IntRecord(value, uniqueID);
     }
 
     @Override
-    public BaseRecord<Integer> readArray(ByteArrayReader reader) {
-        int value = reader.readInt();
-        return new IntRecord(value);
+    public BaseRecord<Integer> read(ByteArrayReader in, int uniqueID) {
+        int value = in.readInt();
+        return new IntRecord(value, uniqueID);
     }
 
-    @Override
-    protected Integer getCopy(Integer curr) {
-        return curr;
-    }
-
-    public static void setTypeID(int typeID) {
-        IntRecord.typeID = typeID;
+    public static void setTypeId(int typeId) {
+        IntRecord.TYPE_ID = typeId;
     }
 
     @Override
     public int getTypeId() {
-        return typeID;
+        return TYPE_ID;
+    }
+
+    public static IntRecord getDefault(int uniqueID) {
+        return new IntRecord(0, uniqueID);
     }
 
     @Override
     public String toString() {
         return "IntRecord{" +
-                "record=" + record +
+                "record=" + value +
                 '}';
     }
 }
