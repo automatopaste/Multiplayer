@@ -34,7 +34,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
         List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
-            case INITIALISATION_READY:
+            //case INITIALISATION_READY:
             case INITIALISING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": initialising connection...");
 
@@ -42,7 +42,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 break;
-            case LOADING_READY:
+            //case LOADING_READY:
             case LOADING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": sending client data over socket...");
 
@@ -52,7 +52,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 break;
-            case SPAWNING_READY:
+            //case SPAWNING_READY:
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": spawning ships on client...");
 
@@ -62,7 +62,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
 
                 break;
-            case SIMULATION_READY:
+            //case SIMULATION_READY:
             case SIMULATING:
             case CLOSED:
             default:

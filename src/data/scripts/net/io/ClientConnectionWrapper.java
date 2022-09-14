@@ -59,28 +59,28 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
-            case INITIALISING:
+            //case INITIALISING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
 
                 break;
             case LOADING_READY:
-            case LOADING:
+            //case LOADING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Receiving data over socket...");
 
                 connectionState = ConnectionState.SPAWNING_READY;
 
                 break;
             case SPAWNING_READY:
-            case SPAWNING:
+            //case SPAWNING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Spawning entities...");
 
                 connectionState = ConnectionState.SIMULATION_READY;
 
                 break;
             case SIMULATION_READY:
-            case SIMULATING:
+            //case SIMULATING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Starting simulation...");
 
                 connectionState = ConnectionState.SIMULATING;
