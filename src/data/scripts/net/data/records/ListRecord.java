@@ -41,7 +41,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
         for (E e : value) {
             BaseRecord<?> record = (BaseRecord<?>) e;
-            record.write(true, dest);
+            record.get(dest);
         }
     }
 
