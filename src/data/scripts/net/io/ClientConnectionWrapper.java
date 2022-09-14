@@ -64,7 +64,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "initialising connection...");
                 Global.getLogger(ClientConnectionWrapper.class).info("initialising connection");
 
-                connectionState = ConnectionState.LOADING_READY;
+                connectionState = ConnectionState.INITIALISING;
 
                 break;
             case LOADING_READY:
@@ -72,7 +72,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Receiving data over socket...");
                 Global.getLogger(ClientConnectionWrapper.class).info("receiving data");
 
-                connectionState = ConnectionState.SPAWNING_READY;
+                connectionState = ConnectionState.LOADING;
 
                 break;
             case SPAWNING_READY:
@@ -80,7 +80,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Spawning entities...");
                 Global.getLogger(ClientConnectionWrapper.class).info("spawning entities");
 
-                connectionState = ConnectionState.SIMULATION_READY;
+                connectionState = ConnectionState.SPAWNING;
 
                 break;
             case SIMULATION_READY:
