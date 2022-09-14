@@ -42,8 +42,8 @@ public abstract class BasePackable {
      * @param deltas incoming deltas
      */
     public void updateFromDelta(Map<Integer, BaseRecord<?>> deltas) {
-        for (BaseRecord<?> record : deltas.values()) {
-            records.get(record.uniqueID).updateFromDelta(record);
+        for (int k : deltas.keySet()) {
+            records.get(k).updateFromDelta(deltas.get(k));
         }
     }
 }

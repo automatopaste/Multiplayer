@@ -81,8 +81,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 startDatagramClient();
 
                 return new PacketContainer(Collections.singletonList((SourcePackable) statusData), -1, true, null, socketBuffer);
-            case SIMULATING:
-            case CLOSED:
             default:
                 return null;
         }
