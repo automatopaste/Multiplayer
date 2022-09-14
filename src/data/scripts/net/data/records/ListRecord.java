@@ -55,7 +55,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             data.add((E) DataGenManager.recordFactory(type).read(in, -1));
         }
 
-        return new ListRecord<E>(data, uniqueID, type);
+        return new ListRecord<>(data, uniqueID, type);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             data.add((E) DataGenManager.recordFactory(type).read(in, -1));
         }
 
-        return new ListRecord<E>(data, uniqueID, type);
+        return new ListRecord<>(data, uniqueID, type);
     }
 
     public void addElement(E e) {
