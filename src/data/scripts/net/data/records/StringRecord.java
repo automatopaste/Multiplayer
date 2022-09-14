@@ -22,7 +22,10 @@ public class StringRecord extends BaseRecord<String> {
 
     @Override
     public void get(ByteBuf dest) {
-        dest.writeCharSequence(value, CHARSET);
+        byte[] bytes = value.getBytes(CHARSET);
+
+        dest.writeInt(bytes.length);
+        dest.writeBytes(bytes);
     }
 
     @Override
