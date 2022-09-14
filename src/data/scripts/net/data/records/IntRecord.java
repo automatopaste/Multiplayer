@@ -18,7 +18,7 @@ public class IntRecord extends BaseRecord<Integer> {
     @Override
     public boolean check() {
         int delta = func.get();
-        boolean isUpdated = !value.equals(delta);
+        boolean isUpdated = value != delta;
         if (isUpdated) value = delta;
 
         return isUpdated;
