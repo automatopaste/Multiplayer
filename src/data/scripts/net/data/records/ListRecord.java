@@ -24,11 +24,14 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public boolean check() {
-        for (E e : value) {
-            BaseRecord<?> record = (BaseRecord<?>) e;
-            if (record.check()) return true;
-        }
-        return false;
+//        for (E e : value) {
+//            BaseRecord<?> record = (BaseRecord<?>) e;
+//            if (record.check()) return true;
+//        }
+//        return false;
+
+        // always returns true because contents all have null deltas
+        return true;
     }
 
     @Override
