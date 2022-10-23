@@ -35,7 +35,13 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.err.println(cause.getMessage());
-        ctx.close();
+        if (cause instanceof ArrayIndexOutOfBoundsException) {
+            System.err.println("Malformed packet caught");
+            ctx.flush();
+        } else {
+            System.err.println("Error caught in datagram channel: " + cause.getMessage());
+            cause.printStackTrace();
+            ctx.close();
+        }
     }
 }
