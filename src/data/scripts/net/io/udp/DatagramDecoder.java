@@ -15,10 +15,6 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf content = in.content();
         int size = content.readInt();
 
-        if (size < content.readableBytes()) {
-            throw new ArrayIndexOutOfBoundsException("frick");
-        }
-
         byte[] bytes = new byte[size];
         content.readBytes(bytes, 0, size);
 

@@ -13,6 +13,11 @@ public class ByteArrayReader {
     }
 
     public int readInt() {
+        if (index + 4 > a.length) {
+            System.err.println("array read index length exceeded");
+            return Integer.MAX_VALUE;
+        }
+
         int i = ((a[index] & 0xFF) << 24) | ((a[index + 1] & 0xFF) << 16) | ((a[index + 2] & 0xFF) << 8) | ((a[index + 3] & 0xFF));
         index += 4;
         return i;
