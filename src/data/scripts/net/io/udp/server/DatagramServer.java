@@ -2,7 +2,6 @@ package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
-import data.scripts.net.io.Check;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.udp.DatagramUtils;
@@ -23,7 +22,7 @@ public class DatagramServer implements Runnable {
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
-    private final Check check;
+    private final Queue<PacketContainer> externalQueue;
 
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
@@ -39,7 +38,7 @@ public class DatagramServer implements Runnable {
         this.connectionManager = connectionManager;
 
         messageQueue = new LinkedList<>();
-        check = new Check(messageQueue);
+        externalQueue = new LinkedList<>();
 
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE, 50f);
@@ -66,19 +65,21 @@ public class DatagramServer implements Runnable {
                 int size = 0;
                 int sizeCompressed = 0;
 
-                synchronized (messageQueue) {
-                    while (!messageQueue.isEmpty()) {
-                        PacketContainer message = messageQueue.poll();
+                synchronized (externalQueue) {
+                    messageQueue.addAll(externalQueue);
+                }
 
-                        if (message == null || message.isEmpty()) continue;
+                while (!messageQueue.isEmpty()) {
+                    PacketContainer message = messageQueue.poll();
 
-                        DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
-                        if (sizeData == null) {
-                            return;
-                        } else {
-                            size += sizeData.size;
-                            sizeCompressed += sizeData.sizeCompressed;
-                        }
+                    if (message == null || message.isEmpty()) continue;
+
+                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                    if (sizeData == null) {
+                        return;
+                    } else {
+                        size += sizeData.size;
+                        sizeCompressed += sizeData.sizeCompressed;
                     }
                 }
 
@@ -124,8 +125,8 @@ public class DatagramServer implements Runnable {
     public void queueMessages(List<PacketContainer> messages) {
         if (messages.isEmpty()) return;
 
-        synchronized (messageQueue) {
-            messageQueue.addAll(messages);
+        synchronized (externalQueue) {
+            externalQueue.addAll(messages);
         }
     }
 
