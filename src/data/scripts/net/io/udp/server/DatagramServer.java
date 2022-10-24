@@ -1,7 +1,6 @@
 package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
-import cmu.misc.Clock;
 import cmu.plugins.debug.DebugGraphContainer;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
@@ -27,7 +26,6 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
-    private Clock clock;
     private boolean running;
 
     private final DebugGraphContainer dataGraph;
@@ -47,8 +45,6 @@ public class DatagramServer implements Runnable {
         dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
         running = false;
-
-        clock = new Clock(ServerConnectionManager.TICK_RATE);
     }
 
     @Override
@@ -65,8 +61,6 @@ public class DatagramServer implements Runnable {
             while (connectionManager.isActive()) {
                 int size = 0;
                 int sizeCompressed = 0;
-
-                clock.sleepUntilTick();
 
                 while (!messageQueue.isEmpty()) {
                     synchronized (messageQueue) {

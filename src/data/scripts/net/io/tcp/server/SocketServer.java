@@ -1,6 +1,5 @@
 package data.scripts.net.io.tcp.server;
 
-import data.scripts.net.io.Clock;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
@@ -33,8 +32,6 @@ public class SocketServer implements Runnable {
     private Channel serverChannel;
     private final DefaultChannelGroup channelGroup;
 
-    private final Clock clock;
-
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
@@ -44,8 +41,6 @@ public class SocketServer implements Runnable {
         messageQueue = new LinkedList<>();
 
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-        clock = new Clock(ServerConnectionManager.TICK_RATE);
     }
 
     @Override
@@ -58,8 +53,6 @@ public class SocketServer implements Runnable {
 
         try {
             while (connectionManager.isActive()) {
-                clock.sleepUntilTick();
-
                 while (!messageQueue.isEmpty()) {
                     final PacketContainer message = messageQueue.poll();
 
