@@ -62,20 +62,19 @@ public class DatagramServer implements Runnable {
                 int size = 0;
                 int sizeCompressed = 0;
 
-                while (!messageQueue.isEmpty()) {
-                    synchronized (messageQueue) {
-                        final PacketContainer message = messageQueue.poll();
+                PacketContainer message;
+                synchronized (messageQueue) {
+                    message = messageQueue.poll();
+                }
 
-                        if (message == null || message.isEmpty()) continue;
+                if (message == null || message.isEmpty()) continue;
 
-                        DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
-                        if (sizeData == null) {
-                            return;
-                        } else {
-                            size += sizeData.size;
-                            sizeCompressed += sizeData.sizeCompressed;
-                        }
-                    }
+                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                if (sizeData == null) {
+                    return;
+                } else {
+                    size += sizeData.size;
+                    sizeCompressed += sizeData.sizeCompressed;
                 }
 
                 dataGraph.increment(size);
@@ -84,14 +83,6 @@ public class DatagramServer implements Runnable {
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
                 dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
-
-                while (check.check()) {
-                    try {
-                        messageQueue.wait();
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
             }
 
             closeFuture.sync();
@@ -121,7 +112,6 @@ public class DatagramServer implements Runnable {
 
         synchronized (messageQueue) {
             messageQueue.addAll(messages);
-            messageQueue.notify();
         }
     }
 

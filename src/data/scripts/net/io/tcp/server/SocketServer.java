@@ -53,25 +53,19 @@ public class SocketServer implements Runnable {
 
         try {
             while (connectionManager.isActive()) {
-                while (!messageQueue.isEmpty()) {
-                    final PacketContainer message = messageQueue.poll();
+                synchronized (messageQueue) {
+                    while (!messageQueue.isEmpty()) {
+                        final PacketContainer message = messageQueue.poll();
 
-                    channelGroup.writeAndFlush(message, new ChannelMatcher() {
-                        @Override
-                        public boolean matches(Channel channel) {
-                            SocketAddress address = channel.remoteAddress();
-                            InetSocketAddress messageAddress = message.getDest();
+                        channelGroup.writeAndFlush(message, new ChannelMatcher() {
+                            @Override
+                            public boolean matches(Channel channel) {
+                                SocketAddress address = channel.remoteAddress();
+                                InetSocketAddress messageAddress = message.getDest();
 
-                            return address == messageAddress;
-                        }
-                    });
-                }
-
-                while (check.check()) {
-                    try {
-                        messageQueue.wait();
-                    } catch (InterruptedException e) {
-                        break;
+                                return address == messageAddress;
+                            }
+                        });
                     }
                 }
             }
@@ -105,7 +99,6 @@ public class SocketServer implements Runnable {
 
         synchronized (messageQueue) {
             messageQueue.addAll(messages);
-            messageQueue.notify();
         }
     }
 
