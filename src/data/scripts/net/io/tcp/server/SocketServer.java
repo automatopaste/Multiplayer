@@ -17,17 +17,16 @@ import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SocketServer implements Runnable {
-    public static final int MAX_QUEUE_SIZE = 64;
+    public static final int MAX_QUEUE_SIZE = 8;
 
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
-    private final Queue<PacketContainer> externalQueue;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -38,8 +37,7 @@ public class SocketServer implements Runnable {
         this.port = port;
         this.connectionManager = connectionManager;
 
-        messageQueue = new LinkedList<>();
-        externalQueue = new LinkedList<>();
+        messageQueue = new ConcurrentLinkedQueue<>();
 
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
@@ -54,10 +52,6 @@ public class SocketServer implements Runnable {
 
         try {
             while (connectionManager.isActive()) {
-                synchronized (externalQueue) {
-                    messageQueue.addAll(externalQueue);
-                }
-
                 while (!messageQueue.isEmpty()) {
                     final PacketContainer message = messageQueue.poll();
 
@@ -70,14 +64,6 @@ public class SocketServer implements Runnable {
                             return address == messageAddress;
                         }
                     });
-                }
-
-                try {
-                    synchronized (externalQueue) {
-                        externalQueue.wait();
-                    }
-                } catch (InterruptedException i) {
-                    System.err.println("socket server wait interrupted");
                 }
             }
 
@@ -108,14 +94,10 @@ public class SocketServer implements Runnable {
     }
 
     public void addMessages(List<PacketContainer> messages) {
-        synchronized (externalQueue) {
-            externalQueue.addAll(messages);
+        messageQueue.addAll(messages);
 
-            while (externalQueue.size() > MAX_QUEUE_SIZE) {
-                externalQueue.remove();
-            }
-
-            externalQueue.notifyAll();
+        while (messageQueue.size() > MAX_QUEUE_SIZE) {
+            messageQueue.remove();
         }
     }
 

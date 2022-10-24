@@ -151,6 +151,8 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         datagramServer.stop();
         socket.interrupt();
         datagram.interrupt();
+
+        System.out.println("STOPPING SERVER THREAD");
     }
 
     @Override

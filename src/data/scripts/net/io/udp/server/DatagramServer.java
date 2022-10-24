@@ -1,5 +1,6 @@
 package data.scripts.net.io.udp.server;
 
+import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
@@ -12,18 +13,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class DatagramServer implements Runnable {
-    public static final int MAX_QUEUE_SIZE = 128;
+    public static final int MAX_QUEUE_SIZE = 8;
 
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
-    private final Queue<PacketContainer> externalQueue;
 
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
@@ -38,8 +38,7 @@ public class DatagramServer implements Runnable {
         this.port = port;
         this.connectionManager = connectionManager;
 
-        messageQueue = new LinkedList<>();
-        externalQueue = new LinkedList<>();
+        messageQueue = new ConcurrentLinkedQueue<>();
 
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE, 50f);
@@ -66,10 +65,6 @@ public class DatagramServer implements Runnable {
                 int size = 0;
                 int sizeCompressed = 0;
 
-                synchronized (externalQueue) {
-                    messageQueue.addAll(externalQueue);
-                }
-
                 while (!messageQueue.isEmpty()) {
                     PacketContainer message = messageQueue.poll();
 
@@ -88,23 +83,15 @@ public class DatagramServer implements Runnable {
                 nano = System.nanoTime();
                 counter += TimeUnit.SECONDS.convert(diff, TimeUnit.NANOSECONDS);
 
-//                if (counter > 1f / ServerConnectionManager.TICK_RATE) {
-//                    dataGraph.increment(size);
-//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
-//                    dataGraphCompressed.increment(sizeCompressed);
-//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
-//                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
-//
-//                    counter -= 1f / ServerConnectionManager.TICK_RATE;
-//                }
+                if (counter > 1f / ServerConnectionManager.TICK_RATE) {
+                    dataGraph.increment(size);
+                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                    dataGraphCompressed.increment(sizeCompressed);
+                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 
-                try {
-                    synchronized (externalQueue) {
-                        externalQueue.wait();
-                    }
-                } catch (InterruptedException i) {
-                    System.err.println("datagram server wait interrupted");
+                    counter -= 1f / ServerConnectionManager.TICK_RATE;
                 }
             }
 
@@ -134,14 +121,10 @@ public class DatagramServer implements Runnable {
     }
 
     public void addMessages(List<PacketContainer> messages) {
-        synchronized (externalQueue) {
-            externalQueue.addAll(messages);
+        messageQueue.addAll(messages);
 
-            while (externalQueue.size() > MAX_QUEUE_SIZE) {
-                externalQueue.remove();
-            }
-
-            externalQueue.notifyAll();
+        while (messageQueue.size() > MAX_QUEUE_SIZE) {
+            messageQueue.remove();
         }
     }
 
