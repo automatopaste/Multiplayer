@@ -2,6 +2,7 @@ package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
+import data.scripts.net.io.Check;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.udp.DatagramUtils;
@@ -21,6 +22,7 @@ public class DatagramServer implements Runnable {
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
+    private final Check check;
 
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
@@ -36,6 +38,7 @@ public class DatagramServer implements Runnable {
         this.connectionManager = connectionManager;
 
         messageQueue = new LinkedList<>();
+        check = new Check(messageQueue);
 
         dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE, 50f);
         dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE, 50f);
@@ -82,7 +85,7 @@ public class DatagramServer implements Runnable {
                 dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 
-                while (messageQueue.isEmpty()) {
+                while (check.check()) {
                     try {
                         messageQueue.wait();
                     } catch (InterruptedException e) {

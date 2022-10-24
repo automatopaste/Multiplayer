@@ -1,5 +1,6 @@
 package data.scripts.net.io.tcp.server;
 
+import data.scripts.net.io.Check;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
@@ -25,6 +26,7 @@ public class SocketServer implements Runnable {
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
+    private final Check check;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -36,6 +38,7 @@ public class SocketServer implements Runnable {
         this.connectionManager = connectionManager;
 
         messageQueue = new LinkedList<>();
+        check = new Check(messageQueue);
 
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
@@ -64,7 +67,7 @@ public class SocketServer implements Runnable {
                     });
                 }
 
-                while (messageQueue.isEmpty()) {
+                while (check.check()) {
                     try {
                         messageQueue.wait();
                     } catch (InterruptedException e) {
