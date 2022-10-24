@@ -32,6 +32,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
+    private final int port;
 
     private int tick;
 
@@ -39,6 +40,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         super(plugin);
 
         this.host = host;
+        this.port = port;
         dataDuplex = new DataDuplex();
 
         socketClient = new SocketClient(host, port, this);
@@ -103,7 +105,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     private void startDatagramClient() {
-        datagramClient = new DatagramClient(host, ((InetSocketAddress) socketClient.getChannel().localAddress()).getPort(), this);
+        datagramClient = new DatagramClient(host, port, this);
         datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
         datagram.start();
     }
