@@ -1,5 +1,6 @@
 package data.scripts.net.io.udp;
 
+import data.scripts.net.io.CompressionUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -13,12 +14,13 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
         ByteBuf content = in.content();
         int size = content.readInt();
+        int sizeCompressed = content.readInt();
 
-        byte[] bytes = new byte[size];
-        content.readBytes(bytes, 0, size);
+        byte[] bytes = new byte[sizeCompressed];
+        content.readBytes(bytes);
 
-//        byte[] compressed = CompressionUtils.inflate(bytes, size);
+        byte[] decompressed = CompressionUtils.inflate(bytes, size);
 
-        out.add(bytes);
+        out.add(decompressed);
     }
 }

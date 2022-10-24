@@ -61,10 +61,10 @@ public class DatagramServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
-            while (connectionManager.isActive()) {
-                int size = 0;
-                int sizeCompressed = 0;
+            int size = 0;
+            int sizeCompressed = 0;
 
+            while (connectionManager.isActive()) {
                 while (!messageQueue.isEmpty()) {
                     PacketContainer message = messageQueue.poll();
 
@@ -84,6 +84,9 @@ public class DatagramServer implements Runnable {
                     CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
                     dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
                     CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
+
+                    size = 0;
+                    sizeCompressed = 0;
                 }
             }
 
@@ -107,7 +110,6 @@ public class DatagramServer implements Runnable {
 
         ChannelFuture future = bootstrap.bind(port).syncUninterruptibly();
         channel = future.channel();
-//        channelGroup.add(channel);
 
         return future;
     }

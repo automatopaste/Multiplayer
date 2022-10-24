@@ -18,19 +18,17 @@ public class DatagramUtils {
 
         SizeData sizeData = new SizeData();
 
-        sizeData.size = message.getBufSize();
-
         byte[] bytes = new byte[buf.readableBytes()];
-        int length = bytes.length;
+        sizeData.size = bytes.length;
         buf.readBytes(bytes);
         byte[] compressed = CompressionUtils.deflate(bytes);
         sizeData.sizeCompressed = compressed.length;
 
         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
-        out.writeInt(length);
+        out.writeInt(sizeData.size);
+        out.writeInt(sizeData.sizeCompressed);
 
-        out.writeBytes(bytes);
-//        out.writeBytes(compressed);
+        out.writeBytes(compressed);
 
         channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
         return sizeData;
