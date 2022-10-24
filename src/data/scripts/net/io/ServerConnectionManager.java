@@ -69,8 +69,21 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
 
                 tickUpdate();
 
-                socketServer.queueMessages(getSocketMessages());
-                datagramServer.queueMessages(getDatagrams());
+                List<PacketContainer> socketMessages = getSocketMessages();
+                if (!socketMessages.isEmpty()) {
+                    Queue<PacketContainer> externalQueue = socketServer.getExternalQueue();
+
+                    externalQueue.addAll(socketMessages);
+                    externalQueue.notifyAll();
+                }
+
+                List<PacketContainer> datagramMessages = getDatagramMessages();
+                if (!datagramMessages.isEmpty()) {
+                    Queue<PacketContainer> externalQueue = datagramServer.getExternalQueue();
+
+                    externalQueue.addAll(datagramMessages);
+                    externalQueue.notifyAll();
+                }
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
@@ -94,7 +107,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         return output;
     }
 
-    public List<PacketContainer> getDatagrams() throws IOException {
+    public List<PacketContainer> getDatagramMessages() throws IOException {
         List<PacketContainer> output = new ArrayList<>();
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {

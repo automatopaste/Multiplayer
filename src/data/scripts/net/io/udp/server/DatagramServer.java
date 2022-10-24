@@ -14,7 +14,6 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
@@ -97,6 +96,12 @@ public class DatagramServer implements Runnable {
 
                     counter -= 1f / ServerConnectionManager.TICK_RATE;
                 }
+
+                try {
+                    externalQueue.wait();
+                } catch (InterruptedException i) {
+                    System.err.println("datagram server wait interrupted");
+                }
             }
 
             closeFuture.sync();
@@ -123,12 +128,8 @@ public class DatagramServer implements Runnable {
         return future;
     }
 
-    public void queueMessages(List<PacketContainer> messages) {
-        if (messages.isEmpty()) return;
-
-        synchronized (externalQueue) {
-            externalQueue.addAll(messages);
-        }
+    public Queue<PacketContainer> getExternalQueue() {
+        return externalQueue;
     }
 
     public void stop() {

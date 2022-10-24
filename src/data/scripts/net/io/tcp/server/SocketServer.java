@@ -1,6 +1,5 @@
 package data.scripts.net.io.tcp.server;
 
-import data.scripts.net.io.Check;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
@@ -19,14 +18,13 @@ import org.lazywizard.console.Console;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class SocketServer implements Runnable {
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
-    private final Check check;
+    private final Queue<PacketContainer> externalQueue;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -38,7 +36,7 @@ public class SocketServer implements Runnable {
         this.connectionManager = connectionManager;
 
         messageQueue = new LinkedList<>();
-        check = new Check(messageQueue);
+        externalQueue = new LinkedList<>();
 
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
@@ -53,20 +51,28 @@ public class SocketServer implements Runnable {
 
         try {
             while (connectionManager.isActive()) {
-                synchronized (messageQueue) {
-                    while (!messageQueue.isEmpty()) {
-                        final PacketContainer message = messageQueue.poll();
+                synchronized (externalQueue) {
+                    messageQueue.addAll(externalQueue);
+                }
 
-                        channelGroup.writeAndFlush(message, new ChannelMatcher() {
-                            @Override
-                            public boolean matches(Channel channel) {
-                                SocketAddress address = channel.remoteAddress();
-                                InetSocketAddress messageAddress = message.getDest();
+                while (!messageQueue.isEmpty()) {
+                    final PacketContainer message = messageQueue.poll();
 
-                                return address == messageAddress;
-                            }
-                        });
-                    }
+                    channelGroup.writeAndFlush(message, new ChannelMatcher() {
+                        @Override
+                        public boolean matches(Channel channel) {
+                            SocketAddress address = channel.remoteAddress();
+                            InetSocketAddress messageAddress = message.getDest();
+
+                            return address == messageAddress;
+                        }
+                    });
+                }
+
+                try {
+                    externalQueue.wait();
+                } catch (InterruptedException i) {
+                    System.err.println("socket server wait interrupted");
                 }
             }
 
@@ -96,12 +102,8 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    public void queueMessages(List<PacketContainer> messages) {
-        if (messages.isEmpty()) return;
-
-        synchronized (messageQueue) {
-            messageQueue.addAll(messages);
-        }
+    public Queue<PacketContainer> getExternalQueue() {
+        return externalQueue;
     }
 
     public void stop() {
