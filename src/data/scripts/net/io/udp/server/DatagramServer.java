@@ -60,12 +60,12 @@ public class DatagramServer implements Runnable {
 
         try {
             float counter = 0f;
+            long nano = System.nanoTime();
 
             while (connectionManager.isActive()) {
                 int size = 0;
                 int sizeCompressed = 0;
 
-                long nano = System.nanoTime();
 
                 PacketContainer message;
                 synchronized (messageQueue) {
@@ -95,6 +95,8 @@ public class DatagramServer implements Runnable {
 
                     counter -= 1f / ServerConnectionManager.TICK_RATE;
                 }
+
+                nano = System.nanoTime();
             }
 
             closeFuture.sync();
