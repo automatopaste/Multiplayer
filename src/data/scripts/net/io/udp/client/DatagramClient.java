@@ -78,17 +78,11 @@ public class DatagramClient implements Runnable {
                 clock.sleepUntilTick();
 
                 PacketContainer message = connection.getDatagram();
+
                 if (message == null || message.isEmpty()) continue;
 
-                ByteBuf buf = message.get();
-                if (buf.readableBytes() <= 4) {
-                    continue;
-                }
-
                 DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
-                if (sizeData == null) {
-                    return;
-                } else {
+                if (sizeData != null) {
                     size += sizeData.size;
                     sizeCompressed += sizeData.sizeCompressed;
                 }
