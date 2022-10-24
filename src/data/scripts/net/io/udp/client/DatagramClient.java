@@ -3,17 +3,19 @@ package data.scripts.net.io.udp.client;
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
-import data.scripts.net.io.*;
+import data.scripts.net.io.BaseConnectionWrapper;
+import data.scripts.net.io.ClientConnectionWrapper;
+import data.scripts.net.io.Clock;
+import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.udp.DatagramDecoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
+import data.scripts.net.io.udp.DatagramUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
@@ -81,21 +83,13 @@ public class DatagramClient implements Runnable {
                     continue;
                 }
 
-                int bufSize = message.getBufSize();
-                size += bufSize;
-
-                byte[] bytes = new byte[buf.readableBytes()];
-                int length = bytes.length;
-                buf.readBytes(bytes);
-                byte[] compressed = CompressionUtils.deflate(bytes);
-                int lengthCompressed = compressed.length;
-                sizeCompressed += lengthCompressed;
-
-                ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
-                out.writeInt(length);
-                out.writeBytes(compressed);
-
-                channel.writeAndFlush(new DatagramPacket(out, remoteAddress)).sync();
+                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                if (sizeData == null) {
+                    return;
+                } else {
+                    size += sizeData.size;
+                    sizeCompressed += sizeData.sizeCompressed;
+                }
 
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraph", dataGraph);
