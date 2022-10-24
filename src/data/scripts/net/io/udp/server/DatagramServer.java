@@ -22,7 +22,6 @@ public class DatagramServer implements Runnable {
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
 
-    private final Object sync;
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
@@ -35,8 +34,6 @@ public class DatagramServer implements Runnable {
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
-
-        sync = new Object();
 
         messageQueue = new LinkedList<>();
 
@@ -86,12 +83,10 @@ public class DatagramServer implements Runnable {
                 CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 
                 while (messageQueue.isEmpty()) {
-                    synchronized (sync) {
-                        try {
-                            sync.wait();
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+                    try {
+                        messageQueue.wait();
+                    } catch (InterruptedException e) {
+                        break;
                     }
                 }
             }
@@ -123,10 +118,7 @@ public class DatagramServer implements Runnable {
 
         synchronized (messageQueue) {
             messageQueue.addAll(messages);
-        }
-
-        synchronized (sync) {
-            sync.notify();
+            messageQueue.notify();
         }
     }
 

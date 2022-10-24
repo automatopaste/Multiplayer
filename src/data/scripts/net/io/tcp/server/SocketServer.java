@@ -25,7 +25,6 @@ public class SocketServer implements Runnable {
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
-    private final Object sync;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -35,8 +34,6 @@ public class SocketServer implements Runnable {
     public SocketServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
         this.connectionManager = connectionManager;
-
-        sync = new Object();
 
         messageQueue = new LinkedList<>();
 
@@ -68,12 +65,10 @@ public class SocketServer implements Runnable {
                 }
 
                 while (messageQueue.isEmpty()) {
-                    synchronized (sync) {
-                        try {
-                            sync.wait();
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+                    try {
+                        messageQueue.wait();
+                    } catch (InterruptedException e) {
+                        break;
                     }
                 }
             }
@@ -107,10 +102,7 @@ public class SocketServer implements Runnable {
 
         synchronized (messageQueue) {
             messageQueue.addAll(messages);
-        }
-
-        synchronized (sync) {
-            sync.notify();
+            messageQueue.notify();
         }
     }
 
