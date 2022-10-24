@@ -66,23 +66,16 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         try {
             while (active) {
                 clock.sleepUntilTick();
-
                 tickUpdate();
 
                 List<PacketContainer> socketMessages = getSocketMessages();
                 if (!socketMessages.isEmpty()) {
-                    Queue<PacketContainer> externalQueue = socketServer.getExternalQueue();
-
-                    externalQueue.addAll(socketMessages);
-                    externalQueue.notifyAll();
+                    socketServer.addMessages(socketMessages);
                 }
 
                 List<PacketContainer> datagramMessages = getDatagramMessages();
                 if (!datagramMessages.isEmpty()) {
-                    Queue<PacketContainer> externalQueue = datagramServer.getExternalQueue();
-
-                    externalQueue.addAll(datagramMessages);
-                    externalQueue.notifyAll();
+                    datagramServer.addMessages(datagramMessages);
                 }
             }
         } catch (InterruptedException | IOException e) {

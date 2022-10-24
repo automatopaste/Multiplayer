@@ -18,6 +18,7 @@ import org.lazywizard.console.Console;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class SocketServer implements Runnable {
@@ -70,7 +71,9 @@ public class SocketServer implements Runnable {
                 }
 
                 try {
-                    externalQueue.wait();
+                    synchronized (externalQueue) {
+                        externalQueue.wait();
+                    }
                 } catch (InterruptedException i) {
                     System.err.println("socket server wait interrupted");
                 }
@@ -102,8 +105,11 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    public Queue<PacketContainer> getExternalQueue() {
-        return externalQueue;
+    public void addMessages(List<PacketContainer> messages) {
+        synchronized (externalQueue) {
+            externalQueue.addAll(messages);
+            externalQueue.notifyAll();
+        }
     }
 
     public void stop() {
