@@ -68,10 +68,11 @@ public class SocketServer implements Runnable {
             }
 
             closeFuture.sync();
+            stop();
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
-            System.err.println("CLOSING THREAD");
+            System.err.println("CLOSING SOCKET THREAD");
         }
     }
 
@@ -105,6 +106,8 @@ public class SocketServer implements Runnable {
         if (serverChannel != null) serverChannel.close();
         if (workerGroup != null) workerGroup.shutdownGracefully();
         if (bossGroup != null) bossGroup.shutdownGracefully();
+
+        System.err.println("CLOSED SOCKET THREAD SYNC GRACEFULLY");
     }
 
     public ChannelGroup getChannelGroup() {

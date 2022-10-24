@@ -93,12 +93,12 @@ public class DatagramServer implements Runnable {
                 }
             }
 
-            System.err.println("CLOSING THREAD SYNC");
             closeFuture.sync();
+            stop();
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
-            System.err.println("CLOSING THREAD");
+            System.err.println("CLOSING DATAGRAM THREAD");
         }
     }
 
@@ -134,6 +134,8 @@ public class DatagramServer implements Runnable {
         dataGraph.expire();
         dataGraphCompressed.expire();
         dataGraphRatio.expire();
+
+        System.err.println("CLOSED DATAGRAM THREAD SYNC GRACEFULLY");
     }
 
     public boolean isRunning() {
