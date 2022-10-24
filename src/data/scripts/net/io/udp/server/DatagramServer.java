@@ -66,23 +66,24 @@ public class DatagramServer implements Runnable {
                 int size = 0;
                 int sizeCompressed = 0;
 
-
-                PacketContainer message;
                 synchronized (messageQueue) {
-                    message = messageQueue.poll();
-                }
+                    while (!messageQueue.isEmpty()) {
+                        PacketContainer message = messageQueue.poll();
 
-                if (message == null || message.isEmpty()) continue;
+                        if (message == null || message.isEmpty()) continue;
 
-                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
-                if (sizeData == null) {
-                    return;
-                } else {
-                    size += sizeData.size;
-                    sizeCompressed += sizeData.sizeCompressed;
+                        DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                        if (sizeData == null) {
+                            return;
+                        } else {
+                            size += sizeData.size;
+                            sizeCompressed += sizeData.sizeCompressed;
+                        }
+                    }
                 }
 
                 long diff = System.nanoTime() - nano;
+                nano = System.nanoTime();
                 counter += TimeUnit.SECONDS.convert(diff, TimeUnit.NANOSECONDS);
 
                 if (counter > 1f / ServerConnectionManager.TICK_RATE) {
@@ -96,7 +97,6 @@ public class DatagramServer implements Runnable {
                     counter -= 1f / ServerConnectionManager.TICK_RATE;
                 }
 
-                nano = System.nanoTime();
             }
 
             closeFuture.sync();
