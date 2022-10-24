@@ -6,7 +6,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.tables.server.ServerPilotCommandMap;
+import data.scripts.net.data.tables.server.ServerPlayerMap;
 import data.scripts.net.data.tables.server.ServerShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
@@ -21,7 +21,7 @@ public class MPServerPlugin extends MPPlugin {
 
     //inbound
     private final ServerConnectionManager serverConnectionManager;
-    private final ServerPilotCommandMap serverPilotCommandMap;
+    private final ServerPlayerMap serverPlayerMap;
 
     //outbound
     private final ServerShipTable serverShipTable;
@@ -36,8 +36,8 @@ public class MPServerPlugin extends MPPlugin {
         initEntityManager(serverConnectionManager);
 
         // inbound init
-        serverPilotCommandMap = new ServerPilotCommandMap();
-        initEntityManager(serverPilotCommandMap);
+        serverPlayerMap = new ServerPlayerMap();
+        initEntityManager(serverPlayerMap);
 
         //outbound init
         serverShipTable = new ServerShipTable();
@@ -93,7 +93,7 @@ public class MPServerPlugin extends MPPlugin {
         return serverShipTable;
     }
 
-    public ServerPilotCommandMap getServerPilotCommandMap() {
-        return serverPilotCommandMap;
+    public ServerPlayerMap getServerPilotCommandMap() {
+        return serverPlayerMap;
     }
 }

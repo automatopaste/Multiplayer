@@ -1,22 +1,19 @@
-package data.scripts.net.data.packables.metadata.pilot;
+package data.scripts.net.data.packables.metadata.player;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.ViewportAPI;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.Vector2fRecord;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 
-public class PilotSource extends SourcePackable {
+public class PlayerSource extends SourcePackable {
 
-
-
-    /**
-     * Source constructor
-     *
-     * @param instanceID unique
-     */
-    public PilotSource(int instanceID) {
+    public PlayerSource(int instanceID, final ViewportAPI viewport) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -24,16 +21,28 @@ public class PilotSource extends SourcePackable {
             public Integer get() {
                 return mask();
             }
-        }, PilotIDs.BITMASK));
+        }, PlayerIDs.BITMASK));
+        putRecord(new Vector2fRecord(new BaseRecord.DeltaFunc<Vector2f>() {
+            @Override
+            public Vector2f get() {
+                return viewport.getCenter();
+            }
+        }, PlayerIDs.CAMERA_CENTER));
+        putRecord(new FloatRecord(new BaseRecord.DeltaFunc<Float>() {
+            @Override
+            public Float get() {
+                return viewport.getViewMult();
+            }
+        }, PlayerIDs.ZOOM));
     }
 
     @Override
     public int getTypeId() {
-        return PilotIDs.TYPE_ID;
+        return PlayerIDs.TYPE_ID;
     }
 
     public static int mask() {
-        boolean[] controls = new boolean[PilotIDs.NUM_CONTROLS];
+        boolean[] controls = new boolean[PlayerIDs.NUM_CONTROLS];
 
         if (!Keyboard.isCreated()) return 0x00000000;
 

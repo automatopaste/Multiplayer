@@ -2,6 +2,7 @@ package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
+import com.fs.starfarer.api.Global;
 import data.scripts.net.io.Clock;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
@@ -19,7 +20,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DatagramServer implements Runnable {
-    public static final int MAX_QUEUE_SIZE = 8;
+    public static final int MAX_QUEUE_SIZE = Global.getSettings().getInt("mpDatagramQueueLimit");
 
     private final int port;
     private final ServerConnectionManager connectionManager;

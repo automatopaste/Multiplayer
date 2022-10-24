@@ -1,58 +1,39 @@
-package data.scripts.net.data.packables.metadata.pilot;
+package data.scripts.net.data.packables.metadata.player;
 
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.DestPackable;
+import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.Vector2fRecord;
 import data.scripts.plugins.MPPlugin;
-import data.scripts.plugins.MPServerPlugin;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PilotDest extends DestPackable {
+public class PlayerDest extends DestPackable {
 
-    private ShipAPI ship;
-    private MPPlugin plugin;
-
-    /**
-     * Destination constructor
-     *
-     * @param instanceID unique
-     * @param records    incoming deltas
-     */
-    public PilotDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public PlayerDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
     @Override
     protected void initDefaultRecords() {
-        putRecord(IntRecord.getDefault(PilotIDs.BITMASK));
+        putRecord(IntRecord.getDefault(PlayerIDs.BITMASK));
+        putRecord(Vector2fRecord.getDefault(PlayerIDs.CAMERA_CENTER));
+        putRecord(FloatRecord.getDefault(PlayerIDs.ZOOM));
     }
 
     @Override
     public void update(float amount) {
-        if (ship == null) {
-            initShip(plugin);
-        } else {
-            int bitmask = (int) getRecord(PilotIDs.BITMASK).getValue();
-            unmask(ship, bitmask);
-        }
+
     }
 
     @Override
     public void init(MPPlugin plugin) {
-        this.plugin = plugin;
-        initShip(plugin);
-    }
-
-    private void initShip(MPPlugin plugin) {
-        MPServerPlugin serverPlugin = plugin.getType() == MPPlugin.PluginType.SERVER ? (MPServerPlugin) plugin : null;
-        if (serverPlugin == null ) return;
-
 
     }
 
@@ -63,17 +44,17 @@ public class PilotDest extends DestPackable {
 
     @Override
     public int getTypeId() {
-        return PilotIDs.TYPE_ID;
+        return PlayerIDs.TYPE_ID;
     }
 
-    public static PilotDest getDefault() {
-        return new PilotDest(-1, new HashMap<Integer, BaseRecord<?>>());
+    public static PlayerDest getDefault() {
+        return new PlayerDest(-1, new HashMap<Integer, BaseRecord<?>>());
     }
 
     // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java
-    public static void unmask(ShipAPI ship, int bitmask) {
+    public void unmask(ShipAPI ship, int bitmask) {
 
-        boolean[] controls = new boolean[PilotIDs.NUM_CONTROLS];
+        boolean[] controls = new boolean[PlayerIDs.NUM_CONTROLS];
         for (int i = 0; i < controls.length; i++) {
             if ((bitmask & 1 << i) != 0) controls[i] = true;
         }

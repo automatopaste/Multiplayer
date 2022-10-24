@@ -1,19 +1,19 @@
 package data.scripts.net.data.tables.client;
 
 import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.packables.metadata.pilot.PilotIDs;
-import data.scripts.net.data.packables.metadata.pilot.PilotSource;
+import data.scripts.net.data.packables.metadata.player.PlayerIDs;
+import data.scripts.net.data.packables.metadata.player.PlayerSource;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PilotCommandOutput implements OutboundEntityManager {
-    private final PilotSource command;
+public class PlayerOutput implements OutboundEntityManager {
+    private final PlayerSource command;
     private final int instanceID;
 
-    public PilotCommandOutput(int instanceID, PilotSource command) {
+    public PlayerOutput(int instanceID, PlayerSource command) {
         this.command = command;
         this.instanceID = instanceID;
     }
@@ -32,7 +32,7 @@ public class PilotCommandOutput implements OutboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(PilotIDs.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(PlayerIDs.TYPE_ID, this);
     }
 
     @Override

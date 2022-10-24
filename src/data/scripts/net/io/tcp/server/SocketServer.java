@@ -1,5 +1,6 @@
 package data.scripts.net.io.tcp.server;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
@@ -22,7 +23,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SocketServer implements Runnable {
-    public static final int MAX_QUEUE_SIZE = 8;
+    public static final int MAX_QUEUE_SIZE = Global.getSettings().getInt("mpSocketQueueLimit");
 
     private final int port;
     private final ServerConnectionManager connectionManager;

@@ -5,9 +5,9 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.packables.metadata.pilot.PilotSource;
+import data.scripts.net.data.packables.metadata.player.PlayerSource;
 import data.scripts.net.data.tables.client.ClientShipTable;
-import data.scripts.net.data.tables.client.PilotCommandOutput;
+import data.scripts.net.data.tables.client.PlayerOutput;
 import data.scripts.net.data.tables.client.VariantDataMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
@@ -27,7 +27,7 @@ public class MPClientPlugin extends MPPlugin {
     private final VariantDataMap variantDataMap;
 
     //outbound
-    private final PilotCommandOutput inputManager;
+    private final PlayerOutput playerOutputManager;
 
     private final VariantDataGenerator dataStore;
 
@@ -50,8 +50,8 @@ public class MPClientPlugin extends MPPlugin {
 
         // outbound init
         int id = -10; // placeholder id
-        inputManager = new PilotCommandOutput(id, new PilotSource(id));
-        initEntityManager(inputManager);
+        playerOutputManager = new PlayerOutput(id, new PlayerSource(id, Global.getCombatEngine().getViewport()));
+        initEntityManager(playerOutputManager);
     }
 
     @Override
