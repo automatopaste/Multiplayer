@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Queue;
 
 public class SocketServer implements Runnable {
+    public static final int MAX_QUEUE_SIZE = 64;
+
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
@@ -108,6 +110,11 @@ public class SocketServer implements Runnable {
     public void addMessages(List<PacketContainer> messages) {
         synchronized (externalQueue) {
             externalQueue.addAll(messages);
+
+            while (externalQueue.size() > MAX_QUEUE_SIZE) {
+                externalQueue.remove();
+            }
+
             externalQueue.notifyAll();
         }
     }

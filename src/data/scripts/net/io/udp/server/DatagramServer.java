@@ -1,6 +1,5 @@
 package data.scripts.net.io.udp.server;
 
-import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
@@ -19,6 +18,8 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 public class DatagramServer implements Runnable {
+    public static final int MAX_QUEUE_SIZE = 128;
+
     private final int port;
     private final ServerConnectionManager connectionManager;
     private final Queue<PacketContainer> messageQueue;
@@ -87,16 +88,16 @@ public class DatagramServer implements Runnable {
                 nano = System.nanoTime();
                 counter += TimeUnit.SECONDS.convert(diff, TimeUnit.NANOSECONDS);
 
-                if (counter > 1f / ServerConnectionManager.TICK_RATE) {
-                    dataGraph.increment(size);
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
-                    dataGraphCompressed.increment(sizeCompressed);
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
-                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
-
-                    counter -= 1f / ServerConnectionManager.TICK_RATE;
-                }
+//                if (counter > 1f / ServerConnectionManager.TICK_RATE) {
+//                    dataGraph.increment(size);
+//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+//                    dataGraphCompressed.increment(sizeCompressed);
+//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+//                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
+//
+//                    counter -= 1f / ServerConnectionManager.TICK_RATE;
+//                }
 
                 try {
                     synchronized (externalQueue) {
@@ -107,6 +108,7 @@ public class DatagramServer implements Runnable {
                 }
             }
 
+            System.err.println("CLOSING THREAD SYNC");
             closeFuture.sync();
         } catch (Throwable e) {
             e.printStackTrace();
@@ -134,6 +136,11 @@ public class DatagramServer implements Runnable {
     public void addMessages(List<PacketContainer> messages) {
         synchronized (externalQueue) {
             externalQueue.addAll(messages);
+
+            while (externalQueue.size() > MAX_QUEUE_SIZE) {
+                externalQueue.remove();
+            }
+
             externalQueue.notifyAll();
         }
     }
