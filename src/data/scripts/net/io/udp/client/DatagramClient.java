@@ -85,10 +85,11 @@ public class DatagramClient implements Runnable {
                 size += bufSize;
 
                 byte[] bytes = new byte[buf.readableBytes()];
+                int length = bytes.length;
                 buf.readBytes(bytes);
                 byte[] compressed = CompressionUtils.deflate(bytes);
-                int length = compressed.length;
-                sizeCompressed += length;
+                int lengthCompressed = compressed.length;
+                sizeCompressed += lengthCompressed;
 
                 ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
                 out.writeInt(length);

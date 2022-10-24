@@ -1,18 +1,16 @@
 package data.scripts.net.io.udp.server;
 
 import cmu.CMUtils;
+import cmu.misc.Clock;
 import cmu.plugins.debug.DebugGraphContainer;
-import data.scripts.net.io.CompressionUtils;
 import data.scripts.net.io.PacketContainer;
 import data.scripts.net.io.ServerConnectionManager;
+import data.scripts.net.io.udp.DatagramUtils;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
@@ -29,6 +27,7 @@ public class DatagramServer implements Runnable {
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
 
+    private Clock clock;
     private boolean running;
 
     private final DebugGraphContainer dataGraph;
@@ -43,11 +42,13 @@ public class DatagramServer implements Runnable {
 
         messageQueue = new LinkedList<>();
 
-        dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
-        dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE * 2, 50f);
-        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE * 2, 50f);
+        dataGraph = new DebugGraphContainer("Bits Out", ServerConnectionManager.TICK_RATE, 50f);
+        dataGraphCompressed = new DebugGraphContainer("Compressed Bits Out", ServerConnectionManager.TICK_RATE, 50f);
+        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
         running = false;
+
+        clock = new Clock(ServerConnectionManager.TICK_RATE);
     }
 
     @Override
@@ -65,31 +66,21 @@ public class DatagramServer implements Runnable {
                 int size = 0;
                 int sizeCompressed = 0;
 
+                clock.sleepUntilTick();
+
                 while (!messageQueue.isEmpty()) {
                     synchronized (messageQueue) {
                         final PacketContainer message = messageQueue.poll();
 
                         if (message == null || message.isEmpty()) continue;
 
-                        ByteBuf buf = message.get();
-                        if (buf.readableBytes() <= 4) {
-                            continue;
+                        DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                        if (sizeData == null) {
+                            return;
+                        } else {
+                            size += sizeData.size;
+                            sizeCompressed += sizeData.sizeCompressed;
                         }
-
-                        int bufSize = message.getBufSize();
-                        size += bufSize;
-
-                        byte[] bytes = new byte[buf.readableBytes()];
-                        buf.readBytes(bytes);
-                        byte[] compressed = CompressionUtils.deflate(bytes);
-                        int length = compressed.length;
-                        sizeCompressed += length;
-
-                        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
-                        out.writeInt(length);
-                        out.writeBytes(compressed);
-
-                        channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
                     }
                 }
 
