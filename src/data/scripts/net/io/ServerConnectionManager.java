@@ -69,14 +69,10 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
                 tickUpdate();
 
                 List<PacketContainer> socketMessages = getSocketMessages();
-                if (!socketMessages.isEmpty()) {
-                    socketServer.addMessages(socketMessages);
-                }
+                if (!socketMessages.isEmpty()) socketServer.addMessages(socketMessages);
 
                 List<PacketContainer> datagramMessages = getDatagramMessages();
-                if (!datagramMessages.isEmpty()) {
-                    datagramServer.addMessages(datagramMessages);
-                }
+                if (!datagramMessages.isEmpty()) datagramServer.addMessages(datagramMessages);
             }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
