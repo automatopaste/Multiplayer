@@ -28,7 +28,9 @@ public class DatagramUtils {
 
         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
         out.writeInt(length);
-        out.writeBytes(compressed);
+
+        out.writeBytes(bytes);
+//        out.writeBytes(compressed);
 
         channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
         return sizeData;

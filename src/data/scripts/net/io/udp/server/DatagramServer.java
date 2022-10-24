@@ -16,7 +16,6 @@ import org.lazywizard.console.Console;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 
 public class DatagramServer implements Runnable {
     public static final int MAX_QUEUE_SIZE = 8;
@@ -58,9 +57,6 @@ public class DatagramServer implements Runnable {
         ChannelFuture closeFuture = channelFuture.channel().closeFuture();
 
         try {
-            float counter = 0f;
-            long nano = System.nanoTime();
-
             while (connectionManager.isActive()) {
                 int size = 0;
                 int sizeCompressed = 0;
@@ -77,20 +73,12 @@ public class DatagramServer implements Runnable {
                     }
                 }
 
-                long diff = System.nanoTime() - nano;
-                nano = System.nanoTime();
-                counter += TimeUnit.SECONDS.convert(diff, TimeUnit.NANOSECONDS);
-
-                if (counter > 1f / ServerConnectionManager.TICK_RATE) {
-                    dataGraph.increment(size);
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
-                    dataGraphCompressed.increment(sizeCompressed);
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
-                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
-
-                    counter -= 1f / ServerConnectionManager.TICK_RATE;
-                }
+                dataGraph.increment(size);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                dataGraphCompressed.increment(sizeCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+                dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
             }
 
             closeFuture.sync();
