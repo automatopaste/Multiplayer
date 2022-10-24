@@ -1,6 +1,5 @@
 package data.scripts.net.io.udp;
 
-import data.scripts.net.io.CompressionUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -18,7 +17,7 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         byte[] bytes = new byte[size];
         content.readBytes(bytes, 0, size);
 
-        byte[] compressed = CompressionUtils.inflate(bytes, size);
+//        byte[] compressed = CompressionUtils.inflate(bytes, size);
 
         out.add(bytes);
     }
