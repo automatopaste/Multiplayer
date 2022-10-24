@@ -105,7 +105,9 @@ public class SocketServer implements Runnable {
     public void queueMessages(List<PacketContainer> messages) {
         if (messages.isEmpty()) return;
 
-        messageQueue.addAll(messages);
+        synchronized (messageQueue) {
+            messageQueue.addAll(messages);
+        }
 
         synchronized (sync) {
             sync.notify();
