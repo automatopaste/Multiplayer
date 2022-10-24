@@ -1,27 +1,39 @@
 package data.scripts.net.io;
 
 public class Clock {
-    private long initialTime;
+    private long prev;
     private final double timeU;
     private double deltaU;
 
     public Clock(int rate) {
-        initialTime = System.nanoTime();
+        prev = System.nanoTime();
         timeU = 1000000000d / rate;
         deltaU = 1d;
     }
 
     public void sleepUntilTick() throws InterruptedException {
-        long currentTime;
+        long curr;
 
         while (deltaU < 1d) {
             Thread.sleep(0);
 
-            currentTime = System.nanoTime();
-            deltaU += (currentTime - initialTime) / timeU;
-            initialTime = currentTime;
+            curr = System.nanoTime();
+            deltaU += (curr - prev) / timeU;
+            prev = curr;
         }
 
         deltaU--;
+    }
+
+    public boolean mark() {
+        long curr = System.nanoTime();
+        deltaU += (curr - prev) / timeU;
+        prev = curr;
+
+        if (deltaU > 1d) {
+            deltaU -= 1d;
+            return true;
+        }
+        return false;
     }
 }
