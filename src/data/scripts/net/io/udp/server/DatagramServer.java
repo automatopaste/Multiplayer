@@ -97,12 +97,13 @@ public class DatagramServer implements Runnable {
 
                     counter -= 1f / ServerConnectionManager.TICK_RATE;
                 }
-
             }
 
             closeFuture.sync();
-        } catch (InterruptedException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+        } finally {
+            System.err.println("CLOSING THREAD");
         }
     }
 

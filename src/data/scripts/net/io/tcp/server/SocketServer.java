@@ -71,8 +71,10 @@ public class SocketServer implements Runnable {
             }
 
             closeFuture.sync();
-        } catch (InterruptedException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+        } finally {
+            System.err.println("CLOSING THREAD");
         }
     }
 
