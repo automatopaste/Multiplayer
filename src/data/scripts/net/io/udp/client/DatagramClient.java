@@ -81,7 +81,7 @@ public class DatagramClient implements Runnable {
 
                 if (message == null || message.isEmpty()) continue;
 
-                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, remoteAddress);
                 if (sizeData != null) {
                     size += sizeData.size;
                     sizeCompressed += sizeData.sizeCompressed;

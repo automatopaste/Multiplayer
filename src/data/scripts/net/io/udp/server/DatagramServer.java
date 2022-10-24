@@ -71,7 +71,7 @@ public class DatagramServer implements Runnable {
 
                     if (message == null || message.isEmpty()) continue;
 
-                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message);
+                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, message.getDest());
                     if (sizeData != null) {
                         size += sizeData.size;
                         sizeCompressed += sizeData.sizeCompressed;

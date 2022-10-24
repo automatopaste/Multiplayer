@@ -7,9 +7,11 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.net.InetSocketAddress;
+
 public class DatagramUtils {
 
-    public static SizeData write(Channel channel, PacketContainer message) throws InterruptedException {
+    public static SizeData write(Channel channel, PacketContainer message, InetSocketAddress dest) throws InterruptedException {
         ByteBuf buf = message.get();
         if (buf.readableBytes() <= 4) {
             channel.flush();
@@ -30,7 +32,7 @@ public class DatagramUtils {
 
         out.writeBytes(compressed);
 
-        channel.writeAndFlush(new DatagramPacket(out, message.getDest())).sync();
+        channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
         return sizeData;
     }
 
