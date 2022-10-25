@@ -30,7 +30,6 @@ public class DatagramUtils {
 
         out.writeInt(sizeData.size);
         out.writeInt(sizeData.sizeCompressed);
-        out.writeInt(connectionID);
         out.writeBytes(compressed);
 
         channel.writeAndFlush(new DatagramPacket(out, dest)).sync();

@@ -46,6 +46,7 @@ public class MessageContainer {
 
         // write data
         output.writeInt(tick);
+        output.writeInt(connectionID);
 
         for (SourcePackable packable : packables) {
             packable.write(flush, output);
