@@ -124,7 +124,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
             if (serverConnectionWrappers.size() >= maxConnections) return null;
         }
 
-        int id = ConnectionIDs.getConnectionId(remoteAddress);
+        int id = ConnectionIDs.getConnectionID(remoteAddress);
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
 
         synchronized (serverConnectionWrappers) {

@@ -56,7 +56,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
 
-            statusData = new ConnectionSource(ConnectionIDs.getConnectionId(address), this);
+            statusData = new ConnectionSource(ConnectionIDs.getConnectionID(address), this);
+            connectionID = ConnectionIDs.getConnectionID(address);
         }
 
         List<SourcePackable> data = new ArrayList<>();

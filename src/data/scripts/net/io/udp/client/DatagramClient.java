@@ -95,6 +95,7 @@ public class DatagramClient implements Runnable {
             }
 
             closeFuture.sync();
+            stop();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
             stop();

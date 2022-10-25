@@ -7,7 +7,7 @@ public class ConnectionIDs {
 
     public static final int STATE = 1;
 
-    public static int getConnectionId(InetSocketAddress address) {
+    public static int getConnectionID(InetSocketAddress address) {
         byte[] ids = address.getAddress().getAddress();
 
         int id = 0x00;
