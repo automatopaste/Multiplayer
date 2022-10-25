@@ -12,10 +12,13 @@ import java.util.List;
 public class BufferUnpacker extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> out) {
+        int connectionID = in.readInt();
+
         Unpacked result = UnpackAlgorithm.unpack(
                 in,
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                (InetSocketAddress) channelHandlerContext.channel().localAddress()
+                (InetSocketAddress) channelHandlerContext.channel().localAddress(),
+                connectionID
         );
 
         out.add(result);
