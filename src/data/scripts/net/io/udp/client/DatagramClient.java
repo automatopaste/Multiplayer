@@ -9,7 +9,6 @@ import data.scripts.net.io.udp.DatagramUnpacker;
 import data.scripts.net.io.udp.DatagramUtils;
 import data.scripts.net.io.udp.server.DatagramServer;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -77,11 +76,11 @@ public class DatagramClient implements Runnable {
 
                 clock.sleepUntilTick();
 
-                PacketContainer message = connection.getDatagram();
+                MessageContainer message = connection.getDatagram();
 
                 if (message == null || message.isEmpty()) continue;
 
-                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, remoteAddress);
+                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, remoteAddress, message.getConnectionID());
                 if (sizeData != null) {
                     size += sizeData.size;
                     sizeCompressed += sizeData.sizeCompressed;

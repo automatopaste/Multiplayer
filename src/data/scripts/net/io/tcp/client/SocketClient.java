@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
-import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.MessageContainer;
 import data.scripts.net.io.tcp.BufferUnpacker;
 import data.scripts.net.io.tcp.PacketContainerDecoder;
 import data.scripts.net.io.tcp.PacketContainerEncoder;
@@ -60,7 +60,7 @@ public class SocketClient implements Runnable {
             while (connection.getConnectionState() != ClientConnectionWrapper.ConnectionState.CLOSED) {
                 clock.sleepUntilTick();
 
-                PacketContainer container = connection.getSocketMessage();
+                MessageContainer container = connection.getSocketMessage();
                 if (container == null || container.isEmpty()) continue;
 
                 write(container);

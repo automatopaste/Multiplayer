@@ -4,7 +4,7 @@ import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.io.Clock;
-import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.MessageContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.udp.DatagramUtils;
 import io.netty.bootstrap.Bootstrap;
@@ -24,7 +24,7 @@ public class DatagramServer implements Runnable {
 
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private final Queue<PacketContainer> messageQueue;
+    private final Queue<MessageContainer> messageQueue;
 
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
@@ -67,11 +67,11 @@ public class DatagramServer implements Runnable {
 
             while (connectionManager.isActive()) {
                 while (!messageQueue.isEmpty()) {
-                    PacketContainer message = messageQueue.poll();
+                    MessageContainer message = messageQueue.poll();
 
                     if (message == null || message.isEmpty()) continue;
 
-                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, message.getDest());
+                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, message.getDest(), message.getConnectionID());
                     if (sizeData != null) {
                         size += sizeData.size;
                         sizeCompressed += sizeData.sizeCompressed;
@@ -115,7 +115,7 @@ public class DatagramServer implements Runnable {
         return future;
     }
 
-    public void addMessages(List<PacketContainer> messages) {
+    public void addMessages(List<MessageContainer> messages) {
         messageQueue.addAll(messages);
 
         while (messageQueue.size() > MAX_QUEUE_SIZE) {

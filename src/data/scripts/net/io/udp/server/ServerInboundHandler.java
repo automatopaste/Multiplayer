@@ -20,7 +20,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Unpacked in) throws Exception {
         if (connectionWrapper == null) {
-            connectionWrapper = serverConnectionManager.getConnection(in.getSender());
+            connectionWrapper = serverConnectionManager.getConnection(in.getConnectionID());
         }
 
         int serverTick = in.getTick();

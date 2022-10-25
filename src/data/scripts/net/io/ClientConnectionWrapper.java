@@ -51,7 +51,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public PacketContainer getSocketMessage() throws IOException {
+    public MessageContainer getSocketMessage() throws IOException {
         if (statusData == null) {
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
@@ -101,7 +101,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
         data.add(statusData);
 
-        return new PacketContainer(data, tick, true, null, socketBuffer);
+        return new MessageContainer(data, tick, true, null, socketBuffer, connectionID);
     }
 
     private void startDatagramClient() {
@@ -111,7 +111,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public PacketContainer getDatagram() throws IOException {
+    public MessageContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
         List<SourcePackable> data = new ArrayList<>();
@@ -135,7 +135,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 break;
         }
 
-        return new PacketContainer(data, tick, false, null, datagramBuffer);
+        return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
     }
 
     public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities, int tick) {
@@ -185,7 +185,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public Map<Integer, SourcePackable> getOutbound() {
         Map<Integer, SourcePackable> out = new HashMap<>();
-        out.put(connectionId, statusData);
+        out.put(connectionID, statusData);
         return out;
     }
 

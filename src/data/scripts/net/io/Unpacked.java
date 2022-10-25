@@ -11,12 +11,14 @@ public class Unpacked {
 
     private final InetSocketAddress sender;
     private final InetSocketAddress recipient;
+    private final int connectionID;
 
-    public Unpacked(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> unpacked, int tick, InetSocketAddress sender, InetSocketAddress recipient) {
+    public Unpacked(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> unpacked, int tick, InetSocketAddress sender, InetSocketAddress recipient, int connectionID) {
         this.unpacked = unpacked;
         this.tick = tick;
         this.sender = sender;
         this.recipient = recipient;
+        this.connectionID = connectionID;
     }
 
     public Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> getUnpacked() {
@@ -33,5 +35,9 @@ public class Unpacked {
 
     public InetSocketAddress getSender() {
         return sender;
+    }
+
+    public int getConnectionID() {
+        return connectionID;
     }
 }

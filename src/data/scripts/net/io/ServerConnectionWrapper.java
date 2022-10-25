@@ -23,20 +23,20 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
         this.connectionManager = connectionManager;
         this.remoteAddress = remoteAddress;
-        this.connectionId = connectionId;
+        this.connectionID = connectionId;
 
         statusData = new ConnectionSource(connectionId, this);
     }
 
     @Override
-    public PacketContainer getSocketMessage() throws IOException {
+    public MessageContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
 
         List<SourcePackable> data = new ArrayList<>();
         switch (connectionState) {
             //case INITIALISATION_READY:
             case INITIALISING:
-                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": initialising connection...");
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
@@ -44,7 +44,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case LOADING_READY:
             case LOADING:
-                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": sending client data over socket...");
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": sending client data over socket...");
 
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
@@ -54,7 +54,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case SPAWNING_READY:
             case SPAWNING:
-                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionId, connectionId + ": spawning ships on client...");
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
 
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
@@ -70,17 +70,13 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
         data.add(statusData);
 
-        return new PacketContainer(
-                data,
-                connectionManager.getTick(),
-                true,
-                remoteAddress,
-                socketBuffer
+        return new MessageContainer(
+                data, connectionManager.getTick(), true, remoteAddress, socketBuffer, connectionID
         );
     }
 
     @Override
-    public PacketContainer getDatagram() throws IOException {
+    public MessageContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
         List<SourcePackable> data = new ArrayList<>();
@@ -104,8 +100,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        return new PacketContainer(
-                data, connectionManager.getTick(), false, remoteAddress, datagramBuffer
+        return new MessageContainer(
+                data, connectionManager.getTick(), false, remoteAddress, datagramBuffer, connectionID
         );
     }
 
@@ -128,7 +124,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void close() {
-        connectionManager.removeConnection(connectionId);
+        connectionManager.removeConnection(connectionID);
     }
 
     public InetSocketAddress getRemoteAddress() {

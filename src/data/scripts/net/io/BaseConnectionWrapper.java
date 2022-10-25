@@ -23,7 +23,7 @@ public abstract class BaseConnectionWrapper {
 
     protected ConnectionSource statusData;
 
-    protected int connectionId;
+    protected int connectionID;
 
     protected MPPlugin localPlugin;
 
@@ -41,21 +41,21 @@ public abstract class BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void setConnectionId(int connectionId) {
-        this.connectionId = connectionId;
+    public void setConnectionID(int connectionID) {
+        this.connectionID = connectionID;
     }
 
-    public int getConnectionId() {
-        return connectionId;
+    public int getConnectionID() {
+        return connectionID;
     }
 
     public ConnectionState getConnectionState() {
         return connectionState;
     }
 
-    public abstract PacketContainer getSocketMessage() throws IOException;
+    public abstract MessageContainer getSocketMessage() throws IOException;
 
-    public abstract PacketContainer getDatagram() throws IOException;
+    public abstract MessageContainer getDatagram() throws IOException;
 
     public static BaseConnectionWrapper.ConnectionState ordinalToConnectionState(int state) {
         switch (state) {

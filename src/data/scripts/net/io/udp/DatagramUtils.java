@@ -1,7 +1,7 @@
 package data.scripts.net.io.udp;
 
 import data.scripts.net.io.CompressionUtils;
-import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.MessageContainer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -11,7 +11,7 @@ import java.net.InetSocketAddress;
 
 public class DatagramUtils {
 
-    public static SizeData write(Channel channel, PacketContainer message, InetSocketAddress dest) throws InterruptedException {
+    public static SizeData write(Channel channel, MessageContainer message, InetSocketAddress dest, int connectionID) throws InterruptedException {
         ByteBuf buf = message.get();
         if (buf.readableBytes() <= 4) {
             channel.flush();
@@ -27,9 +27,10 @@ public class DatagramUtils {
         sizeData.sizeCompressed = compressed.length;
 
         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+
         out.writeInt(sizeData.size);
         out.writeInt(sizeData.sizeCompressed);
-
+        out.writeInt(connectionID);
         out.writeBytes(compressed);
 
         channel.writeAndFlush(new DatagramPacket(out, dest)).sync();

@@ -7,21 +7,23 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class PacketContainer {
+public class MessageContainer {
 
     private final int tick;
     private final List<SourcePackable> packables;
     private final boolean flush;
     private final InetSocketAddress dest;
     private final ByteBuf output;
+    private final int connectionID;
     private int bufSize;
 
-    public PacketContainer(List<SourcePackable> packables, int tick, boolean flush, InetSocketAddress dest, ByteBuf output) throws IOException {
+    public MessageContainer(List<SourcePackable> packables, int tick, boolean flush, InetSocketAddress dest, ByteBuf output, int connectionID) throws IOException {
         this.tick = tick;
         this.packables = packables;
         this.flush = flush;
         this.dest = dest;
         this.output = output;
+        this.connectionID = connectionID;
     }
 
     public void addPackable(SourcePackable toAdd) {
@@ -64,5 +66,9 @@ public class PacketContainer {
 
     public int getBufSize() {
         return bufSize;
+    }
+
+    public int getConnectionID() {
+        return connectionID;
     }
 }

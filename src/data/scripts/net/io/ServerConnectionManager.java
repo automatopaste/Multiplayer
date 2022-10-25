@@ -68,10 +68,10 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
                 clock.sleepUntilTick();
                 tickUpdate();
 
-                List<PacketContainer> socketMessages = getSocketMessages();
+                List<MessageContainer> socketMessages = getSocketMessages();
                 if (!socketMessages.isEmpty()) socketServer.addMessages(socketMessages);
 
-                List<PacketContainer> datagramMessages = getDatagramMessages();
+                List<MessageContainer> datagramMessages = getDatagramMessages();
                 if (!datagramMessages.isEmpty()) datagramServer.addMessages(datagramMessages);
             }
         } catch (InterruptedException | IOException e) {
@@ -85,32 +85,32 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         tick++;
     }
 
-    public List<PacketContainer> getSocketMessages() throws IOException {
-        List<PacketContainer> output = new ArrayList<>();
+    public List<MessageContainer> getSocketMessages() throws IOException {
+        List<MessageContainer> output = new ArrayList<>();
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
-            PacketContainer message = connection.getSocketMessage();
+            MessageContainer message = connection.getSocketMessage();
             if (message != null) output.add(message);
         }
 
         return output;
     }
 
-    public List<PacketContainer> getDatagramMessages() throws IOException {
-        List<PacketContainer> output = new ArrayList<>();
+    public List<MessageContainer> getDatagramMessages() throws IOException {
+        List<MessageContainer> output = new ArrayList<>();
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
-            PacketContainer message = connection.getDatagram();
+            MessageContainer message = connection.getDatagram();
             if (message != null) output.add(message);
         }
 
         return output;
     }
 
-    public ServerConnectionWrapper getConnection(InetSocketAddress remoteAddress) {
+    public ServerConnectionWrapper getConnection(int connectionID) {
         for (Integer id : serverConnectionWrappers.keySet()) {
             ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
-            if (Arrays.equals(wrapper.getRemoteAddress().getAddress().getAddress(), remoteAddress.getAddress().getAddress())) {
+            if (wrapper.connectionID == connectionID) {
                 return wrapper;
             }
         }

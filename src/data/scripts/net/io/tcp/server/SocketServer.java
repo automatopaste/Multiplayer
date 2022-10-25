@@ -1,7 +1,7 @@
 package data.scripts.net.io.tcp.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.io.PacketContainer;
+import data.scripts.net.io.MessageContainer;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -27,7 +27,7 @@ public class SocketServer implements Runnable {
 
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private final Queue<PacketContainer> messageQueue;
+    private final Queue<MessageContainer> messageQueue;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -54,7 +54,7 @@ public class SocketServer implements Runnable {
         try {
             while (connectionManager.isActive()) {
                 while (!messageQueue.isEmpty()) {
-                    final PacketContainer message = messageQueue.poll();
+                    final MessageContainer message = messageQueue.poll();
 
                     channelGroup.writeAndFlush(message, new ChannelMatcher() {
                         @Override
@@ -95,7 +95,7 @@ public class SocketServer implements Runnable {
         return future;
     }
 
-    public void addMessages(List<PacketContainer> messages) {
+    public void addMessages(List<MessageContainer> messages) {
         messageQueue.addAll(messages);
 
         while (messageQueue.size() > MAX_QUEUE_SIZE) {

@@ -8,15 +8,34 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class DatagramUnpacker extends MessageToMessageDecoder<byte[]> {
+public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUnpacker.DatagramBytes> {
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, byte[] in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, DatagramBytes in, List<Object> out) throws Exception {
         Unpacked result = UnpackAlgorithm.unpack(
-                in,
+                in.getBytes(),
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                (InetSocketAddress) channelHandlerContext.channel().localAddress()
+                (InetSocketAddress) channelHandlerContext.channel().localAddress(),
+                in.getConnectionID()
         );
 
         out.add(result);
+    }
+
+    public static class DatagramBytes {
+        private final byte[] bytes;
+        private final int connectionID;
+
+        public DatagramBytes(byte[] bytes, int connectionID) {
+            this.bytes = bytes;
+            this.connectionID = connectionID;
+        }
+
+        public byte[] getBytes() {
+            return bytes;
+        }
+
+        public int getConnectionID() {
+            return connectionID;
+        }
     }
 }

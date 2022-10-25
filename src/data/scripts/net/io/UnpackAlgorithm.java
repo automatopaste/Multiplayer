@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UnpackAlgorithm {
-    public static Unpacked unpack(ByteBuf in, InetSocketAddress remote, InetSocketAddress local) {
+    public static Unpacked unpack(ByteBuf in, InetSocketAddress remote, InetSocketAddress local, int connectionID) {
         int tick = in.readInt();
 
         Unpacked result;
@@ -19,7 +19,8 @@ public class UnpackAlgorithm {
                     new HashMap<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>>(),
                     tick,
                     remote,
-                    local
+                    local,
+                    connectionID
             );
         } else {
             Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data = new HashMap<>();
@@ -33,7 +34,8 @@ public class UnpackAlgorithm {
                     data,
                     tick,
                     remote,
-                    local
+                    local,
+                    connectionID
             );
         }
 
@@ -73,11 +75,11 @@ public class UnpackAlgorithm {
         return n;
     }
 
-    public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {
+    public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local, int connectionID) {
         ByteBuf reader = PooledByteBufAllocator.DEFAULT.buffer(in.length);
         reader.writeBytes(in);
 
-        return unpack(reader, remote, local);
+        return unpack(reader, remote, local, connectionID);
     }
 
 //    public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {
