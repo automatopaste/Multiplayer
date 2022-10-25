@@ -15,14 +15,12 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         ByteBuf content = in.content();
         int size = content.readInt();
         int sizeCompressed = content.readInt();
-        int connectionID = content.readInt();
 
         byte[] bytes = new byte[sizeCompressed];
         content.readBytes(bytes);
 
         byte[] decompressed = CompressionUtils.inflate(bytes, size);
 
-        DatagramUnpacker.DatagramBytes d = new DatagramUnpacker.DatagramBytes(bytes, connectionID);
-        out.add(d);
+        out.add(decompressed);
     }
 }

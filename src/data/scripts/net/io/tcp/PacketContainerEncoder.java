@@ -14,7 +14,6 @@ public class PacketContainerEncoder extends MessageToByteEncoder<MessageContaine
         int length = data.readableBytes();
 
         out.writeInt(length);
-        out.writeInt(msg.getConnectionID());
         out.writeBytes(data);
     }
 }
