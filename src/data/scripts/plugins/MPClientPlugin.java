@@ -50,7 +50,7 @@ public class MPClientPlugin extends MPPlugin {
 
         // outbound init
         int id = -10; // placeholder id
-        playerOutputManager = new PlayerOutput(id, new PlayerSource(id, Global.getCombatEngine().getViewport()));
+        playerOutputManager = new PlayerOutput(id, new PlayerSource(id, Global.getCombatEngine().getViewport(), shipTable));
         initEntityManager(playerOutputManager);
     }
 

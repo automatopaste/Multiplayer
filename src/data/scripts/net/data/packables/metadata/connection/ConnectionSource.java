@@ -20,19 +20,7 @@ public class ConnectionSource extends SourcePackable {
                 return connection.getConnectionState().ordinal();
             }
         }, ConnectionIDs.STATE));
-        putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
-            @Override
-            public String get() {
-                MPPlugin plugin = connection.getLocalPlugin();
-                if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
-                    MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-                    ShipAPI active = clientPlugin.getShipTable().getClientActive();
 
-                    return active == null ? null : active.getFleetMemberId();
-                }
-                return null;
-            }
-        }, ConnectionIDs.CLIENT_ACTIVE_SHIP_ID));
 
     }
 

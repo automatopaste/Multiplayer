@@ -6,14 +6,16 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.net.data.tables.client.ClientShipTable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 
 public class PlayerSource extends SourcePackable {
 
-    public PlayerSource(int instanceID, final ViewportAPI viewport) {
+    public PlayerSource(int instanceID, final ViewportAPI viewport, final ClientShipTable clientShipTable) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -34,6 +36,12 @@ public class PlayerSource extends SourcePackable {
                 return viewport.getViewMult();
             }
         }, PlayerIDs.ZOOM));
+        putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
+            @Override
+            public String get() {
+                return clientShipTable.getClientActive().getFleetMemberId();
+            }
+        }, PlayerIDs.CLIENT_ACTIVE_SHIP_ID));
     }
 
     @Override

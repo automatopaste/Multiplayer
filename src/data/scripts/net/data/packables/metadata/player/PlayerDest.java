@@ -7,6 +7,7 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.DestPackable;
 import data.scripts.net.data.records.FloatRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
 import data.scripts.plugins.MPPlugin;
 
@@ -25,6 +26,7 @@ public class PlayerDest extends DestPackable {
         putRecord(IntRecord.getDefault(PlayerIDs.BITMASK));
         putRecord(Vector2fRecord.getDefault(PlayerIDs.CAMERA_CENTER));
         putRecord(FloatRecord.getDefault(PlayerIDs.ZOOM));
+        putRecord(StringRecord.getDefault(PlayerIDs.CLIENT_ACTIVE_SHIP_ID));
     }
 
     @Override

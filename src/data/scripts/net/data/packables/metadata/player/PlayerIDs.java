@@ -9,4 +9,5 @@ public class PlayerIDs {
     public static final int BITMASK = 1;
     public static final int CAMERA_CENTER = 2;
     public static final int ZOOM = 3;
+    public static final int CLIENT_ACTIVE_SHIP_ID = 4;
 }
