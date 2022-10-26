@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
-    private final InetSocketAddress remoteAddress;
+    private InetSocketAddress remoteAddress;
 
     public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
         super(plugin);
@@ -118,6 +118,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         if (state < connectionState.ordinal()) {
             //return;
         }
+
+        clientPort = (int) data.get(ConnectionIDs.CLIENT_PORT).getValue();
+        remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);
 
         statusData.updateFromDelta(data);
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);

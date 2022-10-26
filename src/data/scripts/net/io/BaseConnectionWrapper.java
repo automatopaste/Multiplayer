@@ -24,6 +24,7 @@ public abstract class BaseConnectionWrapper {
     protected ConnectionSource statusData;
 
     protected int connectionID;
+    protected int clientPort;
 
     protected MPPlugin localPlugin;
 
@@ -84,5 +85,13 @@ public abstract class BaseConnectionWrapper {
 
     public MPPlugin getLocalPlugin() {
         return localPlugin;
+    }
+
+    public int getClientPort() {
+        return clientPort;
+    }
+
+    public void setClientPort(int clientPort) {
+        this.clientPort = clientPort;
     }
 }

@@ -33,7 +33,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
-    private int localPort;
 
     private int tick;
 
@@ -57,7 +56,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             if (address == null) return null;
 
             statusData = new ConnectionSource(ConnectionIDs.getConnectionID(address), this);
-            localPort = socketClient.getLocalPort();
+            clientPort = socketClient.getLocalPort();
             connectionID = ConnectionIDs.getConnectionID(address);
         }
 
@@ -107,7 +106,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     private void startDatagramClient() {
-        datagramClient = new DatagramClient(host, localPort, this);
+        datagramClient = new DatagramClient(host, clientPort, this);
         datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
         datagram.start();
     }
@@ -177,7 +176,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
         statusData.updateFromDelta(toProcess);
         // force value to always be local port
-        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new IntRecord(localPort, ConnectionIDs.CLIENT_PORT));
+        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new IntRecord(clientPort, ConnectionIDs.CLIENT_PORT));
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
     }
 
@@ -202,9 +201,5 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public PacketType getPacketType() {
         return PacketType.SOCKET;
-    }
-
-    public int getLocalPort() {
-        return localPort;
     }
 }

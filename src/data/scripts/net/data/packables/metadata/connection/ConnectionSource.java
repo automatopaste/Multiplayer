@@ -4,7 +4,6 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
-import data.scripts.net.io.ClientConnectionWrapper;
 
 public class ConnectionSource extends SourcePackable {
 
@@ -20,7 +19,7 @@ public class ConnectionSource extends SourcePackable {
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
             @Override
             public Integer get() {
-                return ((ClientConnectionWrapper) connection).getLocalPort();
+                return connection.getClientPort();
             }
         }, ConnectionIDs.CLIENT_PORT));
 
