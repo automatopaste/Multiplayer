@@ -78,9 +78,12 @@ public class UnpackAlgorithm {
 
     public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {
         ByteBuf reader = PooledByteBufAllocator.DEFAULT.buffer(in.length);
-        reader.writeBytes(in);
 
-        return unpack(reader, remote, local);
+        reader.writeBytes(in);
+        Unpacked unpacked = unpack(reader, remote, local);
+        reader.release();
+
+        return unpacked;
     }
 
 //    public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {

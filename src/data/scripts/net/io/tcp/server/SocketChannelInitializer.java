@@ -2,8 +2,8 @@ package data.scripts.net.io.tcp.server;
 
 import data.scripts.net.io.*;
 import data.scripts.net.io.tcp.BufferUnpacker;
-import data.scripts.net.io.tcp.PacketContainerDecoder;
-import data.scripts.net.io.tcp.PacketContainerEncoder;
+import data.scripts.net.io.tcp.MessageContainerDecoder;
+import data.scripts.net.io.tcp.MessageContainerEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 
@@ -30,8 +30,8 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
         socketChannel.remoteAddress();
 
         socketChannel.pipeline().addLast(
-                new PacketContainerEncoder(),
-                new PacketContainerDecoder(),
+                new MessageContainerEncoder(),
+                new MessageContainerDecoder(),
                 new BufferUnpacker(),
                 new ServerChannelHandler(connection, socketServer)
         );

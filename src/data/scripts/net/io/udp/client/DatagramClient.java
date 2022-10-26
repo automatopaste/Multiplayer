@@ -16,7 +16,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class DatagramClient implements Runnable {
@@ -96,7 +95,7 @@ public class DatagramClient implements Runnable {
 
             closeFuture.sync();
             stop();
-        } catch (InterruptedException | IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             stop();
             connection.setConnectionState(BaseConnectionWrapper.ConnectionState.CLOSED);

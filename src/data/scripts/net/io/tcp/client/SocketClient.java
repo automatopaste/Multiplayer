@@ -6,8 +6,8 @@ import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
 import data.scripts.net.io.MessageContainer;
 import data.scripts.net.io.tcp.BufferUnpacker;
-import data.scripts.net.io.tcp.PacketContainerDecoder;
-import data.scripts.net.io.tcp.PacketContainerEncoder;
+import data.scripts.net.io.tcp.MessageContainerDecoder;
+import data.scripts.net.io.tcp.MessageContainerEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -90,8 +90,8 @@ public class SocketClient implements Runnable {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
                 socketChannel.pipeline().addLast(
-                        new PacketContainerEncoder(),
-                        new PacketContainerDecoder(),
+                        new MessageContainerEncoder(),
+                        new MessageContainerDecoder(),
                         new BufferUnpacker(),
                         new ClientChannelHandler(connection)
                 );

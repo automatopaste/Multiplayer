@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public class PacketContainerEncoder extends MessageToByteEncoder<MessageContainer> {
+public class MessageContainerEncoder extends MessageToByteEncoder<MessageContainer> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, MessageContainer msg, ByteBuf out) throws Exception {
