@@ -1,13 +1,10 @@
 package data.scripts.net.data.packables.metadata.connection;
 
-import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
-import data.scripts.plugins.MPClientPlugin;
-import data.scripts.plugins.MPPlugin;
+import data.scripts.net.io.ClientConnectionWrapper;
 
 public class ConnectionSource extends SourcePackable {
 
@@ -20,7 +17,12 @@ public class ConnectionSource extends SourcePackable {
                 return connection.getConnectionState().ordinal();
             }
         }, ConnectionIDs.STATE));
-
+        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
+            @Override
+            public Integer get() {
+                return ((ClientConnectionWrapper) connection).getLocalPort();
+            }
+        }, ConnectionIDs.CLIENT_PORT));
 
     }
 

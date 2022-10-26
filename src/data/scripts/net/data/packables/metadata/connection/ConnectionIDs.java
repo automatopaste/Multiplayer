@@ -6,6 +6,7 @@ public class ConnectionIDs {
     public static int TYPE_ID;
 
     public static final int STATE = 1;
+    public static final int CLIENT_PORT = 2;
 
     public static int getConnectionID(InetSocketAddress address) {
         byte[] ids = address.getAddress().getAddress();

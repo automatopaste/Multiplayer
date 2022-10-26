@@ -17,6 +17,7 @@ public class ConnectionDest extends DestPackable {
     @Override
     protected void initDefaultRecords() {
         putRecord(IntRecord.getDefault(ConnectionIDs.STATE));
+        putRecord(IntRecord.getDefault(ConnectionIDs.CLIENT_PORT));
     }
 
     @Override

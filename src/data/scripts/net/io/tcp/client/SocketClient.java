@@ -114,4 +114,8 @@ public class SocketClient implements Runnable {
     public Channel getChannel() {
         return channel;
     }
+
+    public int getLocalPort() {
+        return ((InetSocketAddress) channel.localAddress()).getPort();
+    }
 }

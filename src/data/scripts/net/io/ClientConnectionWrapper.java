@@ -6,6 +6,7 @@ import data.scripts.net.data.BaseRecord;
 import data.scripts.net.data.SourcePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -32,7 +33,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     private final SocketClient socketClient;
     private final Thread socket;
     private final String host;
-    private final int port;
+    private int localPort;
 
     private int tick;
 
@@ -40,7 +41,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         super(plugin);
 
         this.host = host;
-        this.port = port;
         dataDuplex = new DataDuplex();
 
         socketClient = new SocketClient(host, port, this);
@@ -57,6 +57,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             if (address == null) return null;
 
             statusData = new ConnectionSource(ConnectionIDs.getConnectionID(address), this);
+            localPort = socketClient.getLocalPort();
             connectionID = ConnectionIDs.getConnectionID(address);
         }
 
@@ -106,7 +107,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     private void startDatagramClient() {
-        datagramClient = new DatagramClient(host, port, this);
+        datagramClient = new DatagramClient(host, localPort, this);
         datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
         datagram.start();
     }
@@ -175,6 +176,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         }
 
         statusData.updateFromDelta(toProcess);
+        // force value to always be local port
+        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new IntRecord(localPort, ConnectionIDs.CLIENT_PORT));
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
     }
 
@@ -199,5 +202,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     @Override
     public PacketType getPacketType() {
         return PacketType.SOCKET;
+    }
+
+    public int getLocalPort() {
+        return localPort;
     }
 }
