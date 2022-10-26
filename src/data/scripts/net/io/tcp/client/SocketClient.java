@@ -1,7 +1,6 @@
 package data.scripts.net.io.tcp.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Clock;
 import data.scripts.net.io.MessageContainer;
@@ -15,7 +14,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.lazywizard.console.Console;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class SocketClient implements Runnable {
@@ -68,10 +66,11 @@ public class SocketClient implements Runnable {
 
             // Wait for channel to close
             closeFuture.sync();
-        } catch (InterruptedException | IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
-            stop();
-            connection.setConnectionState(BaseConnectionWrapper.ConnectionState.CLOSED);
+        } finally {
+            System.err.println("CLOSING SOCKET THREAD");
+            connection.stop();
         }
     }
 

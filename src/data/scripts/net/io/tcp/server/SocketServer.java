@@ -69,11 +69,11 @@ public class SocketServer implements Runnable {
             }
 
             closeFuture.sync();
-            stop();
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {
             System.err.println("CLOSING SOCKET THREAD");
+            connectionManager.stop();
         }
     }
 

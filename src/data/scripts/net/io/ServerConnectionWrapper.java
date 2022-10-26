@@ -120,7 +120,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         clientPort = (int) data.get(ConnectionIDs.CLIENT_PORT).getValue();
-        remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);
+        //remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);
 
         statusData.updateFromDelta(data);
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
