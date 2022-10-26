@@ -108,7 +108,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     private void startDatagramClient() {
-        datagramClient = new DatagramClient(host, port, this);
+        datagramClient = new DatagramClient(host, port, clientPort, this);
         datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
         datagram.start();
     }

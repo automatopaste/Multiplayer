@@ -21,8 +21,9 @@ import java.net.InetSocketAddress;
 public class DatagramClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
 
-    private final int port;
+    private final int remotePort;
     private final String host;
+    private final int localPort;
     private final ClientConnectionWrapper connection;
 
     private EventLoopGroup workerGroup;
@@ -37,9 +38,10 @@ public class DatagramClient implements Runnable {
     private final DebugGraphContainer dataGraphRatio;
 
 
-    public DatagramClient(String host, int port, ClientConnectionWrapper connection) {
+    public DatagramClient(String host, int remotePort, int localPort, ClientConnectionWrapper connection) {
         this.host = host;
-        this.port = port;
+        this.remotePort = remotePort;
+        this.localPort = localPort;
         this.connection = connection;
 
         clock = new Clock(TICK_RATE);
@@ -60,11 +62,11 @@ public class DatagramClient implements Runnable {
     public void runClient() {
         running = true;
 
-        InetSocketAddress remoteAddress = new InetSocketAddress(host, port);
+        InetSocketAddress remoteAddress = new InetSocketAddress(host, remotePort);
 
         ChannelFuture future = start();
         ChannelFuture closeFuture = future.channel().closeFuture();
-        Console.showMessage("UDP channel active on port " + port + " at " + TICK_RATE + "Hz");
+        Console.showMessage("UDP channel active on port " + remotePort + " at " + TICK_RATE + "Hz");
 
         try {
             // LOOP WRITE OPERATIONS ONLY
@@ -120,8 +122,7 @@ public class DatagramClient implements Runnable {
             }
         });
 
-        // use same port as server to avoid sending datagrams to ephemeral ports
-        ChannelFuture channelFuture = bootstrap.bind(port).syncUninterruptibly();
+        ChannelFuture channelFuture = bootstrap.bind(localPort).syncUninterruptibly();
         channelFuture.syncUninterruptibly();
 
         channel = (NioDatagramChannel) channelFuture.channel();
