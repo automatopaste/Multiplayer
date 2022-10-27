@@ -29,7 +29,7 @@ public class ProjectileTable extends EntityTable implements OutboundEntityManage
     }
 
     @Override
-    public PacketType getPacketType() {
+    public PacketType getOutboundPacketType() {
         return null;
     }
 }

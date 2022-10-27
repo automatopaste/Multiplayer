@@ -87,7 +87,7 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     @Override
-    public PacketType getPacketType() {
+    public PacketType getOutboundPacketType() {
         return PacketType.DATAGRAM;
     }
 }

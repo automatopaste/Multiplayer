@@ -205,7 +205,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public PacketType getPacketType() {
+    public PacketType getOutboundPacketType() {
         return PacketType.SOCKET;
     }
 }

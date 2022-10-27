@@ -23,7 +23,7 @@ public class LobbyDest extends DestPackable {
 
     @Override
     public int getTypeID() {
-        return 0;
+        return LobbyIDs.TYPE_ID;
     }
 
     @Override

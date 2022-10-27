@@ -203,7 +203,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public PacketType getPacketType() {
+    public PacketType getOutboundPacketType() {
         return PacketType.SOCKET;
     }
 }

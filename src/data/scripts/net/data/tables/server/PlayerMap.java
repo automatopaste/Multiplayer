@@ -104,7 +104,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public PacketType getPacketType() {
+    public PacketType getOutboundPacketType() {
         return PacketType.SOCKET;
     }
 

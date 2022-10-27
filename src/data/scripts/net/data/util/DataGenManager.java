@@ -70,7 +70,7 @@ public class DataGenManager {
 
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getPacketType() == OutboundEntityManager.PacketType.SOCKET) {
+            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
                 Map<Integer, BasePackable> entities = manager.getOutbound(source);
                 out.put(source, entities);
             }
@@ -84,7 +84,7 @@ public class DataGenManager {
 
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
+            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
                 Map<Integer, BasePackable> entities = manager.getOutbound(source);
                 out.put(source, entities);
             }

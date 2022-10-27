@@ -32,7 +32,7 @@ public class PlayerShipDest extends DestPackable {
 
     @Override
     public int getTypeID() {
-        return 0;
+        return PlayerShipIDs.TYPE_ID;
     }
 
     @Override
