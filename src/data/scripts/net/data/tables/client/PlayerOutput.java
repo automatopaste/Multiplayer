@@ -55,6 +55,6 @@ public class PlayerOutput implements OutboundEntityManager {
 
     @Override
     public PacketType getOutboundPacketType() {
-        return PacketType.SOCKET;
+        return PacketType.DATAGRAM;
     }
 }
