@@ -5,10 +5,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.client.ClientShipTable;
-import data.scripts.net.data.tables.client.LobbyInput;
-import data.scripts.net.data.tables.client.PlayerOutput;
-import data.scripts.net.data.tables.client.VariantDataMap;
+import data.scripts.net.data.tables.client.*;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
@@ -30,6 +27,7 @@ public class MPClientPlugin extends MPPlugin {
 
     //outbound
     private final PlayerOutput playerOutput;
+    private final PlayerShipOutput playerShipOutput;
 
     private final VariantDataGenerator dataStore;
 
@@ -63,6 +61,9 @@ public class MPClientPlugin extends MPPlugin {
 
         // outbound init
         int connectionID = connection.getConnectionID();
+
+        playerShipOutput = new PlayerShipOutput(connectionID);
+        initEntityManager(playerShipOutput);
 
         playerOutput = new PlayerOutput(connectionID, this);
         initEntityManager(playerOutput);
