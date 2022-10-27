@@ -6,7 +6,7 @@ import data.scripts.net.data.packables.entities.ship.ShipIDs;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.server.HostShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -37,7 +37,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     protected int getSize() {
-        return ShipTable.MAX_ENTITIES;
+        return HostShipTable.MAX_ENTITIES;
     }
 
     @Override

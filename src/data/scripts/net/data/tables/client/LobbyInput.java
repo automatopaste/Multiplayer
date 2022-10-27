@@ -9,11 +9,11 @@ import data.scripts.plugins.MPPlugin;
 
 import java.util.Map;
 
-public class LobbyStatusMap implements InboundEntityManager {
+public class LobbyInput implements InboundEntityManager {
 
     private LobbyDest lobby;
 
-    public LobbyStatusMap() {
+    public LobbyInput() {
         lobby = null;
     }
 

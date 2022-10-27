@@ -15,11 +15,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ShipTable extends EntityTable implements OutboundEntityManager {
+public class HostShipTable extends EntityTable implements OutboundEntityManager {
     public static final int MAX_ENTITIES = 1024;
     private final Map<String, Integer> registered;
 
-    public ShipTable() {
+    public HostShipTable() {
         registered = new HashMap<>();
     }
 

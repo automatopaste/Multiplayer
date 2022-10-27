@@ -7,7 +7,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.server.PlayerMap;
-import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.server.HostShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.ServerConnectionManager;
@@ -24,7 +24,7 @@ public class MPServerPlugin extends MPPlugin {
     private final PlayerMap playerMap;
 
     //outbound
-    private final ShipTable shipTable;
+    private final HostShipTable hostShipTable;
 
     private final VariantDataGenerator dataStore;
 
@@ -40,8 +40,8 @@ public class MPServerPlugin extends MPPlugin {
         initEntityManager(playerMap);
 
         //outbound init
-        shipTable = new ShipTable();
-        initEntityManager(shipTable);
+        hostShipTable = new HostShipTable();
+        initEntityManager(hostShipTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
@@ -76,7 +76,7 @@ public class MPServerPlugin extends MPPlugin {
         GUIDebug guiDebug = CMUtils.getGuiDebug();
 
         guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
-        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + shipTable.getRegistered().size() + " ships in local table");
+        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + hostShipTable.getRegistered().size() + " ships in local table");
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
@@ -89,8 +89,8 @@ public class MPServerPlugin extends MPPlugin {
         return PluginType.SERVER;
     }
 
-    public ShipTable getServerShipTable() {
-        return shipTable;
+    public HostShipTable getServerShipTable() {
+        return hostShipTable;
     }
 
     public PlayerMap getPlayerMap() {

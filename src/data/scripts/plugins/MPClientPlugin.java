@@ -4,9 +4,9 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.metadata.player.PlayerData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.client.ClientShipTable;
+import data.scripts.net.data.tables.client.LobbyInput;
 import data.scripts.net.data.tables.client.PlayerOutput;
 import data.scripts.net.data.tables.client.VariantDataMap;
 import data.scripts.net.data.util.DataGenManager;
@@ -25,9 +25,10 @@ public class MPClientPlugin extends MPPlugin {
     private final ClientConnectionWrapper connection;
     private final ClientShipTable shipTable;
     private final VariantDataMap variantDataMap;
+    private final LobbyInput lobbyInput;
 
     //outbound
-    private final PlayerOutput playerOutputManager;
+    private final PlayerOutput playerOutput;
 
     private final VariantDataGenerator dataStore;
 
@@ -48,10 +49,14 @@ public class MPClientPlugin extends MPPlugin {
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
 
+        lobbyInput = new LobbyInput();
+        initEntityManager(lobbyInput);
+
         // outbound init
-        int id = connection.getConnectionID();
-        playerOutputManager = new PlayerOutput(id, new PlayerData(id, Global.getCombatEngine().getViewport(), this));
-        initEntityManager(playerOutputManager);
+        int connectionID = connection.getConnectionID();
+
+        playerOutput = new PlayerOutput(connectionID, this);
+        initEntityManager(playerOutput);
     }
 
     @Override
@@ -95,6 +100,14 @@ public class MPClientPlugin extends MPPlugin {
 
     public VariantDataMap getVariantDataMap() {
         return variantDataMap;
+    }
+
+    public PlayerOutput getPlayerOutput() {
+        return playerOutput;
+    }
+
+    public LobbyInput getLobbyInput() {
+        return lobbyInput;
     }
 
     @Override

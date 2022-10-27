@@ -1,24 +1,34 @@
 package data.scripts.net.data.tables.client;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.player.PlayerIDs;
 import data.scripts.net.data.packables.metadata.player.PlayerData;
 import data.scripts.net.data.packables.metadata.playership.PlayerShipData;
 import data.scripts.net.data.packables.metadata.playership.PlayerShipIDs;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerOutput implements OutboundEntityManager {
     private final PlayerData player;
-    private PlayerShipData playerShip;
+    private final PlayerShipData playerShip;
     private final int instanceID;
 
-    public PlayerOutput(int instanceID, PlayerData player) {
-        this.player = player;
+    public PlayerOutput(int instanceID, MPPlugin plugin) {
         this.instanceID = instanceID;
+
+        player = new PlayerData(instanceID, Global.getCombatEngine().getViewport(), plugin);
+        playerShip = new PlayerShipData(instanceID, new BaseRecord.DeltaFunc<String>() {
+            @Override
+            public String get() {
+                return Global.getCombatEngine().getPlayerShip().getFleetMemberId();
+            }
+        });
     }
 
     @Override
