@@ -54,6 +54,11 @@ public class DataGenManager {
             Map<Integer, Map<Integer, BaseRecord<?>>> entities = inbound.get(type);
             InboundEntityManager manager = inboundDataDestinations.get(type);
 
+            if (manager == null) {
+                System.err.println("MANAGER NOT FOUND");
+                continue;
+            }
+
             for (Integer instance : entities.keySet()) {
                 manager.processDelta(type, instance, entities.get(instance), plugin);
             }

@@ -13,6 +13,7 @@ import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
+import data.scripts.net.io.Clock;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
@@ -40,6 +41,14 @@ public class MPClientPlugin extends MPPlugin {
         dataStore = new VariantDataGenerator();
 
         connection = new ClientConnectionWrapper(host, port, this);
+
+        Clock msgClock = new Clock(3);
+        while (connection.getConnectionID() == BaseConnectionWrapper.DEFAULT_CONNECTION_ID) {
+            if (msgClock.mark()) {
+                System.out.println("waiting for connection...");
+            }
+        }
+
         initEntityManager(connection);
 
         // inbound init
