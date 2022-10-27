@@ -7,7 +7,6 @@ import data.scripts.net.io.*;
 import data.scripts.net.io.udp.DatagramDecoder;
 import data.scripts.net.io.udp.DatagramUnpacker;
 import data.scripts.net.io.udp.DatagramUtils;
-import data.scripts.net.io.udp.server.DatagramServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -88,11 +87,11 @@ public class DatagramClient implements Runnable {
                 }
 
                 dataGraph.increment(size);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraph", dataGraph);
                 dataGraphCompressed.increment(sizeCompressed);
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphCompressed", dataGraphCompressed);
                 dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-                CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
+                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphRatio", dataGraphRatio);
             }
 
             closeFuture.sync();

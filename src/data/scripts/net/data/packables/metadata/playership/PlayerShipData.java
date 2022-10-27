@@ -32,7 +32,7 @@ public class PlayerShipData extends BasePackable {
 
     @Override
     public int getTypeID() {
-        return 0;
+        return PlayerShipIDs.TYPE_ID;
     }
 
     public static int mask() {
