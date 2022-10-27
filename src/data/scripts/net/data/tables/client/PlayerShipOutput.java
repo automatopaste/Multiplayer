@@ -46,6 +46,6 @@ public class PlayerShipOutput implements OutboundEntityManager {
 
     @Override
     public PacketType getOutboundPacketType() {
-        return null;
+        return PacketType.DATAGRAM;
     }
 }

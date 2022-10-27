@@ -98,8 +98,10 @@ public class SocketServer implements Runnable {
     public void addMessages(List<MessageContainer> messages) {
         messageQueue.addAll(messages);
 
-        while (messageQueue.size() > MAX_QUEUE_SIZE) {
-            messageQueue.remove();
+        synchronized (messageQueue) {
+            while (messageQueue.size() > MAX_QUEUE_SIZE) {
+                messageQueue.remove();
+            }
         }
     }
 
