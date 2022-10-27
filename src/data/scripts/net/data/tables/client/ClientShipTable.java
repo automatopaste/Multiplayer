@@ -31,7 +31,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     public void update(float amount) {
         for (BasePackable p : table) {
             ShipDest ship = (ShipDest) p;
-            ship.update(amount);
+            if (ship != null) ship.update(amount);
         }
     }
 
