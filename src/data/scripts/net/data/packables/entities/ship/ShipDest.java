@@ -125,6 +125,9 @@ public class ShipDest extends DestPackable {
             fleetManager.addToReserves(fleetMember);
             Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
             float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
+
+            fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
+
             ship = fleetManager.spawnFleetMember(fleetMember, loc, ang, 0f);
             ship.setCRAtDeployment(0.7f);
             ship.setControlsLocked(false);
