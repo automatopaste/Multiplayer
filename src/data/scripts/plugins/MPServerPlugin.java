@@ -38,11 +38,11 @@ public class MPServerPlugin extends MPPlugin {
         initEntityManager(serverConnectionManager);
 
         // inbound init
-        playerMap = new PlayerMap(this);
-        initEntityManager(playerMap);
-
         playerShipMap = new PlayerShipMap();
         initEntityManager(playerShipMap);
+
+        playerMap = new PlayerMap(this);
+        initEntityManager(playerMap);
 
         //outbound init
         hostShipTable = new HostShipTable();
