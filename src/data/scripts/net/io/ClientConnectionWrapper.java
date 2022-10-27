@@ -2,10 +2,10 @@ package data.scripts.net.io;
 
 import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
-import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -57,12 +57,12 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
 
-            statusData = new ConnectionSource(ConnectionIDs.getConnectionID(address), this);
+            statusData = new ConnectionData(ConnectionIDs.getConnectionID(address), this);
             clientPort = socketClient.getLocalPort();
             connectionID = ConnectionIDs.getConnectionID(address);
         }
 
-        List<SourcePackable> data = new ArrayList<>();
+        List<BasePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             //case INITIALISING:
@@ -117,7 +117,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     public MessageContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
-        List<SourcePackable> data = new ArrayList<>();
+        List<BasePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -128,7 +128,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SPAWNING:
                 break;
             case SIMULATING:
-                for (Map<Integer, SourcePackable> type : dataDuplex.getOutboundDatagram().values()) {
+                for (Map<Integer, BasePackable> type : dataDuplex.getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 
@@ -172,7 +172,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
             //return;
@@ -190,8 +190,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public Map<Integer, SourcePackable> getOutbound() {
-        Map<Integer, SourcePackable> out = new HashMap<>();
+    public Map<Integer, BasePackable> getOutbound(int entityID) {
+        Map<Integer, BasePackable> out = new HashMap<>();
         out.put(connectionID, statusData);
         return out;
     }

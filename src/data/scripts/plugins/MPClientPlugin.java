@@ -3,9 +3,9 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.packables.metadata.player.PlayerSource;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.metadata.player.PlayerData;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.data.tables.client.PlayerOutput;
 import data.scripts.net.data.tables.client.VariantDataMap;
@@ -49,8 +49,8 @@ public class MPClientPlugin extends MPPlugin {
         initEntityManager(variantDataMap);
 
         // outbound init
-        int id = -10; // placeholder id
-        playerOutputManager = new PlayerOutput(id, new PlayerSource(id, Global.getCombatEngine().getViewport(), shipTable));
+        int id = connection.getConnectionID();
+        playerOutputManager = new PlayerOutput(id, new PlayerData(id, Global.getCombatEngine().getViewport(), this));
         initEntityManager(playerOutputManager);
     }
 
@@ -74,10 +74,10 @@ public class MPClientPlugin extends MPPlugin {
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Integer, Map<Integer, SourcePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Integer, Map<Integer, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         connection.getDuplex().updateOutboundSocket(outboundSocket);
 
-        Map<Integer, Map<Integer, SourcePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Integer, Map<Integer, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         connection.getDuplex().updateOutboundDatagram(outboundDatagram);
     }
 

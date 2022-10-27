@@ -1,6 +1,6 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;

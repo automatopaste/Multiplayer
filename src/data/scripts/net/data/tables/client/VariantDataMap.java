@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.packables.entities.variant.VariantDest;
 import data.scripts.net.data.packables.entities.variant.VariantIDs;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -18,12 +18,12 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         String shipID = (String) toProcess.get(VariantIDs.SHIP_ID).getValue();
         VariantDest data = variantData.get(shipID);
 
         if (data == null) {
-            VariantDest variantDest = new VariantDest(id, toProcess);
+            VariantDest variantDest = new VariantDest(instanceID, toProcess);
             variantData.put(shipID, variantDest);
             variantDest.init(plugin);
         } else {

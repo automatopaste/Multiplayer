@@ -6,11 +6,11 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import org.lwjgl.util.vector.Vector2f;
 
-public class DefaultAutofireAIPlugin implements AutofireAIPlugin {
+public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     private final WeaponAPI weapon;
 
-    public DefaultAutofireAIPlugin(WeaponAPI weapon) {
+    public MPDefaultAutofireAIPlugin(WeaponAPI weapon) {
         this.weapon = weapon;
     }
 

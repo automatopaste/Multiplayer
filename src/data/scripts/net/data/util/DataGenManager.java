@@ -1,9 +1,8 @@
 package data.scripts.net.data.util;
 
-import data.scripts.net.data.BasePackable;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.DestPackable;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.DestPackable;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -56,18 +55,18 @@ public class DataGenManager {
             InboundEntityManager manager = inboundDataDestinations.get(type);
 
             for (Integer instance : entities.keySet()) {
-                manager.processDelta(instance, entities.get(instance), plugin);
+                manager.processDelta(type, instance, entities.get(instance), plugin);
             }
         }
     }
 
-    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltasSocket() {
-        Map<Integer, Map<Integer, SourcePackable>> out = new HashMap<>();
+    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltasSocket() {
+        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
 
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Integer, SourcePackable> entities = manager.getOutbound();
+                Map<Integer, BasePackable> entities = manager.getOutbound(source);
                 out.put(source, entities);
             }
         }
@@ -75,13 +74,13 @@ public class DataGenManager {
         return out;
     }
 
-    public static Map<Integer, Map<Integer, SourcePackable>> collectOutboundDeltasDatagram() {
-        Map<Integer, Map<Integer, SourcePackable>> out = new HashMap<>();
+    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltasDatagram() {
+        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
 
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Integer, SourcePackable> entities = manager.getOutbound();
+                Map<Integer, BasePackable> entities = manager.getOutbound(source);
                 out.put(source, entities);
             }
         }

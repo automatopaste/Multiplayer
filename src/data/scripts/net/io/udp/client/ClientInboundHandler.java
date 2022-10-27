@@ -1,6 +1,6 @@
 package data.scripts.net.io.udp.client;
 
-import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;

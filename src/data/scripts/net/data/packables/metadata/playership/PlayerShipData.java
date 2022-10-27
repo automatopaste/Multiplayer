@@ -1,21 +1,24 @@
-package data.scripts.net.data.packables.metadata.player;
+package data.scripts.net.data.packables.metadata.playership;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ViewportAPI;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.records.FloatRecord;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.Vector2fRecord;
-import data.scripts.net.data.tables.client.ClientShipTable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.util.vector.Vector2f;
 
-public class PlayerSource extends SourcePackable {
+/**
+ * Sends player ship commands to the server
+ */
+public class PlayerShipData extends BasePackable {
 
-    public PlayerSource(int instanceID, final ViewportAPI viewport, final ClientShipTable clientShipTable) {
+    /**
+     * Source constructor
+     *
+     * @param instanceID unique
+     */
+    public PlayerShipData(int instanceID, final BaseRecord.DeltaFunc<String> activeShipIDDeltaFunc) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -23,34 +26,17 @@ public class PlayerSource extends SourcePackable {
             public Integer get() {
                 return mask();
             }
-        }, PlayerIDs.BITMASK));
-        putRecord(new Vector2fRecord(new BaseRecord.DeltaFunc<Vector2f>() {
-            @Override
-            public Vector2f get() {
-                return viewport.getCenter();
-            }
-        }, PlayerIDs.CAMERA_CENTER));
-        putRecord(new FloatRecord(new BaseRecord.DeltaFunc<Float>() {
-            @Override
-            public Float get() {
-                return viewport.getViewMult();
-            }
-        }, PlayerIDs.ZOOM));
-        putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
-            @Override
-            public String get() {
-                return clientShipTable.getClientActive().getFleetMemberId();
-            }
-        }, PlayerIDs.CLIENT_ACTIVE_SHIP_ID));
+        }, PlayerShipIDs.BITMASK));
+        putRecord(new StringRecord(activeShipIDDeltaFunc, PlayerShipIDs.CLIENT_ACTIVE_SHIP_ID));
     }
 
     @Override
-    public int getTypeId() {
-        return PlayerIDs.TYPE_ID;
+    public int getTypeID() {
+        return 0;
     }
 
     public static int mask() {
-        boolean[] controls = new boolean[PlayerIDs.NUM_CONTROLS];
+        boolean[] controls = new boolean[PlayerShipIDs.NUM_CONTROLS];
 
         if (!Keyboard.isCreated()) return 0x00000000;
 

@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables;
 
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ public interface OutboundEntityManager extends BaseEntityManager {
         DATAGRAM
     }
 
-    Map<Integer, SourcePackable> getOutbound();
+    Map<Integer, BasePackable> getOutbound(int entityID);
 
     PacketType getPacketType();
 }

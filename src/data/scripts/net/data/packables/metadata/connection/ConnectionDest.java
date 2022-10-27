@@ -1,7 +1,7 @@
 package data.scripts.net.data.packables.metadata.connection;
 
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.DestPackable;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.plugins.MPPlugin;
 
@@ -36,7 +36,7 @@ public class ConnectionDest extends DestPackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return ConnectionIDs.TYPE_ID;
     }
 

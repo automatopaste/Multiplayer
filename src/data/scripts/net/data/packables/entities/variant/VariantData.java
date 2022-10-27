@@ -1,8 +1,8 @@
 package data.scripts.net.data.packables.entities.variant;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.StringRecord;
@@ -11,9 +11,9 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariantSource extends SourcePackable {
+public class VariantData extends BasePackable {
 
-    public VariantSource(int instanceID, final ShipVariantAPI variant, final String id) {
+    public VariantData(int instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -65,7 +65,7 @@ public class VariantSource extends SourcePackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return VariantIDs.TYPE_ID;
     }
 

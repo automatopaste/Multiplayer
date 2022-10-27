@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.ShipAIConfig;
 import com.fs.starfarer.api.combat.ShipAIPlugin;
 import com.fs.starfarer.api.combat.ShipwideAIFlags;
 
-public class DefaultShipAIPlugin implements ShipAIPlugin {
+public class MPDefaultShipAIPlugin implements ShipAIPlugin {
     @Override
     public void setDoNotFireDelay(float amount) {
 

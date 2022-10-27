@@ -1,9 +1,9 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -15,10 +15,13 @@ import org.lazywizard.console.Console;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ServerConnectionManager implements Runnable, InboundEntityManager, OutboundEntityManager {
-    private final int maxConnections = Global.getSettings().getInt("mpMaxConnections");
+    public static final int MP_MAX_CONNECTIONS = Global.getSettings().getInt("mpMaxConnections");
 
     public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
@@ -121,7 +124,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         if (remoteAddress == null) return null;
 
         synchronized (serverConnectionWrappers) {
-            if (serverConnectionWrappers.size() >= maxConnections) return null;
+            if (serverConnectionWrappers.size() >= MP_MAX_CONNECTIONS) return null;
         }
 
         int id = ConnectionIDs.getConnectionID(remoteAddress);
@@ -152,8 +155,8 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public void processDelta(int id, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
+    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+        ServerConnectionWrapper wrapper = serverConnectionWrappers.get(instanceID);
 
         if (wrapper != null) {
             wrapper.updateConnectionStatus(toProcess);
@@ -191,8 +194,8 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public Map<Integer, SourcePackable> getOutbound() {
-        Map<Integer, SourcePackable> out = new HashMap<>();
+    public Map<Integer, BasePackable> getOutbound(int entityID) {
+        Map<Integer, BasePackable> out = new HashMap<>();
 
         for (int id : serverConnectionWrappers.keySet()) {
             out.put(id, serverConnectionWrappers.get(id).statusData);

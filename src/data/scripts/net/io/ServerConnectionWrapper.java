@@ -1,10 +1,11 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.entities.ship.ShipIDs;
+import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
-import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.plugins.MPPlugin;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
-    private InetSocketAddress remoteAddress;
+    private final InetSocketAddress remoteAddress;
 
     public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
         super(plugin);
@@ -25,14 +26,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.remoteAddress = remoteAddress;
         this.connectionID = connectionId;
 
-        statusData = new ConnectionSource(connectionId, this);
+        statusData = new ConnectionData(connectionId, this);
     }
 
     @Override
     public MessageContainer getSocketMessage() throws IOException {
         if (statusData == null) return null;
 
-        List<SourcePackable> data = new ArrayList<>();
+        List<BasePackable> data = new ArrayList<>();
         switch (connectionState) {
             //case INITIALISATION_READY:
             case INITIALISING:
@@ -56,7 +57,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
 
-                data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
+                data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound(ShipIDs.TYPE_ID).values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
                 statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
@@ -64,6 +65,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case SIMULATION_READY:
             case SIMULATING:
+                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutboundSocket().values()) {
+                    data.addAll(type.values());
+                }
+
+                break;
             case CLOSED:
             default:
         }
@@ -79,7 +85,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public MessageContainer getDatagram() throws IOException {
         if (statusData == null) return null;
 
-        List<SourcePackable> data = new ArrayList<>();
+        List<BasePackable> data = new ArrayList<>();
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -90,7 +96,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SIMULATION_READY:
                 break;
             case SIMULATING:
-                for (Map<Integer, SourcePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
+                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 

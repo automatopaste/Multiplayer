@@ -1,6 +1,6 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.packables.metadata.connection.ConnectionSource;
+import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -21,7 +21,7 @@ public abstract class BaseConnectionWrapper {
     }
     protected ConnectionState connectionState = ConnectionState.INITIALISATION_READY;
 
-    protected ConnectionSource statusData;
+    protected ConnectionData statusData;
 
     protected int connectionID;
     protected int clientPort;

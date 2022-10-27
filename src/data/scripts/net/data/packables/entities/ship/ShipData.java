@@ -1,17 +1,13 @@
 package data.scripts.net.data.packables.entities.ship;
 
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.records.FloatRecord;
-import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.*;
 import org.lwjgl.util.vector.Vector2f;
 
-public class ShipSource extends SourcePackable {
+public class ShipData extends BasePackable {
 
-    public ShipSource(int instanceID, final ShipAPI ship) {
+    public ShipData(int instanceID, final ShipAPI ship) {
         super(instanceID);
 
         putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
@@ -83,7 +79,7 @@ public class ShipSource extends SourcePackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return ShipIDs.TYPE_ID;
     }
 }

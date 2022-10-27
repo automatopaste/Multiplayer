@@ -1,6 +1,5 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.BaseRecord;
 import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 

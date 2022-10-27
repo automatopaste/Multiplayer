@@ -1,13 +1,13 @@
 package data.scripts.net.data.packables.metadata.connection;
 
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
 
-public class ConnectionSource extends SourcePackable {
+public class ConnectionData extends BasePackable {
 
-    public ConnectionSource(int connectionID, final BaseConnectionWrapper connection) {
+    public ConnectionData(int connectionID, final BaseConnectionWrapper connection) {
         super(connectionID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -26,7 +26,7 @@ public class ConnectionSource extends SourcePackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return ConnectionIDs.TYPE_ID;
     }
 }

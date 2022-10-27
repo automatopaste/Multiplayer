@@ -1,10 +1,13 @@
-package data.scripts.net.data;
+package data.scripts.net.data.packables;
 
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.plugins.MPPlugin;
 
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Executes on arrival at packable destination
+ */
 public abstract class DestPackable extends BasePackable {
 
     /**
@@ -14,8 +17,6 @@ public abstract class DestPackable extends BasePackable {
      */
     public DestPackable(int instanceID, Map<Integer, BaseRecord<?>> records) {
         super(instanceID);
-
-        this.records = new HashMap<>();
 
         initDefaultRecords();
 

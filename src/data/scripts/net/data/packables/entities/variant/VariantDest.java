@@ -1,7 +1,7 @@
 package data.scripts.net.data.packables.entities.variant;
 
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.DestPackable;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.StringRecord;
@@ -40,7 +40,7 @@ public class VariantDest extends DestPackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return VariantIDs.TYPE_ID;
     }
 

@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables;
 
-import data.scripts.net.data.BasePackable;
+import data.scripts.net.data.packables.BasePackable;
 
 import java.util.LinkedList;
 import java.util.Queue;

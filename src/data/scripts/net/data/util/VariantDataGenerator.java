@@ -3,7 +3,7 @@ package data.scripts.net.data.util;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
-import data.scripts.net.data.packables.entities.variant.VariantSource;
+import data.scripts.net.data.packables.entities.variant.VariantData;
 import data.scripts.plugins.MPServerPlugin;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class VariantDataGenerator {
 
-    private List<VariantSource> generated;
+    private List<VariantData> generated;
 
     /**
      * Collects data that needs to be loaded on client side before combat entities can be updated or spawned
@@ -36,12 +36,12 @@ public class VariantDataGenerator {
         generated = new ArrayList<>();
         int index = 0;
         for (FleetMemberAPI member : members) {
-            generated.add(new VariantSource(index, member.getVariant(), member.getId()));
+            generated.add(new VariantData(index, member.getVariant(), member.getId()));
             index++;
         }
     }
 
-    public List<VariantSource> getGenerated() {
+    public List<VariantData> getGenerated() {
         return generated;
     }
 }

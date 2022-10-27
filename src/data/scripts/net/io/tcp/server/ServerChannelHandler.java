@@ -1,6 +1,6 @@
 package data.scripts.net.io.tcp.server;
 
-import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.io.ServerConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;

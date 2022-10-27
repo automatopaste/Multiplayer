@@ -1,4 +1,4 @@
-package data.scripts.net.data;
+package data.scripts.net.data.records;
 
 import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 public abstract class BaseRecord<T> {
     protected DeltaFunc<T> func;
     protected T value;
-    protected final int uniqueID;
+    public final int uniqueID;
 
     public BaseRecord(T value, int uniqueID) {
         this.value = value;

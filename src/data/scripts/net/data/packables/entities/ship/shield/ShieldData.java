@@ -1,18 +1,18 @@
 package data.scripts.net.data.packables.entities.ship.shield;
 
 import com.fs.starfarer.api.combat.ShieldAPI;
-import data.scripts.net.data.SourcePackable;
+import data.scripts.net.data.packables.BasePackable;
 
-public class ShieldSource extends SourcePackable {
+public class ShieldData extends BasePackable {
 
-    public ShieldSource(int instanceID, ShieldAPI shield) {
+    public ShieldData(int instanceID, ShieldAPI shield) {
         super(instanceID);
 
 
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return 0;
     }
 }

@@ -5,8 +5,8 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.combat.entities.Ship;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.DestPackable;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.packables.entities.variant.VariantDest;
 import data.scripts.net.data.packables.entities.variant.VariantIDs;
 import data.scripts.net.data.records.FloatRecord;
@@ -15,7 +15,7 @@ import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2fRecord;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
-import data.scripts.plugins.ai.DefaultShipAIPlugin;
+import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.HashMap;
@@ -137,7 +137,7 @@ public class ShipDest extends DestPackable {
             throw new NullPointerException("Attempted fighter init in ship data");
         }
 
-        ship.setShipAI(new DefaultShipAIPlugin());
+        ship.setShipAI(new MPDefaultShipAIPlugin());
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ShipDest extends DestPackable {
     }
 
     @Override
-    public int getTypeId() {
+    public int getTypeID() {
         return ShipIDs.TYPE_ID;
     }
 

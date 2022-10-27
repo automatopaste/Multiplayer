@@ -4,10 +4,10 @@ import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.BaseRecord;
-import data.scripts.net.data.SourcePackable;
-import data.scripts.net.data.tables.server.ServerPlayerMap;
-import data.scripts.net.data.tables.server.ServerShipTable;
+import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.tables.server.PlayerMap;
+import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.ServerConnectionManager;
@@ -21,10 +21,10 @@ public class MPServerPlugin extends MPPlugin {
 
     //inbound
     private final ServerConnectionManager serverConnectionManager;
-    private final ServerPlayerMap serverPlayerMap;
+    private final PlayerMap playerMap;
 
     //outbound
-    private final ServerShipTable serverShipTable;
+    private final ShipTable shipTable;
 
     private final VariantDataGenerator dataStore;
 
@@ -36,12 +36,12 @@ public class MPServerPlugin extends MPPlugin {
         initEntityManager(serverConnectionManager);
 
         // inbound init
-        serverPlayerMap = new ServerPlayerMap();
-        initEntityManager(serverPlayerMap);
+        playerMap = new PlayerMap(this);
+        initEntityManager(playerMap);
 
         //outbound init
-        serverShipTable = new ServerShipTable();
-        initEntityManager(serverShipTable);
+        shipTable = new ShipTable();
+        initEntityManager(shipTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
@@ -63,10 +63,10 @@ public class MPServerPlugin extends MPPlugin {
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Integer, Map<Integer, SourcePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Integer, Map<Integer, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
 
-        Map<Integer, Map<Integer, SourcePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Integer, Map<Integer, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();
@@ -76,7 +76,7 @@ public class MPServerPlugin extends MPPlugin {
         GUIDebug guiDebug = CMUtils.getGuiDebug();
 
         guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
-        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + serverShipTable.getRegistered().size() + " ships in local table");
+        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + shipTable.getRegistered().size() + " ships in local table");
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
@@ -89,11 +89,11 @@ public class MPServerPlugin extends MPPlugin {
         return PluginType.SERVER;
     }
 
-    public ServerShipTable getServerShipTable() {
-        return serverShipTable;
+    public ShipTable getServerShipTable() {
+        return shipTable;
     }
 
-    public ServerPlayerMap getServerPilotCommandMap() {
-        return serverPlayerMap;
+    public PlayerMap getPlayerMap() {
+        return playerMap;
     }
 }

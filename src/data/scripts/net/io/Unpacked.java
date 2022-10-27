@@ -1,6 +1,6 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.BaseRecord;
+import data.scripts.net.data.records.BaseRecord;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
