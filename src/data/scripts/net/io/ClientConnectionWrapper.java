@@ -89,13 +89,18 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 break;
             case SIMULATION_READY:
-            //case SIMULATING:
                 CMUtils.getGuiDebug().putText(ClientConnectionWrapper.class, "debug", "Starting simulation...");
                 Global.getLogger(ClientConnectionWrapper.class).info("starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
 
                 if (datagramClient == null) startDatagramClient();
+
+                break;
+            case SIMULATING:
+                for (Map<Integer, BasePackable> type : dataDuplex.getOutboundSocket().values()) {
+                    data.addAll(type.values());
+                }
 
                 break;
             default:
