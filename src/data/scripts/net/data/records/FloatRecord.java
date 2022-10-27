@@ -10,14 +10,14 @@ public class FloatRecord extends BaseRecord<Float> {
         FLOAT_32,
         FLOAT_16,
     }
-    private FloatPrecision precision;
+//    private FloatPrecision precision;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
     public FloatRecord(Float record, int uniqueID) {
         super(record, uniqueID);
 
-        precision = FloatPrecision.FLOAT_32;
+//        precision = FloatPrecision.FLOAT_32;
     }
 
     public FloatRecord(DeltaFunc<Float> deltaFunc, int uniqueID) {
@@ -46,29 +46,31 @@ public class FloatRecord extends BaseRecord<Float> {
 
     @Override
     public void get(ByteBuf dest) {
-        switch (precision) {
-            default:
-            case FLOAT_32:
-                dest.writeFloat(value);
-                break;
-            case FLOAT_16:
-                dest.writeShort(toHalfFloat(value));
-                break;
-        }
+        dest.writeFloat(value);
+
+//        switch (precision) {
+//            default:
+//            case FLOAT_32:
+//                dest.writeFloat(value);
+//                break;
+//            case FLOAT_16:
+//                dest.writeShort(toHalfFloat(value));
+//                break;
+//        }
     }
 
     @Override
     public BaseRecord<Float> read(ByteBuf in, int uniqueID) {
-        float value;
-        switch (precision) {
-            default:
-            case FLOAT_32:
-                value = in.readFloat();
-                break;
-            case FLOAT_16:
-                value = toFloat(in.readShort());
-                break;
-        }
+        float value = in.readFloat();
+//        switch (precision) {
+//            default:
+//            case FLOAT_32:
+//                value = in.readFloat();
+//                break;
+//            case FLOAT_16:
+//                value = toFloat(in.readShort());
+//                break;
+//        }
         return new FloatRecord(value, uniqueID);
     }
 
@@ -91,10 +93,10 @@ public class FloatRecord extends BaseRecord<Float> {
         return new FloatRecord(0f, uniqueID);
     }
 
-    public FloatRecord setPrecision(FloatPrecision precision) {
-        this.precision = precision;
-        return this;
-    }
+//    public FloatRecord setPrecision(FloatPrecision precision) {
+//        this.precision = precision;
+//        return this;
+//    }
 
     @Override
     public String toString() {
