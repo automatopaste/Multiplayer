@@ -24,7 +24,7 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound(int entityID) {
+    public Map<Integer, BasePackable> getOutbound() {
         Map<Integer, BasePackable> out = new HashMap<>();
 
         for (int i = 0; i < table.length; i++) {

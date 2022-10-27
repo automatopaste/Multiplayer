@@ -155,7 +155,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         ServerConnectionWrapper wrapper = serverConnectionWrappers.get(instanceID);
 
         if (wrapper != null) {
@@ -194,7 +194,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound(int entityID) {
+    public Map<Integer, BasePackable> getOutbound() {
         Map<Integer, BasePackable> out = new HashMap<>();
 
         for (int id : serverConnectionWrappers.keySet()) {

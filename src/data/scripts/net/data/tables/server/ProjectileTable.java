@@ -24,7 +24,7 @@ public class ProjectileTable extends EntityTable implements OutboundEntityManage
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound(int entityID) {
+    public Map<Integer, BasePackable> getOutbound() {
         return null;
     }
 

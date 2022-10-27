@@ -18,7 +18,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         String shipID = (String) toProcess.get(VariantIDs.SHIP_ID).getValue();
         VariantDest data = variantData.get(shipID);
 

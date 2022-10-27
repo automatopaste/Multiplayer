@@ -60,7 +60,7 @@ public class DataGenManager {
             }
 
             for (Integer instance : entities.keySet()) {
-                manager.processDelta(type, instance, entities.get(instance), plugin);
+                manager.processDelta(instance, entities.get(instance), plugin);
             }
         }
     }
@@ -71,7 +71,7 @@ public class DataGenManager {
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Integer, BasePackable> entities = manager.getOutbound(source);
+                Map<Integer, BasePackable> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }
@@ -85,7 +85,7 @@ public class DataGenManager {
         for (Integer source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Integer, BasePackable> entities = manager.getOutbound(source);
+                Map<Integer, BasePackable> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }

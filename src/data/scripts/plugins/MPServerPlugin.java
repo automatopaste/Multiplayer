@@ -8,6 +8,7 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.HostShipTable;
+import data.scripts.net.data.tables.server.PlayerShipMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.ServerConnectionManager;
@@ -22,6 +23,7 @@ public class MPServerPlugin extends MPPlugin {
     //inbound
     private final ServerConnectionManager serverConnectionManager;
     private final PlayerMap playerMap;
+    private final PlayerShipMap playerShipMap;
 
     //outbound
     private final HostShipTable hostShipTable;
@@ -38,6 +40,9 @@ public class MPServerPlugin extends MPPlugin {
         // inbound init
         playerMap = new PlayerMap(this);
         initEntityManager(playerMap);
+
+        playerShipMap = new PlayerShipMap();
+        initEntityManager(playerShipMap);
 
         //outbound init
         hostShipTable = new HostShipTable();
@@ -95,5 +100,9 @@ public class MPServerPlugin extends MPPlugin {
 
     public PlayerMap getPlayerMap() {
         return playerMap;
+    }
+
+    public PlayerShipMap getPlayerShipMap() {
+        return playerShipMap;
     }
 }

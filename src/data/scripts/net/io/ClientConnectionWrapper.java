@@ -177,7 +177,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public void processDelta(int entityID, int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
         int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
             //return;
@@ -195,7 +195,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound(int entityID) {
+    public Map<Integer, BasePackable> getOutbound() {
         Map<Integer, BasePackable> out = new HashMap<>();
         out.put(connectionID, statusData);
         return out;
