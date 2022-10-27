@@ -77,7 +77,7 @@ public class ShipDest extends DestPackable {
             int owner = (int) getRecord(ShipIDs.OWNER).getValue();
             ship.setOwner(owner);
             float cr = (float) getRecord(ShipIDs.COMBAT_READINESS).getValue();
-            ship.setCurrentCR(0.7f);
+            ship.setCurrentCR(cr);
         }
     }
 
@@ -121,12 +121,13 @@ public class ShipDest extends DestPackable {
 
             FleetMemberType fleetMemberType = FleetMemberType.SHIP;
             FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
-            fleetMember.getRepairTracker().setCR(0.7f);
 
             fleetManager.addToReserves(fleetMember);
             Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
             float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
             ship = fleetManager.spawnFleetMember(fleetMember, loc, ang, 0f);
+            ship.setCRAtDeployment(0.7f);
+            ship.setControlsLocked(false);
 
             // set fleetmember id to sync with server
             Ship s = (Ship) ship;
