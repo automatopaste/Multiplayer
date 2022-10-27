@@ -77,7 +77,7 @@ public class ShipDest extends DestPackable {
             int owner = (int) getRecord(ShipIDs.OWNER).getValue();
             ship.setOwner(owner);
             float cr = (float) getRecord(ShipIDs.COMBAT_READINESS).getValue();
-            ship.setCurrentCR(cr);
+            ship.setCurrentCR(0.7f);
         }
     }
 
