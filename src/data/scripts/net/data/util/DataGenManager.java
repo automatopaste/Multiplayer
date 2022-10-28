@@ -14,44 +14,44 @@ import java.util.Map;
  * Allows mods to specify entity types and record types at runtime
  */
 public class DataGenManager {
-    public static Map<Class<? extends BasePackable>, Integer> entityTypeIDs = new HashMap<>();
-    public static Map<Integer, DestPackable> entityInstances = new HashMap<>();
+    public static Map<Class<? extends BasePackable>, Byte> entityTypeIDs = new HashMap<>();
+    public static Map<Byte, DestPackable> entityInstances = new HashMap<>();
 
-    public static Map<String, Integer> recordTypeIDs = new HashMap<>();
-    public static Map<Integer, BaseRecord<?>> recordInstances = new HashMap<>();
+    public static Map<String, Byte> recordTypeIDs = new HashMap<>();
+    public static Map<Byte, BaseRecord<?>> recordInstances = new HashMap<>();
 
-    public static Map<Integer, InboundEntityManager> inboundDataDestinations = new HashMap<>();
-    public static Map<Integer, OutboundEntityManager> outboundDataSources = new HashMap<>();
+    public static Map<Byte, InboundEntityManager> inboundDataDestinations = new HashMap<>();
+    public static Map<Byte, OutboundEntityManager> outboundDataSources = new HashMap<>();
 
-    private static int idIncrementer = 1;
+    private static byte idIncrementer = 1;
 
-    public static int registerEntityType(Class<? extends BasePackable> clazz, DestPackable instance) {
-        int id = idIncrementer;
+    public static byte registerEntityType(Class<? extends BasePackable> clazz, DestPackable instance) {
+        byte id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         entityInstances.put(id, instance);
         idIncrementer++;
         return id;
     }
 
-    public static int registerRecordType(String c, BaseRecord<?> instance) {
-        int id = idIncrementer;
+    public static byte registerRecordType(String c, BaseRecord<?> instance) {
+        byte id = idIncrementer;
         recordTypeIDs.put(c, id);
         recordInstances.put(id, instance);
         idIncrementer++;
         return id;
     }
 
-    public static void registerInboundEntityManager(int dataTypeID, InboundEntityManager manager) {
+    public static void registerInboundEntityManager(byte dataTypeID, InboundEntityManager manager) {
         inboundDataDestinations.put(dataTypeID, manager);
     }
 
-    public static void registerOutboundEntityManager(int dataTypeID, OutboundEntityManager manager) {
+    public static void registerOutboundEntityManager(byte dataTypeID, OutboundEntityManager manager) {
         outboundDataSources.put(dataTypeID, manager);
     }
 
-    public static void distributeInboundDeltas(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> inbound, MPPlugin plugin) {
-        for (Integer type : inbound.keySet()) {
-            Map<Integer, Map<Integer, BaseRecord<?>>> entities = inbound.get(type);
+    public static void distributeInboundDeltas(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound, MPPlugin plugin) {
+        for (byte type : inbound.keySet()) {
+            Map<Short, Map<Byte, BaseRecord<?>>> entities = inbound.get(type);
             InboundEntityManager manager = inboundDataDestinations.get(type);
 
             if (manager == null) {
@@ -59,19 +59,19 @@ public class DataGenManager {
                 continue;
             }
 
-            for (Integer instance : entities.keySet()) {
+            for (short instance : entities.keySet()) {
                 manager.processDelta(instance, entities.get(instance), plugin);
             }
         }
     }
 
-    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltasSocket() {
-        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
+    public static Map<Byte, Map<Short, BasePackable>> collectOutboundDeltasSocket() {
+        Map<Byte, Map<Short, BasePackable>> out = new HashMap<>();
 
-        for (Integer source : outboundDataSources.keySet()) {
+        for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Integer, BasePackable> entities = manager.getOutbound();
+                Map<Short, BasePackable> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }
@@ -79,13 +79,13 @@ public class DataGenManager {
         return out;
     }
 
-    public static Map<Integer, Map<Integer, BasePackable>> collectOutboundDeltasDatagram() {
-        Map<Integer, Map<Integer, BasePackable>> out = new HashMap<>();
+    public static Map<Byte, Map<Short, BasePackable>> collectOutboundDeltasDatagram() {
+        Map<Byte, Map<Short, BasePackable>> out = new HashMap<>();
 
-        for (Integer source : outboundDataSources.keySet()) {
+        for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Integer, BasePackable> entities = manager.getOutbound();
+                Map<Short, BasePackable> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }
@@ -98,7 +98,7 @@ public class DataGenManager {
      * @param typeID id
      * @return new empty instance
      */
-    public static BaseRecord<?> recordFactory(int typeID) {
+    public static BaseRecord<?> recordFactory(byte typeID) {
         BaseRecord<?> out = recordInstances.get(typeID);
         if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
         return out;

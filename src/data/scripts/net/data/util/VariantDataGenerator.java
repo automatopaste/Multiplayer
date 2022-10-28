@@ -36,7 +36,7 @@ public class VariantDataGenerator {
         generated = new ArrayList<>();
         int index = 0;
         for (FleetMemberAPI member : members) {
-            generated.add(new VariantData(index, member.getVariant(), member.getId()));
+            generated.add(new VariantData((short) index, member.getVariant(), member.getId()));
             index++;
         }
     }

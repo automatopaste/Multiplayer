@@ -14,12 +14,12 @@ import java.util.Map;
 
 public class PlayerShipMap implements InboundEntityManager {
 
-    private final Map<Integer, PlayerShipDest> playerShips;
+    private final Map<Short, PlayerShipDest> playerShips;
     private final PlayerShipData hostShip;
 
     public PlayerShipMap() {
         playerShips = new HashMap<>();
-        hostShip = new PlayerShipData(-1, new BaseRecord.DeltaFunc<String>() {
+        hostShip = new PlayerShipData((short) -1, new BaseRecord.DeltaFunc<String>() {
             @Override
             public String get() {
                 return getHostShipID();
@@ -39,12 +39,12 @@ public class PlayerShipMap implements InboundEntityManager {
         DataGenManager.registerInboundEntityManager(PlayerShipIDs.TYPE_ID, this);
     }
 
-    public Map<Integer, PlayerShipDest> getPlayerShips() {
+    public Map<Short, PlayerShipDest> getPlayerShips() {
         return playerShips;
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         PlayerShipDest data = playerShips.get(instanceID);
 
         if (data == null) {

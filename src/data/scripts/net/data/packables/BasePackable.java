@@ -12,16 +12,16 @@ import java.util.Map;
  */
 public abstract class BasePackable {
 
-    protected final int instanceID;
-    protected final Map<Integer, BaseRecord<?>> records;
+    protected final short instanceID;
+    protected final Map<Byte, BaseRecord<?>> records;
     protected boolean initialForce = true;
 
-    public BasePackable(int instanceID) {
+    public BasePackable(short instanceID) {
         this.instanceID = instanceID;
         records = new HashMap<>();
     }
 
-    public int getInstanceID() {
+    public short getInstanceID() {
         return instanceID;
     }
 
@@ -35,10 +35,10 @@ public abstract class BasePackable {
         records.put(record.uniqueID, record);
     }
 
-    public BaseRecord<?> getRecord(int uniqueID) {
+    public BaseRecord<?> getRecord(byte uniqueID) {
         return records.get(uniqueID);
     }
-    public Map<Integer, BaseRecord<?>> getRecords() {
+    public Map<Byte, BaseRecord<?>> getRecords() {
         return records;
     }
 
@@ -46,8 +46,8 @@ public abstract class BasePackable {
      * Update stored data with changes from a delta
      * @param deltas incoming deltas
      */
-    public void updateFromDelta(Map<Integer, BaseRecord<?>> deltas) {
-        for (int k : deltas.keySet()) {
+    public void updateFromDelta(Map<Byte, BaseRecord<?>> deltas) {
+        for (byte k : deltas.keySet()) {
             records.get(k).updateFromDelta(deltas.get(k));
         }
     }

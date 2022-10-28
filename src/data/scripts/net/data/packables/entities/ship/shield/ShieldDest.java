@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ShieldDest extends DestPackable {
 
-    public ShieldDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public ShieldDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 

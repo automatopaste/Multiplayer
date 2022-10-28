@@ -18,7 +18,7 @@ public class PlayerShipData extends BasePackable {
      *
      * @param instanceID unique
      */
-    public PlayerShipData(int instanceID, final BaseRecord.DeltaFunc<String> activeShipIDDeltaFunc) {
+    public PlayerShipData(short instanceID, final BaseRecord.DeltaFunc<String> activeShipIDDeltaFunc) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {

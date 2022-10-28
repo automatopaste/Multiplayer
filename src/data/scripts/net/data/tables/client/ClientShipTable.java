@@ -15,7 +15,7 @@ import java.util.Map;
 public class ClientShipTable extends EntityTable implements InboundEntityManager {
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         ShipDest data = (ShipDest) table[instanceID];
 
         if (data == null) {

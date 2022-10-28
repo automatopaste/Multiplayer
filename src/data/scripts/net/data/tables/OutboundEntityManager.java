@@ -11,7 +11,7 @@ public interface OutboundEntityManager extends BaseEntityManager {
         DATAGRAM
     }
 
-    Map<Integer, BasePackable> getOutbound();
+    Map<Short, BasePackable> getOutbound();
 
     PacketType getOutboundPacketType();
 }

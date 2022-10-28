@@ -24,13 +24,13 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
 
         for (int i = 0; i < table.length; i++) {
             ShipData data = (ShipData) table[i];
             if (data != null) {
-                out.put(i, data);
+                out.put((short) i, data);
             }
         }
 
@@ -57,9 +57,9 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     private void createEntry(ShipAPI ship) {
-        int id = getVacant();
+        short id = (short) getVacant();
 
-        registered.put(ship.getId(), id);
+        registered.put(ship.getId(), (int) id);
         table[id] = new ShipData(id, ship);
     }
 

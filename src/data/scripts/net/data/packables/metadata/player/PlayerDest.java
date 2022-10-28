@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class PlayerDest extends DestPackable {
 
-    public PlayerDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public PlayerDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
@@ -45,6 +45,6 @@ public class PlayerDest extends DestPackable {
     }
 
     public static PlayerDest getDefault() {
-        return new PlayerDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new PlayerDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 }

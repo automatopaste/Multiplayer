@@ -5,14 +5,14 @@ import io.netty.buffer.ByteBuf;
 public abstract class BaseRecord<T> {
     protected DeltaFunc<T> func;
     protected T value;
-    public final int uniqueID;
+    public final byte uniqueID;
 
-    public BaseRecord(T value, int uniqueID) {
+    public BaseRecord(T value, byte uniqueID) {
         this.value = value;
         this.uniqueID = uniqueID;
     }
 
-    public BaseRecord(DeltaFunc<T> func, int uniqueID) {
+    public BaseRecord(DeltaFunc<T> func, byte uniqueID) {
         this.func = func;
         this.uniqueID = uniqueID;
         value = func.get();
@@ -25,10 +25,7 @@ public abstract class BaseRecord<T> {
     public void write(boolean force, ByteBuf dest) {
         boolean isUpdate = check();
         if (value != null && (force || isUpdate)) {
-//            dest.writeInt(getTypeId());
-//            dest.writeInt(uniqueID);
-
-            dest.writeByte((byte) getTypeId());
+            dest.writeByte(getTypeId());
             dest.writeByte(uniqueID);
 
             write(dest);
@@ -41,10 +38,10 @@ public abstract class BaseRecord<T> {
      */
     public abstract void write(ByteBuf dest);
 
-    public abstract BaseRecord<T> read(ByteBuf in, int uniqueID);
+    public abstract BaseRecord<T> read(ByteBuf in, byte uniqueID);
     public abstract boolean check();
 
-    public abstract int getTypeId();
+    public abstract byte getTypeId();
 
     public T getValue() {
         return value;

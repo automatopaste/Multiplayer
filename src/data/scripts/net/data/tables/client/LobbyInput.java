@@ -28,7 +28,7 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         if (lobby == null) {
             lobby = new LobbyDest(instanceID, toProcess);
             lobby.init(plugin);

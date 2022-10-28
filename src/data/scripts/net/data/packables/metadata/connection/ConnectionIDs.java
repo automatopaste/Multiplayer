@@ -3,10 +3,10 @@ package data.scripts.net.data.packables.metadata.connection;
 import java.net.InetSocketAddress;
 
 public class ConnectionIDs {
-    public static int TYPE_ID;
+    public static byte TYPE_ID;
 
-    public static final int STATE = 1;
-    public static final int CLIENT_PORT = 2;
+    public static final byte STATE = 1;
+    public static final byte CLIENT_PORT = 2;
 
     public static short getConnectionID(InetSocketAddress address) {
         byte[] ids = address.getAddress().getAddress();

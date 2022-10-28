@@ -7,12 +7,8 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class ShipData extends BasePackable {
 
-    public ShipData(int instanceID, final ShipAPI ship) {
+    public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
-
-        float angle = 210.2324f;
-        byte a = (byte) (0xFFb & (byte) ((int) angle * (255f / 360f)));
-        System.out.println();
 
         putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
             @Override

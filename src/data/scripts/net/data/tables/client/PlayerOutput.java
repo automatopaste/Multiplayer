@@ -13,17 +13,17 @@ import java.util.Map;
 
 public class PlayerOutput implements OutboundEntityManager {
     private final PlayerData player;
-    private final int instanceID;
+    private final short instanceID;
 
-    public PlayerOutput(int instanceID, MPPlugin plugin) {
+    public PlayerOutput(short instanceID, MPPlugin plugin) {
         this.instanceID = instanceID;
 
         player = new PlayerData(instanceID, Global.getCombatEngine().getViewport(), plugin);
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
         out.put(instanceID, player);
         return out;
     }

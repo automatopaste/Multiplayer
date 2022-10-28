@@ -5,7 +5,7 @@ import data.scripts.net.data.packables.BasePackable;
 
 public class ShieldData extends BasePackable {
 
-    public ShieldData(int instanceID, ShieldAPI shield) {
+    public ShieldData(short instanceID, ShieldAPI shield) {
         super(instanceID);
 
 

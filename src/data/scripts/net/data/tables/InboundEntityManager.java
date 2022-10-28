@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface InboundEntityManager extends BaseEntityManager {
 
-    void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin);
+    void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin);
 }

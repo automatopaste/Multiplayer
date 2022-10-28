@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class VariantDest extends DestPackable {
 
-    public VariantDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public VariantDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
@@ -45,7 +45,7 @@ public class VariantDest extends DestPackable {
     }
 
     public static VariantDest getDefault() {
-        return new VariantDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new VariantDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 
 }

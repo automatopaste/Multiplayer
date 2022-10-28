@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector2f;
  */
 public class PlayerData extends BasePackable {
 
-    public PlayerData(int instanceID, final ViewportAPI viewport, final MPPlugin plugin) {
+    public PlayerData(short instanceID, final ViewportAPI viewport, final MPPlugin plugin) {
         super(instanceID);
 
         putRecord(new Vector2f32Record(new BaseRecord.DeltaFunc<Vector2f>() {

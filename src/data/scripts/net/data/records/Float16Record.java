@@ -7,15 +7,15 @@ import io.netty.buffer.ByteBuf;
  */
 public class Float16Record extends BaseRecord<Float> {
 
-    public static int TYPE_ID;
+    public static byte TYPE_ID;
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Float16Record(float record, int uniqueID) {
+    public Float16Record(float record, byte uniqueID) {
         super(record, uniqueID);
     }
 
-    public Float16Record(DeltaFunc<Float> deltaFunc, int uniqueID) {
+    public Float16Record(DeltaFunc<Float> deltaFunc, byte uniqueID) {
         super(deltaFunc, uniqueID);
     }
 
@@ -25,7 +25,7 @@ public class Float16Record extends BaseRecord<Float> {
     }
 
     @Override
-    public BaseRecord<Float> read(ByteBuf in, int uniqueID) {
+    public BaseRecord<Float> read(ByteBuf in, byte uniqueID) {
         short value = in.readShort();
         return new Float16Record(ConversionUtils.toFloat(value), uniqueID);
     }
@@ -50,16 +50,16 @@ public class Float16Record extends BaseRecord<Float> {
         return isUpdated;
     }
 
-    public static BaseRecord<Float> getDefault(int uniqueID) {
+    public static BaseRecord<Float> getDefault(byte uniqueID) {
         return new Float16Record(0f, uniqueID);
     }
 
-    public static void setTypeId(int typeId) {
+    public static void setTypeId(byte typeId) {
         Float16Record.TYPE_ID = typeId;
     }
 
     @Override
-    public int getTypeId() {
+    public byte getTypeId() {
         return TYPE_ID;
     }
 }

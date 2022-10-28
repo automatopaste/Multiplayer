@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
-    private final Map<Integer, PlayerDest> players;
+    private final Map<Short, PlayerDest> players;
     private final MPServerPlugin serverPlugin;
 
     private final PlayerData host;
@@ -29,17 +29,17 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
         players = new HashMap<>();
 
-        host = new PlayerData(-1, Global.getCombatEngine().getViewport(), serverPlugin);
+        host = new PlayerData((short) -1, Global.getCombatEngine().getViewport(), serverPlugin);
 
-        lobby = new LobbyData(-1, this, serverPlugin.getPlayerShipMap());
+        lobby = new LobbyData((short) -1, this, serverPlugin.getPlayerShipMap());
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         PlayerDest data = players.get(instanceID);
 
         if (data == null) {
-            data = new PlayerDest(instanceID, toProcess);
+            data = new PlayerDest((short) instanceID, toProcess);
             data.init(plugin);
             players.put(instanceID, data);
         } else {
@@ -48,9 +48,9 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
-        out.put(-1, lobby);
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
+        out.put((short) -1, lobby);
         return out;
     }
 
@@ -61,7 +61,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
         }
     }
 
-    public Map<Integer, PlayerDest> getPlayers() {
+    public Map<Short, PlayerDest> getPlayers() {
         return players;
     }
 

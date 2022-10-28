@@ -26,7 +26,7 @@ public class PlayerShipDest extends DestPackable {
      * @param instanceID unique
      * @param records    incoming deltas
      */
-    public PlayerShipDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public PlayerShipDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
@@ -76,7 +76,7 @@ public class PlayerShipDest extends DestPackable {
     }
 
     public static PlayerShipDest getDefault() {
-        return new PlayerShipDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new PlayerShipDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 
     // https://stackoverflow.com/questions/32550451/packing-an-array-of-booleans-into-an-int-in-java

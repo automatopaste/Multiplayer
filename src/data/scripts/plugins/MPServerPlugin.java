@@ -61,17 +61,17 @@ public class MPServerPlugin extends MPPlugin {
         }
 
         // inbound data update
-        Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this);
 
         // simulation update
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Integer, Map<Integer, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Byte, Map<Short, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
 
-        Map<Integer, Map<Integer, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Byte, Map<Short, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();

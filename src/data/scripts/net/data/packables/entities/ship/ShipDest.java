@@ -23,7 +23,7 @@ public class ShipDest extends DestPackable {
     private ShipAPI ship;
     private MPPlugin plugin;
 
-    public ShipDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public ShipDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
@@ -138,7 +138,7 @@ public class ShipDest extends DestPackable {
     }
 
     public static ShipDest getDefault() {
-        return new ShipDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new ShipDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 
     public String getSpecID() {

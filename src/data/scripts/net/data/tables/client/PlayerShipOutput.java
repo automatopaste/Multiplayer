@@ -14,9 +14,9 @@ import java.util.Map;
 public class PlayerShipOutput implements OutboundEntityManager {
 
     private final PlayerShipData playerShip;
-    private final int instanceID;
+    private final short instanceID;
 
-    public PlayerShipOutput(int instanceID) {
+    public PlayerShipOutput(short instanceID) {
         this.instanceID = instanceID;
 
         playerShip = new PlayerShipData(instanceID, new BaseRecord.DeltaFunc<String>() {
@@ -38,8 +38,8 @@ public class PlayerShipOutput implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
         out.put(instanceID, playerShip);
         return out;
     }

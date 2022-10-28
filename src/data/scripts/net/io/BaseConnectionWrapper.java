@@ -8,7 +8,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import java.io.IOException;
 
 public abstract class BaseConnectionWrapper {
-    public static final int DEFAULT_CONNECTION_ID = -10;
+    public static final short DEFAULT_CONNECTION_ID = -10;
 
     public enum ConnectionState {
         INITIALISATION_READY,
@@ -25,7 +25,7 @@ public abstract class BaseConnectionWrapper {
 
     protected ConnectionData statusData;
 
-    protected int connectionID = DEFAULT_CONNECTION_ID;
+    protected short connectionID = DEFAULT_CONNECTION_ID;
     protected int clientPort;
 
     protected MPPlugin localPlugin;
@@ -44,11 +44,11 @@ public abstract class BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void setConnectionID(int connectionID) {
+    public void setConnectionID(short connectionID) {
         this.connectionID = connectionID;
     }
 
-    public int getConnectionID() {
+    public short getConnectionID() {
         return connectionID;
     }
 

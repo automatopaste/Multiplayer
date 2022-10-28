@@ -13,7 +13,7 @@ import java.util.List;
 
 public class VariantData extends BasePackable {
 
-    public VariantData(int instanceID, final ShipVariantAPI variant, final String id) {
+    public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
 
         putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
@@ -43,7 +43,7 @@ public class VariantData extends BasePackable {
 
                     if (weaponID == null) continue;
 
-                    weaponIDs.add(new StringRecord(weaponID, -1));
+                    weaponIDs.add(new StringRecord(weaponID, (byte) -1));
                 }
                 return weaponIDs;
             }
@@ -57,7 +57,7 @@ public class VariantData extends BasePackable {
 
                     if (weaponID == null) continue;
 
-                    weaponSlots.add(new StringRecord(slot, -1));
+                    weaponSlots.add(new StringRecord(slot, (byte) -1));
                 }
                 return weaponSlots;
             }

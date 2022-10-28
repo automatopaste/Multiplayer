@@ -18,7 +18,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
     private final InetSocketAddress remoteAddress;
 
-    public ServerConnectionWrapper(ServerConnectionManager connectionManager, int connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager, short connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
         super(plugin);
 
         this.connectionManager = connectionManager;
@@ -39,7 +39,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
 
                 break;
             //case LOADING_READY:
@@ -49,7 +49,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 connectionState = ConnectionState.SPAWNING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SPAWNING_READY:
@@ -59,12 +59,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SIMULATION_READY:
             case SIMULATING:
-                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutboundSocket().values()) {
+                for (Map<Short, BasePackable> type : connectionManager.getDuplex().getOutboundSocket().values()) {
                     data.addAll(type.values());
                 }
 
@@ -95,7 +95,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SIMULATION_READY:
                 break;
             case SIMULATING:
-                for (Map<Integer, BasePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
+                for (Map<Short, BasePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 
@@ -114,11 +114,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities) {
+    public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
         connectionManager.getDuplex().updateInbound(entities);
     }
 
-    public void updateConnectionStatus(Map<Integer, BaseRecord<?>> data) {
+    public void updateConnectionStatus(Map<Byte, BaseRecord<?>> data) {
         int state = (int) data.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
             //return;

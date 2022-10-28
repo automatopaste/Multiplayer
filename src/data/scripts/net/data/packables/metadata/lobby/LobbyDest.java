@@ -17,7 +17,7 @@ public class LobbyDest extends DestPackable {
      * @param instanceID unique
      * @param records    incoming deltas
      */
-    public LobbyDest(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public LobbyDest(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID, records);
     }
 
@@ -48,6 +48,6 @@ public class LobbyDest extends DestPackable {
     }
 
     public static LobbyDest getDefault() {
-        return new LobbyDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new LobbyDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 }

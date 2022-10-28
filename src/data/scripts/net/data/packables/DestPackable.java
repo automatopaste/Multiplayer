@@ -15,12 +15,12 @@ public abstract class DestPackable extends BasePackable {
      * @param instanceID unique
      * @param records incoming deltas
      */
-    public DestPackable(int instanceID, Map<Integer, BaseRecord<?>> records) {
+    public DestPackable(short instanceID, Map<Byte, BaseRecord<?>> records) {
         super(instanceID);
 
         initDefaultRecords();
 
-        for (Integer key : records.keySet()) {
+        for (byte key : records.keySet()) {
             BaseRecord<?> record = records.get(key);
             putRecord(record);
         }

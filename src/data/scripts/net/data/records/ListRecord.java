@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListRecord<E> extends BaseRecord<List<E>> {
-    public static int TYPE_ID;
-    private final int elementTypeID;
+    public static byte TYPE_ID;
+    private final byte elementTypeID;
 
-    public ListRecord(List<E> collection, int uniqueID, int elementTypeID) {
+    public ListRecord(List<E> collection, byte uniqueID, byte elementTypeID) {
         super(collection, uniqueID);
         this.elementTypeID = elementTypeID;
     }
 
-    public ListRecord(DeltaFunc<List<E>> deltaFunc, int uniqueID, int elementTypeID) {
+    public ListRecord(DeltaFunc<List<E>> deltaFunc, byte uniqueID, byte elementTypeID) {
         super(deltaFunc, uniqueID);
         this.elementTypeID = elementTypeID;
     }
@@ -44,14 +44,14 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     @Override
-    public BaseRecord<List<E>> read(ByteBuf in, int uniqueID) {
+    public BaseRecord<List<E>> read(ByteBuf in, byte uniqueID) {
         byte type = in.readByte();
         byte num = in.readByte();
 
         BaseRecord<?> reader = DataGenManager.recordFactory(type);
         List<E> data = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            data.add((E) reader.read(in, -1));
+            data.add((E) reader.read(in, (byte) -1));
         }
 
         return new ListRecord<>(data, uniqueID, type);
@@ -62,12 +62,12 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         value.add(e);
     }
 
-    public static void setTypeId(int typeId) {
+    public static void setTypeId(byte typeId) {
         ListRecord.TYPE_ID = typeId;
     }
 
     @Override
-    public int getTypeId() {
+    public byte getTypeId() {
         return TYPE_ID;
     }
 
@@ -78,7 +78,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
                 '}';
     }
 
-    public static ListRecord<?> getDefault(int uniqueID, int elementTypeID) {
+    public static ListRecord<?> getDefault(byte uniqueID, byte elementTypeID) {
         return new ListRecord<>(new ArrayList<>(), uniqueID, elementTypeID);
     }
 }

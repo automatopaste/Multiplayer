@@ -35,7 +35,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         //Console.showMessage("Received TCP unpacked with tick: " + serverTick);
 
         // DISCARD WHILE DEBUG
-        Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities = unpacked.getUnpacked();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = unpacked.getUnpacked();
 
         connection.updateInbound(entities, serverTick);
     }

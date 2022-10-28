@@ -3,13 +3,13 @@ package data.scripts.net.data.records;
 import io.netty.buffer.ByteBuf;
 
 public class IntRecord extends BaseRecord<Integer> {
-    public static int TYPE_ID;
+    public static byte TYPE_ID;
 
-    public IntRecord(Integer record, int uniqueID) {
+    public IntRecord(Integer record, byte uniqueID) {
         super(record, uniqueID);
     }
 
-    public IntRecord(DeltaFunc<Integer> deltaFunc, int uniqueID) {
+    public IntRecord(DeltaFunc<Integer> deltaFunc, byte uniqueID) {
         super(deltaFunc, uniqueID);
     }
 
@@ -28,21 +28,21 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    public BaseRecord<Integer> read(ByteBuf in, int uniqueID) {
+    public BaseRecord<Integer> read(ByteBuf in, byte uniqueID) {
         int value = in.readInt();
         return new IntRecord(value, uniqueID);
     }
 
-    public static void setTypeId(int typeId) {
+    public static void setTypeId(byte typeId) {
         IntRecord.TYPE_ID = typeId;
     }
 
     @Override
-    public int getTypeId() {
+    public byte getTypeId() {
         return TYPE_ID;
     }
 
-    public static IntRecord getDefault(int uniqueID) {
+    public static IntRecord getDefault(byte uniqueID) {
         return new IntRecord(0, uniqueID);
     }
 

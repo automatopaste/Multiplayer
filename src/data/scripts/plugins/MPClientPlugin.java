@@ -60,7 +60,7 @@ public class MPClientPlugin extends MPPlugin {
         initEntityManager(lobbyInput);
 
         // outbound init
-        int connectionID = connection.getConnectionID();
+        short connectionID = connection.getConnectionID();
 
         playerShipOutput = new PlayerShipOutput(connectionID);
         initEntityManager(playerShipOutput);
@@ -83,16 +83,16 @@ public class MPClientPlugin extends MPPlugin {
         }
 
         // get inbound
-        Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Integer, Map<Integer, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Byte, Map<Short, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         connection.getDuplex().updateOutboundSocket(outboundSocket);
 
-        Map<Integer, Map<Integer, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Byte, Map<Short, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         connection.getDuplex().updateOutboundDatagram(outboundDatagram);
     }
 

@@ -1,8 +1,8 @@
 package data.scripts.net.data.packables.metadata.connection;
 
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.packables.DestPackable;
-import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -10,14 +10,14 @@ import java.util.Map;
 
 public class ConnectionDest extends DestPackable {
 
-    public ConnectionDest(int connectionID, Map<Integer, BaseRecord<?>> records) {
+    public ConnectionDest(short connectionID, Map<Byte, BaseRecord<?>> records) {
         super(connectionID, records);
     }
 
     @Override
     protected void initDefaultRecords() {
-        putRecord(IntRecord.getDefault(ConnectionIDs.STATE));
-        putRecord(IntRecord.getDefault(ConnectionIDs.CLIENT_PORT));
+        putRecord(ByteRecord.getDefault(ConnectionIDs.STATE));
+        putRecord(ByteRecord.getDefault(ConnectionIDs.CLIENT_PORT));
     }
 
     @Override
@@ -41,6 +41,6 @@ public class ConnectionDest extends DestPackable {
     }
 
     public static ConnectionDest getDefault() {
-        return new ConnectionDest(-1, new HashMap<Integer, BaseRecord<?>>());
+        return new ConnectionDest((short) -1, new HashMap<Byte, BaseRecord<?>>());
     }
 }

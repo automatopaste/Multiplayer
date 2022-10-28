@@ -6,15 +6,15 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class StringRecord extends BaseRecord<String> {
-    public static int TYPE_ID;
+    public static byte TYPE_ID;
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-    public StringRecord(DeltaFunc<String> deltaFunc, int uniqueID) {
+    public StringRecord(DeltaFunc<String> deltaFunc, byte uniqueID) {
         super(deltaFunc, uniqueID);
     }
 
-    public StringRecord(String value, int uniqueID) {
+    public StringRecord(String value, byte uniqueID) {
         super(value, uniqueID);
     }
 
@@ -27,7 +27,7 @@ public class StringRecord extends BaseRecord<String> {
     }
 
     @Override
-    public BaseRecord<String> read(ByteBuf in, int uniqueID) {
+    public BaseRecord<String> read(ByteBuf in, byte uniqueID) {
         int length = in.readInt();
         String value = in.readCharSequence(length, CHARSET).toString();
 
@@ -43,16 +43,16 @@ public class StringRecord extends BaseRecord<String> {
         return isUpdated;
     }
 
-    public static void setTypeId(int typeId) {
+    public static void setTypeId(byte typeId) {
         StringRecord.TYPE_ID = typeId;
     }
 
     @Override
-    public int getTypeId() {
+    public byte getTypeId() {
         return TYPE_ID;
     }
 
-    public static StringRecord getDefault(int uniqueID) {
+    public static StringRecord getDefault(byte uniqueID) {
         return new StringRecord("DEFAULT", uniqueID);
     }
 

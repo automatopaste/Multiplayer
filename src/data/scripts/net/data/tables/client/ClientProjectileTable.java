@@ -19,7 +19,7 @@ public class ClientProjectileTable implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
 
     }
 }

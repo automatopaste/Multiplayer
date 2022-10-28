@@ -4,13 +4,13 @@ import io.netty.buffer.ByteBuf;
 
 public class ByteRecord extends BaseRecord<Byte> {
 
-    public static int TYPE_ID;
+    public static byte TYPE_ID;
 
-    public ByteRecord(byte record, int uniqueID) {
+    public ByteRecord(byte record, byte uniqueID) {
         super(record, uniqueID);
     }
 
-    public ByteRecord(DeltaFunc<Byte> func, int uniqueID) {
+    public ByteRecord(DeltaFunc<Byte> func, byte uniqueID) {
         super(func, uniqueID);
     }
 
@@ -20,7 +20,7 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
-    public BaseRecord<Byte> read(ByteBuf in, int uniqueID) {
+    public BaseRecord<Byte> read(ByteBuf in, byte uniqueID) {
         byte value = in.readByte();
         return new ByteRecord(value, uniqueID);
     }
@@ -34,16 +34,16 @@ public class ByteRecord extends BaseRecord<Byte> {
         return isUpdated;
     }
 
-    public static ByteRecord getDefault(int uniqueID) {
-        return new ByteRecord((byte) 0x00, uniqueID);
+    public static ByteRecord getDefault(byte uniqueID) {
+        return new ByteRecord((byte) 0, uniqueID);
     }
 
-    public static void setTypeId(int typeId) {
+    public static void setTypeId(byte typeId) {
         ByteRecord.TYPE_ID = typeId;
     }
 
     @Override
-    public int getTypeId() {
+    public byte getTypeId() {
         return TYPE_ID;
     }
 }

@@ -98,7 +98,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
                 break;
             case SIMULATING:
-                for (Map<Integer, BasePackable> type : dataDuplex.getOutboundSocket().values()) {
+                for (Map<Short, BasePackable> type : dataDuplex.getOutboundSocket().values()) {
                     data.addAll(type.values());
                 }
 
@@ -133,7 +133,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SPAWNING:
                 break;
             case SIMULATING:
-                for (Map<Integer, BasePackable> type : dataDuplex.getOutboundDatagram().values()) {
+                for (Map<Short, BasePackable> type : dataDuplex.getOutboundDatagram().values()) {
                     data.addAll(type.values());
                 }
 
@@ -146,7 +146,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
     }
 
-    public void updateInbound(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> entities, int tick) {
+    public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities, int tick) {
         this.tick = tick;
         dataDuplex.updateInbound(entities);
     }
@@ -177,7 +177,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
         if (state < connectionState.ordinal()) {
             //return;
@@ -195,8 +195,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
         out.put(connectionID, statusData);
         return out;
     }

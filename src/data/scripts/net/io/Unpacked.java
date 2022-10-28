@@ -6,14 +6,14 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 public class Unpacked {
-    private final Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> unpacked;
+    private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> unpacked;
     private final int tick;
 
     private final InetSocketAddress sender;
     private final InetSocketAddress recipient;
     private final int connectionID;
 
-    public Unpacked(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> unpacked, int tick, InetSocketAddress sender, InetSocketAddress recipient, int connectionID) {
+    public Unpacked(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> unpacked, int tick, InetSocketAddress sender, InetSocketAddress recipient, int connectionID) {
         this.unpacked = unpacked;
         this.tick = tick;
         this.sender = sender;
@@ -21,7 +21,7 @@ public class Unpacked {
         this.connectionID = connectionID;
     }
 
-    public Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> getUnpacked() {
+    public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getUnpacked() {
         return unpacked;
     }
 

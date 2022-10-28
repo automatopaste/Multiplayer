@@ -36,7 +36,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     private final SocketServer socketServer;
     private final Thread socket;
 
-    private final Map<Integer, ServerConnectionWrapper> serverConnectionWrappers;
+    private final Map<Short, ServerConnectionWrapper> serverConnectionWrappers;
 
     private int tick;
     private final Clock clock;
@@ -111,7 +111,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     public ServerConnectionWrapper getConnection(int connectionID) {
-        for (Integer id : serverConnectionWrappers.keySet()) {
+        for (Short id : serverConnectionWrappers.keySet()) {
             ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
             if (wrapper.connectionID == connectionID) {
                 return wrapper;
@@ -127,7 +127,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
             if (serverConnectionWrappers.size() >= MP_MAX_CONNECTIONS) return null;
         }
 
-        int id = ConnectionIDs.getConnectionID(remoteAddress);
+        short id = ConnectionIDs.getConnectionID(remoteAddress);
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
 
         synchronized (serverConnectionWrappers) {
@@ -137,7 +137,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         return serverConnectionWrapper;
     }
 
-    public void removeConnection(int id) {
+    public void removeConnection(short id) {
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.remove(id);
         }
@@ -155,7 +155,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public void processDelta(int instanceID, Map<Integer, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         ServerConnectionWrapper wrapper = serverConnectionWrappers.get(instanceID);
 
         if (wrapper != null) {
@@ -189,15 +189,15 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
     }
 
-    public Map<Integer, ServerConnectionWrapper> getServerConnectionWrappers() {
+    public Map<Short, ServerConnectionWrapper> getServerConnectionWrappers() {
         return serverConnectionWrappers;
     }
 
     @Override
-    public Map<Integer, BasePackable> getOutbound() {
-        Map<Integer, BasePackable> out = new HashMap<>();
+    public Map<Short, BasePackable> getOutbound() {
+        Map<Short, BasePackable> out = new HashMap<>();
 
-        for (int id : serverConnectionWrappers.keySet()) {
+        for (short id : serverConnectionWrappers.keySet()) {
             out.put(id, serverConnectionWrappers.get(id).statusData);
         }
 

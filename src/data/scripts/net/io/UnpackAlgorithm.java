@@ -17,19 +17,21 @@ public class UnpackAlgorithm {
         Unpacked result;
         if (in.readableBytes() == 0) {
             result = new Unpacked(
-                    new HashMap<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>>(),
+                    new HashMap<Byte, Map<Short, Map<Byte, BaseRecord<?>>>>(),
                     tick,
                     remote,
                     local,
                     connectionID
             );
         } else {
-            Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data = new HashMap<>();
+            Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> data = new HashMap<>();
 
-            int nextID = in.readByte();
-            while (nextID != Integer.MIN_VALUE) {
-                nextID = readNextEntity(data, in, nextID);
-            }
+            byte nextID = in.readByte();
+            Result r;
+            do {
+                r = readNextEntity(data, in, nextID);
+                nextID = r.nextByte;
+            } while (!r.result);
 
             result = new Unpacked(
                     data,
@@ -43,37 +45,46 @@ public class UnpackAlgorithm {
         return result;
     }
 
-    private static int readNextEntity(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data, ByteBuf in, int entityTypeID) {
-        int entityInstanceID = in.readShort();
+    private static Result readNextEntity(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> data, ByteBuf in, byte entityTypeID) {
+        Result result = new Result();
 
-        Map<Integer, BaseRecord<?>> records = new HashMap<>();
+        short entityInstanceID = in.readShort();
 
-        int n = in.readByte();
-        while (DataGenManager.recordTypeIDs.containsValue(n)) {
+        Map<Byte, BaseRecord<?>> records = new HashMap<>();
+
+        byte nextByte = in.readByte();
+        while (DataGenManager.recordTypeIDs.containsValue(nextByte)) {
             // type
-            byte recordTypeID = (byte) n;
+            byte recordTypeID = nextByte;
             // unique
             byte recordUniqueID = in.readByte();
 
             //data
             BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in, recordUniqueID);
-            records.put((int) recordUniqueID, record);
+            records.put(recordUniqueID, record);
 
             if (in.readableBytes() > 0) {
-                n = in.readByte();
+                nextByte = in.readByte();
             } else {
-                n = Integer.MIN_VALUE;
+                result.result = true;
                 break;
             }
         }
 
-        Map<Integer, Map<Integer, BaseRecord<?>>> entities = data.get(entityTypeID);
+        Map<Short, Map<Byte, BaseRecord<?>>> entities = data.get(entityTypeID);
         if (entities == null) entities = new HashMap<>();
 
         entities.put(entityInstanceID, records);
         data.put(entityTypeID, entities);
 
-        return n;
+        result.nextByte = nextByte;
+
+        return result;
+    }
+
+    public static class Result {
+        public boolean result = false;
+        public byte nextByte;
     }
 
     public static Unpacked unpack(byte[] in, InetSocketAddress remote, InetSocketAddress local) {
