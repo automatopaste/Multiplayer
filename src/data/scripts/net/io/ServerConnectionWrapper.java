@@ -5,7 +5,7 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case LOADING_READY:
@@ -49,7 +49,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
 
                 connectionState = ConnectionState.SPAWNING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SPAWNING_READY:
@@ -59,7 +59,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
 
                 connectionState = ConnectionState.SIMULATION_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new IntRecord(connectionState.ordinal(), (byte) -1));
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SIMULATION_READY:

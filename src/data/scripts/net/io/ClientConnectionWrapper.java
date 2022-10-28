@@ -6,6 +6,7 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -70,6 +71,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("initialising connection");
 
                 connectionState = ConnectionState.INITIALISING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case LOADING_READY:
@@ -78,6 +80,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("receiving data");
 
                 connectionState = ConnectionState.LOADING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case SPAWNING_READY:
@@ -86,6 +89,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case SIMULATION_READY:
@@ -93,6 +97,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
+                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 if (datagramClient == null) startDatagramClient();
 

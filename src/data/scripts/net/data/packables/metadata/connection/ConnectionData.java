@@ -20,7 +20,7 @@ public class ConnectionData extends BasePackable {
         putRecord(new ShortRecord(new BaseRecord.DeltaFunc<Short>() {
             @Override
             public Short get() {
-                return (short) connection.getClientPort();
+                return connection.getClientPort();
             }
         }, ConnectionIDs.CLIENT_PORT));
 
