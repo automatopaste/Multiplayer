@@ -26,7 +26,7 @@ public abstract class BaseConnectionWrapper {
     protected ConnectionData statusData;
 
     protected short connectionID = DEFAULT_CONNECTION_ID;
-    protected int clientPort;
+    protected short clientPort;
 
     protected MPPlugin localPlugin;
 
@@ -89,11 +89,11 @@ public abstract class BaseConnectionWrapper {
         return localPlugin;
     }
 
-    public int getClientPort() {
+    public short getClientPort() {
         return clientPort;
     }
 
-    public void setClientPort(int clientPort) {
+    public void setClientPort(short clientPort) {
         this.clientPort = clientPort;
     }
 }

@@ -121,7 +121,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public void updateConnectionStatus(Map<Byte, BaseRecord<?>> data) {
         byte state = (byte) data.get(ConnectionIDs.STATE).getValue();
 
-        clientPort = (int) data.get(ConnectionIDs.CLIENT_PORT).getValue();
+        clientPort = (short) data.get(ConnectionIDs.CLIENT_PORT).getValue();
         //remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);
 
         statusData.updateFromDelta(data);
