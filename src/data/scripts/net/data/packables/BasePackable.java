@@ -1,6 +1,5 @@
 package data.scripts.net.data.packables;
 
-import data.scripts.net.data.packables.entities.variant.VariantData;
 import data.scripts.net.data.records.BaseRecord;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -57,10 +56,6 @@ public abstract class BasePackable {
      * Ouput data to a byte buffer
      */
     public void write(boolean force, ByteBuf dest) {
-        if (this instanceof VariantData) {
-            int i = 0;
-        }
-
         ByteBuf temp = PooledByteBufAllocator.DEFAULT.buffer();
 
         boolean f = force || initialForce;

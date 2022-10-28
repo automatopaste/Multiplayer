@@ -49,7 +49,7 @@ public class UnpackAlgorithm {
         Map<Integer, BaseRecord<?>> records = new HashMap<>();
 
         int n = in.readByte();
-        while (DataGenManager.recordTypeIDs.containsValue((byte) n)) {
+        while (DataGenManager.recordTypeIDs.containsValue(n)) {
             // type
             byte recordTypeID = (byte) n;
             // unique
