@@ -1,6 +1,5 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 public class IntRecord extends BaseRecord<Integer> {
@@ -30,12 +29,6 @@ public class IntRecord extends BaseRecord<Integer> {
 
     @Override
     public BaseRecord<Integer> read(ByteBuf in, int uniqueID) {
-        int value = in.readInt();
-        return new IntRecord(value, uniqueID);
-    }
-
-    @Override
-    public BaseRecord<Integer> read(ByteArrayReader in, int uniqueID) {
         int value = in.readInt();
         return new IntRecord(value, uniqueID);
     }

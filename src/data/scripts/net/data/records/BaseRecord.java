@@ -1,6 +1,5 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
@@ -40,8 +39,6 @@ public abstract class BaseRecord<T> {
     public abstract void get(ByteBuf dest);
 
     public abstract BaseRecord<T> read(ByteBuf in, int uniqueID);
-    public abstract BaseRecord<T> read(ByteArrayReader in, int uniqueID);
-
     public abstract boolean check();
 
     public abstract int getTypeId();

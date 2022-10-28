@@ -1,7 +1,6 @@
 package data.scripts.net.data.records;
 
 import data.scripts.net.data.util.DataGenManager;
-import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -46,19 +45,6 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public BaseRecord<List<E>> read(ByteBuf in, int uniqueID) {
-        int type = in.readInt();
-        int num = in.readInt();
-
-        List<E> data = new ArrayList<>();
-        for (int i = 0; i < num; i++) {
-            data.add((E) DataGenManager.recordFactory(type).read(in, -1));
-        }
-
-        return new ListRecord<>(data, uniqueID, type);
-    }
-
-    @Override
-    public BaseRecord<List<E>> read(ByteArrayReader in, int uniqueID) {
         int type = in.readInt();
         int num = in.readInt();
 

@@ -2,9 +2,9 @@ package data.scripts.net.data.packables.metadata.player;
 
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.packables.DestPackable;
-import data.scripts.net.data.records.FloatRecord;
+import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -18,8 +18,8 @@ public class PlayerDest extends DestPackable {
 
     @Override
     protected void initDefaultRecords() {
-        putRecord(Vector2fRecord.getDefault(PlayerIDs.CAMERA_CENTER));
-        putRecord(FloatRecord.getDefault(PlayerIDs.ZOOM));
+        putRecord(Vector2f32Record.getDefault(PlayerIDs.CAMERA_CENTER));
+        putRecord(Float32Record.getDefault(PlayerIDs.ZOOM));
         putRecord(IntRecord.getDefault(PlayerIDs.IS_HOST));
     }
 

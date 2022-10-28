@@ -37,12 +37,14 @@ public class MPModPlugin extends BaseModPlugin {
         ConnectionIDs.TYPE_ID = DataGenManager.registerEntityType(ConnectionDest.class, ConnectionDest.getDefault());
         LobbyIDs.TYPE_ID = DataGenManager.registerEntityType(LobbyDest.class, LobbyDest.getDefault());
 
-        FloatRecord.setTypeId(DataGenManager.registerRecordType(FloatRecord.class.getSimpleName(), FloatRecord.getDefault(-1)));
+        Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault(-1)));
         IntRecord.setTypeId(DataGenManager.registerRecordType(IntRecord.class.getSimpleName(), IntRecord.getDefault(-1)));
         StringRecord.setTypeId(DataGenManager.registerRecordType(StringRecord.class.getSimpleName(), StringRecord.getDefault(-1)));
-        Vector2fRecord.setTypeId(DataGenManager.registerRecordType(Vector2fRecord.class.getSimpleName(), Vector2fRecord.getDefault(-1)));
-        Vector3fRecord.setTypeId(DataGenManager.registerRecordType(Vector3fRecord.class.getSimpleName(), Vector3fRecord.getDefault(-1)));
+        Vector2f32Record.setTypeId(DataGenManager.registerRecordType(Vector2f32Record.class.getSimpleName(), Vector2f32Record.getDefault(-1)));
+        Vector3f32Record.setTypeId(DataGenManager.registerRecordType(Vector3f32Record.class.getSimpleName(), Vector3f32Record.getDefault(-1)));
         ListRecord.setTypeId(DataGenManager.registerRecordType(ListRecord.class.getSimpleName(), ListRecord.getDefault(-1, -1)));
+        Float16Record.setTypeId(DataGenManager.registerRecordType(Float16Record.class.getSimpleName(), Float16Record.getDefault(-1)));
+        ByteRecord.setTypeId(DataGenManager.registerRecordType(ByteRecord.class.getSimpleName(), ByteRecord.getDefault(-1)));
     }
 
     @Override

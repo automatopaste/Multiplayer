@@ -9,10 +9,10 @@ import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.packables.entities.variant.VariantDest;
 import data.scripts.net.data.packables.entities.variant.VariantIDs;
-import data.scripts.net.data.records.FloatRecord;
+import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.Vector2fRecord;
+import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
@@ -34,15 +34,15 @@ public class ShipDest extends DestPackable {
     @Override
     protected void initDefaultRecords() {
         putRecord(StringRecord.getDefault(ShipIDs.SHIP_ID));
-        putRecord(Vector2fRecord.getDefault(ShipIDs.SHIP_LOC));
-        putRecord(Vector2fRecord.getDefault(ShipIDs.SHIP_VEL));
-        putRecord(FloatRecord.getDefault(ShipIDs.SHIP_ANG));
-        putRecord(FloatRecord.getDefault(ShipIDs.SHIP_ANGVEL));
-        putRecord(FloatRecord.getDefault(ShipIDs.SHIP_FLUX));
-        putRecord(FloatRecord.getDefault(ShipIDs.SHIP_HULL));
-        putRecord(Vector2fRecord.getDefault(ShipIDs.CURSOR));
+        putRecord(Vector2f32Record.getDefault(ShipIDs.SHIP_LOC));
+        putRecord(Vector2f32Record.getDefault(ShipIDs.SHIP_VEL));
+        putRecord(Float32Record.getDefault(ShipIDs.SHIP_ANG));
+        putRecord(Float32Record.getDefault(ShipIDs.SHIP_ANGVEL));
+        putRecord(Float32Record.getDefault(ShipIDs.SHIP_FLUX));
+        putRecord(Float32Record.getDefault(ShipIDs.SHIP_HULL));
+        putRecord(Vector2f32Record.getDefault(ShipIDs.CURSOR));
         putRecord(IntRecord.getDefault(ShipIDs.OWNER));
-        putRecord(FloatRecord.getDefault(ShipIDs.COMBAT_READINESS));
+        putRecord(Float32Record.getDefault(ShipIDs.COMBAT_READINESS));
     }
 
     @Override

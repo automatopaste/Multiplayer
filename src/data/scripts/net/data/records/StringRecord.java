@@ -1,6 +1,5 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.io.ByteArrayReader;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
@@ -31,14 +30,6 @@ public class StringRecord extends BaseRecord<String> {
     public BaseRecord<String> read(ByteBuf in, int uniqueID) {
         int length = in.readInt();
         String value = in.readCharSequence(length, CHARSET).toString();
-
-        return new StringRecord(value, uniqueID);
-    }
-
-    @Override
-    public BaseRecord<String> read(ByteArrayReader in, int uniqueID) {
-        int length = in.readInt();
-        String value = in.readString(length, CHARSET);
 
         return new StringRecord(value, uniqueID);
     }
