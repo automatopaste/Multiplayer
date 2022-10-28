@@ -19,7 +19,7 @@ public class StringRecord extends BaseRecord<String> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
+    public void write(ByteBuf dest) {
         byte[] bytes = value.getBytes(CHARSET);
 
         dest.writeInt(bytes.length);

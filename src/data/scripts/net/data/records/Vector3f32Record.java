@@ -23,7 +23,7 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
+    public void write(ByteBuf dest) {
         dest.writeFloat(value.x);
         dest.writeFloat(value.y);
         dest.writeFloat(value.z);

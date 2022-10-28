@@ -25,10 +25,13 @@ public abstract class BaseRecord<T> {
     public void write(boolean force, ByteBuf dest) {
         boolean isUpdate = check();
         if (value != null && (force || isUpdate)) {
-            dest.writeInt(getTypeId());
-            dest.writeInt(uniqueID);
+//            dest.writeInt(getTypeId());
+//            dest.writeInt(uniqueID);
 
-            get(dest);
+            dest.writeByte((byte) getTypeId());
+            dest.writeByte(uniqueID);
+
+            write(dest);
         }
     }
 
@@ -36,7 +39,7 @@ public abstract class BaseRecord<T> {
      * Get raw data without writing base IDs
      * @param dest buffer to write to
      */
-    public abstract void get(ByteBuf dest);
+    public abstract void write(ByteBuf dest);
 
     public abstract BaseRecord<T> read(ByteBuf in, int uniqueID);
     public abstract boolean check();

@@ -15,7 +15,7 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
+    public void write(ByteBuf dest) {
         dest.writeByte(value);
     }
 

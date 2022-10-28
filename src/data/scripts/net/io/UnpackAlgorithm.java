@@ -26,7 +26,7 @@ public class UnpackAlgorithm {
         } else {
             Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data = new HashMap<>();
 
-            int nextID = in.readInt();
+            int nextID = in.readByte();
             while (nextID != Integer.MIN_VALUE) {
                 nextID = readNextEntity(data, in, nextID);
             }
@@ -44,23 +44,23 @@ public class UnpackAlgorithm {
     }
 
     private static int readNextEntity(Map<Integer, Map<Integer, Map<Integer, BaseRecord<?>>>> data, ByteBuf in, int entityTypeID) {
-        int entityInstanceID = in.readInt();
+        int entityInstanceID = in.readShort();
 
         Map<Integer, BaseRecord<?>> records = new HashMap<>();
 
-        int n = in.readInt();
-        while (DataGenManager.recordTypeIDs.containsValue(n)) {
+        int n = in.readByte();
+        while (DataGenManager.recordTypeIDs.containsValue((byte) n)) {
             // type
-            int recordTypeID = n;
+            byte recordTypeID = (byte) n;
             // unique
-            int recordUniqueID = in.readInt();
+            byte recordUniqueID = in.readByte();
 
             //data
             BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in, recordUniqueID);
-            records.put(recordUniqueID, record);
+            records.put((int) recordUniqueID, record);
 
             if (in.readableBytes() > 0) {
-                n = in.readInt();
+                n = in.readByte();
             } else {
                 n = Integer.MIN_VALUE;
                 break;

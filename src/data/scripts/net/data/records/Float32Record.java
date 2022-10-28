@@ -36,7 +36,7 @@ public class Float32Record extends BaseRecord<Float> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
+    public void write(ByteBuf dest) {
         dest.writeFloat(value);
     }
 

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class HostShipTable extends EntityTable implements OutboundEntityManager {
-    public static final int MAX_ENTITIES = 1024;
+    public static final int MAX_ENTITIES = Short.MAX_VALUE;
     private final Map<String, Integer> registered;
 
     public HostShipTable() {

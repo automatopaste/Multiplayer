@@ -33,24 +33,25 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
-        dest.writeInt(elementTypeID);
-        dest.writeInt(value.size());
+    public void write(ByteBuf dest) {
+        dest.writeByte(elementTypeID);
+        dest.writeByte(value.size());
 
         for (E e : value) {
             BaseRecord<?> record = (BaseRecord<?>) e;
-            record.get(dest);
+            record.write(dest);
         }
     }
 
     @Override
     public BaseRecord<List<E>> read(ByteBuf in, int uniqueID) {
-        int type = in.readInt();
-        int num = in.readInt();
+        byte type = in.readByte();
+        byte num = in.readByte();
 
+        BaseRecord<?> reader = DataGenManager.recordFactory(type);
         List<E> data = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            data.add((E) DataGenManager.recordFactory(type).read(in, -1));
+            data.add((E) reader.read(in, -1));
         }
 
         return new ListRecord<>(data, uniqueID, type);

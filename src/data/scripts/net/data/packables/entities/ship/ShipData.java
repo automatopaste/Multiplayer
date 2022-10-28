@@ -10,6 +10,10 @@ public class ShipData extends BasePackable {
     public ShipData(int instanceID, final ShipAPI ship) {
         super(instanceID);
 
+        float angle = 210.2324f;
+        byte a = (byte) (0xFFb & (byte) ((int) angle * (255f / 360f)));
+        System.out.println();
+
         putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
             @Override
             public String get() {
@@ -28,28 +32,28 @@ public class ShipData extends BasePackable {
                 return new Vector2f(ship.getVelocity());
             }
         }, ShipIDs.SHIP_VEL).setUseDecimalPrecision(false));
-        putRecord(new Float32Record(new BaseRecord.DeltaFunc<Float>() {
+        putRecord(new ByteRecord(new BaseRecord.DeltaFunc<Byte>() {
             @Override
-            public Float get() {
-                return ship.getFacing();
+            public Byte get() {
+                return ConversionUtils.floatToByte(ship.getFacing(), 360f);
             }
-        }, ShipIDs.SHIP_ANG).setUseDecimalPrecision(false));
-        putRecord(new Float32Record(new BaseRecord.DeltaFunc<Float>() {
+        }, ShipIDs.SHIP_ANG));
+        putRecord(new Float16Record(new BaseRecord.DeltaFunc<Float>() {
             @Override
             public Float get() {
                 return ship.getAngularVelocity();
             }
         }, ShipIDs.SHIP_ANGVEL).setUseDecimalPrecision(false));
-        putRecord(new Float32Record(new BaseRecord.DeltaFunc<Float>() {
+        putRecord(new ByteRecord(new BaseRecord.DeltaFunc<Byte>() {
             @Override
-            public Float get() {
-                return ship.getHullLevel();
+            public Byte get() {
+                return ConversionUtils.floatToByte(ship.getHullLevel(), 1f);
             }
         }, ShipIDs.SHIP_HULL));
-        putRecord(new Float32Record(new BaseRecord.DeltaFunc<Float>() {
+        putRecord(new ByteRecord(new BaseRecord.DeltaFunc<Byte>() {
             @Override
-            public Float get() {
-                return ship.getFluxLevel();
+            public Byte get() {
+                return ConversionUtils.floatToByte(ship.getFluxLevel(), 1f);
             }
         }, ShipIDs.SHIP_FLUX));
         putRecord(new Vector2f32Record(new BaseRecord.DeltaFunc<Vector2f>() {
@@ -58,10 +62,10 @@ public class ShipData extends BasePackable {
                 return new Vector2f(ship.getMouseTarget());
             }
         }, ShipIDs.CURSOR).setUseDecimalPrecision(false));
-        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
+        putRecord(new ByteRecord(new BaseRecord.DeltaFunc<Byte>() {
             @Override
-            public Integer get() {
-                return ship.getOwner();
+            public Byte get() {
+                return (byte) ship.getOwner();
             }
         }, ShipIDs.OWNER));
         putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
@@ -70,10 +74,10 @@ public class ShipData extends BasePackable {
                 return ship.getHullSpec().getHullId();
             }
         }, ShipIDs.SPEC_ID));
-        putRecord(new Float32Record(new BaseRecord.DeltaFunc<Float>() {
+        putRecord(new ByteRecord(new BaseRecord.DeltaFunc<Byte>() {
             @Override
-            public Float get() {
-                return ship.getCurrentCR();
+            public Byte get() {
+                return ConversionUtils.floatToByte(ship.getCurrentCR(), 1f);
             }
         }, ShipIDs.COMBAT_READINESS));
     }

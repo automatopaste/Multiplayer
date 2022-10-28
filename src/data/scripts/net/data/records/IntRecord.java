@@ -23,7 +23,7 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    public void get(ByteBuf dest) {
+    public void write(ByteBuf dest) {
         dest.writeInt(value);
     }
 

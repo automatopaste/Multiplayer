@@ -14,11 +14,11 @@ import java.util.Map;
  * Allows mods to specify entity types and record types at runtime
  */
 public class DataGenManager {
-    public static Map<Class<? extends BasePackable>, Integer> entityTypeIDs = new HashMap<>();
-    public static Map<Integer, DestPackable> entityInstances = new HashMap<>();
+    public static Map<Class<? extends BasePackable>, Byte> entityTypeIDs = new HashMap<>();
+    public static Map<Byte, DestPackable> entityInstances = new HashMap<>();
 
-    public static Map<String, Integer> recordTypeIDs = new HashMap<>();
-    public static Map<Integer, BaseRecord<?>> recordInstances = new HashMap<>();
+    public static Map<String, Byte> recordTypeIDs = new HashMap<>();
+    public static Map<Byte, BaseRecord<?>> recordInstances = new HashMap<>();
 
     public static Map<Integer, InboundEntityManager> inboundDataDestinations = new HashMap<>();
     public static Map<Integer, OutboundEntityManager> outboundDataSources = new HashMap<>();
@@ -26,7 +26,7 @@ public class DataGenManager {
     private static int idIncrementer = 1;
 
     public static int registerEntityType(Class<? extends BasePackable> clazz, DestPackable instance) {
-        int id = idIncrementer;
+        byte id = (byte) idIncrementer;
         entityTypeIDs.put(clazz, id);
         entityInstances.put(id, instance);
         idIncrementer++;
@@ -35,8 +35,8 @@ public class DataGenManager {
 
     public static int registerRecordType(String c, BaseRecord<?> instance) {
         int id = idIncrementer;
-        recordTypeIDs.put(c, id);
-        recordInstances.put(id, instance);
+        recordTypeIDs.put(c, (byte) id);
+        recordInstances.put((byte) id, instance);
         idIncrementer++;
         return id;
     }
@@ -98,7 +98,7 @@ public class DataGenManager {
      * @param typeID id
      * @return new empty instance
      */
-    public static BaseRecord<?> recordFactory(int typeID) {
+    public static BaseRecord<?> recordFactory(byte typeID) {
         BaseRecord<?> out = recordInstances.get(typeID);
         if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
         return out;

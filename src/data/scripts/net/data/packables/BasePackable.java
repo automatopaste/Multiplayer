@@ -71,9 +71,9 @@ public abstract class BasePackable {
 
         if (temp.readableBytes() > 0) {
             // so packer type can be identified
-            dest.writeInt(getTypeID());
+            dest.writeByte(getTypeID());
             // so packer instance can be identified
-            dest.writeInt(getInstanceID());
+            dest.writeShort(getInstanceID());
 
             dest.writeBytes(temp);
         }

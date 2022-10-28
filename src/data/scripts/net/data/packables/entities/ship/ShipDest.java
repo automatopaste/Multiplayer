@@ -5,14 +5,10 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.combat.entities.Ship;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.*;
 import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.packables.entities.variant.VariantDest;
 import data.scripts.net.data.packables.entities.variant.VariantIDs;
-import data.scripts.net.data.records.Float32Record;
-import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
@@ -36,13 +32,13 @@ public class ShipDest extends DestPackable {
         putRecord(StringRecord.getDefault(ShipIDs.SHIP_ID));
         putRecord(Vector2f32Record.getDefault(ShipIDs.SHIP_LOC));
         putRecord(Vector2f32Record.getDefault(ShipIDs.SHIP_VEL));
-        putRecord(Float32Record.getDefault(ShipIDs.SHIP_ANG));
-        putRecord(Float32Record.getDefault(ShipIDs.SHIP_ANGVEL));
-        putRecord(Float32Record.getDefault(ShipIDs.SHIP_FLUX));
-        putRecord(Float32Record.getDefault(ShipIDs.SHIP_HULL));
+        putRecord(ByteRecord.getDefault(ShipIDs.SHIP_ANG)); // 0..255 represent 0..360
+        putRecord(Float16Record.getDefault(ShipIDs.SHIP_ANGVEL));
+        putRecord(ByteRecord.getDefault(ShipIDs.SHIP_HULL)); // 0..255 represent 0%..100%
+        putRecord(ByteRecord.getDefault(ShipIDs.SHIP_FLUX)); // 0..255 represent 0%..100%
         putRecord(Vector2f32Record.getDefault(ShipIDs.CURSOR));
-        putRecord(IntRecord.getDefault(ShipIDs.OWNER));
-        putRecord(Float32Record.getDefault(ShipIDs.COMBAT_READINESS));
+        putRecord(ByteRecord.getDefault(ShipIDs.OWNER)); // values 0..1
+        putRecord(ByteRecord.getDefault(ShipIDs.COMBAT_READINESS)); // 0..255 represent 0%..100%
     }
 
     @Override
@@ -53,31 +49,18 @@ public class ShipDest extends DestPackable {
 
     @Override
     public void update(float amount) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
-
         if (ship == null) {
             initShip(plugin);
         } else {
-            Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
-            ship.getLocation().set(loc);
-            Vector2f vel = (Vector2f) getRecord(ShipIDs.SHIP_VEL).getValue();
-            ship.getVelocity().set(vel);
-            float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
-            ship.setFacing(ang);
-            float angVel = (float) getRecord(ShipIDs.SHIP_ANGVEL).getValue();
-            ship.setAngularVelocity(angVel);
-            float hull = (float) getRecord(ShipIDs.SHIP_HULL).getValue();
-            ship.setHitpoints(ship.getMaxHitpoints() * hull);
-            float flux = (float) getRecord(ShipIDs.SHIP_FLUX).getValue();
-            ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * flux);
-            Vector2f cursor = (Vector2f) getRecord(ShipIDs.CURSOR).getValue();
-            ship.getMouseTarget().set(cursor);
-            int owner = (int) getRecord(ShipIDs.OWNER).getValue();
-            ship.setOwner(owner);
-            float cr = (float) getRecord(ShipIDs.COMBAT_READINESS).getValue();
-            ship.setCurrentCR(cr);
+            ship.getLocation().set(getLoc());
+            ship.getVelocity().set(getVel());
+            ship.setFacing(getAng());
+            ship.setAngularVelocity(getAngVel());
+            ship.setHitpoints(getHull());
+            ship.getFluxTracker().setCurrFlux(getFlux());
+            ship.getMouseTarget().set(getCursor());
+            ship.setOwner(getOwner());
+            ship.setCurrentCR(getCR());
         }
     }
 
@@ -87,16 +70,16 @@ public class ShipDest extends DestPackable {
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        String id = (String) getRecord(ShipIDs.SHIP_ID).getValue();
+        String id = getShipID();
 
         VariantDest variantDest = clientPlugin.getVariantDataMap().getVariantData().get(id);
         if (variantDest == null) return;
 
         // update variant
-        String hullSpecId = (String) getRecord(ShipIDs.SPEC_ID).getValue();
+        String hullSpecId = getSpecID();
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullSpecId);
 
-        CombatFleetManagerAPI fleetManager = engine.getFleetManager((int) getRecord(ShipIDs.OWNER).getValue());
+        CombatFleetManagerAPI fleetManager = engine.getFleetManager(getOwner());
 
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
             String hullVariantId = hullSpecId + "_Hull";
@@ -123,8 +106,8 @@ public class ShipDest extends DestPackable {
             FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
 
             fleetManager.addToReserves(fleetMember);
-            Vector2f loc = (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
-            float ang = (float) getRecord(ShipIDs.SHIP_ANG).getValue();
+            Vector2f loc = getLoc();
+            float ang = getAng();
 
             fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
 
@@ -134,7 +117,7 @@ public class ShipDest extends DestPackable {
 
             // set fleetmember id to sync with server
             Ship s = (Ship) ship;
-            String fleetmemberID = (String) getRecord(ShipIDs.SHIP_ID).getValue();
+            String fleetmemberID = getShipID();
             s.setFleetMemberId(fleetmemberID);
         } else {
             throw new NullPointerException("Attempted fighter init in ship data");
@@ -156,5 +139,53 @@ public class ShipDest extends DestPackable {
 
     public static ShipDest getDefault() {
         return new ShipDest(-1, new HashMap<Integer, BaseRecord<?>>());
+    }
+
+    public String getSpecID() {
+        return (String) getRecord(ShipIDs.SPEC_ID).getValue();
+    }
+
+    public String getShipID() {
+        return (String) getRecord(ShipIDs.SHIP_ID).getValue();
+    }
+
+    public Vector2f getLoc() {
+        return (Vector2f) getRecord(ShipIDs.SHIP_LOC).getValue();
+    }
+
+    public Vector2f getVel() {
+        return (Vector2f) getRecord(ShipIDs.SHIP_VEL).getValue();
+    }
+
+    public float getAng() {
+        byte ang = (byte) getRecord(ShipIDs.SHIP_ANG).getValue();
+        return ConversionUtils.byteToFloat(ang, 360f);
+    }
+
+    public float getAngVel() {
+        return (float) getRecord(ShipIDs.SHIP_ANGVEL).getValue();
+    }
+
+    public float getHull() {
+        byte hull = (byte) getRecord(ShipIDs.SHIP_HULL).getValue();
+        return ship.getMaxHitpoints() * ConversionUtils.byteToFloat(hull, 1f);
+    }
+
+    public float getFlux() {
+        byte flux = (byte) getRecord(ShipIDs.SHIP_FLUX).getValue();
+        return ship.getMaxFlux() * ConversionUtils.byteToFloat(flux, 1f);
+    }
+
+    public Vector2f getCursor() {
+        return (Vector2f) getRecord(ShipIDs.CURSOR).getValue();
+    }
+
+    public int getOwner() {
+        return (byte) getRecord(ShipIDs.OWNER).getValue();
+    }
+
+    public float getCR() {
+        byte cr = (byte) getRecord(ShipIDs.COMBAT_READINESS).getValue();
+        return ConversionUtils.byteToFloat(cr, 1f);
     }
 }
