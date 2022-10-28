@@ -8,11 +8,11 @@ public class ConnectionIDs {
     public static final int STATE = 1;
     public static final int CLIENT_PORT = 2;
 
-    public static int getConnectionID(InetSocketAddress address) {
+    public static short getConnectionID(InetSocketAddress address) {
         byte[] ids = address.getAddress().getAddress();
 
-        int id = 0x00;
-        byte o = 0x0;
+        short id = 0;
+        byte o = 0;
         for (int i = 0; i < 4; i++) {
             byte d = ids[i];
             id <<= (4 - i) * 4;
@@ -20,7 +20,7 @@ public class ConnectionIDs {
             o = d;
         }
 
-        id =~ id;
+        id = (short) ~ id;
 
         return id;
     }
