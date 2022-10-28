@@ -119,10 +119,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateConnectionStatus(Map<Byte, BaseRecord<?>> data) {
-        int state = (int) data.get(ConnectionIDs.STATE).getValue();
-        if (state < connectionState.ordinal()) {
-            //return;
-        }
+        byte state = (byte) data.get(ConnectionIDs.STATE).getValue();
 
         clientPort = (int) data.get(ConnectionIDs.CLIENT_PORT).getValue();
         //remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);

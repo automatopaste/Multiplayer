@@ -178,10 +178,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        int state = (int) toProcess.get(ConnectionIDs.STATE).getValue();
-        if (state < connectionState.ordinal()) {
-            //return;
-        }
+        byte state = (byte) toProcess.get(ConnectionIDs.STATE).getValue();
 
         statusData.updateFromDelta(toProcess);
         // force value to always be local port
