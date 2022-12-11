@@ -121,7 +121,8 @@ public class DatagramClient implements Runnable {
             }
         });
 
-        ChannelFuture channelFuture = bootstrap.bind(localPort & 0xFFFF).syncUninterruptibly();
+        // ushort bit conversion
+        ChannelFuture channelFuture = bootstrap.bind(localPort).syncUninterruptibly();
         channelFuture.syncUninterruptibly();
 
         channel = (NioDatagramChannel) channelFuture.channel();

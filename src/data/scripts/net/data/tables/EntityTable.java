@@ -5,6 +5,9 @@ import data.scripts.net.data.packables.BasePackable;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * No real difference in speed vs using lists
+ */
 public abstract class EntityTable {
     protected final BasePackable[] table;
     private final Queue<Integer> vacant;

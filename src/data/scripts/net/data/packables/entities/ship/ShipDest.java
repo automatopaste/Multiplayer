@@ -38,6 +38,7 @@ public class ShipDest extends DestPackable {
         putRecord(ByteRecord.getDefault(ShipIDs.SHIP_FLUX)); // 0..255 represent 0%..100%
         putRecord(Vector2f32Record.getDefault(ShipIDs.CURSOR));
         putRecord(ByteRecord.getDefault(ShipIDs.OWNER)); // values 0..1
+        putRecord(StringRecord.getDefault(ShipIDs.SPEC_ID));
         putRecord(ByteRecord.getDefault(ShipIDs.COMBAT_READINESS)); // 0..255 represent 0%..100%
     }
 

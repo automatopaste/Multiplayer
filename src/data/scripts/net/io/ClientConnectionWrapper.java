@@ -7,7 +7,7 @@ import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.ShortRecord;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -59,7 +59,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             if (address == null) return null;
 
             statusData = new ConnectionData(ConnectionIDs.getConnectionID(address), this);
-            clientPort = (short) socketClient.getLocalPort();
+            clientPort = socketClient.getLocalPort();
             connectionID = ConnectionIDs.getConnectionID(address);
         }
 
@@ -187,7 +187,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
         statusData.updateFromDelta(toProcess);
         // force value to always be local port
-        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new ShortRecord(clientPort, ConnectionIDs.CLIENT_PORT));
+        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new IntRecord(clientPort, ConnectionIDs.CLIENT_PORT));
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
     }
 

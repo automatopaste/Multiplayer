@@ -3,7 +3,7 @@ package data.scripts.net.data.packables.metadata.connection;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.ShortRecord;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.io.BaseConnectionWrapper;
 
 public class ConnectionData extends BasePackable {
@@ -17,9 +17,9 @@ public class ConnectionData extends BasePackable {
                 return (byte) connection.getConnectionState().ordinal();
             }
         }, ConnectionIDs.STATE));
-        putRecord(new ShortRecord(new BaseRecord.DeltaFunc<Short>() {
+        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
             @Override
-            public Short get() {
+            public Integer get() {
                 return connection.getClientPort();
             }
         }, ConnectionIDs.CLIENT_PORT));
