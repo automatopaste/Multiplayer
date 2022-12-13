@@ -3,6 +3,7 @@ package data.scripts.net.data.packables.metadata.connection;
 import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
+import data.scripts.net.data.records.IntRecord;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class ConnectionDest extends DestPackable {
     @Override
     protected void initDefaultRecords() {
         putRecord(ByteRecord.getDefault(ConnectionIDs.STATE));
-        putRecord(ByteRecord.getDefault(ConnectionIDs.CLIENT_PORT));
+        putRecord(IntRecord.getDefault(ConnectionIDs.CLIENT_PORT));
     }
 
     @Override
