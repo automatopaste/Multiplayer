@@ -60,7 +60,7 @@ public class UnpackAlgorithm {
             byte recordUniqueID = in.readByte();
 
             //data
-            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in, recordUniqueID);
+            BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(in);
             records.put(recordUniqueID, record);
 
             if (in.readableBytes() > 0) {

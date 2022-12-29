@@ -12,7 +12,7 @@ import java.net.InetSocketAddress;
 public class DatagramUtils {
 
     public static SizeData write(Channel channel, MessageContainer message, InetSocketAddress dest, int connectionID) throws InterruptedException {
-        ByteBuf buf = message.get();
+        ByteBuf buf = message.getData();
         if (buf.readableBytes() <= 4) {
             channel.flush();
             return null;

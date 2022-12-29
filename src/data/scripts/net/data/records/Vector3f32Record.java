@@ -9,12 +9,8 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Vector3f32Record(Vector3f record, byte uniqueID) {
-        super(record, uniqueID);
-    }
-
-    public Vector3f32Record(DeltaFunc<Vector3f> func, byte uniqueID) {
-        super(func, uniqueID);
+    public Vector3f32Record(Vector3f record) {
+        super(record);
     }
 
     public Vector3f32Record setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -30,24 +26,22 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     }
 
     @Override
-    public BaseRecord<Vector3f> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<Vector3f> read(ByteBuf in) {
         float x = in.readFloat();
         float y = in.readFloat();
         float z = in.readFloat();
-        return new Vector3f32Record(new Vector3f(x, y, z), uniqueID);
+        return new Vector3f32Record(new Vector3f(x, y, z));
     }
 
     @Override
-    public boolean check() {
+    public boolean checkNotEqual(Vector3f delta) {
         boolean isUpdated;
-        Vector3f delta = func.get();
 
         if (useDecimalPrecision) {
             isUpdated = (value.x != delta.x) || (value.y != delta.y) || (value.z != delta.z);
         } else {
             isUpdated = ((int) value.x != (int) delta.x) || ((int) value.y != (int) delta.y) || ((int) value.z != (int) delta.z);
         }
-        if (isUpdated) value.set(delta);
 
         return isUpdated;
     }
@@ -61,8 +55,8 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
         return TYPE_ID;
     }
 
-    public static Vector3f32Record getDefault(byte uniqueID) {
-        return new Vector3f32Record(new Vector3f(0f, 0f, 0f), uniqueID);
+    public static Vector3f32Record getDefault() {
+        return new Vector3f32Record(new Vector3f(0f, 0f, 0f));
     }
 
     @Override

@@ -8,12 +8,8 @@ public class Vector2f16Record extends BaseRecord<Vector2f> {
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Vector2f16Record(Vector2f record, byte uniqueID) {
-        super(record, uniqueID);
-    }
-
-    public Vector2f16Record(DeltaFunc<Vector2f> deltaFunc, byte uniqueID) {
-        super(deltaFunc, uniqueID);
+    public Vector2f16Record(Vector2f record) {
+        super(record);
     }
 
     public Vector2f16Record setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -22,16 +18,14 @@ public class Vector2f16Record extends BaseRecord<Vector2f> {
     }
 
     @Override
-    public boolean check() {
+    public boolean checkNotEqual(Vector2f delta) {
         boolean isUpdated;
-        Vector2f delta = func.get();
 
         if (useDecimalPrecision) {
             isUpdated = (value.x != delta.x) || (value.y != delta.y);
         } else {
             isUpdated = ((int) value.x != (int) delta.x) || ((int) value.y != (int) delta.y);
         }
-        if (isUpdated) value.set(delta);
 
         return isUpdated;
     }
@@ -43,10 +37,10 @@ public class Vector2f16Record extends BaseRecord<Vector2f> {
     }
 
     @Override
-    public BaseRecord<Vector2f> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<Vector2f> read(ByteBuf in) {
         float x = ConversionUtils.toFloat(in.readShort());
         float y = ConversionUtils.toFloat(in.readShort());
-        return new Vector2f16Record(new Vector2f(x, y), uniqueID);
+        return new Vector2f16Record(new Vector2f(x, y));
     }
 
     public static void setTypeId(byte typeId) {
@@ -58,7 +52,7 @@ public class Vector2f16Record extends BaseRecord<Vector2f> {
         return TYPE_ID;
     }
 
-    public static Vector2f16Record getDefault(byte uniqueID) {
-        return new Vector2f16Record(new Vector2f(0f, 0f), uniqueID);
+    public static Vector2f16Record getDefault() {
+        return new Vector2f16Record(new Vector2f(0f, 0f));
     }
 }

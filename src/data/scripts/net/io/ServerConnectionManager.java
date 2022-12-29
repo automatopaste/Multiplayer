@@ -1,8 +1,7 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
+import data.scripts.net.data.packables.metadata.connection.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -127,7 +126,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
             if (serverConnectionWrappers.size() >= MP_MAX_CONNECTIONS) return null;
         }
 
-        short id = ConnectionIDs.getConnectionID(remoteAddress);
+        short id = ConnectionData.getConnectionID(remoteAddress);
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
 
         synchronized (serverConnectionWrappers) {
@@ -186,7 +185,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ConnectionData.TYPE_ID, this);
     }
 
     public Map<Short, ServerConnectionWrapper> getServerConnectionWrappers() {
@@ -194,14 +193,21 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
-        Map<Short, BasePackable> out = new HashMap<>();
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
         for (short id : serverConnectionWrappers.keySet()) {
-            out.put(id, serverConnectionWrappers.get(id).statusData);
+            out.put(id, serverConnectionWrappers.get(id).connectionData.getDeltas());
         }
 
         return out;
+    }
+
+    @Override
+    public void execute() {
+        for (ServerConnectionWrapper connectionWrapper : serverConnectionWrappers.values()) {
+            connectionWrapper.connectionData.execute();
+        }
     }
 
     @Override

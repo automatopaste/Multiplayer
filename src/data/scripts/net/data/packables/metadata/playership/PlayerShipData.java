@@ -1,42 +1,131 @@
 package data.scripts.net.data.packables.metadata.playership;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipCommand;
+import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.RecordLambda;
+import data.scripts.net.data.packables.SourceLambda;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.plugins.MPPlugin;
+import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+
+import java.util.List;
 
 /**
  * Sends player ship commands to the server
  */
 public class PlayerShipData extends BasePackable {
 
+    public static byte TYPE_ID;
+
+    private int controlBitmask;
+    private String playerShipID;
+
+    private ShipAPI playerShip;
+
     /**
      * Source constructor
      *
      * @param instanceID unique
      */
-    public PlayerShipData(short instanceID, final BaseRecord.DeltaFunc<String> activeShipIDDeltaFunc) {
+    public PlayerShipData(short instanceID, final SourceLambda<String> playerShipID) {
         super(instanceID);
 
-        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
-            @Override
-            public Integer get() {
-                return mask();
-            }
-        }, PlayerShipIDs.BITMASK));
-        putRecord(new StringRecord(activeShipIDDeltaFunc, PlayerShipIDs.CLIENT_ACTIVE_SHIP_ID));
+        addRecord(new RecordLambda<>(
+                IntRecord.getDefault(),
+                new SourceLambda<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return mask();
+                    }
+                },
+                new DestExecute<Integer>() {
+                    @Override
+                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                        PlayerShipData playerShipData = (PlayerShipData) packable;
+                        playerShipData.setControlBitmask(record.getValue());
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                StringRecord.getDefault(),
+                new SourceLambda<String>() {
+                    @Override
+                    public String get() {
+                        return playerShipID.get();
+                    }
+                },
+                new DestExecute<String>() {
+                    @Override
+                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                        PlayerShipData playerShipData = (PlayerShipData) packable;
+                        playerShipData.setPlayerShipID(record.getValue());
+                    }
+                }
+        ));
     }
 
     @Override
-    public int getTypeID() {
-        return PlayerShipIDs.TYPE_ID;
+    public void init(MPPlugin plugin) {
+
+    }
+
+    @Override
+    public void update(float amount) {
+        if (playerShip == null) {
+            check();
+        } else {
+            unmask(playerShip, controlBitmask);
+        }
+    }
+
+    private void check() {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        for (ShipAPI ship : engine.getShips()) {
+            if (ship.getFleetMemberId().equals(playerShipID)) {
+                ship.setShipAI(new MPDefaultShipAIPlugin());
+
+                playerShip = ship;
+            }
+        }
+    }
+
+    @Override
+    public void delete() {
+
+    }
+
+    @Override
+    public byte getTypeID() {
+        return TYPE_ID;
+    }
+
+    public int getControlBitmask() {
+        return controlBitmask;
+    }
+
+    public void setControlBitmask(int controlBitmask) {
+        this.controlBitmask = controlBitmask;
+    }
+
+    public String getPlayerShipID() {
+        return playerShipID;
+    }
+
+    public void setPlayerShipID(String playerShipID) {
+        this.playerShipID = playerShipID;
     }
 
     public static int mask() {
-        boolean[] controls = new boolean[PlayerShipIDs.NUM_CONTROLS];
+        boolean[] controls = new boolean[Integer.SIZE];
 
         if (!Keyboard.isCreated()) return 0x00000000;
 
@@ -77,5 +166,44 @@ public class PlayerShipData extends BasePackable {
         }
 
         return bits;
+    }
+
+    public void unmask(ShipAPI ship, int bitmask) {
+
+        boolean[] controls = new boolean[Integer.SIZE];
+        for (int i = 0; i < controls.length; i++) {
+            if ((bitmask & 1 << i) != 0) controls[i] = true;
+        }
+
+        if (controls[0]) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
+        if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
+        if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+        if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
+        if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
+        //if (controls[5]) ship.giveCommand(ShipCommand., null, 0); STRAFE_KEY
+        if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
+        if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
+        if (controls[8]) ship.giveCommand(ShipCommand.USE_SYSTEM, null, 0);
+        if (controls[9]) ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
+
+        int selected = 0;
+        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.get(i).equals(ship.getSelectedGroupAPI())) {
+                selected = i;
+            }
+        }
+
+        if (controls[10]) ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), selected);
+        if (controls[11]) ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
+        if (controls[12]) ship.giveCommand(ShipCommand.HOLD_FIRE, null, 0);
+        if (controls[13]) ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
+        if (controls[14]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 0);
+        if (controls[15]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 1);
+        if (controls[16]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 2);
+        if (controls[17]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 3);
+        if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 4);
+        if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 5);
+        if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 6);
     }
 }

@@ -1,8 +1,7 @@
 package data.scripts.net.data.tables.client;
 
+import data.scripts.net.data.packables.entities.variant.VariantData;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.packables.entities.variant.VariantDest;
-import data.scripts.net.data.packables.entities.variant.VariantIDs;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
@@ -11,24 +10,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VariantDataMap implements InboundEntityManager {
-    private final Map<String, VariantDest> variantData;
+    private final Map<Short, VariantData> variants;
 
     public VariantDataMap() {
-        variantData = new HashMap<>();
+        variants = new HashMap<>();
     }
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        String shipID = (String) toProcess.get(VariantIDs.SHIP_ID).getValue();
-        VariantDest data = variantData.get(shipID);
+        VariantData data = variants.get(instanceID);
 
         if (data == null) {
-            VariantDest variantDest = new VariantDest(instanceID, toProcess);
-            variantData.put(shipID, variantDest);
-            variantDest.init(plugin);
+            VariantData variantData = new VariantData(instanceID, null, null);
+            variantData.overwrite(toProcess);
+
+            variants.put(instanceID, variantData);
+
+            variantData.init(plugin);
         } else {
-            data.updateFromDelta(toProcess);
+            data.overwrite(toProcess);
         }
+    }
+
+    public VariantData find(String shipID) {
+        for (VariantData variantData : variants.values()) {
+            if (variantData.getFleetMemberID().equals(shipID)) return variantData;
+        }
+        return null;
+    }
+
+    @Override
+    public void execute() {
+        for (VariantData v : variants.values()) v.execute();
     }
 
     @Override
@@ -36,12 +49,12 @@ public class VariantDataMap implements InboundEntityManager {
 
     }
 
-    public Map<String, VariantDest> getVariantData() {
-        return variantData;
+    public Map<Short, VariantData> getVariants() {
+        return variants;
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(VariantIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(VariantData.TYPE_ID, this);
     }
 }

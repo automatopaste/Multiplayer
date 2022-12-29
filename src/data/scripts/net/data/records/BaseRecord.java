@@ -1,53 +1,61 @@
 package data.scripts.net.data.records;
 
+import data.scripts.net.data.packables.SourceLambda;
 import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
-    protected DeltaFunc<T> func;
     protected T value;
-    public final byte uniqueID;
+    private boolean isUpdated;
 
-    public BaseRecord(T value, byte uniqueID) {
+    public BaseRecord(T value) {
         this.value = value;
-        this.uniqueID = uniqueID;
     }
 
-    public BaseRecord(DeltaFunc<T> func, byte uniqueID) {
-        this.func = func;
-        this.uniqueID = uniqueID;
-        value = func.get();
+    public void sourceUpdate(SourceLambda<T> sourceLambda) {
+        T t = sourceLambda.get();
+        if (checkNotEqual(sourceLambda.get())) isUpdated = true;
+        value = t;
     }
 
-    public void updateFromDelta(BaseRecord<?> delta) {
-        this.value = (T) delta.value;
-    }
-
-    public void write(boolean force, ByteBuf dest) {
-        boolean isUpdate = check();
-        if (value != null && (force || isUpdate)) {
-            dest.writeByte(getTypeId());
-            dest.writeByte(uniqueID);
-
-            write(dest);
-        }
-    }
+//    public void write(boolean force, ByteBuf dest, byte uniqueID) {
+//        if (value != null && (force || isUpdated)) {
+//            dest.writeByte(getTypeId());
+//            dest.writeByte(uniqueID);
+//
+//            write(dest);
+//
+//            isUpdated = false;
+//        }
+//    }
 
     /**
-     * Get raw data without writing base IDs
+     * Get raw data without writing IDs
      * @param dest buffer to write to
      */
     public abstract void write(ByteBuf dest);
 
-    public abstract BaseRecord<T> read(ByteBuf in, byte uniqueID);
-    public abstract boolean check();
+    public abstract BaseRecord<T> read(ByteBuf in);
 
     public abstract byte getTypeId();
+
+    /**
+     * Return true if updated
+     * @param delta incoming delta
+     * @return result
+     */
+    protected abstract boolean checkNotEqual(T delta);
 
     public T getValue() {
         return value;
     }
 
-    public interface DeltaFunc<T> {
-        T get();
+    public void overwrite(Object delta) {
+        T t = (T) delta;
+        isUpdated = checkNotEqual(t);
+        value = t;
+    }
+
+    public boolean isUpdated() {
+        return isUpdated;
     }
 }

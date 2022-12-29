@@ -2,24 +2,19 @@ package data.scripts.net.io;
 
 import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.connection.ConnectionData;
-import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
+import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,16 +49,17 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     @Override
     public MessageContainer getSocketMessage() throws IOException {
-        if (statusData == null) {
+        if (connectionData == null) {
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
 
-            statusData = new ConnectionData(ConnectionIDs.getConnectionID(address), this);
+            connectionID = ConnectionData.getConnectionID(address);
+            connectionData = new ConnectionData(connectionID, this);
             clientPort = socketClient.getLocalPort();
-            connectionID = ConnectionIDs.getConnectionID(address);
         }
 
-        List<BasePackable> data = new ArrayList<>();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundSocket();
+
         switch (connectionState) {
             case INITIALISATION_READY:
             //case INITIALISING:
@@ -71,7 +67,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("initialising connection");
 
                 connectionState = ConnectionState.INITIALISING;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case LOADING_READY:
@@ -80,7 +75,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("receiving data");
 
                 connectionState = ConnectionState.LOADING;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case SPAWNING_READY:
@@ -89,7 +83,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("spawning entities");
 
                 connectionState = ConnectionState.SPAWNING;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             case SIMULATION_READY:
@@ -97,22 +90,17 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 Global.getLogger(ClientConnectionWrapper.class).info("starting simulation");
 
                 connectionState = ConnectionState.SIMULATING;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 if (datagramClient == null) startDatagramClient();
 
                 break;
             case SIMULATING:
-                for (Map<Short, BasePackable> type : dataDuplex.getOutboundSocket().values()) {
-                    data.addAll(type.values());
-                }
-
-                break;
             default:
                 break;
         }
 
-        data.add(statusData);
+        ByteBuf data = initBuffer(tick, connectionID);
+        writeToBuffer(outbound, data);
 
         return new MessageContainer(data, tick, true, null, socketBuffer, connectionID);
     }
@@ -125,9 +113,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     @Override
     public MessageContainer getDatagram() throws IOException {
-        if (statusData == null) return null;
+        if (connectionData == null) return null;
 
-        List<BasePackable> data = new ArrayList<>();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundDatagram();
+
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -136,17 +125,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             case SIMULATION_READY:
             case SPAWNING_READY:
             case SPAWNING:
-                break;
             case SIMULATING:
-                for (Map<Short, BasePackable> type : dataDuplex.getOutboundDatagram().values()) {
-                    data.addAll(type.values());
-                }
-
-                break;
             case CLOSED:
             default:
                 break;
         }
+
+        ByteBuf data = initBuffer(tick, connectionID);
+        writeToBuffer(outbound, data);
 
         return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
     }
@@ -183,12 +169,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        byte state = (byte) toProcess.get(ConnectionIDs.STATE).getValue();
-
-        statusData.updateFromDelta(toProcess);
-        // force value to always be local port
-        statusData.getRecord(ConnectionIDs.CLIENT_PORT).updateFromDelta(new IntRecord(clientPort, ConnectionIDs.CLIENT_PORT));
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
+        connectionData.overwrite(toProcess);
     }
 
     @Override
@@ -197,16 +178,21 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
-        Map<Short, BasePackable> out = new HashMap<>();
-        out.put(connectionID, statusData);
+    public void execute() {
+        connectionData.execute();
+    }
+
+    @Override
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+        out.put(connectionID, connectionData.getDeltas());
         return out;
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionIDs.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(ConnectionIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ConnectionData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ConnectionData.TYPE_ID, this);
     }
 
     @Override

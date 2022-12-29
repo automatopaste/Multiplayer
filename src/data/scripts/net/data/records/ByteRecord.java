@@ -6,12 +6,8 @@ public class ByteRecord extends BaseRecord<Byte> {
 
     public static byte TYPE_ID;
 
-    public ByteRecord(byte record, byte uniqueID) {
-        super(record, uniqueID);
-    }
-
-    public ByteRecord(DeltaFunc<Byte> func, byte uniqueID) {
-        super(func, uniqueID);
+    public ByteRecord(byte record) {
+        super(record);
     }
 
     @Override
@@ -20,22 +16,18 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
-    public BaseRecord<Byte> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<Byte> read(ByteBuf in) {
         byte value = in.readByte();
-        return new ByteRecord(value, uniqueID);
+        return new ByteRecord(value);
     }
 
     @Override
-    public boolean check() {
-        byte delta = func.get();
-        boolean isUpdated = value != delta;
-        if (isUpdated) value = delta;
-
-        return isUpdated;
+    public boolean checkNotEqual(Byte delta) {
+        return (byte) value != delta;
     }
 
-    public static ByteRecord getDefault(byte uniqueID) {
-        return new ByteRecord((byte) 0, uniqueID);
+    public static ByteRecord getDefault() {
+        return new ByteRecord((byte) 0);
     }
 
     public static void setTypeId(byte typeId) {

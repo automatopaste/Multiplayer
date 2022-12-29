@@ -2,77 +2,193 @@ package data.scripts.net.data.packables.entities.variant;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.RecordLambda;
+import data.scripts.net.data.packables.SourceLambda;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.StringRecord;
-import io.netty.buffer.ByteBuf;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VariantData extends BasePackable {
 
+    public static byte TYPE_ID;
+
+    private int numFluxCapacitors;
+    private int numFluxVents;
+    private String fleetMemberID;
+    private List<String> weaponIDs;
+    private List<String> weaponSlots;
+
     public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
 
-        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
-            @Override
-            public Integer get() {
-                return variant.getNumFluxCapacitors();
-            }
-        }, VariantIDs.CAPACITORS));
-        putRecord(new IntRecord(new BaseRecord.DeltaFunc<Integer>() {
-            @Override
-            public Integer get() {
-                return variant.getNumFluxVents();
-            }
-        }, VariantIDs.VENTS));
-        putRecord(new StringRecord(new BaseRecord.DeltaFunc<String>() {
-            @Override
-            public String get() {
-                return id;
-            }
-        }, VariantIDs.SHIP_ID));
-        putRecord(new ListRecord<>(new BaseRecord.DeltaFunc<List<StringRecord>>() {
-            @Override
-            public List<StringRecord> get() {
-                List<StringRecord> weaponIDs = new ArrayList<>();
-                for (String slot : variant.getNonBuiltInWeaponSlots()) {
-                    String weaponID = variant.getWeaponId(slot);
-
-                    if (weaponID == null) continue;
-
-                    weaponIDs.add(new StringRecord(weaponID, (byte) -1));
+        addRecord(new RecordLambda<>(
+                IntRecord.getDefault(),
+                new SourceLambda<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return variant.getNumFluxCapacitors();
+                    }
+                },
+                new DestExecute<Integer>() {
+                    @Override
+                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setNumFluxCapacitors(record.getValue());
+                    }
                 }
-                return weaponIDs;
-            }
-        }, VariantIDs.WEAPON_IDS, StringRecord.TYPE_ID));
-        putRecord(new ListRecord<>(new BaseRecord.DeltaFunc<List<StringRecord>>() {
-            @Override
-            public List<StringRecord> get() {
-                List<StringRecord> weaponSlots = new ArrayList<>();
-                for (String slot : variant.getNonBuiltInWeaponSlots()) {
-                    String weaponID = variant.getWeaponId(slot);
-
-                    if (weaponID == null) continue;
-
-                    weaponSlots.add(new StringRecord(slot, (byte) -1));
+        ));
+        addRecord(new RecordLambda<>(
+                IntRecord.getDefault(),
+                new SourceLambda<Integer>() {
+                    @Override
+                    public Integer get() {
+                        return variant.getNumFluxVents();
+                    }
+                },
+                new DestExecute<Integer>() {
+                    @Override
+                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setNumFluxVents(record.getValue());
+                    }
                 }
-                return weaponSlots;
-            }
-        }, VariantIDs.WEAPON_SLOTS, StringRecord.TYPE_ID));
+        ));
+        addRecord(new RecordLambda<>(
+                StringRecord.getDefault(),
+                new SourceLambda<String>() {
+                    @Override
+                    public String get() {
+                        return id;
+                    }
+                },
+                new DestExecute<String>() {
+                    @Override
+                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setFleetMemberID(id);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SourceLambda<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> weaponIDs = new ArrayList<>();
+                        for (String slot : variant.getNonBuiltInWeaponSlots()) {
+                            String weaponID = variant.getWeaponId(slot);
+
+                            if (weaponID == null) continue;
+
+                            weaponIDs.add(weaponID);
+                        }
+                        return weaponIDs;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setWeaponIDs(record.getValue());
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SourceLambda<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> weaponSlots = new ArrayList<>();
+                        for (String slot : variant.getNonBuiltInWeaponSlots()) {
+                            String weaponID = variant.getWeaponId(slot);
+
+                            if (weaponID == null) continue;
+
+                            weaponSlots.add(slot);
+                        }
+                        return weaponSlots;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setWeaponSlots(record.getValue());
+                    }
+                }
+        ));
     }
 
     @Override
-    public int getTypeID() {
-        return VariantIDs.TYPE_ID;
+    public void init(MPPlugin plugin) {
+
     }
 
     @Override
-    public void write(boolean force, ByteBuf dest) {
-        initialForce = true;
+    public void update(float amount) {
 
-        super.write(force, dest);
+    }
+
+    @Override
+    public void delete() {
+
+    }
+
+    @Override
+    public byte getTypeID() {
+        return TYPE_ID;
+    }
+
+//    @Override
+//    public void write(boolean force, ByteBuf dest) {
+//        initialForce = true;
+//
+//        super.write(force, dest);
+//    }
+
+    public int getNumFluxCapacitors() {
+        return numFluxCapacitors;
+    }
+
+    public void setNumFluxCapacitors(int numFluxCapacitors) {
+        this.numFluxCapacitors = numFluxCapacitors;
+    }
+
+    public int getNumFluxVents() {
+        return numFluxVents;
+    }
+
+    public void setNumFluxVents(int numFluxVents) {
+        this.numFluxVents = numFluxVents;
+    }
+
+    public String getFleetMemberID() {
+        return fleetMemberID;
+    }
+
+    public void setFleetMemberID(String fleetMemberID) {
+        this.fleetMemberID = fleetMemberID;
+    }
+
+    public List<String> getWeaponIDs() {
+        return weaponIDs;
+    }
+
+    public void setWeaponIDs(List<String> weaponIDs) {
+        this.weaponIDs = weaponIDs;
+    }
+
+    public List<String> getWeaponSlots() {
+        return weaponSlots;
+    }
+
+    public void setWeaponSlots(List<String> weaponSlots) {
+        this.weaponSlots = weaponSlots;
     }
 }

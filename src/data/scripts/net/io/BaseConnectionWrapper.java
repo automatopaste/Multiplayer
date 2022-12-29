@@ -1,11 +1,13 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.packables.metadata.connection.ConnectionData;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 
 import java.io.IOException;
+import java.util.Map;
 
 public abstract class BaseConnectionWrapper {
     public static final short DEFAULT_CONNECTION_ID = -10;
@@ -23,7 +25,7 @@ public abstract class BaseConnectionWrapper {
     }
     protected ConnectionState connectionState = ConnectionState.INITIALISATION_READY;
 
-    protected ConnectionData statusData;
+    protected ConnectionData connectionData;
 
     protected short connectionID = DEFAULT_CONNECTION_ID;
     protected int clientPort;
@@ -82,6 +84,32 @@ public abstract class BaseConnectionWrapper {
                 return BaseConnectionWrapper.ConnectionState.CLOSED;
             default:
                 return null;
+        }
+    }
+
+    public static ByteBuf initBuffer(int tick, int connectionID) {
+        ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
+        buf.writeInt(tick);
+        buf.writeInt(connectionID);
+        return buf;
+    }
+
+    public static void writeToBuffer(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> map, ByteBuf dest) {
+        for (byte type : map.keySet()) {
+            dest.writeByte(type);
+
+            Map<Short, Map<Byte, BaseRecord<?>>> instances = map.get(type);
+            for (short instance : instances.keySet()) {
+                dest.writeShort(instance);
+
+                Map<Byte, BaseRecord<?>> records = instances.get(instance);
+                for (byte id : records.keySet()) {
+                    dest.writeByte(type);
+
+                    BaseRecord<?> record = records.get(id);
+                    record.write(dest);
+                }
+            }
         }
     }
 

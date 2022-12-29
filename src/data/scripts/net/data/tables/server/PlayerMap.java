@@ -3,10 +3,7 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.lobby.LobbyData;
-import data.scripts.net.data.packables.metadata.lobby.LobbyIDs;
 import data.scripts.net.data.packables.metadata.player.PlayerData;
-import data.scripts.net.data.packables.metadata.player.PlayerDest;
-import data.scripts.net.data.packables.metadata.player.PlayerIDs;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -18,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
-    private final Map<Short, PlayerDest> players;
+    private final Map<Short, PlayerData> players;
     private final MPServerPlugin serverPlugin;
 
     private final PlayerData host;
@@ -36,39 +33,46 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        PlayerDest data = players.get(instanceID);
+        PlayerData data = players.get(instanceID);
 
         if (data == null) {
-            data = new PlayerDest((short) instanceID, toProcess);
+            data = new PlayerData(instanceID, null, null);
+            data.overwrite(toProcess);
+
             data.init(plugin);
             players.put(instanceID, data);
         } else {
-            data.updateFromDelta(toProcess);
+            data.overwrite(toProcess);
         }
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
-        Map<Short, BasePackable> out = new HashMap<>();
-        out.put((short) -1, lobby);
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+        out.put((short) -1, lobby.getDeltas());
         return out;
     }
 
     @Override
+    public void execute() {
+        for (BasePackable p : players.values()) p.execute();
+    }
+
+    @Override
     public void update(float amount) {
-        for (PlayerDest playerDest : players.values()) {
-            playerDest.update(amount);
+        for (PlayerData playerData : players.values()) {
+            playerData.update(amount);
         }
     }
 
-    public Map<Short, PlayerDest> getPlayers() {
+    public Map<Short, PlayerData> getPlayers() {
         return players;
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(PlayerIDs.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(LobbyIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(PlayerData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(LobbyData.TYPE_ID, this);
     }
 
     @Override

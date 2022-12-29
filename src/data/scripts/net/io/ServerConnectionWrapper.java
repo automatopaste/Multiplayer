@@ -1,17 +1,15 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.entities.variant.VariantData;
 import data.scripts.net.data.packables.metadata.connection.ConnectionData;
-import data.scripts.net.data.packables.metadata.connection.ConnectionIDs;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.records.ByteRecord;
 import data.scripts.plugins.MPPlugin;
+import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
@@ -25,55 +23,53 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.remoteAddress = remoteAddress;
         this.connectionID = connectionId;
 
-        statusData = new ConnectionData(connectionId, this);
+        connectionData = new ConnectionData(connectionId, this);
     }
 
     @Override
     public MessageContainer getSocketMessage() throws IOException {
-        if (statusData == null) return null;
+        if (connectionData == null) return null;
 
-        List<BasePackable> data = new ArrayList<>();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundSocket();
+
         switch (connectionState) {
             //case INITIALISATION_READY:
             case INITIALISING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": initialising connection...");
 
                 connectionState = ConnectionState.LOADING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case LOADING_READY:
             case LOADING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": sending client data over socket...");
 
-                data.addAll(connectionManager.getServerPlugin().getDataStore().getGenerated());
+                Map<Short, Map<Byte, BaseRecord<?>>> variants = new HashMap<>();
+                for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
+                    variants.put(variantData.getInstanceID(), variantData.getDeltas());
+                }
+
+                outbound.put(VariantData.TYPE_ID, variants);
 
                 connectionState = ConnectionState.SPAWNING_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SPAWNING_READY:
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
 
-                data.addAll(connectionManager.getServerPlugin().getServerShipTable().getOutbound().values());
-
                 connectionState = ConnectionState.SIMULATION_READY;
-                statusData.getRecord(ConnectionIDs.STATE).updateFromDelta(new ByteRecord((byte) connectionState.ordinal(), (byte) -1));
 
                 break;
             //case SIMULATION_READY:
             case SIMULATING:
-                for (Map<Short, BasePackable> type : connectionManager.getDuplex().getOutboundSocket().values()) {
-                    data.addAll(type.values());
-                }
-
-                break;
             case CLOSED:
             default:
+                break;
         }
 
-        data.add(statusData);
+        ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
+        writeToBuffer(outbound, data);
 
         return new MessageContainer(
                 data, connectionManager.getTick(), true, remoteAddress, socketBuffer, connectionID
@@ -82,9 +78,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public MessageContainer getDatagram() throws IOException {
-        if (statusData == null) return null;
+        if (connectionData == null) return null;
 
-        List<BasePackable> data = new ArrayList<>();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundDatagram();
+
         switch (connectionState) {
             case INITIALISATION_READY:
             case INITIALISING:
@@ -93,17 +90,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING_READY:
             case SPAWNING:
             case SIMULATION_READY:
-                break;
             case SIMULATING:
-                for (Map<Short, BasePackable> type : connectionManager.getDuplex().getOutboundDatagram().values()) {
-                    data.addAll(type.values());
-                }
-
-                break;
-            case CLOSED: // *shuts briefcase*
+            case CLOSED:
             default:
                 break;
         }
+
+        ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
+        writeToBuffer(outbound, data);
 
         return new MessageContainer(
                 data, connectionManager.getTick(), false, remoteAddress, datagramBuffer, connectionID
@@ -119,13 +113,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateConnectionStatus(Map<Byte, BaseRecord<?>> data) {
-        byte state = (byte) data.get(ConnectionIDs.STATE).getValue();
-
-        clientPort = (short) data.get(ConnectionIDs.CLIENT_PORT).getValue();
-        //remoteAddress = new InetSocketAddress(remoteAddress.getAddress(), clientPort);
-
-        statusData.updateFromDelta(data);
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(state);
+        connectionData.overwrite(data);
     }
 
     public void close() {

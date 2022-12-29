@@ -5,21 +5,13 @@ import io.netty.buffer.ByteBuf;
 public class IntRecord extends BaseRecord<Integer> {
     public static byte TYPE_ID;
 
-    public IntRecord(Integer record, byte uniqueID) {
-        super(record, uniqueID);
-    }
-
-    public IntRecord(DeltaFunc<Integer> deltaFunc, byte uniqueID) {
-        super(deltaFunc, uniqueID);
+    public IntRecord(Integer record) {
+        super(record);
     }
 
     @Override
-    public boolean check() {
-        int delta = func.get();
-        boolean isUpdated = value != delta;
-        if (isUpdated) value = delta;
-
-        return isUpdated;
+    protected boolean checkNotEqual(Integer delta) {
+        return value != (int) delta;
     }
 
     @Override
@@ -28,9 +20,9 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    public BaseRecord<Integer> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<Integer> read(ByteBuf in) {
         int value = in.readInt();
-        return new IntRecord(value, uniqueID);
+        return new IntRecord(value);
     }
 
     public static void setTypeId(byte typeId) {
@@ -42,8 +34,8 @@ public class IntRecord extends BaseRecord<Integer> {
         return TYPE_ID;
     }
 
-    public static IntRecord getDefault(byte uniqueID) {
-        return new IntRecord(0, uniqueID);
+    public static IntRecord getDefault() {
+        return new IntRecord(0);
     }
 
     @Override

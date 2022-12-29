@@ -4,7 +4,6 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import data.scripts.net.data.packables.entities.variant.VariantData;
-import data.scripts.plugins.MPServerPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +19,8 @@ public class VariantDataGenerator {
     /**
      * Collects data that needs to be loaded on client side before combat entities can be updated or spawned
      * @param engine NNEEEEEOOOOOOOOOOWWW VVvvv VVvv VVvv NEEEEEEEEEEEEOOWOOOWOWOOW Vvv NEEEEEEEEOOOOO
-     * @param plugin the plugin
      */
-    public void generate(CombatEngineAPI engine, MPServerPlugin plugin) {
+    public void generate(CombatEngineAPI engine) {
         List<FleetMemberAPI> members = new ArrayList<>();
 
         CombatFleetManagerAPI manager0 = engine.getFleetManager(0);
@@ -34,9 +32,9 @@ public class VariantDataGenerator {
         members.addAll(manager1.getReservesCopy());
 
         generated = new ArrayList<>();
-        int index = 0;
+        short index = 0;
         for (FleetMemberAPI member : members) {
-            generated.add(new VariantData((short) index, member.getVariant(), member.getId()));
+            generated.add(new VariantData(index, member.getVariant(), member.getId()));
             index++;
         }
     }

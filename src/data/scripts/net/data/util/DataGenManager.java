@@ -1,7 +1,6 @@
 package data.scripts.net.data.util;
 
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.DestPackable;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -15,7 +14,6 @@ import java.util.Map;
  */
 public class DataGenManager {
     public static Map<Class<? extends BasePackable>, Byte> entityTypeIDs = new HashMap<>();
-    public static Map<Byte, DestPackable> entityInstances = new HashMap<>();
 
     public static Map<String, Byte> recordTypeIDs = new HashMap<>();
     public static Map<Byte, BaseRecord<?>> recordInstances = new HashMap<>();
@@ -25,10 +23,9 @@ public class DataGenManager {
 
     private static byte idIncrementer = 1;
 
-    public static byte registerEntityType(Class<? extends BasePackable> clazz, DestPackable instance) {
+    public static byte registerEntityType(Class<? extends BasePackable> clazz) {
         byte id = idIncrementer;
         entityTypeIDs.put(clazz, id);
-        entityInstances.put(id, instance);
         idIncrementer++;
         return id;
     }
@@ -65,13 +62,13 @@ public class DataGenManager {
         }
     }
 
-    public static Map<Byte, Map<Short, BasePackable>> collectOutboundDeltasSocket() {
-        Map<Byte, Map<Short, BasePackable>> out = new HashMap<>();
+    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasSocket() {
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Short, BasePackable> entities = manager.getOutbound();
+                Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }
@@ -79,13 +76,13 @@ public class DataGenManager {
         return out;
     }
 
-    public static Map<Byte, Map<Short, BasePackable>> collectOutboundDeltasDatagram() {
-        Map<Byte, Map<Short, BasePackable>> out = new HashMap<>();
+    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasDatagram() {
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Short, BasePackable> entities = manager.getOutbound();
+                Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound();
                 out.put(source, entities);
             }
         }

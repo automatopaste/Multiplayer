@@ -1,11 +1,17 @@
 package data.scripts.net.data.packables.metadata.lobby;
 
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.metadata.playership.PlayerShipDest;
-import data.scripts.net.data.packables.metadata.playership.PlayerShipIDs;
-import data.scripts.net.data.records.*;
+import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.RecordLambda;
+import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.metadata.playership.PlayerShipData;
+import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.ListRecord;
+import data.scripts.net.data.records.ShortRecord;
+import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.PlayerShipMap;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,43 +20,98 @@ import java.util.List;
  * Sends information about lobby data to clients
  */
 public class LobbyData extends BasePackable {
+
+    public static byte TYPE_ID;
+
+    private List<Short> players;
+    private List<String> playerShipIDs;
+
     public LobbyData(short instanceID, final PlayerMap playerMap, final PlayerShipMap playerShipMap) {
         super(instanceID);
 
-        putRecord(new ListRecord<>(new BaseRecord.DeltaFunc<List<ShortRecord>>() {
-            @Override
-            public List<ShortRecord> get() {
-                List<ShortRecord> out = new ArrayList<>();
+        addRecord(new RecordLambda<>(
+                new ListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
+                new SourceLambda<List<Short>>() {
+                    @Override
+                    public List<Short> get() {
+                        List<Short> out = new ArrayList<>();
 
-                // server ship
-                out.add(new ShortRecord((short) -1, (byte) -1));
+                        // server ship
+                        out.add((short) -1);
 
-                for (Short connectionID : playerMap.getPlayers().keySet()) {
-                    out.add(new ShortRecord(connectionID, (byte) -1));
+                        out.addAll(playerMap.getPlayers().keySet());
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Short>>() {
+                    @Override
+                    public void execute(BaseRecord<List<Short>> record, BasePackable packable) {
+                        LobbyData lobbyData = (LobbyData) packable;
+                        lobbyData.setPlayers(record.getValue());
+                    }
                 }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SourceLambda<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>();
 
-                return out;
-            }
-        }, LobbyIDs.PLAYER_CONNECTION_IDS, IntRecord.TYPE_ID));
-        putRecord(new ListRecord<>(new BaseRecord.DeltaFunc<List<StringRecord>>() {
-            @Override
-            public List<StringRecord> get() {
-                List<StringRecord> out = new ArrayList<>();
+                        // server ship
+                        out.add(playerShipMap.getHostShipID());
 
-                // server ship
-                out.add(new StringRecord(playerShipMap.getHostShipID(), (byte) -1));
+                        for (PlayerShipData playerShipData : playerShipMap.getPlayerShips().values()) {
+                            out.add(playerShipData.getPlayerShipID());
+                        }
 
-                for (PlayerShipDest playerShip : playerShipMap.getPlayerShips().values()) {
-                    out.add(new StringRecord((String) playerShip.getRecord(PlayerShipIDs.CLIENT_ACTIVE_SHIP_ID).getValue(), (byte) -1));
+                        return out;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                        LobbyData lobbyData = (LobbyData) packable;
+                        lobbyData.setPlayerShipIDs(record.getValue());
+                    }
                 }
-
-                return out;
-            }
-        }, LobbyIDs.PLAYER_SHIP_IDS, StringRecord.TYPE_ID));
+        ));
     }
 
     @Override
-    public int getTypeID() {
-        return LobbyIDs.TYPE_ID;
+    public void init(MPPlugin plugin) {
+
+    }
+
+    @Override
+    public void update(float amount) {
+
+    }
+
+    @Override
+    public void delete() {
+
+    }
+
+    @Override
+    public byte getTypeID() {
+        return TYPE_ID;
+    }
+
+    public List<Short> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Short> players) {
+        this.players = players;
+    }
+
+    public List<String> getPlayerShipIDs() {
+        return playerShipIDs;
+    }
+
+    public void setPlayerShipIDs(List<String> playerShipIDs) {
+        this.playerShipIDs = playerShipIDs;
     }
 }

@@ -4,10 +4,9 @@ import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.HostShipTable;
+import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.PlayerShipMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
@@ -32,7 +31,7 @@ public class MPServerPlugin extends MPPlugin {
 
     public MPServerPlugin() {
         dataStore = new VariantDataGenerator();
-        dataStore.generate(Global.getCombatEngine(), this);
+        dataStore.generate(Global.getCombatEngine());
 
         serverConnectionManager = new ServerConnectionManager(this);
         initEntityManager(serverConnectionManager);
@@ -68,10 +67,9 @@ public class MPServerPlugin extends MPPlugin {
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Byte, Map<Short, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
-
-        Map<Byte, Map<Short, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();
@@ -85,7 +83,7 @@ public class MPServerPlugin extends MPPlugin {
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
-    public VariantDataGenerator getDataStore() {
+    public VariantDataGenerator getVariantStore() {
         return dataStore;
     }
 

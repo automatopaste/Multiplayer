@@ -1,10 +1,11 @@
 package data.scripts.net.data.packables;
 
 import data.scripts.net.data.records.BaseRecord;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.PooledByteBufAllocator;
+import data.scripts.plugins.MPPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,12 +14,15 @@ import java.util.Map;
 public abstract class BasePackable {
 
     protected final short instanceID;
-    protected final Map<Byte, BaseRecord<?>> records;
+    protected final List<RecordLambda<?>> records;
+    protected final Map<Byte, BaseRecord<?>> deltas;
     protected boolean initialForce = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
-        records = new HashMap<>();
+
+        records = new ArrayList<>();
+        deltas = new HashMap<>();
     }
 
     public short getInstanceID() {
@@ -29,51 +33,80 @@ public abstract class BasePackable {
      * Immutable ID type to identify and construct entity when decoding packet
      * @return id
      */
-    public abstract int getTypeID();
+    public abstract byte getTypeID();
 
-    protected void putRecord(BaseRecord<?> record) {
-        records.put(record.uniqueID, record);
+    protected void addRecord(RecordLambda<?> record) {
+        records.add(record);
     }
 
-    public BaseRecord<?> getRecord(byte uniqueID) {
-        return records.get(uniqueID);
-    }
-    public Map<Byte, BaseRecord<?>> getRecords() {
+    public List<RecordLambda<?>> getRecords() {
         return records;
+    }
+
+    /**
+     * Returns a map of all records that are marked as updated since the last time
+     * @return deltas
+     */
+    public Map<Byte, BaseRecord<?>> getDeltas() {
+        return deltas;
+    }
+
+    public void execute() {
+        for (RecordLambda<?> recordLambda : records) recordLambda.execute(this);
     }
 
     /**
      * Update stored data with changes from a delta
      * @param deltas incoming deltas
      */
-    public void updateFromDelta(Map<Byte, BaseRecord<?>> deltas) {
+    public void overwrite(Map<Byte, BaseRecord<?>> deltas) {
+        this.deltas.clear();
+
         for (byte k : deltas.keySet()) {
-            records.get(k).updateFromDelta(deltas.get(k));
+            RecordLambda<?> record = records.get(k);
+            record.overwrite(deltas.get(k));
+
+            if (record.record.isUpdated()) this.deltas.put(k, record.record);
         }
     }
 
     /**
      * Ouput data to a byte buffer
      */
-    public void write(boolean force, ByteBuf dest) {
-        ByteBuf temp = PooledByteBufAllocator.DEFAULT.buffer();
+//    public void write(boolean force, ByteBuf dest) {
+//        ByteBuf temp = PooledByteBufAllocator.DEFAULT.buffer();
+//
+//        boolean f = force || initialForce;
+//
+//        for (byte i = 0; i < records.size(); i++) {
+//            records.get(i).record.write(f, temp, i);
+//        }
+//
+//        if (temp.readableBytes() > 0) {
+//            // so packer type can be identified
+//            dest.writeByte(getTypeID());
+//            // so packer instance can be identified
+//            dest.writeShort(getInstanceID());
+//
+//            dest.writeBytes(temp);
+//        }
+//
+//        temp.release();
+//        initialForce = false;
+//    }
 
-        boolean f = force || initialForce;
+    /**
+     * Called every time an entity plugin updates on the game thread. May be called by either client or server
+     */
+    public abstract void update(float amount);
 
-        for (BaseRecord<?> record : records.values()) {
-            record.write(f, temp);
-        }
+    /**
+     * Called when entity is initialised
+     */
+    public abstract void init(MPPlugin plugin);
 
-        if (temp.readableBytes() > 0) {
-            // so packer type can be identified
-            dest.writeByte(getTypeID());
-            // so packer instance can be identified
-            dest.writeShort(getInstanceID());
-
-            dest.writeBytes(temp);
-        }
-
-        temp.release();
-        initialForce = false;
-    }
+    /**
+     * Called when entity is deleted
+     */
+    public abstract void delete();
 }

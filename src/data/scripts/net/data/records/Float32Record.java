@@ -7,12 +7,8 @@ public class Float32Record extends BaseRecord<Float> {
 
     private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
 
-    public Float32Record(Float record, byte uniqueID) {
-        super(record, uniqueID);
-    }
-
-    public Float32Record(DeltaFunc<Float> deltaFunc, byte uniqueID) {
-        super(deltaFunc, uniqueID);
+    public Float32Record(Float record) {
+        super(record);
     }
 
     public Float32Record setUseDecimalPrecision(boolean useDecimalPrecision) {
@@ -21,18 +17,8 @@ public class Float32Record extends BaseRecord<Float> {
     }
 
     @Override
-    public boolean check() {
-        boolean isUpdated;
-        Float delta = func.get();
-
-        if (useDecimalPrecision) {
-            isUpdated = value.intValue() != delta.intValue();
-        } else {
-            isUpdated = !value.equals(delta);
-        }
-        if (isUpdated) value = delta;
-
-        return isUpdated;
+    protected boolean checkNotEqual(Float delta) {
+        return (useDecimalPrecision) ? value.intValue() != delta.intValue() : !value.equals(delta);
     }
 
     @Override
@@ -41,9 +27,9 @@ public class Float32Record extends BaseRecord<Float> {
     }
 
     @Override
-    public BaseRecord<Float> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<Float> read(ByteBuf in) {
         float value = in.readFloat();
-        return new Float32Record(value, uniqueID);
+        return new Float32Record(value);
     }
 
     public static void setTypeId(byte typeId) {
@@ -55,8 +41,8 @@ public class Float32Record extends BaseRecord<Float> {
         return TYPE_ID;
     }
 
-    public static BaseRecord<Float> getDefault(byte uniqueID) {
-        return new Float32Record(0f, uniqueID);
+    public static BaseRecord<Float> getDefault() {
+        return new Float32Record(0f);
     }
 
     @Override

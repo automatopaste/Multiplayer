@@ -4,8 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.entities.ship.ShipIDs;
 import data.scripts.net.data.packables.entities.ship.ShipData;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -24,17 +24,22 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
-        Map<Short, BasePackable> out = new HashMap<>();
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
         for (int i = 0; i < table.length; i++) {
             ShipData data = (ShipData) table[i];
             if (data != null) {
-                out.put((short) i, data);
+                out.put((short) i, data.getDeltas());
             }
         }
 
         return out;
+    }
+
+    @Override
+    public void execute() {
+        for (BasePackable p : table) p.execute();
     }
 
     @Override
@@ -83,7 +88,7 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(ShipIDs.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ShipData.TYPE_ID, this);
     }
 
     @Override

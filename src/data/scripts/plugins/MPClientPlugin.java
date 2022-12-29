@@ -3,8 +3,8 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.client.*;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
@@ -86,13 +86,16 @@ public class MPClientPlugin extends MPPlugin {
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
 
+        // execute
+        for (BaseEntityManager entityManager : entityManagers) entityManager.execute();
+
+        // update
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Byte, Map<Short, BasePackable>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         connection.getDuplex().updateOutboundSocket(outboundSocket);
-
-        Map<Byte, Map<Short, BasePackable>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         connection.getDuplex().updateOutboundDatagram(outboundDatagram);
     }
 

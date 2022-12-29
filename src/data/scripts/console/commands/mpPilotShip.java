@@ -4,8 +4,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.MPModPlugin;
-import data.scripts.net.data.packables.metadata.lobby.LobbyIDs;
-import data.scripts.net.data.records.StringRecord;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +12,6 @@ import org.lazywizard.console.Console;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class mpPilotShip  implements BaseCommand {
@@ -35,11 +32,7 @@ public class mpPilotShip  implements BaseCommand {
         }
         MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
 
-        List<StringRecord> ids = (List<StringRecord>) clientPlugin.getLobbyInput().getLobby().getRecord(LobbyIDs.PLAYER_SHIP_IDS).getValue();
-        Set<String> occupied = new HashSet<>();
-        for (StringRecord s : ids) {
-            occupied.add(s.getValue());
-        }
+        Set<String> occupied = new HashSet<>(clientPlugin.getLobbyInput().getLobby().getPlayerShipIDs());
 
         ShipAPI ship = getClosest(loc, Global.getCombatEngine(), occupied);
 

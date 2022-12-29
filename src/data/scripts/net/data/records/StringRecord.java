@@ -10,12 +10,8 @@ public class StringRecord extends BaseRecord<String> {
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-    public StringRecord(DeltaFunc<String> deltaFunc, byte uniqueID) {
-        super(deltaFunc, uniqueID);
-    }
-
-    public StringRecord(String value, byte uniqueID) {
-        super(value, uniqueID);
+    public StringRecord(String value) {
+        super(value);
     }
 
     @Override
@@ -27,20 +23,16 @@ public class StringRecord extends BaseRecord<String> {
     }
 
     @Override
-    public BaseRecord<String> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<String> read(ByteBuf in) {
         int length = in.readInt();
         String value = in.readCharSequence(length, CHARSET).toString();
 
-        return new StringRecord(value, uniqueID);
+        return new StringRecord(value);
     }
 
     @Override
-    public boolean check() {
-        String delta = func.get();
-        boolean isUpdated = value != null && !value.equals(delta);
-        if (isUpdated) value = delta;
-
-        return isUpdated;
+    public boolean checkNotEqual(String delta) {
+        return value != null && !value.equals(delta);
     }
 
     public static void setTypeId(byte typeId) {
@@ -52,8 +44,8 @@ public class StringRecord extends BaseRecord<String> {
         return TYPE_ID;
     }
 
-    public static StringRecord getDefault(byte uniqueID) {
-        return new StringRecord("DEFAULT", uniqueID);
+    public static StringRecord getDefault() {
+        return new StringRecord("DEFAULT");
     }
 
     @Override

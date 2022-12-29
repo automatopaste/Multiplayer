@@ -10,25 +10,13 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
-    public ListRecord(List<E> collection, byte uniqueID, byte elementTypeID) {
-        super(collection, uniqueID);
-        this.elementTypeID = elementTypeID;
-    }
-
-    public ListRecord(DeltaFunc<List<E>> deltaFunc, byte uniqueID, byte elementTypeID) {
-        super(deltaFunc, uniqueID);
+    public ListRecord(List<E> collection, byte elementTypeID) {
+        super(collection);
         this.elementTypeID = elementTypeID;
     }
 
     @Override
-    public boolean check() {
-//        for (E e : value) {
-//            BaseRecord<?> record = (BaseRecord<?>) e;
-//            if (record.check()) return true;
-//        }
-//        return false;
-
-        // always returns true because contents all have null deltas
+    protected boolean checkNotEqual(List<E> delta) {
         return true;
     }
 
@@ -44,17 +32,17 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     @Override
-    public BaseRecord<List<E>> read(ByteBuf in, byte uniqueID) {
+    public BaseRecord<List<E>> read(ByteBuf in) {
         byte type = in.readByte();
         byte num = in.readByte();
 
         BaseRecord<?> reader = DataGenManager.recordFactory(type);
         List<E> data = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            data.add((E) reader.read(in, (byte) -1));
+            data.add((E) reader.read(in));
         }
 
-        return new ListRecord<>(data, uniqueID, type);
+        return new ListRecord<>(data, type);
     }
 
     public void addElement(E e) {
@@ -76,9 +64,5 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         return "ListRecord{" +
                 "record=" + value.toString() +
                 '}';
-    }
-
-    public static ListRecord<?> getDefault(byte uniqueID, byte elementTypeID) {
-        return new ListRecord<>(new ArrayList<>(), uniqueID, elementTypeID);
     }
 }

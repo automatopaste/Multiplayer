@@ -1,7 +1,6 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.metadata.lobby.LobbyDest;
-import data.scripts.net.data.packables.metadata.lobby.LobbyIDs;
+import data.scripts.net.data.packables.metadata.lobby.LobbyData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -11,10 +10,15 @@ import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
 
-    private LobbyDest lobby;
+    private LobbyData lobby;
 
     public LobbyInput() {
         lobby = null;
+    }
+
+    @Override
+    public void execute() {
+        lobby.execute();
     }
 
     @Override
@@ -24,20 +28,22 @@ public class LobbyInput implements InboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(LobbyIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(LobbyData.TYPE_ID, this);
     }
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         if (lobby == null) {
-            lobby = new LobbyDest(instanceID, toProcess);
+            lobby = new LobbyData(instanceID, null, null);
+            lobby.overwrite(toProcess);
+
             lobby.init(plugin);
         } else {
-            lobby.updateFromDelta(toProcess);
+            lobby.overwrite(toProcess);
         }
     }
 
-    public LobbyDest getLobby() {
+    public LobbyData getLobby() {
         return lobby;
     }
 }

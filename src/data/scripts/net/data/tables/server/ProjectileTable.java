@@ -1,12 +1,17 @@
 package data.scripts.net.data.tables.server;
 
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 
 import java.util.Map;
 
 public class ProjectileTable extends EntityTable implements OutboundEntityManager {
+
+    @Override
+    public void execute() {
+
+    }
 
     @Override
     public void update(float amount) {
@@ -24,7 +29,7 @@ public class ProjectileTable extends EntityTable implements OutboundEntityManage
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         return null;
     }
 

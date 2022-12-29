@@ -1,9 +1,8 @@
 package data.scripts.net.data.tables.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.player.PlayerData;
-import data.scripts.net.data.packables.metadata.player.PlayerIDs;
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
@@ -22,10 +21,15 @@ public class PlayerOutput implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, BasePackable> getOutbound() {
-        Map<Short, BasePackable> out = new HashMap<>();
-        out.put(instanceID, player);
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+        out.put(instanceID, player.getDeltas());
         return out;
+    }
+
+    @Override
+    public void execute() {
+        player.execute();
     }
 
     @Override
@@ -35,7 +39,7 @@ public class PlayerOutput implements OutboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(PlayerIDs.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(PlayerData.TYPE_ID, this);
     }
 
     @Override

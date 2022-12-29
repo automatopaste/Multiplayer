@@ -1,8 +1,7 @@
 package data.scripts.net.data.tables.client;
 
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.entities.ship.ShipDest;
-import data.scripts.net.data.packables.entities.ship.ShipIDs;
+import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -16,21 +15,29 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        ShipDest data = (ShipDest) table[instanceID];
+        ShipData data = (ShipData) table[instanceID];
 
         if (data == null) {
-            ShipDest shipDest = new ShipDest(instanceID, toProcess);
-            table[instanceID] = shipDest;
-            shipDest.init(plugin);
+            ShipData shipData = new ShipData(instanceID, null);
+            table[instanceID] = shipData;
+
+            shipData.overwrite(toProcess);
+
+            shipData.init(plugin);
         } else {
-            data.updateFromDelta(toProcess);
+            data.overwrite(toProcess);
         }
+    }
+
+    @Override
+    public void execute() {
+        for (BasePackable p : table) p.execute();
     }
 
     @Override
     public void update(float amount) {
         for (BasePackable p : table) {
-            ShipDest ship = (ShipDest) p;
+            ShipData ship = (ShipData) p;
             if (ship != null) ship.update(amount);
         }
     }
@@ -42,6 +49,6 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ShipIDs.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
     }
 }

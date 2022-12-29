@@ -9,6 +9,11 @@ import java.util.Map;
 public class ClientProjectileTable implements InboundEntityManager {
 
     @Override
+    public void execute() {
+
+    }
+
+    @Override
     public void update(float amount) {
 
     }
