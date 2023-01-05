@@ -16,7 +16,6 @@ public abstract class BasePackable {
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final Map<Byte, BaseRecord<?>> deltas;
-    protected boolean initialForce = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
@@ -48,6 +47,8 @@ public abstract class BasePackable {
      * @return deltas
      */
     public Map<Byte, BaseRecord<?>> getDeltas() {
+        Map<Byte, BaseRecord<?>> deltas = new HashMap<>(this.deltas);
+        this.deltas.clear();
         return deltas;
     }
 
@@ -60,8 +61,6 @@ public abstract class BasePackable {
      * @param deltas incoming deltas
      */
     public void overwrite(Map<Byte, BaseRecord<?>> deltas) {
-        this.deltas.clear();
-
         for (byte k : deltas.keySet()) {
             RecordLambda<?> record = records.get(k);
             record.overwrite(deltas.get(k));
@@ -69,31 +68,6 @@ public abstract class BasePackable {
             if (record.record.isUpdated()) this.deltas.put(k, record.record);
         }
     }
-
-    /**
-     * Ouput data to a byte buffer
-     */
-//    public void write(boolean force, ByteBuf dest) {
-//        ByteBuf temp = PooledByteBufAllocator.DEFAULT.buffer();
-//
-//        boolean f = force || initialForce;
-//
-//        for (byte i = 0; i < records.size(); i++) {
-//            records.get(i).record.write(f, temp, i);
-//        }
-//
-//        if (temp.readableBytes() > 0) {
-//            // so packer type can be identified
-//            dest.writeByte(getTypeID());
-//            // so packer instance can be identified
-//            dest.writeShort(getInstanceID());
-//
-//            dest.writeBytes(temp);
-//        }
-//
-//        temp.release();
-//        initialForce = false;
-//    }
 
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server

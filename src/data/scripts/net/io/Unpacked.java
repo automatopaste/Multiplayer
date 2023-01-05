@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.records.BaseRecord;
+import io.netty.buffer.ByteBuf;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -13,12 +14,14 @@ public class Unpacked {
     private final InetSocketAddress recipient;
     private final int connectionID;
 
-    public Unpacked(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> unpacked, int tick, InetSocketAddress sender, InetSocketAddress recipient, int connectionID) {
-        this.unpacked = unpacked;
-        this.tick = tick;
+    public Unpacked(ByteBuf data, InetSocketAddress sender, InetSocketAddress recipient) {
         this.sender = sender;
         this.recipient = recipient;
-        this.connectionID = connectionID;
+
+        tick = data.readInt();
+        connectionID = data.readInt();
+
+        unpacked = BaseConnectionWrapper.readBuffer(data);
     }
 
     public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getUnpacked() {

@@ -100,7 +100,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         }
 
         ByteBuf data = initBuffer(tick, connectionID);
-        writeToBuffer(outbound, data);
+        writeBuffer(outbound, data);
 
         return new MessageContainer(data, tick, true, null, socketBuffer, connectionID);
     }
@@ -132,7 +132,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
         }
 
         ByteBuf data = initBuffer(tick, connectionID);
-        writeToBuffer(outbound, data);
+        writeBuffer(outbound, data);
 
         return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
     }

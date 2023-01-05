@@ -2,11 +2,13 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class BaseConnectionWrapper {
@@ -94,23 +96,72 @@ public abstract class BaseConnectionWrapper {
         return buf;
     }
 
-    public static void writeToBuffer(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> map, ByteBuf dest) {
+    public static void writeBuffer(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> map, ByteBuf dest) {
         for (byte type : map.keySet()) {
+            // write type byte
             dest.writeByte(type);
 
             Map<Short, Map<Byte, BaseRecord<?>>> instances = map.get(type);
+
+            // write num instances short
+            dest.writeShort(instances.size());
+
             for (short instance : instances.keySet()) {
+                // write instance short
                 dest.writeShort(instance);
 
                 Map<Byte, BaseRecord<?>> records = instances.get(instance);
+
+                // write num records byte
+                dest.writeByte(records.size());
+
                 for (byte id : records.keySet()) {
+                    // write record byte
                     dest.writeByte(type);
 
                     BaseRecord<?> record = records.get(id);
+                    // write record data bytes
                     record.write(dest);
                 }
             }
         }
+    }
+
+    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> readBuffer(ByteBuf data) {
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
+
+        while (data.readableBytes() > 0) {
+            byte typeID = data.readByte();
+
+            Map<Short, Map<Byte, BaseRecord<?>>> instances = out.get(typeID);
+            if (instances == null) {
+                instances = new HashMap<>();
+                out.put(typeID, instances);
+            }
+
+            short numInstances = data.readShort();
+
+            for (int i = 0; i < numInstances; i++) {
+                short instanceID = data.readShort();
+
+                Map<Byte, BaseRecord<?>> records = instances.get(instanceID);
+                if (records == null) {
+                    records = new HashMap<>();
+                    instances.put(instanceID, records);
+                }
+
+                byte numRecords = data.readByte();
+
+                for (int j = 0; j < numRecords; j++) {
+                    byte recordID = data.readByte();
+
+                    BaseRecord<?> record = DataGenManager.recordFactory(recordID).read(data);
+                    records.put(recordID, record);
+                }
+            }
+        }
+
+        return out;
     }
 
     public MPPlugin getLocalPlugin() {

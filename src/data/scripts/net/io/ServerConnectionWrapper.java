@@ -69,7 +69,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
-        writeToBuffer(outbound, data);
+        writeBuffer(outbound, data);
 
         return new MessageContainer(
                 data, connectionManager.getTick(), true, remoteAddress, socketBuffer, connectionID
@@ -97,7 +97,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
-        writeToBuffer(outbound, data);
+        writeBuffer(outbound, data);
 
         return new MessageContainer(
                 data, connectionManager.getTick(), false, remoteAddress, datagramBuffer, connectionID

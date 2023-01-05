@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
     protected T value;
-    private boolean isUpdated;
+    private boolean isUpdated = true;
 
     public BaseRecord(T value) {
         this.value = value;
@@ -16,17 +16,6 @@ public abstract class BaseRecord<T> {
         if (checkNotEqual(sourceLambda.get())) isUpdated = true;
         value = t;
     }
-
-//    public void write(boolean force, ByteBuf dest, byte uniqueID) {
-//        if (value != null && (force || isUpdated)) {
-//            dest.writeByte(getTypeId());
-//            dest.writeByte(uniqueID);
-//
-//            write(dest);
-//
-//            isUpdated = false;
-//        }
-//    }
 
     /**
      * Get raw data without writing IDs
