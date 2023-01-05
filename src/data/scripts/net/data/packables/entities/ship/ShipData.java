@@ -9,7 +9,6 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceLambda;
-import data.scripts.net.data.packables.entities.VariantData;
 import data.scripts.net.data.records.*;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;

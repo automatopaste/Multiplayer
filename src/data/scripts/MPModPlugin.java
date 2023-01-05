@@ -7,7 +7,7 @@ import com.fs.starfarer.api.campaign.CampaignPlugin;
 import com.fs.starfarer.api.combat.AutofireAIPlugin;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.packables.entities.ship.ShipData;
-import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.packables.entities.ship.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.packables.metadata.PlayerData;

@@ -22,7 +22,7 @@ public class RecordLambda<T> {
         record.overwrite(delta.getValue());
     }
 
-    public void execute(BasePackable packable) {
+    public void destExecute(BasePackable packable) {
         destExecute.execute(record, packable);
     }
 }

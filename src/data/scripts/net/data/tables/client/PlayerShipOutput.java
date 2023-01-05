@@ -31,7 +31,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
 
     @Override
     public void execute() {
-        playerShipData.execute();
+        playerShipData.sourceUpdate();
     }
 
     @Override

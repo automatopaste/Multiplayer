@@ -52,8 +52,12 @@ public abstract class BasePackable {
         return deltas;
     }
 
-    public void execute() {
-        for (RecordLambda<?> recordLambda : records) recordLambda.execute(this);
+    public void sourceUpdate() {
+        for (RecordLambda<?> recordLambda : records) recordLambda.sourceUpdate();
+    }
+
+    public void destExecute() {
+        for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);
     }
 
     /**

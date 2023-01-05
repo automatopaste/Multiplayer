@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.packables.entities.ship.VariantData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -41,7 +41,7 @@ public class VariantDataMap implements InboundEntityManager {
 
     @Override
     public void execute() {
-        for (VariantData v : variants.values()) v.execute();
+        for (VariantData v : variants.values()) v.destExecute();
     }
 
     @Override

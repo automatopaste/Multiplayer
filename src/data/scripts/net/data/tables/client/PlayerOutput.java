@@ -29,7 +29,7 @@ public class PlayerOutput implements OutboundEntityManager {
 
     @Override
     public void execute() {
-        player.execute();
+        player.sourceUpdate();
     }
 
     @Override

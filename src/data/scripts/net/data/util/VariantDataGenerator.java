@@ -3,7 +3,7 @@ package data.scripts.net.data.util;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
-import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.packables.entities.ship.VariantData;
 
 import java.util.ArrayList;
 import java.util.List;

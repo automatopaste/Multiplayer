@@ -206,7 +206,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
     @Override
     public void execute() {
         for (ServerConnectionWrapper connectionWrapper : serverConnectionWrappers.values()) {
-            connectionWrapper.connectionData.execute();
+            connectionWrapper.connectionData.destExecute();
         }
     }
 

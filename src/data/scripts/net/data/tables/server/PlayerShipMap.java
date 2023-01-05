@@ -32,8 +32,8 @@ public class PlayerShipMap implements InboundEntityManager {
 
     @Override
     public void execute() {
-        hostShipData.execute();
-        for (BasePackable p : playerShips.values()) if (p != null) p.execute();
+        hostShipData.sourceUpdate();
+        for (BasePackable p : playerShips.values()) if (p != null) p.destExecute();
     }
 
     @Override
