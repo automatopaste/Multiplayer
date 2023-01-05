@@ -53,7 +53,11 @@ public abstract class BasePackable {
     }
 
     public void sourceExecute() {
-        for (RecordLambda<?> recordLambda : records) recordLambda.sourceExecute();
+        for (byte i = 0; i < records.size(); i++) {
+            RecordLambda<?> recordLambda = records.get(i);
+            recordLambda.sourceExecute();
+            if (recordLambda.record.isUpdated()) this.deltas.put(i, recordLambda.record);
+        }
     }
 
     public void destExecute() {
@@ -68,8 +72,6 @@ public abstract class BasePackable {
         for (byte k : deltas.keySet()) {
             RecordLambda<?> record = records.get(k);
             record.overwrite(deltas.get(k));
-
-            if (record.record.isUpdated()) this.deltas.put(k, record.record);
         }
     }
 
