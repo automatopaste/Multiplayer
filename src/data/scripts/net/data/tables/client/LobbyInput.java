@@ -18,7 +18,7 @@ public class LobbyInput implements InboundEntityManager {
 
     @Override
     public void execute() {
-        lobby.destExecute();
+        if (lobby != null) lobby.destExecute();
     }
 
     @Override
