@@ -31,7 +31,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     public void execute() {
-        for (BasePackable p : table) p.execute();
+        for (BasePackable p : table) if (p != null) p.execute();
     }
 
     @Override

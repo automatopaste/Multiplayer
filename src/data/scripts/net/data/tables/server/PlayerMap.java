@@ -55,7 +55,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void execute() {
-        for (BasePackable p : players.values()) p.execute();
+        for (BasePackable p : players.values()) if (p != null) p.execute();
     }
 
     @Override
