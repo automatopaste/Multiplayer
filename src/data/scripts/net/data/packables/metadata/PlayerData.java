@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables.metadata.player;
+package data.scripts.net.data.packables.metadata;
 
 import com.fs.starfarer.api.combat.ViewportAPI;
 import data.scripts.net.data.packables.BasePackable;

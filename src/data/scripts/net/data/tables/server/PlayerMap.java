@@ -2,8 +2,8 @@ package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.metadata.lobby.LobbyData;
-import data.scripts.net.data.packables.metadata.player.PlayerData;
+import data.scripts.net.data.packables.metadata.LobbyData;
+import data.scripts.net.data.packables.metadata.PlayerData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;

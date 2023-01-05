@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables.metadata.playership;
+package data.scripts.net.data.packables.metadata;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;

@@ -62,6 +62,11 @@ public class DataGenManager {
         }
     }
 
+    /**
+     * An ordered hierarchy of data that will be compressed into a byte buffer
+     * Order: Type ID -> Instance ID -> Record ID
+     * @return data hierarchy
+     */
     public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasSocket() {
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
 
@@ -76,6 +81,11 @@ public class DataGenManager {
         return out;
     }
 
+    /**
+     * An ordered hierarchy of data that will be compressed into a byte buffer
+     * Order: Type ID -> Instance ID -> Record ID
+     * @return data hierarchy
+     */
     public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasDatagram() {
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
 

@@ -1,7 +1,7 @@
 package data.scripts.net.data.tables.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.metadata.player.PlayerData;
+import data.scripts.net.data.packables.metadata.PlayerData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;

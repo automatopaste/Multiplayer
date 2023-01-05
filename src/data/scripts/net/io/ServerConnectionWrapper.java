@@ -1,8 +1,8 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
-import data.scripts.net.data.packables.entities.variant.VariantData;
-import data.scripts.net.data.packables.metadata.connection.ConnectionData;
+import data.scripts.net.data.packables.entities.VariantData;
+import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;

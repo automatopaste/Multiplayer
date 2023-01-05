@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.SourceLambda;
-import data.scripts.net.data.packables.metadata.playership.PlayerShipData;
+import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;

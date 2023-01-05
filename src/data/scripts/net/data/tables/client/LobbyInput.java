@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.metadata.lobby.LobbyData;
+import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;

@@ -1,10 +1,9 @@
-package data.scripts.net.data.packables.metadata.lobby;
+package data.scripts.net.data.packables.metadata;
 
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceLambda;
-import data.scripts.net.data.packables.metadata.playership.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.ShortRecord;

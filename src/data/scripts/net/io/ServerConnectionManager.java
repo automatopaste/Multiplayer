@@ -1,7 +1,7 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.metadata.connection.ConnectionData;
+import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
