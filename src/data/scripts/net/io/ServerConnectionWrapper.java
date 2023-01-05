@@ -30,6 +30,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public MessageContainer getSocketMessage() throws IOException {
         if (connectionData == null) return null;
 
+        connectionData.destExecute();
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
+        clientPort = connectionData.getClientPort();
+
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundSocket();
 
         switch (connectionState) {
@@ -67,6 +71,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             default:
                 break;
         }
+
+        connectionData.sourceExecute();
+
+        Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
+        instance.put(connectionID, connectionData.getDeltas());
+        outbound.put(ConnectionData.TYPE_ID, instance);
 
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
         writeBuffer(outbound, data);
@@ -109,6 +119,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
+        Map<Short, Map<Byte, BaseRecord<?>>> instance = entities.get(ConnectionData.TYPE_ID);
+        connectionData.overwrite(instance.get(connectionID));
+        entities.remove(ConnectionData.TYPE_ID);
+
         connectionManager.getDuplex().updateInbound(entities);
     }
 

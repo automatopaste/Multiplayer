@@ -1,5 +1,5 @@
 package data.scripts.net.data.packables;
 
-public interface SourceLambda<T> {
+public interface SourceExecute<T> {
     T get();
 }

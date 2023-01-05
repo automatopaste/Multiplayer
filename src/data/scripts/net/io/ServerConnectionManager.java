@@ -2,13 +2,8 @@ package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
-import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
 import org.lazywizard.console.Console;
 
@@ -19,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServerConnectionManager implements Runnable, InboundEntityManager, OutboundEntityManager {
+public class ServerConnectionManager implements Runnable {
     public static final int MP_MAX_CONNECTIONS = Global.getSettings().getInt("mpMaxConnections");
 
     public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
@@ -68,7 +63,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         try {
             while (active) {
                 clock.sleepUntilTick();
-                tickUpdate();
+                tick++;
 
                 List<MessageContainer> socketMessages = getSocketMessages();
                 if (!socketMessages.isEmpty()) socketServer.addMessages(socketMessages);
@@ -81,10 +76,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         } finally {
             stop();
         }
-    }
-
-    public void tickUpdate() {
-        tick++;
     }
 
     public List<MessageContainer> getSocketMessages() throws IOException {
@@ -153,20 +144,6 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         System.out.println("STOPPING PRIMARY SERVER THREAD");
     }
 
-    @Override
-    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        ServerConnectionWrapper wrapper = serverConnectionWrappers.get(instanceID);
-
-        if (wrapper != null) {
-            wrapper.updateConnectionStatus(toProcess);
-        }
-    }
-
-    @Override
-    public void update(float amount) {
-
-    }
-
     public synchronized int getTick() {
         return tick;
     }
@@ -183,35 +160,7 @@ public class ServerConnectionManager implements Runnable, InboundEntityManager, 
         return serverPlugin;
     }
 
-    @Override
-    public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionData.TYPE_ID, this);
-    }
-
     public Map<Short, ServerConnectionWrapper> getServerConnectionWrappers() {
         return serverConnectionWrappers;
-    }
-
-    @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
-        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
-
-        for (short id : serverConnectionWrappers.keySet()) {
-            out.put(id, serverConnectionWrappers.get(id).connectionData.getDeltas());
-        }
-
-        return out;
-    }
-
-    @Override
-    public void execute() {
-        for (ServerConnectionWrapper connectionWrapper : serverConnectionWrappers.values()) {
-            connectionWrapper.connectionData.destExecute();
-        }
-    }
-
-    @Override
-    public PacketType getOutboundPacketType() {
-        return PacketType.SOCKET;
     }
 }

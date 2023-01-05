@@ -2,7 +2,7 @@ package data.scripts.net.data.tables.client;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -21,7 +21,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
     public PlayerShipOutput(short instanceID) {
         this.instanceID = instanceID;
 
-        playerShipData = new PlayerShipData(instanceID, new SourceLambda<String>() {
+        playerShipData = new PlayerShipData(instanceID, new SourceExecute<String>() {
             @Override
             public String get() {
                 return playerShipData.getPlayerShipID();
@@ -31,7 +31,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
 
     @Override
     public void execute() {
-        playerShipData.sourceUpdate();
+        playerShipData.sourceExecute();
     }
 
     @Override

@@ -3,7 +3,7 @@ package data.scripts.net.data.packables.metadata;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ListRecord;
 import data.scripts.net.data.records.ShortRecord;
@@ -30,7 +30,7 @@ public class LobbyData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
-                new SourceLambda<List<Short>>() {
+                new SourceExecute<List<Short>>() {
                     @Override
                     public List<Short> get() {
                         List<Short> out = new ArrayList<>();
@@ -53,7 +53,7 @@ public class LobbyData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceLambda<List<String>>() {
+                new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {
                         List<String> out = new ArrayList<>();

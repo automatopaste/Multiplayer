@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.ViewportAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.*;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
@@ -25,7 +25,7 @@ public class PlayerData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 Vector2f32Record.getDefault(),
-                new SourceLambda<Vector2f>() {
+                new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
                         return viewport.getCenter();
@@ -41,7 +41,7 @@ public class PlayerData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault(),
-                new SourceLambda<Float>() {
+                new SourceExecute<Float>() {
                     @Override
                     public Float get() {
                         return viewport.getViewMult();
@@ -57,7 +57,7 @@ public class PlayerData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceLambda<Byte>() {
+                new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
                         switch (plugin.getType()) {

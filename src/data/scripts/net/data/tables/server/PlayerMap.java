@@ -55,6 +55,9 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void execute() {
+        host.sourceExecute();
+        lobby.sourceExecute();
+
         for (BasePackable p : players.values()) if (p != null) p.destExecute();
     }
 
@@ -64,9 +67,6 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
         for (PlayerData playerData : players.values()) {
             playerData.update(amount);
         }
-
-        host.sourceUpdate();
-        lobby.sourceUpdate();
     }
 
     public Map<Short, PlayerData> getPlayers() {

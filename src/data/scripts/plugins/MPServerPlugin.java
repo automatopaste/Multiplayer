@@ -5,6 +5,7 @@ import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.server.HostShipTable;
 import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.PlayerShipMap;
@@ -34,7 +35,6 @@ public class MPServerPlugin extends MPPlugin {
         dataStore.generate(Global.getCombatEngine());
 
         serverConnectionManager = new ServerConnectionManager(this);
-        initEntityManager(serverConnectionManager);
 
         // inbound init
         playerShipMap = new PlayerShipMap();
@@ -62,6 +62,9 @@ public class MPServerPlugin extends MPPlugin {
         // inbound data update
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this);
+
+        // execute
+        for (BaseEntityManager entityManager : entityManagers) entityManager.execute();
 
         // simulation update
         updateEntityManagers(amount);

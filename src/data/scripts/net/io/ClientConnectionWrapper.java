@@ -4,9 +4,6 @@ import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
@@ -20,7 +17,7 @@ import java.util.Map;
 /**
  * Manages switching logic for inputting/sending data
  */
-public class ClientConnectionWrapper extends BaseConnectionWrapper implements InboundEntityManager, OutboundEntityManager {
+public class ClientConnectionWrapper extends BaseConnectionWrapper {
     private final DataDuplex dataDuplex;
 
     private DatagramClient datagramClient;
@@ -57,6 +54,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
             connectionData = new ConnectionData(connectionID, this);
             clientPort = socketClient.getLocalPort();
         }
+
+        connectionData.destExecute();
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
+        clientPort = connectionData.getClientPort();
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundSocket();
 
@@ -99,6 +100,12 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
                 break;
         }
 
+        connectionData.sourceExecute();
+
+        Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
+        instance.put(connectionID, connectionData.getDeltas());
+        outbound.put(ConnectionData.TYPE_ID, instance);
+
         ByteBuf data = initBuffer(tick, connectionID);
         writeBuffer(outbound, data);
 
@@ -138,6 +145,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
     }
 
     public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities, int tick) {
+        Map<Short, Map<Byte, BaseRecord<?>>> instance = entities.get(ConnectionData.TYPE_ID);
+        connectionData.overwrite(instance.get(connectionID));
+        entities.remove(ConnectionData.TYPE_ID);
+
         this.tick = tick;
         dataDuplex.updateInbound(entities);
     }
@@ -165,38 +176,5 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper implements In
 
     public int getTick() {
         return tick;
-    }
-
-    @Override
-    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        connectionData.overwrite(toProcess);
-    }
-
-    @Override
-    public void update(float amount) {
-
-    }
-
-    @Override
-    public void execute() {
-        connectionData.destExecute();
-    }
-
-    @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
-        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
-        out.put(connectionID, connectionData.getDeltas());
-        return out;
-    }
-
-    @Override
-    public void register() {
-        DataGenManager.registerInboundEntityManager(ConnectionData.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(ConnectionData.TYPE_ID, this);
-    }
-
-    @Override
-    public PacketType getOutboundPacketType() {
-        return PacketType.SOCKET;
     }
 }

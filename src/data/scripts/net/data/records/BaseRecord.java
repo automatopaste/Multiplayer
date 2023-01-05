@@ -1,6 +1,6 @@
 package data.scripts.net.data.records;
 
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
@@ -11,9 +11,9 @@ public abstract class BaseRecord<T> {
         this.value = value;
     }
 
-    public void sourceUpdate(SourceLambda<T> sourceLambda) {
-        T t = sourceLambda.get();
-        if (checkNotEqual(sourceLambda.get())) isUpdated = true;
+    public void sourceExecute(SourceExecute<T> sourceExecute) {
+        T t = sourceExecute.get();
+        isUpdated = checkNotEqual(t);
         value = t;
     }
 

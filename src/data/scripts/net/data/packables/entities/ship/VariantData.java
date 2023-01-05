@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ListRecord;
@@ -29,7 +29,7 @@ public class VariantData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 IntRecord.getDefault(),
-                new SourceLambda<Integer>() {
+                new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
                         return variant.getNumFluxCapacitors();
@@ -45,7 +45,7 @@ public class VariantData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 IntRecord.getDefault(),
-                new SourceLambda<Integer>() {
+                new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
                         return variant.getNumFluxVents();
@@ -61,7 +61,7 @@ public class VariantData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault(),
-                new SourceLambda<String>() {
+                new SourceExecute<String>() {
                     @Override
                     public String get() {
                         return id;
@@ -77,7 +77,7 @@ public class VariantData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceLambda<List<String>>() {
+                new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {
                         List<String> weaponIDs = new ArrayList<>();
@@ -101,7 +101,7 @@ public class VariantData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceLambda<List<String>>() {
+                new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {
                         List<String> weaponSlots = new ArrayList<>();

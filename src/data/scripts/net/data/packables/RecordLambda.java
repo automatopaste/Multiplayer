@@ -5,17 +5,17 @@ import data.scripts.net.data.records.BaseRecord;
 public class RecordLambda<T> {
 
     public final BaseRecord<T> record;
-    public final SourceLambda<T> sourceLambda;
+    public final SourceExecute<T> sourceExecute;
     public final DestExecute<T> destExecute;
 
-    public RecordLambda(BaseRecord<T> record, SourceLambda<T> sourceLambda, DestExecute<T> destExecute) {
+    public RecordLambda(BaseRecord<T> record, SourceExecute<T> sourceExecute, DestExecute<T> destExecute) {
         this.record = record;
-        this.sourceLambda = sourceLambda;
+        this.sourceExecute = sourceExecute;
         this.destExecute = destExecute;
     }
 
-    public void sourceUpdate() {
-        record.sourceUpdate(sourceLambda);
+    public void sourceExecute() {
+        record.sourceExecute(sourceExecute);
     }
 
     public void overwrite(BaseRecord<?> delta) {

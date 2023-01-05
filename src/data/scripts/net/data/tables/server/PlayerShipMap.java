@@ -3,7 +3,7 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -21,7 +21,7 @@ public class PlayerShipMap implements InboundEntityManager {
 
     public PlayerShipMap() {
         playerShips = new HashMap<>();
-        hostShipData = new PlayerShipData((short) -1, new SourceLambda<String>() {
+        hostShipData = new PlayerShipData((short) -1, new SourceExecute<String>() {
             @Override
             public String get() {
                 if (hostShip != null) return hostShip.getFleetMemberId();
@@ -32,7 +32,7 @@ public class PlayerShipMap implements InboundEntityManager {
 
     @Override
     public void execute() {
-        hostShipData.sourceUpdate();
+        hostShipData.sourceExecute();
         for (BasePackable p : playerShips.values()) if (p != null) p.destExecute();
     }
 

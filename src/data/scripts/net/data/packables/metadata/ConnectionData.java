@@ -3,7 +3,7 @@ package data.scripts.net.data.packables.metadata;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
@@ -24,7 +24,7 @@ public class ConnectionData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceLambda<Byte>() {
+                new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
                         return (byte) connection.getConnectionState().ordinal();
@@ -40,7 +40,7 @@ public class ConnectionData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 IntRecord.getDefault(),
-                new SourceLambda<Integer>() {
+                new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
                         return connection.getClientPort();

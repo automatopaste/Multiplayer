@@ -52,8 +52,8 @@ public abstract class BasePackable {
         return deltas;
     }
 
-    public void sourceUpdate() {
-        for (RecordLambda<?> recordLambda : records) recordLambda.sourceUpdate();
+    public void sourceExecute() {
+        for (RecordLambda<?> recordLambda : records) recordLambda.sourceExecute();
     }
 
     public void destExecute() {
@@ -61,7 +61,7 @@ public abstract class BasePackable {
     }
 
     /**
-     * Update stored data with changes from a delta
+     * Update stored data with changes from a delta at dest
      * @param deltas incoming deltas
      */
     public void overwrite(Map<Byte, BaseRecord<?>> deltas) {

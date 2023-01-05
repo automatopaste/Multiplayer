@@ -8,7 +8,7 @@ import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
@@ -36,12 +36,12 @@ public class PlayerShipData extends BasePackable {
      *
      * @param instanceID unique
      */
-    public PlayerShipData(short instanceID, final SourceLambda<String> playerShipID) {
+    public PlayerShipData(short instanceID, final SourceExecute<String> playerShipID) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
                 IntRecord.getDefault(),
-                new SourceLambda<Integer>() {
+                new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
                         return mask();
@@ -57,7 +57,7 @@ public class PlayerShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault(),
-                new SourceLambda<String>() {
+                new SourceExecute<String>() {
                     @Override
                     public String get() {
                         return playerShipID.get();

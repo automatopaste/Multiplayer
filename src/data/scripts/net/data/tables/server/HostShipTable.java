@@ -39,7 +39,7 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
 
     @Override
     public void execute() {
-        for (BasePackable p : table) if (p != null) p.sourceUpdate();
+        for (BasePackable p : table) if (p != null) p.sourceExecute();
     }
 
     @Override

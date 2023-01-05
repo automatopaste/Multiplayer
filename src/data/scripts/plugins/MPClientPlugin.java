@@ -47,8 +47,6 @@ public class MPClientPlugin extends MPPlugin {
             }
         }
 
-        initEntityManager(connection);
-
         // inbound init
         shipTable = new ClientShipTable();
         initEntityManager(shipTable);
