@@ -47,8 +47,14 @@ public abstract class BasePackable {
      * @return deltas
      */
     public Map<Byte, BaseRecord<?>> getDeltas() {
-        Map<Byte, BaseRecord<?>> deltas = new HashMap<>(this.deltas);
-        this.deltas.clear();
+//        Map<Byte, BaseRecord<?>> deltas = new HashMap<>(this.deltas);
+//        this.deltas.clear();
+//        return deltas;
+        Map<Byte, BaseRecord<?>> deltas = new HashMap<>();
+        for (byte i = 0; i < records.size(); i++) {
+            RecordLambda<?> lambda = records.get(i);
+            deltas.put(i, lambda.record);
+        }
         return deltas;
     }
 
