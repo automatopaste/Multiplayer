@@ -5,16 +5,21 @@ import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
     protected T value;
-    private boolean isUpdated = true;
 
     public BaseRecord(T value) {
         this.value = value;
     }
 
-    public void sourceExecute(SourceExecute<T> sourceExecute) {
+    /**
+     * Executes the source update lambda
+     * @param sourceExecute the lambda script
+     * @return true if the data has updated
+     */
+    public boolean sourceExecute(SourceExecute<T> sourceExecute) {
         T t = sourceExecute.get();
-        isUpdated = checkNotEqual(t);
+        boolean isUpdated = checkNotEqual(t);
         value = t;
+        return isUpdated;
     }
 
     /**
@@ -38,13 +43,10 @@ public abstract class BaseRecord<T> {
         return value;
     }
 
+    /**
+     * Overwrite the stored record with new data
+     * @param delta incoming delta
+     */
     public void overwrite(Object delta) {
-        T t = (T) delta;
-        isUpdated = checkNotEqual(t);
-        value = t;
-    }
-
-    public boolean isUpdated() {
-        return isUpdated;
-    }
+        value = (T) delta;}
 }

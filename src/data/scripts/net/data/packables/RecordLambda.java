@@ -14,8 +14,8 @@ public class RecordLambda<T> {
         this.destExecute = destExecute;
     }
 
-    public void sourceExecute() {
-        record.sourceExecute(sourceExecute);
+    public boolean sourceExecute() {
+        return record.sourceExecute(sourceExecute);
     }
 
     public void overwrite(BaseRecord<?> delta) {

@@ -25,10 +25,10 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
         this.serverPlugin = serverPlugin;
 
         players = new HashMap<>();
+        host = new PlayerData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);
+        players.put((short) 0, host);
 
-        host = new PlayerData((short) -1, Global.getCombatEngine().getViewport(), serverPlugin);
-
-        lobby = new LobbyData((short) -1, this, serverPlugin.getPlayerShipMap());
+        lobby = new LobbyData((short) 0, this, serverPlugin.getPlayerShipMap());
     }
 
     @Override

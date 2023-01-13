@@ -4,30 +4,61 @@ import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ListRecord<E> extends BaseRecord<List<E>> {
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
+    private final BaseRecord<E> writer;
+    private final Map<Byte, E> toWrite;
+
     public ListRecord(List<E> collection, byte elementTypeID) {
         super(collection);
         this.elementTypeID = elementTypeID;
+
+        writer = (BaseRecord<E>) DataGenManager.recordFactory(elementTypeID);
+        toWrite = new HashMap<>();
     }
 
     @Override
     protected boolean checkNotEqual(List<E> delta) {
-        return true;
+        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+
+        toWrite.clear();
+
+        boolean update = false;
+        for (byte i = 0; i < delta.size(); i++) {
+            E d = delta.get(i);
+            if (d == null) continue;
+
+            E e = value.get(i);
+            if (!e.equals(d)) {
+                update = true;
+                toWrite.put(i, e);
+            }
+        }
+        return update;
     }
 
     @Override
     public void write(ByteBuf dest) {
         dest.writeByte(elementTypeID);
-        dest.writeByte(value.size());
 
-        for (E e : value) {
-            BaseRecord<?> record = (BaseRecord<?>) e;
-            record.write(dest);
+        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+
+        // write num entry updates
+        dest.writeByte(toWrite.size());
+
+        for (byte i : toWrite.keySet()) {
+            // write index
+            dest.writeByte(i);
+
+            // write data
+            writer.value = value.get(i);
+            writer.write(dest);
         }
     }
 
