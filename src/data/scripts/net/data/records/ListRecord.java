@@ -19,7 +19,11 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         super(collection);
         this.elementTypeID = elementTypeID;
 
-        writer = (BaseRecord<E>) DataGenManager.recordFactory(elementTypeID);
+        if (elementTypeID != (byte) -1) {
+            writer = (BaseRecord<E>) DataGenManager.recordFactory(elementTypeID);
+        } else {
+            writer = null;
+        }
         toWrite = new HashMap<>();
     }
 

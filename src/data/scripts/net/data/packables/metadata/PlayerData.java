@@ -57,9 +57,9 @@ public class PlayerData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         switch (plugin.getType()) {
                             case SERVER:
                                 return 1;
@@ -69,9 +69,9 @@ public class PlayerData extends BasePackable {
                         }
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         PlayerData playerData = (PlayerData) packable;
                         playerData.setConnectionType(record.getValue());
                     }

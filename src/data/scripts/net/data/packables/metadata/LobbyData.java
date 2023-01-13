@@ -13,7 +13,6 @@ import data.scripts.net.data.tables.server.PlayerShipMap;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sends information about lobby data to clients
@@ -22,18 +21,18 @@ public class LobbyData extends BasePackable {
 
     public static byte TYPE_ID;
 
-    private List<Short> players;
-    private List<String> playerShipIDs;
+    private java.util.List<Short> players;
+    private java.util.List<java.lang.String> playerShipIDs;
 
     public LobbyData(short instanceID, final PlayerMap playerMap, final PlayerShipMap playerShipMap) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
-                new SourceExecute<List<Short>>() {
+                new SourceExecute<java.util.List<Short>>() {
                     @Override
-                    public List<Short> get() {
-                        List<Short> out = new ArrayList<>();
+                    public java.util.List<Short> get() {
+                        java.util.List<Short> out = new ArrayList<>();
 
                         // server ship
                         out.add((short) -1);
@@ -43,20 +42,20 @@ public class LobbyData extends BasePackable {
                         return out;
                     }
                 },
-                new DestExecute<List<Short>>() {
+                new DestExecute<java.util.List<Short>>() {
                     @Override
-                    public void execute(BaseRecord<List<Short>> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.util.List<Short>> record, BasePackable packable) {
                         LobbyData lobbyData = (LobbyData) packable;
                         lobbyData.setPlayers(record.getValue());
                     }
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceExecute<List<String>>() {
+                new ListRecord<>(new ArrayList<java.lang.String>(), StringRecord.TYPE_ID),
+                new SourceExecute<java.util.List<java.lang.String>>() {
                     @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>();
+                    public java.util.List<java.lang.String> get() {
+                        java.util.List<java.lang.String> out = new ArrayList<>();
 
                         // server ship
                         out.add(playerShipMap.getHostShipID());
@@ -68,9 +67,9 @@ public class LobbyData extends BasePackable {
                         return out;
                     }
                 },
-                new DestExecute<List<String>>() {
+                new DestExecute<java.util.List<java.lang.String>>() {
                     @Override
-                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.util.List<java.lang.String>> record, BasePackable packable) {
                         LobbyData lobbyData = (LobbyData) packable;
                         lobbyData.setPlayerShipIDs(record.getValue());
                     }
@@ -98,19 +97,19 @@ public class LobbyData extends BasePackable {
         return TYPE_ID;
     }
 
-    public List<Short> getPlayers() {
+    public java.util.List<Short> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<Short> players) {
+    public void setPlayers(java.util.List<Short> players) {
         this.players = players;
     }
 
-    public List<String> getPlayerShipIDs() {
+    public java.util.List<java.lang.String> getPlayerShipIDs() {
         return playerShipIDs;
     }
 
-    public void setPlayerShipIDs(List<String> playerShipIDs) {
+    public void setPlayerShipIDs(java.util.List<java.lang.String> playerShipIDs) {
         this.playerShipIDs = playerShipIDs;
     }
 }

@@ -24,15 +24,15 @@ public class ConnectionData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return (byte) connection.getConnectionState().ordinal();
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
                         connectionData.setConnectionState(record.getValue());
                     }

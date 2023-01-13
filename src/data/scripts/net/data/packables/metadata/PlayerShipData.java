@@ -27,7 +27,7 @@ public class PlayerShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private int controlBitmask;
-    private String playerShipID;
+    private java.lang.String playerShipID;
 
     private ShipAPI playerShip;
 
@@ -36,7 +36,7 @@ public class PlayerShipData extends BasePackable {
      *
      * @param instanceID unique
      */
-    public PlayerShipData(short instanceID, final SourceExecute<String> playerShipID) {
+    public PlayerShipData(short instanceID, final SourceExecute<java.lang.String> playerShipID) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -57,15 +57,15 @@ public class PlayerShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault(),
-                new SourceExecute<String>() {
+                new SourceExecute<java.lang.String>() {
                     @Override
-                    public String get() {
+                    public java.lang.String get() {
                         return playerShipID.get();
                     }
                 },
-                new DestExecute<String>() {
+                new DestExecute<java.lang.String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
                         playerShipData.setPlayerShipID(record.getValue());
                     }
@@ -116,11 +116,11 @@ public class PlayerShipData extends BasePackable {
         this.controlBitmask = controlBitmask;
     }
 
-    public String getPlayerShipID() {
+    public java.lang.String getPlayerShipID() {
         return playerShipID;
     }
 
-    public void setPlayerShipID(String playerShipID) {
+    public void setPlayerShipID(java.lang.String playerShipID) {
         this.playerShipID = playerShipID;
     }
 

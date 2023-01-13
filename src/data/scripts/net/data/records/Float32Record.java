@@ -44,11 +44,4 @@ public class Float32Record extends BaseRecord<Float> {
     public static BaseRecord<Float> getDefault() {
         return new Float32Record(0f);
     }
-
-    @Override
-    public String toString() {
-        return "FloatRecord{" +
-                "record=" + value +
-                '}';
-    }
 }

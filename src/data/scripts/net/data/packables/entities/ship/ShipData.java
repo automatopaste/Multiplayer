@@ -21,8 +21,8 @@ public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private ShipAPI ship;
-    private String hullID;
-    private String fleetMemberID;
+    private java.lang.String hullID;
+    private java.lang.String fleetMemberID;
     private int owner;
 
     public ShipData(short instanceID, final ShipAPI ship) {
@@ -31,30 +31,30 @@ public class ShipData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault(),
-                new SourceExecute<String>() {
+                new SourceExecute<java.lang.String>() {
                     @Override
-                    public String get() {
+                    public java.lang.String get() {
                         return ship.getFleetMemberId();
                     }
                 },
-                new DestExecute<String>() {
+                new DestExecute<java.lang.String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
                         ((ShipData) packable).setFleetMemberID(record.getValue());
                     }
                 }
         ));
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault(),
-                new SourceExecute<String>() {
+                new SourceExecute<java.lang.String>() {
                     @Override
-                    public String get() {
+                    public java.lang.String get() {
                         return ship.getHullSpec().getHullId();
                     }
                 },
-                new DestExecute<String>() {
+                new DestExecute<java.lang.String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
                         ((ShipData) packable).setHullID(record.getValue());
                     }
                 }
@@ -95,15 +95,15 @@ public class ShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return ConversionUtils.floatToByte(ship.getFacing(), 360f);
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setFacing(ConversionUtils.byteToFloat(record.getValue(), 360f));
@@ -129,15 +129,15 @@ public class ShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return ConversionUtils.floatToByte(ship.getHullLevel(), 1f);
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setHitpoints(ship.getMaxHitpoints() * ConversionUtils.byteToFloat(record.getValue(), 1f));
@@ -146,15 +146,15 @@ public class ShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return ConversionUtils.floatToByte(ship.getFluxLevel(), 1f);
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * ConversionUtils.byteToFloat(record.getValue(), 1f));
@@ -163,15 +163,15 @@ public class ShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return ConversionUtils.floatToByte(ship.getCurrentCR(), 1f);
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setCurrentCR(ConversionUtils.byteToFloat(record.getValue(), 1f));
@@ -197,15 +197,15 @@ public class ShipData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault(),
-                new SourceExecute<Byte>() {
+                new SourceExecute<java.lang.Byte>() {
                     @Override
-                    public Byte get() {
+                    public java.lang.Byte get() {
                         return (byte) ship.getOwner();
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<java.lang.Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setOwner(record.getValue());
@@ -231,7 +231,7 @@ public class ShipData extends BasePackable {
         CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner);
 
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
-            String hullVariantId = hullID + "_Hull";
+            java.lang.String hullVariantId = hullID + "_Hull";
             ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
                     hullVariantId,
                     hullSpec
@@ -242,10 +242,10 @@ public class ShipData extends BasePackable {
             int numVents = variantData.getNumFluxVents();
             variant.setNumFluxVents(numVents);
 
-            List<String> weaponSlots = variantData.getWeaponSlots();
-            List<String> weaponIds = variantData.getWeaponIDs();
+            List<java.lang.String> weaponSlots = variantData.getWeaponSlots();
+            List<java.lang.String> weaponIds = variantData.getWeaponIDs();
             for (int i = 0; i < weaponSlots.size(); i++) {
-                String slot = weaponSlots.get(i);
+                java.lang.String slot = weaponSlots.get(i);
                 variant.addWeapon(slot, weaponIds.get(i));
             }
 
@@ -291,11 +291,11 @@ public class ShipData extends BasePackable {
         return ship;
     }
 
-    public void setHullID(String hullID) {
+    public void setHullID(java.lang.String hullID) {
         this.hullID = hullID;
     }
 
-    public void setFleetMemberID(String fleetMemberID) {
+    public void setFleetMemberID(java.lang.String fleetMemberID) {
         this.fleetMemberID = fleetMemberID;
     }
 
