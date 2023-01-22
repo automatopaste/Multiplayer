@@ -1,12 +1,11 @@
-package data.scripts.net.data.records;
+package data.scripts.net.data.records.collections;
 
+import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 public class ListRecord<E> extends BaseRecord<List<E>> {
     public static byte TYPE_ID;
@@ -24,26 +23,31 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         } else {
             writer = null;
         }
+
         toWrite = new HashMap<>();
     }
 
     @Override
     protected boolean checkNotEqual(List<E> delta) {
-        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("Array size exceeded " + Byte.MAX_VALUE + " elements");
 
         toWrite.clear();
 
-        boolean update = false;
+        boolean update = delta.size() != value.size();
+
         for (byte i = 0; i < delta.size(); i++) {
             E d = delta.get(i);
-            if (d == null) continue;
 
-            E e = value.get(i);
-            if (!e.equals(d)) {
-                update = true;
-                toWrite.put(i, e);
+            if (i + 1> value.size()) {
+                toWrite.put(i, d);
+            } else {
+                if (!d.equals(value.get(i))) {
+                    toWrite.put(i, d);
+                    update = true;
+                }
             }
         }
+
         return update;
     }
 
@@ -61,7 +65,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             dest.writeByte(i);
 
             // write data
-            writer.value = value.get(i);
+            writer.overwrite(toWrite.get(i));
             writer.write(dest);
         }
     }
@@ -80,11 +84,6 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         return new ListRecord<>(data, type);
     }
 
-    public void addElement(E e) {
-        if (!(e instanceof BaseRecord)) throw new ClassCastException("Elements must extend " + BaseRecord.class.getName());
-        value.add(e);
-    }
-
     public static void setTypeId(byte typeId) {
         ListRecord.TYPE_ID = typeId;
     }
@@ -92,12 +91,5 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     @Override
     public byte getTypeId() {
         return TYPE_ID;
-    }
-
-    @Override
-    public String toString() {
-        return "ListRecord{" +
-                "record=" + value.toString() +
-                '}';
     }
 }

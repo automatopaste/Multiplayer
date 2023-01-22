@@ -13,6 +13,7 @@ import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.packables.metadata.PlayerData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
+import data.scripts.net.data.records.collections.ListRecord;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
