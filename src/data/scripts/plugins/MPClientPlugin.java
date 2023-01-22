@@ -3,6 +3,7 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
+import data.scripts.MPModPlugin;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.client.*;
@@ -41,9 +42,16 @@ public class MPClientPlugin extends MPPlugin {
         connection = new ClientConnectionWrapper(host, port, this);
 
         Clock msgClock = new Clock(3);
+        int timeout = 0;
         while (connection.getConnectionID() == BaseConnectionWrapper.DEFAULT_CONNECTION_ID) {
             if (msgClock.mark()) {
                 System.out.println("waiting for connection...");
+                timeout++;
+            }
+
+            if (timeout >= 10) {
+                connection.stop();
+                MPModPlugin.destroyPlugin();
             }
         }
 
