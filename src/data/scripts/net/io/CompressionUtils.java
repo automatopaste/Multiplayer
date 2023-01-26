@@ -25,6 +25,6 @@ public class CompressionUtils {
         int decompressedLength = decompressor.inflate(decompressed);
         decompressor.end();
 
-        return decompressed;
+        return Arrays.copyOfRange(decompressed, 0, size);
     }
 }
