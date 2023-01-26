@@ -2,11 +2,9 @@
 	"plugins" : {
 		"MPUIPlugin": "data.scripts.plugins.MPUIPlugin",
 	},
-	"mpLocalPortTCP": 20303,
 	"mpServerTickRate": 60, # rate at which server broadcasts packets
 	"mpClientTickrate": 30, # rate at which client will send command packets
 	"mpMaxConnections": 4,
-	"mpHost": "192.168.1.111:20303",
 
 	"mpSocketQueueLimit": 32,
 	"mpDatagramQueueLimit": 64,
