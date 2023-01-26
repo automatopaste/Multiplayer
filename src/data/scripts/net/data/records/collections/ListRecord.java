@@ -101,6 +101,11 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         List<E> d = (List<E>) delta;
         for (int i = 0; i < d.size(); i++) {
             E e = d.get(i);
+
+            while (i > value.size() - 1) {
+                value.add(null);
+            }
+
             value.set(i, e);
         }
     }
