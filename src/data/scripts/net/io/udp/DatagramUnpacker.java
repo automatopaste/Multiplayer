@@ -22,5 +22,7 @@ public class DatagramUnpacker extends MessageToMessageDecoder<byte[]> {
         );
 
         out.add(result);
+
+        data.release();
     }
 }

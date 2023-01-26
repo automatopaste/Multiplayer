@@ -57,7 +57,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
         connectionData.destExecute();
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
-        clientPort = connectionData.getClientPort();
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundSocket();
 
