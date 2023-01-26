@@ -9,6 +9,7 @@ import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         Set<String> diff = new HashSet<>(registered.keySet());

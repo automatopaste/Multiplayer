@@ -10,9 +10,13 @@ import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
 
+    private final short instanceID;
     private LobbyData lobby;
 
-    public LobbyInput() {
+    private String id = null;
+
+    public LobbyInput(short instanceID) {
+        this.instanceID = instanceID;
         lobby = null;
     }
 
@@ -22,8 +26,24 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
+        if (lobby != null) {
+            short[] players = lobby.getPlayers();
 
+            for (int i = 0; i < players.length; i++) {
+                short s = players[i];
+
+                if (s == instanceID) {
+                    String e = lobby.getPlayerShipIDs().get(i);
+
+                    if (!e.equals(id)) {
+                        id = e;
+
+                        plugin.initEntityManager(new PlayerShipOutput(instanceID, id));
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -37,7 +37,7 @@ public class PlayerShipMap implements InboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
         hostShip = Global.getCombatEngine().getPlayerShip();
 
         for (PlayerShipData playerShipData : playerShips.values()) {

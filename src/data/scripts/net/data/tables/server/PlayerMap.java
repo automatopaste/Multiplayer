@@ -62,7 +62,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
         host.update(amount);
         for (PlayerData playerData : players.values()) {
             playerData.update(amount);

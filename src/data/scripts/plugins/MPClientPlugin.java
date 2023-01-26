@@ -26,7 +26,6 @@ public class MPClientPlugin extends MPPlugin {
 
     //outbound
     private final PlayerOutput playerOutput;
-    private final PlayerShipOutput playerShipOutput;
 
     private final VariantDataGenerator dataStore;
 
@@ -46,16 +45,11 @@ public class MPClientPlugin extends MPPlugin {
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
 
-        lobbyInput = new LobbyInput();
+        lobbyInput = new LobbyInput(connection.getConnectionID());
         initEntityManager(lobbyInput);
 
         // outbound init
-        short connectionID = connection.getConnectionID();
-
-        playerShipOutput = new PlayerShipOutput(connectionID);
-        initEntityManager(playerShipOutput);
-
-        playerOutput = new PlayerOutput(connectionID, this);
+        playerOutput = new PlayerOutput(connection.getConnectionID(), this);
         initEntityManager(playerOutput);
     }
 

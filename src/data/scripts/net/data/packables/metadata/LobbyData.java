@@ -23,7 +23,7 @@ public class LobbyData extends BasePackable {
     public static byte TYPE_ID;
 
     private short[] players;
-    private java.util.List<java.lang.String> playerShipIDs;
+    private List<String> playerShipIDs;
 
     public LobbyData(short instanceID, final PlayerMap playerMap, final PlayerShipMap playerShipMap) {
         super(instanceID);
@@ -53,10 +53,10 @@ public class LobbyData extends BasePackable {
         ));
         addRecord(new RecordLambda<>(
                 new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceExecute<java.util.List<java.lang.String>>() {
+                new SourceExecute<List<String>>() {
                     @Override
-                    public java.util.List<java.lang.String> get() {
-                        java.util.List<java.lang.String> out = new ArrayList<>();
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>();
 
                         // server ship
                         out.add(playerShipMap.getHostShipID());
@@ -68,9 +68,9 @@ public class LobbyData extends BasePackable {
                         return out;
                     }
                 },
-                new DestExecute<java.util.List<java.lang.String>>() {
+                new DestExecute<List<String>>() {
                     @Override
-                    public void execute(BaseRecord<java.util.List<java.lang.String>> record, BasePackable packable) {
+                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
                         LobbyData lobbyData = (LobbyData) packable;
                         lobbyData.setPlayerShipIDs(record.getValue());
                     }
@@ -108,11 +108,11 @@ public class LobbyData extends BasePackable {
         this.players = p;
     }
 
-    public java.util.List<java.lang.String> getPlayerShipIDs() {
+    public List<String> getPlayerShipIDs() {
         return playerShipIDs;
     }
 
-    public void setPlayerShipIDs(java.util.List<java.lang.String> playerShipIDs) {
+    public void setPlayerShipIDs(List<String> playerShipIDs) {
         this.playerShipIDs = playerShipIDs;
     }
 }

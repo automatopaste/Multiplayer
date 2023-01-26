@@ -33,7 +33,7 @@ public class PlayerOutput implements OutboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
 
     }
 

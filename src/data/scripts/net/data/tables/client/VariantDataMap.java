@@ -45,7 +45,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
 
     }
 

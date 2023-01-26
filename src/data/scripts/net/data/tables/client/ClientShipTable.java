@@ -35,7 +35,7 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, MPPlugin plugin) {
         for (BasePackable p : table) {
             ShipData ship = (ShipData) p;
             if (ship != null) ship.update(amount);

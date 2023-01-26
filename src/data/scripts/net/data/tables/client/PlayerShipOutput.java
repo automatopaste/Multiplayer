@@ -1,12 +1,11 @@
 package data.scripts.net.data.tables.client;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
+import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,15 +15,13 @@ public class PlayerShipOutput implements OutboundEntityManager {
     private final PlayerShipData playerShipData;
     private final short instanceID;
 
-    private ShipAPI playerShip;
-
-    public PlayerShipOutput(short instanceID) {
+    public PlayerShipOutput(short instanceID, final String playerShipID) {
         this.instanceID = instanceID;
 
         playerShipData = new PlayerShipData(instanceID, new SourceExecute<String>() {
             @Override
             public String get() {
-                return playerShipData.getPlayerShipID();
+                return playerShipID;
             }
         });
     }
@@ -35,8 +32,8 @@ public class PlayerShipOutput implements OutboundEntityManager {
     }
 
     @Override
-    public void update(float amount) {
-        playerShip = Global.getCombatEngine().getPlayerShip();
+    public void update(float amount, MPPlugin plugin) {
+
     }
 
     @Override
@@ -54,9 +51,5 @@ public class PlayerShipOutput implements OutboundEntityManager {
     @Override
     public PacketType getOutboundPacketType() {
         return PacketType.DATAGRAM;
-    }
-
-    public ShipAPI getPlayerShip() {
-        return playerShip;
     }
 }

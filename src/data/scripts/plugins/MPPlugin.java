@@ -20,12 +20,16 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
 
     public abstract PluginType getType();
 
-    protected void initEntityManager(BaseEntityManager manager) {
+    public void initEntityManager(BaseEntityManager manager) {
         entityManagers.add(manager);
         manager.register();
     }
 
+    public Set<BaseEntityManager> getEntityManagers() {
+        return entityManagers;
+    }
+
     protected void updateEntityManagers(float amount) {
-        for (BaseEntityManager manager : entityManagers) manager.update(amount);
+        for (BaseEntityManager manager : entityManagers) manager.update(amount, this);
     }
 }
