@@ -78,7 +78,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         for (int i = 0; i < num; i++) {
             byte index = in.readByte();
 
-            E e = (E) reader.read(in);
+            E e = (E) reader.read(in).getValue();
 
             while (index > data.size() - 1) {
                 data.add(null);
@@ -98,15 +98,15 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public void overwrite(Object delta) {
-        List<BaseRecord<E>> d = (List<BaseRecord<E>>) delta;
+        List<E> d = (List<E>) delta;
         for (int i = 0; i < d.size(); i++) {
-            BaseRecord<E> e = d.get(i);
+            E e = d.get(i);
 
             while (i > value.size() - 1) {
                 value.add(null);
             }
 
-            value.set(i, e.getValue());
+            value.set(i, e);
         }
     }
 
