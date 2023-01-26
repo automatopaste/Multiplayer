@@ -28,7 +28,7 @@ public class PlayerOutput implements OutboundEntityManager {
     }
 
     @Override
-    public void execute() {
+    public void execute(MPPlugin plugin) {
         player.sourceExecute();
     }
 

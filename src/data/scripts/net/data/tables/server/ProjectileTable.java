@@ -10,7 +10,7 @@ import java.util.Map;
 public class ProjectileTable extends EntityTable implements OutboundEntityManager {
 
     @Override
-    public void execute() {
+    public void execute(MPPlugin plugin) {
 
     }
 

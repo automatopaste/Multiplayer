@@ -39,7 +39,6 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
             data = new PlayerData(instanceID, null, null);
             data.overwrite(toProcess);
 
-            data.init(plugin);
             players.put(instanceID, data);
         } else {
             data.overwrite(toProcess);
@@ -54,11 +53,20 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public void execute() {
+    public void execute(MPPlugin plugin) {
         host.sourceExecute();
         lobby.sourceExecute();
 
-        for (BasePackable p : players.values()) if (p != null) p.destExecute();
+        for (BasePackable p : players.values()) {
+            if (p != null) {
+                p.destExecute();
+
+                if (p.isInit()) {
+                    p.init(plugin);
+                    p.setInit(false);
+                }
+            }
+        }
     }
 
     @Override

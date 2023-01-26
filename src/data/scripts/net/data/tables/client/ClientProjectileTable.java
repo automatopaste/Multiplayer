@@ -9,7 +9,7 @@ import java.util.Map;
 public class ClientProjectileTable implements InboundEntityManager {
 
     @Override
-    public void execute() {
+    public void execute(MPPlugin plugin) {
 
     }
 

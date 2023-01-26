@@ -16,7 +16,7 @@ public abstract class BasePackable {
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final Map<Byte, BaseRecord<?>> deltas;
-    private boolean initialFlush = true;
+    private boolean init = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
@@ -92,4 +92,12 @@ public abstract class BasePackable {
      * Called when entity is deleted
      */
     public abstract void delete();
+
+    public boolean isInit() {
+        return init;
+    }
+
+    public void setInit(boolean init) {
+        this.init = init;
+    }
 }

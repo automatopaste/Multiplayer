@@ -4,7 +4,7 @@ import data.scripts.plugins.MPPlugin;
 
 public interface BaseEntityManager {
 
-    void execute();
+    void execute(MPPlugin plugin);
 
     void update(float amount, MPPlugin plugin);
 

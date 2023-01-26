@@ -21,8 +21,15 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void execute() {
-        if (lobby != null) lobby.destExecute();
+    public void execute(MPPlugin plugin) {
+        if (lobby != null) {
+            lobby.destExecute();
+
+            if (lobby.isInit()) {
+                lobby.init(plugin);
+                lobby.setInit(false);
+            }
+        }
     }
 
     @Override

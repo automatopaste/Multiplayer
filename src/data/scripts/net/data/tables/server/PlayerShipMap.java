@@ -31,9 +31,18 @@ public class PlayerShipMap implements InboundEntityManager {
     }
 
     @Override
-    public void execute() {
+    public void execute(MPPlugin plugin) {
         hostShipData.sourceExecute();
-        for (BasePackable p : playerShips.values()) if (p != null) p.destExecute();
+        for (BasePackable p : playerShips.values()) {
+            if (p != null) {
+                p.destExecute();
+
+                if (p.isInit()) {
+                    p.init(plugin);
+                    p.setInit(false);
+                }
+            }
+        }
     }
 
     @Override
@@ -62,7 +71,6 @@ public class PlayerShipMap implements InboundEntityManager {
             data = new PlayerShipData(instanceID, null);
             data.overwrite(toProcess);
 
-            data.init(plugin);
             playerShips.put(instanceID, data);
         } else {
             data.overwrite(toProcess);

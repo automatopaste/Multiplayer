@@ -22,16 +22,23 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
             table[instanceID] = shipData;
 
             shipData.overwrite(toProcess);
-
-            shipData.init(plugin);
         } else {
             data.overwrite(toProcess);
         }
     }
 
     @Override
-    public void execute() {
-        for (BasePackable p : table) if (p != null) p.destExecute();
+    public void execute(MPPlugin plugin) {
+        for (BasePackable p : table) {
+            if (p != null) {
+                p.destExecute();
+
+                if (p.isInit()) {
+                    p.init(plugin);
+                    p.setInit(false);
+                }
+            }
+        }
     }
 
     @Override
