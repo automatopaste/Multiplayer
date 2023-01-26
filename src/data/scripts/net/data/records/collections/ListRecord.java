@@ -98,15 +98,15 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public void overwrite(Object delta) {
-        List<E> d = (List<E>) delta;
+        List<BaseRecord<E>> d = (List<BaseRecord<E>>) delta;
         for (int i = 0; i < d.size(); i++) {
-            E e = d.get(i);
+            BaseRecord<E> e = d.get(i);
 
             while (i > value.size() - 1) {
                 value.add(null);
             }
 
-            value.set(i, e);
+            value.set(i, e.getValue());
         }
     }
 
