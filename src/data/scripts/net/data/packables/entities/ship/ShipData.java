@@ -21,8 +21,8 @@ public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private ShipAPI ship;
-    private java.lang.String hullID;
-    private java.lang.String fleetMemberID;
+    private String hullID;
+    private String fleetMemberID;
     private int owner;
 
     public ShipData(short instanceID, final ShipAPI ship) {
@@ -31,30 +31,30 @@ public class ShipData extends BasePackable {
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
-                new SourceExecute<java.lang.String>() {
+                new SourceExecute<String>() {
                     @Override
-                    public java.lang.String get() {
+                    public String get() {
                         return ship.getFleetMemberId();
                     }
                 },
-                new DestExecute<java.lang.String>() {
+                new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
+                    public void execute(BaseRecord<String> record, BasePackable packable) {
                         ((ShipData) packable).setFleetMemberID(record.getValue());
                     }
                 }
         ));
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("hullspec id"),
-                new SourceExecute<java.lang.String>() {
+                new SourceExecute<String>() {
                     @Override
-                    public java.lang.String get() {
+                    public String get() {
                         return ship.getHullSpec().getHullId();
                     }
                 },
-                new DestExecute<java.lang.String>() {
+                new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
+                    public void execute(BaseRecord<String> record, BasePackable packable) {
                         ((ShipData) packable).setHullID(record.getValue());
                     }
                 }
@@ -231,7 +231,7 @@ public class ShipData extends BasePackable {
         CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner);
 
         if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
-            java.lang.String hullVariantId = hullID + "_Hull";
+            String hullVariantId = hullID + "_Hull";
             ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
                     hullVariantId,
                     hullSpec
@@ -242,10 +242,10 @@ public class ShipData extends BasePackable {
             int numVents = variantData.getNumFluxVents();
             variant.setNumFluxVents(numVents);
 
-            List<java.lang.String> weaponSlots = variantData.getWeaponSlots();
-            List<java.lang.String> weaponIds = variantData.getWeaponIDs();
+            List<String> weaponSlots = variantData.getWeaponSlots();
+            List<String> weaponIds = variantData.getWeaponIDs();
             for (int i = 0; i < weaponSlots.size(); i++) {
-                java.lang.String slot = weaponSlots.get(i);
+                String slot = weaponSlots.get(i);
                 variant.addWeapon(slot, weaponIds.get(i));
             }
 
@@ -291,11 +291,11 @@ public class ShipData extends BasePackable {
         return ship;
     }
 
-    public void setHullID(java.lang.String hullID) {
+    public void setHullID(String hullID) {
         this.hullID = hullID;
     }
 
-    public void setFleetMemberID(java.lang.String fleetMemberID) {
+    public void setFleetMemberID(String fleetMemberID) {
         this.fleetMemberID = fleetMemberID;
     }
 
