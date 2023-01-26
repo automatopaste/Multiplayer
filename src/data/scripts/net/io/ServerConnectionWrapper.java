@@ -81,8 +81,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
         writeBuffer(outbound, data);
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> o = readBuffer(data.copy());
-
         return new MessageContainer(
                 data, connectionManager.getTick(), true, remoteAddress, socketBuffer, connectionID
         );
