@@ -121,7 +121,8 @@ public abstract class BaseConnectionWrapper {
 
                     BaseRecord<?> record = records.get(id);
                     //write record type byte
-                    dest.writeByte(record.getTypeId());
+                    byte typeID = record.getTypeId();
+                    dest.writeByte(typeID);
 
                     // write record data bytes
                     record.write(dest);
@@ -163,12 +164,11 @@ public abstract class BaseConnectionWrapper {
                         BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(data);
                         records.put(recordID, record);
                     } catch (NullPointerException e) {
-                        System.err.println(
+                        throw new NullPointerException(
                                 "Incorrect record type ID for destination " +
                                 DataGenManager.inboundDataDestinations.get(typeID).getClass().getSimpleName() +
                                 " at record ID " + recordID + " with instance " + instanceID
                         );
-                        e.printStackTrace();
                     }
                 }
             }
