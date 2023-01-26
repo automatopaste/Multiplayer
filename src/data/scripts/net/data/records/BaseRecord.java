@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 
 public abstract class BaseRecord<T> {
     protected T value;
+    private String debug;
 
     public BaseRecord(T value) {
         this.value = value;
@@ -48,5 +49,15 @@ public abstract class BaseRecord<T> {
      * @param delta incoming delta
      */
     public void overwrite(Object delta) {
-        value = (T) delta;}
+        value = (T) delta;
+    }
+
+    public BaseRecord<T> setDebugText(String debug) {
+        this.debug = debug;
+        return this;
+    }
+
+    public String getDebugText() {
+        return debug;
+    }
 }

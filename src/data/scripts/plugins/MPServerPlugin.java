@@ -88,6 +88,7 @@ public class MPServerPlugin extends MPPlugin {
         ByteBuf buf = UnpooledByteBufAllocator.DEFAULT.buffer();
         BaseConnectionWrapper.writeBuffer(m, buf);
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> output = BaseConnectionWrapper.readBuffer(buf);
+        buf.release();
 
         // inbound data update
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();

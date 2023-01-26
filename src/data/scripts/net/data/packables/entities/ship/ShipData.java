@@ -30,7 +30,7 @@ public class ShipData extends BasePackable {
         this.ship = ship;
 
         addRecord(new RecordLambda<>(
-                StringRecord.getDefault(),
+                StringRecord.getDefault().setDebugText("fleet member id"),
                 new SourceExecute<java.lang.String>() {
                     @Override
                     public java.lang.String get() {
@@ -45,7 +45,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                StringRecord.getDefault(),
+                StringRecord.getDefault().setDebugText("hullspec id"),
                 new SourceExecute<java.lang.String>() {
                     @Override
                     public java.lang.String get() {
@@ -60,7 +60,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Vector2f32Record.getDefault().setUseDecimalPrecision(false),
+                Vector2f32Record.getDefault().setUseDecimalPrecision(false).setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -77,7 +77,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Vector2f16Record.getDefault(),
+                Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -89,12 +89,12 @@ public class ShipData extends BasePackable {
                     public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getLocation().set(record.getValue());
+                        if (ship != null) ship.getVelocity().set(record.getValue());
                     }
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("facing"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
@@ -111,7 +111,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Float16Record.getDefault(),
+                Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
@@ -128,7 +128,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("hitpoints"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
@@ -145,7 +145,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("flux level"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
@@ -162,7 +162,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("cr level"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
@@ -179,7 +179,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Vector2f32Record.getDefault().setUseDecimalPrecision(false),
+                Vector2f32Record.getDefault().setUseDecimalPrecision(false).setDebugText("mouse target"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -196,7 +196,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("fleet owner"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
