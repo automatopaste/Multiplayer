@@ -107,7 +107,9 @@ public class DataGenManager {
      */
     public static BaseRecord<?> recordFactory(byte typeID) {
         BaseRecord<?> out = recordInstances.get(typeID);
-        if (out == null) throw new NullPointerException("No record type found at ID: " + typeID);
+        if (out == null) {
+            throw new NullPointerException("No record type found at ID: " + typeID);
+        }
         return out;
     }
 }

@@ -157,17 +157,27 @@ public abstract class BaseConnectionWrapper {
 
                 for (byte j = 0; j < numRecords; j++) {
                     byte recordID = data.readByte();
-
                     byte recordTypeID = data.readByte();
-                    BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(data);
 
-                    records.put(recordID, record);
+                    try {
+                        BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(data);
+                        records.put(recordID, record);
+                    } catch (NullPointerException e) {
+                        System.err.println(
+                                "Incorrect record type ID for destination " +
+                                DataGenManager.inboundDataDestinations.get(typeID).getClass().getSimpleName() +
+                                " at record ID " + recordID + " with instance " + instanceID
+                        );
+                        e.printStackTrace();
+                    }
                 }
             }
         }
 
         return out;
     }
+
+    public abstract void stop();
 
     public MPPlugin getLocalPlugin() {
         return localPlugin;

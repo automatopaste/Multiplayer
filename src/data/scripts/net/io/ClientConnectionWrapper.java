@@ -165,6 +165,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
+    @Override
     public void stop() {
         socketClient.stop();
         if (datagramClient != null) datagramClient.stop();

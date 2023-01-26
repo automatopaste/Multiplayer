@@ -114,6 +114,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         );
     }
 
+    @Override
+    public void stop() {
+        connectionManager.removeConnection(connectionID);
+    }
+
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
     }
