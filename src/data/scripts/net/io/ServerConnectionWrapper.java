@@ -50,6 +50,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 Map<Short, Map<Byte, BaseRecord<?>>> variants = new HashMap<>();
                 for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
+                    variantData.sourceExecute();
                     variants.put(variantData.getInstanceID(), variantData.getDeltas());
                 }
 
