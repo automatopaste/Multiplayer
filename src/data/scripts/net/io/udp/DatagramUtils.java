@@ -21,15 +21,16 @@ public class DatagramUtils {
         SizeData sizeData = new SizeData();
 
         byte[] bytes = new byte[buf.readableBytes()];
-        sizeData.size = bytes.length;
+        if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
+        sizeData.size = (short) bytes.length;
         buf.readBytes(bytes);
         byte[] compressed = CompressionUtils.deflate(bytes);
-        sizeData.sizeCompressed = compressed.length;
+        sizeData.sizeCompressed = (short) compressed.length;
 
         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
 
-        out.writeInt(sizeData.size);
-        out.writeInt(sizeData.sizeCompressed);
+        out.writeShort(sizeData.size);
+        out.writeShort(sizeData.sizeCompressed);
         out.writeBytes(compressed);
 
         channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
@@ -37,7 +38,7 @@ public class DatagramUtils {
     }
 
     public static class SizeData {
-        public int size;
-        public int sizeCompressed;
+        public short size;
+        public short sizeCompressed;
     }
 }

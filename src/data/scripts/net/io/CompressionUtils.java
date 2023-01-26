@@ -8,10 +8,10 @@ import java.util.zip.Inflater;
 public class CompressionUtils {
 
     public static byte[] deflate(byte[] bytes) {
-        Deflater compressor = new Deflater(Deflater.BEST_SPEED);
+        Deflater compressor = new Deflater(5);
         compressor.setInput(bytes);
         compressor.finish();
-        byte[] compressed = new byte[bytes.length];
+        byte[] compressed = new byte[bytes.length + 4];
         int length = compressor.deflate(compressed);
         compressor.end();
 
@@ -21,7 +21,7 @@ public class CompressionUtils {
     public static byte[] inflate(byte[] bytes, int size, int sizeCompressed) throws DataFormatException {
         Inflater decompressor = new Inflater();
         decompressor.setInput(bytes, 0, sizeCompressed);
-        byte[] decompressed = new byte[size];
+        byte[] decompressed = new byte[size + 4];
         int decompressedLength = decompressor.inflate(decompressed);
         decompressor.end();
 

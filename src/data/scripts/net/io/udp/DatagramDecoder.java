@@ -13,8 +13,8 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
     @Override
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
         ByteBuf content = in.content();
-        int size = content.readInt();
-        int sizeCompressed = content.readInt();
+        int size = content.readShort();
+        int sizeCompressed = content.readShort();
 
         byte[] bytes = new byte[sizeCompressed];
         content.readBytes(bytes);
