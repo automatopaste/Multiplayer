@@ -209,13 +209,13 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
         String s;
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
-            s = (String) data.get("host_port");
+            s = data.getInt("host_port") + "";
         } catch (Exception e) {
             s = "";
         }
         TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
-        textEntryBoxParams.height = 30f;
-        textEntryBoxParams.width = 200f;
+        textEntryBoxParams.height = 26f;
+        textEntryBoxParams.width = 80f;
         Text.TextParams entryBoxTextParams = new Text.TextParams();
         entryBoxTextParams.align = LazyFont.TextAlignment.LEFT;
         final TextEntryBox textEntryBox = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
@@ -302,7 +302,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
         String s;
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
-            s = (String) data.get("ip");
+            s = data.getString("ip");
         } catch (Exception e) {
             s = "";
         }
@@ -384,6 +384,12 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             });
             infoText.setColor(Color.RED);
             return;
+        }
+
+        try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
+            data.put("host_port", p);
+            data.save();
+        } catch (Exception ignored) {
         }
 
         infoText.setExecute(new Execute<String>() {

@@ -159,8 +159,8 @@ public abstract class BaseConnectionWrapper {
                     byte recordID = data.readByte();
 
                     byte recordTypeID = data.readByte();
-
                     BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(data);
+
                     records.put(recordID, record);
                 }
             }

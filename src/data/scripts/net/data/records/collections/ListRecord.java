@@ -53,11 +53,9 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public void write(ByteBuf dest) {
-        dest.writeByte(elementTypeID);
-
         if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
 
-        // write num entry updates
+        dest.writeByte(elementTypeID);
         dest.writeByte(toWrite.size());
 
         for (byte i : toWrite.keySet()) {
@@ -78,10 +76,33 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         BaseRecord<?> reader = DataGenManager.recordFactory(type);
         List<E> data = new ArrayList<>();
         for (int i = 0; i < num; i++) {
-            data.add((E) reader.read(in));
+            byte index = in.readByte();
+
+            E e = (E) reader.read(in);
+
+            while (index > data.size() - 1) {
+                data.add(null);
+            }
+
+//            if (index > data.size() - 1) {
+//                for (int j = data.size(); j < index; j++) {
+//                    data.add(null);
+//                }
+//            }
+
+            data.set(index, e);
         }
 
         return new ListRecord<>(data, type);
+    }
+
+    @Override
+    public void overwrite(Object delta) {
+        List<E> d = (List<E>) delta;
+        for (int i = 0; i < d.size(); i++) {
+            E e = d.get(i);
+            value.set(i, e);
+        }
     }
 
     public static void setTypeId(byte typeId) {
