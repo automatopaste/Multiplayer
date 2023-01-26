@@ -95,7 +95,7 @@ public class MPServerPlugin extends MPPlugin {
         DataGenManager.distributeInboundDeltas(inbound, this);
 
         // execute
-        for (BaseEntityManager entityManager : entityManagers) entityManager.execute();
+        for (BaseEntityManager entityManager : entityManagers) entityManager.execute(this);
 
         // simulation update
         updateEntityManagers(amount);

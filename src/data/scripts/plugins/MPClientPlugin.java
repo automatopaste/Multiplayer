@@ -81,7 +81,7 @@ public class MPClientPlugin extends MPPlugin {
         DataGenManager.distributeInboundDeltas(entities, this);
 
         // execute
-        for (BaseEntityManager entityManager : entityManagers) entityManager.execute();
+        for (BaseEntityManager entityManager : entityManagers) entityManager.execute(this);
 
         // update
         updateEntityManagers(amount);
