@@ -15,5 +15,7 @@ public class MessageContainerEncoder extends MessageToByteEncoder<MessageContain
 
         out.writeInt(length);
         out.writeBytes(data);
+
+        data.release();
     }
 }

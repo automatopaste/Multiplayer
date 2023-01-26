@@ -13,6 +13,7 @@ public class DatagramUnpacker extends MessageToMessageDecoder<byte[]> {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, byte[] in, List<Object> out) throws Exception {
         ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.length);
+        data.writeBytes(in);
 
         Unpacked result = new Unpacked(
                 data,
