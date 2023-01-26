@@ -22,10 +22,10 @@ public class MPClientPlugin extends MPPlugin {
     private final ClientConnectionWrapper connection;
     private final ClientShipTable shipTable;
     private final VariantDataMap variantDataMap;
-    private final LobbyInput lobbyInput;
+    private LobbyInput lobbyInput;
 
     //outbound
-    private final PlayerOutput playerOutput;
+    private PlayerOutput playerOutput;
 
     private final VariantDataGenerator dataStore;
 
@@ -45,12 +45,7 @@ public class MPClientPlugin extends MPPlugin {
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
 
-        lobbyInput = new LobbyInput(connection.getConnectionID());
-        initEntityManager(lobbyInput);
-
         // outbound init
-        playerOutput = new PlayerOutput(connection.getConnectionID(), this);
-        initEntityManager(playerOutput);
     }
 
     @Override
@@ -70,6 +65,15 @@ public class MPClientPlugin extends MPPlugin {
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Closed client");
             return;
+        }
+
+        if (lobbyInput == null) {
+            lobbyInput = new LobbyInput(connection.getConnectionID());
+            initEntityManager(lobbyInput);
+        }
+        if (playerOutput == null) {
+            playerOutput = new PlayerOutput(connection.getConnectionID(), this);
+            initEntityManager(playerOutput);
         }
 
         // get inbound
