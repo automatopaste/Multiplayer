@@ -23,13 +23,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
             connectionWrapper = serverConnectionManager.getConnection(in.getConnectionID());
         }
 
-        int serverTick = in.getTick();
-        //Console.showMessage("Received UDP unpacked with tick: " + serverTick);
-
-        // DISCARD WHILE DEBUG
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = in.getUnpacked();
-
-        // if getting -1 value tick from server, server is sending preload data
         connectionWrapper.updateInbound(entities);
     }
 

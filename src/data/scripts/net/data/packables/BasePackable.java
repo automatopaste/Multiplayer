@@ -16,6 +16,7 @@ public abstract class BasePackable {
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final Map<Byte, BaseRecord<?>> deltas;
+    private boolean initialFlush = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
@@ -47,9 +48,6 @@ public abstract class BasePackable {
      * @return deltas
      */
     public Map<Byte, BaseRecord<?>> getDeltas() {
-//        Map<Byte, BaseRecord<?>> deltas = new HashMap<>(this.deltas);
-//        this.deltas.clear();
-//        return deltas;
         Map<Byte, BaseRecord<?>> deltas = new HashMap<>();
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> lambda = records.get(i);
