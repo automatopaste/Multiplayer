@@ -19,7 +19,7 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         byte[] bytes = new byte[sizeCompressed];
         content.readBytes(bytes);
 
-        byte[] decompressed = CompressionUtils.inflate(bytes, size);
+        byte[] decompressed = CompressionUtils.inflate(bytes, size, sizeCompressed);
 
         out.add(decompressed);
     }

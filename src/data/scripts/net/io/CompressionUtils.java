@@ -18,11 +18,11 @@ public class CompressionUtils {
         return Arrays.copyOfRange(compressed, 0, length);
     }
 
-    public static byte[] inflate(byte[] bytes, int size) throws DataFormatException {
+    public static byte[] inflate(byte[] bytes, int size, int sizeCompressed) throws DataFormatException {
         Inflater decompressor = new Inflater();
-        decompressor.setInput(bytes);
+        decompressor.setInput(bytes, 0, sizeCompressed);
         byte[] decompressed = new byte[size];
-        decompressor.inflate(decompressed);
+        int decompressedLength = decompressor.inflate(decompressed);
         decompressor.end();
 
         return decompressed;
