@@ -70,7 +70,7 @@ public class VariantData extends BasePackable {
                     @Override
                     public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setFleetMemberID(id);
+                        variantData.setFleetMemberID(record.getValue());
                     }
                 }
         ));
