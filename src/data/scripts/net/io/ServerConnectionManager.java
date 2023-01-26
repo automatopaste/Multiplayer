@@ -17,7 +17,7 @@ import java.util.Map;
 public class ServerConnectionManager implements Runnable {
     public static final int MP_MAX_CONNECTIONS = Global.getSettings().getInt("mpMaxConnections");
 
-    public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
+//    public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
     private final DataDuplex dataDuplex;
@@ -35,17 +35,17 @@ public class ServerConnectionManager implements Runnable {
     private int tick;
     private final Clock clock;
 
-    public ServerConnectionManager(MPServerPlugin serverPlugin) {
+    public ServerConnectionManager(MPServerPlugin serverPlugin, int port) {
         this.serverPlugin = serverPlugin;
         dataDuplex = new DataDuplex();
         active = true;
 
         serverConnectionWrappers = new HashMap<>();
 
-        socketServer = new SocketServer(PORT, this);
+        socketServer = new SocketServer(port, this);
         socket = new Thread(socketServer, "SOCKET_SERVER_THREAD");
 
-        datagramServer = new DatagramServer(PORT, this);
+        datagramServer = new DatagramServer(port, this);
         datagram = new Thread(datagramServer, "DATAGRAM_SERVER_THREAD");
 
         tick = 0;

@@ -30,11 +30,11 @@ public class MPServerPlugin extends MPPlugin {
 
     private final VariantDataGenerator dataStore;
 
-    public MPServerPlugin() {
+    public MPServerPlugin(int port) {
         dataStore = new VariantDataGenerator();
         dataStore.generate(Global.getCombatEngine());
 
-        serverConnectionManager = new ServerConnectionManager(this);
+        serverConnectionManager = new ServerConnectionManager(this, port);
 
         // inbound init
         playerShipMap = new PlayerShipMap();

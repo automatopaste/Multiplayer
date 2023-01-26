@@ -1,6 +1,6 @@
 {
 	"plugins" : {
-		"MPPluginInstanceDestroyer": "data.scripts.plugins.MPPluginInstanceDestroyer",
+		"MPUIPlugin": "data.scripts.plugins.MPUIPlugin",
 	},
 	"mpLocalPortTCP": 20303,
 	"mpServerTickRate": 60, # rate at which server broadcasts packets

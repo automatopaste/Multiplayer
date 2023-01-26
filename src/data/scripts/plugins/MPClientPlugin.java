@@ -3,7 +3,6 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.MPModPlugin;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.client.*;
@@ -11,7 +10,6 @@ import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
-import data.scripts.net.io.Clock;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
@@ -41,20 +39,6 @@ public class MPClientPlugin extends MPPlugin {
 
         connection = new ClientConnectionWrapper(host, port, this);
 
-        Clock msgClock = new Clock(3);
-        int timeout = 0;
-        while (connection.getConnectionID() == BaseConnectionWrapper.DEFAULT_CONNECTION_ID) {
-            if (msgClock.mark()) {
-                System.out.println("waiting for connection...");
-                timeout++;
-            }
-
-            if (timeout >= 10) {
-                connection.stop();
-                MPModPlugin.destroyPlugin();
-            }
-        }
-
         // inbound init
         shipTable = new ClientShipTable();
         initEntityManager(shipTable);
@@ -77,15 +61,21 @@ public class MPClientPlugin extends MPPlugin {
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
+        if (connection.getConnectionID() == ClientConnectionWrapper.DEFAULT_CONNECTION_ID) {
+            return;
+        }
+
         if (connection.getConnectionState() == BaseConnectionWrapper.ConnectionState.CLOSED) {
             Global.getCombatEngine().removePlugin(this);
-            Console.showMessage("Server interrupted");
+            Console.showMessage("Connection interrupted");
+            return;
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
             connection.stop();
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Closed client");
+            return;
         }
 
         // get inbound

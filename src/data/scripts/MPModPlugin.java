@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 public class MPModPlugin extends BaseModPlugin {
 
+    public static String VERSION = "v0.1.1";
+
     private static MPPlugin PLUGIN;
 
     @Override
