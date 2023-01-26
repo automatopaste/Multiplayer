@@ -17,13 +17,15 @@ public class Float16Record extends BaseRecord<Float> {
 
     @Override
     public void write(ByteBuf dest) {
-        dest.writeShort(ConversionUtils.toHalfFloat(value));
+//        dest.writeShort(ConversionUtils.toHalfFloat(value));
+        dest.writeFloat(value);
     }
 
     @Override
     public BaseRecord<Float> read(ByteBuf in) {
-        short value = in.readShort();
-        return new Float16Record(ConversionUtils.toFloat(value));
+//        short value = in.readShort();
+//        return new Float16Record(ConversionUtils.toFloat(value));
+        return new Float16Record(in.readFloat());
     }
 
     public Float16Record setUseDecimalPrecision(boolean useDecimalPrecision) {
