@@ -84,12 +84,6 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
                 data.add(null);
             }
 
-//            if (index > data.size() - 1) {
-//                for (int j = data.size(); j < index; j++) {
-//                    data.add(null);
-//                }
-//            }
-
             data.set(index, e);
         }
 
