@@ -105,7 +105,10 @@ public class LobbyData extends BasePackable {
 
     public void setPlayers(List<Short> players) {
         short[] p = new short[players.size()];
-        for (short s = 0; s < players.size(); s++) p[s] = players.get(s);
+        for (short s = 0; s < players.size(); s++) {
+            Short e = players.get(s);
+            p[s] = e == null ? (short) -1 : e;
+        }
         this.players = p;
     }
 

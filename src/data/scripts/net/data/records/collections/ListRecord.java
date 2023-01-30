@@ -53,7 +53,12 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public void write(ByteBuf dest) {
-        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+        if (value.size() > Byte.MAX_VALUE) {
+            throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+        }
+        if (toWrite.isEmpty()) {
+            throw new RuntimeException("List Record writing with no updated data");
+        }
 
         dest.writeByte(elementTypeID);
         dest.writeByte(toWrite.size());
