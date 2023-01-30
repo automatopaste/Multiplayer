@@ -6,6 +6,7 @@ import com.fs.starfarer.api.PluginPick;
 import com.fs.starfarer.api.campaign.CampaignPlugin;
 import com.fs.starfarer.api.combat.AutofireAIPlugin;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import data.scripts.net.data.packables.entities.ship.ShieldData;
 import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.packables.entities.ship.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
@@ -29,6 +30,7 @@ public class MPModPlugin extends BaseModPlugin {
     @Override
     public void onApplicationLoad() {
         ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
+        ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
         VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
         PlayerData.TYPE_ID = DataGenManager.registerEntityType(PlayerData.class);
         PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);

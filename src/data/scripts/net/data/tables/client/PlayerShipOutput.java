@@ -37,7 +37,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
         playerShipData.sourceExecute();

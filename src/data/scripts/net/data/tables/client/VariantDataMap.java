@@ -17,7 +17,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         VariantData data = variants.get(instanceID);
 
         if (data == null) {

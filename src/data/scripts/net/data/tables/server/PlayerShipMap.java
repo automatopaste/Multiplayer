@@ -46,7 +46,7 @@ public class PlayerShipMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         PlayerShipData data = playerShips.get(instanceID);
 
         if (data == null) {

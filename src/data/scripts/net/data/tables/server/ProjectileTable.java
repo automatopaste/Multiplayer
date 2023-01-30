@@ -25,7 +25,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     }
 
     @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         return null;
     }
 

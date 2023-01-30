@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.RecordLambda;
+import data.scripts.net.data.packables.entities.ship.ShieldData;
 import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
@@ -14,30 +15,44 @@ import data.scripts.plugins.MPPlugin;
 import java.util.*;
 
 public class HostShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
-    public static final int MAX_ENTITIES = Short.MAX_VALUE;
     private final Map<String, Short> registered;
+    private final Map<Short, ShieldData> shields;
 
     public HostShipTable() {
         super(new ShipData[100]);
 
         registered = new HashMap<>();
+        shields = new HashMap<>();
     }
 
     @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
-        for (int i = 0; i < table.length; i++) {
-            ShipData data = table[i];
-            if (data != null) {
-                data.sourceExecute();
+        if (typeID == ShipData.TYPE_ID) {
+            for (int i = 0; i < table.length; i++) {
+                ShipData data = table[i];
+                if (data != null) {
+                    data.sourceExecute();
 
-                Map<Byte, BaseRecord<?>> deltas = data.getDeltas();
+                    Map<Byte, BaseRecord<?>> deltas = data.getDeltas();
+                    if (deltas != null && !deltas.isEmpty()) {
+                        out.put((short) i, deltas);
+                    }
+                }
+            }
+        } else if (typeID == ShieldData.TYPE_ID) {
+            for (Short id : shields.keySet()) {
+                ShieldData shieldData = shields.get(id);
+                shieldData.sourceExecute();
+
+                Map<Byte, BaseRecord<?>> deltas = shieldData.getDeltas();
                 if (deltas != null && !deltas.isEmpty()) {
-                    out.put((short) i, deltas);
+                    out.put(id, deltas);
                 }
             }
         }
+
 
         return out;
     }
@@ -66,6 +81,9 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
 
         registered.put(ship.getId(), id);
         table[id] = new ShipData(id, ship);
+        if (ship.getShield() != null) {
+            shields.put(id, new ShieldData(id, ship.getShield()));
+        }
     }
 
     private void deleteEntry(String id) {
@@ -74,6 +92,7 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
         table[index] = null;
 
         registered.remove(id);
+        shields.remove(index);
         markVacant(index);
     }
 
@@ -105,6 +124,7 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
     @Override
     public void register() {
         DataGenManager.registerOutboundEntityManager(ShipData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ShieldData.TYPE_ID, this);
     }
 
     @Override

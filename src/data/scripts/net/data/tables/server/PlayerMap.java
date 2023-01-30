@@ -29,7 +29,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         PlayerData data = players.get(instanceID);
 
         if (data == null) {
@@ -45,7 +45,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
         lobby.sourceExecute();
