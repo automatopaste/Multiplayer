@@ -66,7 +66,7 @@ public class ShipData extends BasePackable {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        return ship.getLocation();
+                        return new Vector2f(ship.getLocation());
                     }
                 },
                 new DestExecute<Vector2f>() {
@@ -83,7 +83,7 @@ public class ShipData extends BasePackable {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        return ship.getVelocity();
+                        return new Vector2f(ship.getVelocity());
                     }
                 },
                 new DestExecute<Vector2f>() {
