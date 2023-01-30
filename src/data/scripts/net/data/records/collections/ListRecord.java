@@ -139,8 +139,8 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         }
 
         for (int i = 0; i < size; i++) {
-            E d = delta.get(i);
-            E v = value.get(i);
+            E d = i < delta.size() ? delta.get(i) : null;
+            E v = i < value.size() ? value.get(i) : null;
 
             if (d != null) {
                 temp.set(i, d);
