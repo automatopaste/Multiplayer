@@ -24,7 +24,7 @@ public class LobbyData extends BasePackable {
 
     public static byte TYPE_ID;
 
-    private short[] players;
+    private List<Short> players;
     private List<String> playerShipIDs;
 
     public LobbyData(short instanceID, final PlayerMap playerMap, final PlayerShipMap playerShipMap) {
@@ -100,17 +100,12 @@ public class LobbyData extends BasePackable {
         return TYPE_ID;
     }
 
-    public short[] getPlayers() {
+    public List<Short> getPlayers() {
         return players;
     }
 
     public void setPlayers(List<Short> players) {
-        short[] p = new short[players.size()];
-        for (short s = 0; s < players.size(); s++) {
-            Short e = players.get(s);
-            p[s] = e == null ? (short) -1 : e;
-        }
-        this.players = p;
+        this.players = players;
     }
 
     public List<String> getPlayerShipIDs() {
