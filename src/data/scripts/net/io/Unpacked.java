@@ -2,8 +2,11 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.records.BaseRecord;
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Unpacked {
@@ -21,7 +24,15 @@ public class Unpacked {
         tick = data.readInt();
         connectionID = data.readInt();
 
-        unpacked = BaseConnectionWrapper.readBuffer(data);
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> m;
+        try {
+            m = BaseConnectionWrapper.readBuffer(data);
+        } catch (IOException | DecoderException i) {
+            i.printStackTrace();
+            m = new HashMap<>();
+        }
+
+        unpacked = m;
     }
 
     public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getUnpacked() {

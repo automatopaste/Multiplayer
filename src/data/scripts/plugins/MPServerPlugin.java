@@ -21,6 +21,7 @@ import io.netty.buffer.UnpooledByteBufAllocator;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,12 @@ public class MPServerPlugin extends MPPlugin {
         m.put((byte) 69, i);
         ByteBuf buf = UnpooledByteBufAllocator.DEFAULT.buffer();
         BaseConnectionWrapper.writeBuffer(m, buf);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> output = BaseConnectionWrapper.readBuffer(buf);
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> output;
+        try {
+            output = BaseConnectionWrapper.readBuffer(buf);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         buf.release();
 
         // inbound data update
