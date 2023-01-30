@@ -72,6 +72,8 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             writer.overwrite(toWrite.get(i));
             writer.write(dest);
         }
+
+        toWrite.clear();
     }
 
     @Override
