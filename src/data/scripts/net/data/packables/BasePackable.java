@@ -53,6 +53,13 @@ public abstract class BasePackable {
 //            RecordLambda<?> lambda = records.get(i);
 //            deltas.put(i, lambda.record);
 //        }
+        if (init) {
+            for (byte i = 0; i < records.size(); i++) {
+                RecordLambda<?> lambda = records.get(i);
+                deltas.put(i, lambda.record);
+            }
+        }
+
         return deltas;
     }
 
