@@ -57,10 +57,14 @@ public class MPServerPlugin extends MPPlugin {
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
+
+        testInit();
     }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
+        test();
+
         if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
             serverConnectionManager.stop();
             Global.getCombatEngine().removePlugin(this);
@@ -91,7 +95,10 @@ public class MPServerPlugin extends MPPlugin {
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
-    private void test() {
+    Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> m;
+    float f = 0f;
+
+    private void testInit() {
         ListRecord<Float> listRecord = new ListRecord<>(new ArrayList<Float>(), Float32Record.TYPE_ID);
         listRecord.sourceExecute(new SourceExecute<List<Float>>() {
             @Override
@@ -108,8 +115,27 @@ public class MPServerPlugin extends MPPlugin {
         t.put((byte) 3, listRecord);
         Map<Short, Map<Byte, BaseRecord<?>>> i = new HashMap<>();
         i.put((short) 10, t);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> m = new HashMap<>();
+        m = new HashMap<>();
         m.put((byte) 69, i);
+    }
+
+    private void test() {
+        f += 10f;
+
+        ListRecord<Float> listRecord = (ListRecord<Float>) m.get((byte) 69).get((short) 10).get((byte) 3);
+        listRecord.sourceExecute(new SourceExecute<List<Float>>() {
+            @Override
+            public List<Float> get() {
+                List<Float> data = new ArrayList<>();
+                data.add(1f);
+                data.add(10f);
+                data.add(53423f);
+                data.add(2321f);
+                data.add(f);
+                return data;
+            }
+        });
+
         ByteBuf buf = UnpooledByteBufAllocator.DEFAULT.buffer();
         BaseConnectionWrapper.writeBuffer(m, buf);
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> output;

@@ -115,6 +115,10 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         }
 
         List<E> value = new ArrayList<>(max);
+        for (int i = 0; i < max; i++) {
+            value.add(null);
+        }
+
         for (byte b : data.keySet()) {
             value.set(b, data.get(b));
         }
@@ -129,6 +133,9 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         List<E> temp;
         int size = Math.max(delta.size(), value.size());
         temp = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            temp.add(null);
+        }
 
         for (int i = 0; i < size; i++) {
             E d = delta.get(i);
