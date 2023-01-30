@@ -32,11 +32,6 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
         for (BasePackable p : table) {
             if (p != null) {
                 p.destExecute();
-
-                if (p.isInit()) {
-                    p.init(plugin);
-                    p.setInit(false);
-                }
             }
         }
     }

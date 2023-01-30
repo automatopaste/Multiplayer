@@ -24,11 +24,6 @@ public class LobbyInput implements InboundEntityManager {
     public void execute(MPPlugin plugin) {
         if (lobby != null) {
             lobby.destExecute();
-
-            if (lobby.isInit()) {
-                lobby.init(plugin);
-                lobby.setInit(false);
-            }
         }
     }
 

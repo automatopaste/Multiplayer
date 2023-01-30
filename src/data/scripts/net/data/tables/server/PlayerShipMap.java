@@ -36,11 +36,6 @@ public class PlayerShipMap implements InboundEntityManager {
         for (BasePackable p : playerShips.values()) {
             if (p != null) {
                 p.destExecute();
-
-                if (p.isInit()) {
-                    p.init(plugin);
-                    p.setInit(false);
-                }
             }
         }
     }

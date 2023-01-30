@@ -60,11 +60,6 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
         for (BasePackable p : players.values()) {
             if (p != null) {
                 p.destExecute();
-
-                if (p.isInit()) {
-                    p.init(plugin);
-                    p.setInit(false);
-                }
             }
         }
     }

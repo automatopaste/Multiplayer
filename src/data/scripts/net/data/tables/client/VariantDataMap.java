@@ -41,11 +41,6 @@ public class VariantDataMap implements InboundEntityManager {
     public void execute(MPPlugin plugin) {
         for (VariantData v : variants.values()) {
             v.destExecute();
-
-            if (v.isInit()) {
-                v.init(plugin);
-                v.setInit(false);
-            }
         }
     }
 

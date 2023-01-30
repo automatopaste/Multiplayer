@@ -213,6 +213,40 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("shield facing"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        return ConversionUtils.floatToByte(ship.getShield().getFacing(), 360f);
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) ship.getShield().forceFacing(ConversionUtils.byteToFloat(record.getValue(), 360f));
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("shield arc"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        return ConversionUtils.floatToByte(ship.getShield().getActiveArc(), 360f);
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) ship.getShield().setActiveArc(ConversionUtils.byteToFloat(record.getValue(), 360f));
+                    }
+                }
+        ));
     }
 
     @Override
