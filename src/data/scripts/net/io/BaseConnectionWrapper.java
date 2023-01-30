@@ -116,10 +116,11 @@ public abstract class BaseConnectionWrapper {
                 dest.writeByte(records.size());
 
                 for (byte id : records.keySet()) {
+                    BaseRecord<?> record = records.get(id);
+
                     // write record id byte
                     dest.writeByte(id);
 
-                    BaseRecord<?> record = records.get(id);
                     //write record type byte
                     byte typeID = record.getTypeId();
                     dest.writeByte(typeID);
