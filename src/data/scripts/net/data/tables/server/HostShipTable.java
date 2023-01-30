@@ -87,6 +87,8 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
         for (short id : registered.values()) {
             ShipData shipData = table[id];
 
+            shipData.sourceExecute();
+
             Map<Byte, BaseRecord<?>> records = new HashMap<>();
             List<RecordLambda<?>> recordLambdas = shipData.getRecords();
             for (byte i = 0; i < recordLambdas.size(); i++) {
