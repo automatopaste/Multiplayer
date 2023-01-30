@@ -10,11 +10,13 @@ import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.ConversionUtils;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.plugins.MPPlugin;
 
 public class ShieldData extends BasePackable {
 
     public static byte TYPE_ID;
+    private final short instanceID;
 
     private ShieldAPI shield;
 
@@ -23,6 +25,7 @@ public class ShieldData extends BasePackable {
      */
     public ShieldData(short instanceID, final ShieldAPI shield) {
         super(instanceID);
+        this.instanceID = instanceID;
 
         if (shield == null) throw new NullPointerException("Null shield object");
 
@@ -95,7 +98,11 @@ public class ShieldData extends BasePackable {
 
     @Override
     public void update(float amount, BaseEntityManager manager) {
+        if (shield == null && manager instanceof ClientShipTable) {
+            ClientShipTable clientShipTable = (ClientShipTable) manager;
 
+            setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
+        }
     }
 
     @Override

@@ -68,4 +68,8 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
         DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
         DataGenManager.registerInboundEntityManager(ShieldData.TYPE_ID, this);
     }
+
+    public Map<Short, ShieldData> getShields() {
+        return shields;
+    }
 }

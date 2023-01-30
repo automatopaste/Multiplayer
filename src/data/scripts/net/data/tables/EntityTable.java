@@ -29,4 +29,8 @@ public abstract class EntityTable<T extends BasePackable> {
         if (i == null) throw new NullPointerException("No vacant entity index found");
         return i;
     }
+
+    public T[] getTable() {
+        return table;
+    }
 }
