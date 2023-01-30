@@ -67,6 +67,31 @@ public class MPServerPlugin extends MPPlugin {
             Console.showMessage("Closed server");
         }
 
+        // inbound data update
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
+        DataGenManager.distributeInboundDeltas(inbound, this);
+
+        // simulation update
+        updateEntityManagers(amount);
+
+        // outbound data update
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
+        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
+
+        debug();
+    }
+
+    private void debug() {
+        GUIDebug guiDebug = CMUtils.getGuiDebug();
+
+        guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
+        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + hostShipTable.getRegistered().size() + " ships in local table");
+        guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
+    }
+
+    private void test() {
         ListRecord<Float> listRecord = new ListRecord<>(new ArrayList<Float>(), Float32Record.TYPE_ID);
         listRecord.sourceExecute(new SourceExecute<List<Float>>() {
             @Override
@@ -94,29 +119,6 @@ public class MPServerPlugin extends MPPlugin {
             throw new RuntimeException(e);
         }
         buf.release();
-
-        // inbound data update
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
-        DataGenManager.distributeInboundDeltas(inbound, this);
-
-        // simulation update
-        updateEntityManagers(amount);
-
-        // outbound data update
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
-        serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
-        serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
-
-        debug();
-    }
-
-    private void debug() {
-        GUIDebug guiDebug = CMUtils.getGuiDebug();
-
-        guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
-        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + hostShipTable.getRegistered().size() + " ships in local table");
-        guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
     public VariantDataGenerator getVariantStore() {

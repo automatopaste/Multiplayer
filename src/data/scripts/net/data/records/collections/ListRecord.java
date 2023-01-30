@@ -59,21 +59,33 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
         }
 
-        if (toWrite.size() == 0) return;
+//        if (toWrite.size() == 0) return;
+//
+//        dest.writeByte(elementTypeID);
+//        dest.writeByte(toWrite.size());
+//
+//        for (byte i : toWrite.keySet()) {
+//            // write index
+//            dest.writeByte(i);
+//
+//            // write data
+//            writer.overwrite(toWrite.get(i));
+//            writer.write(dest);
+//        }
+//
+//        toWrite.clear();
 
         dest.writeByte(elementTypeID);
-        dest.writeByte(toWrite.size());
+        dest.writeByte(value.size());
 
-        for (byte i : toWrite.keySet()) {
-            // write index
+        for (byte i = 0; i < value.size(); i++) {
+            E e = value.get(i);
+
             dest.writeByte(i);
 
-            // write data
-            writer.overwrite(toWrite.get(i));
+            writer.overwrite(e);
             writer.write(dest);
         }
-
-        toWrite.clear();
     }
 
     @Override
@@ -81,36 +93,53 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         byte type = in.readByte();
         byte num = in.readByte();
 
-        BaseRecord<?> reader = DataGenManager.recordFactory(type);
-        List<E> data = new ArrayList<>();
+        if (num == 0) {
+            throw new IndexOutOfBoundsException("Empty list delta");
+        }
+
+        BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
+
+        Map<Byte, E> data = new HashMap<>();
+        int max = 0;
         for (int i = 0; i < num; i++) {
             byte index = in.readByte();
 
-            E e = (E) reader.read(in).getValue();
+            max = Math.max(index, max);
 
-            while (index > data.size() - 1) {
-                data.add(null);
-            }
+            reader.read(in);
+            E e = reader.getValue();
 
-            data.set(index, e);
+            data.put(index, e);
         }
 
-        return new ListRecord<>(data, type);
+        List<E> value = new ArrayList<>(max);
+        for (byte b : data.keySet()) {
+            value.set(b, data.get(b));
+        }
+
+        return new ListRecord<>(value, type);
     }
 
     @Override
-    public void overwrite(Object delta) {
-        List<E> d = (List<E>) delta;
+    public void overwrite(Object o) {
+        List<E> delta = (List<E>) o;
 
-        for (int i = 0; i < d.size(); i++) {
-            E e = d.get(i);
+        List<E> temp;
+        int size = Math.max(delta.size(), value.size());
+        temp = new ArrayList<>(size);
 
-            while (i > value.size() - 1) {
-                value.add(null);
+        for (int i = 0; i < size; i++) {
+            E d = delta.get(i);
+            E v = value.get(i);
+
+            if (d != null) {
+                temp.set(i, d);
+            } else if (v != null) {
+                temp.set(i, v);
             }
-
-            value.set(i, e);
         }
+
+        value = temp;
     }
 
     public static void setTypeId(byte typeId) {
