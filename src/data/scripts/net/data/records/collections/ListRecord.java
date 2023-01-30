@@ -39,17 +39,15 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             E d = delta.get(i);
 
             if (i + 1 > value.size()) {
-                value.add(d);
-
                 toWrite.put(i, d);
                 update = true;
             } else if (!d.equals(value.get(i))) {
-                value.set(i, d);
-
                 toWrite.put(i, d);
                 update = true;
             }
         }
+
+        value = delta;
 
         return update;
     }
