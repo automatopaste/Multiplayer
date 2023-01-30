@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables.entities.projectiles;
 
 import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 public class ProjectileData extends BasePackable {
@@ -20,7 +21,7 @@ public class ProjectileData extends BasePackable {
     }
 
     @Override
-    public void init(MPPlugin plugin) {
+    public void init(MPPlugin plugin, InboundEntityManager manager) {
 
     }
 

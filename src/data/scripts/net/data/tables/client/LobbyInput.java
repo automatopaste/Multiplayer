@@ -53,7 +53,7 @@ public class LobbyInput implements InboundEntityManager {
 
             lobby.destExecute(toProcess);
 
-            lobby.init(plugin);
+            lobby.init(plugin, this);
         } else {
             lobby.destExecute(toProcess);
         }

@@ -55,7 +55,7 @@ public class PlayerShipMap implements InboundEntityManager {
             playerShips.put(instanceID, data);
 
             data.destExecute(toProcess);
-            data.init(plugin);
+            data.init(plugin, this);
         } else {
             data.destExecute(toProcess);
         }

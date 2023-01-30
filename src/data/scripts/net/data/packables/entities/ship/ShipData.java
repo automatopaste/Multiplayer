@@ -10,6 +10,7 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.*;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
@@ -216,7 +217,7 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public void init(MPPlugin plugin) {
+    public void init(MPPlugin plugin, InboundEntityManager manager) {
         if (plugin.getType() != MPPlugin.PluginType.CLIENT) return;
         MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
 

@@ -26,7 +26,7 @@ public class VariantDataMap implements InboundEntityManager {
 
             variantData.destExecute(toProcess);
 
-            variantData.init(plugin);
+            variantData.init(plugin, );
         } else {
             data.destExecute(toProcess);
         }

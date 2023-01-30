@@ -8,6 +8,7 @@ import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.PlayerShipMap;
 import data.scripts.plugins.MPPlugin;
@@ -79,7 +80,7 @@ public class LobbyData extends BasePackable {
     }
 
     @Override
-    public void init(MPPlugin plugin) {
+    public void init(MPPlugin plugin, InboundEntityManager manager) {
 
     }
 

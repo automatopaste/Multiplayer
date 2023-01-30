@@ -12,6 +12,7 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lwjgl.input.Keyboard;
@@ -74,7 +75,7 @@ public class PlayerShipData extends BasePackable {
     }
 
     @Override
-    public void init(MPPlugin plugin) {
+    public void init(MPPlugin plugin, InboundEntityManager manager) {
 
     }
 

@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables;
 
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public abstract class BasePackable {
     /**
      * Called when entity is initialised
      */
-    public abstract void init(MPPlugin plugin);
+    public abstract void init(MPPlugin plugin, InboundEntityManager manager);
 
     /**
      * Called when entity is deleted

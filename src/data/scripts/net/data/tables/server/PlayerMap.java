@@ -38,7 +38,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
             data.destExecute(toProcess);
 
-            data.init(plugin);
+            data.init(plugin, this);
         } else {
             data.destExecute(toProcess);
         }

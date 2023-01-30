@@ -32,7 +32,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
 
                 data.destExecute(toProcess);
 
-                data.init(plugin);
+                data.init(plugin, this);
             } else {
                 data.destExecute(toProcess);
             }
@@ -40,12 +40,13 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             ShieldData shieldData = shields.get(instanceID);
 
             if (shieldData == null) {
-                shieldData = new ShieldData(instanceID, null);
+                ShipData shipData = table[instanceID];
+                shieldData = new ShieldData(instanceID, shipData.getShip().getShield());
                 shields.put(instanceID, shieldData);
 
                 shieldData.destExecute(toProcess);
 
-                shieldData.init(plugin);
+                shieldData.init(plugin, this);
             } else {
                 shieldData.destExecute(toProcess);
             }
