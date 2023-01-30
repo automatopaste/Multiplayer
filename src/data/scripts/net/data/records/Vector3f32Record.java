@@ -7,15 +7,8 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
 
     public static byte TYPE_ID;
 
-    private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
-
     public Vector3f32Record(Vector3f record) {
         super(record);
-    }
-
-    public Vector3f32Record setUseDecimalPrecision(boolean useDecimalPrecision) {
-        this.useDecimalPrecision = useDecimalPrecision;
-        return this;
     }
 
     @Override
@@ -37,11 +30,7 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     public boolean checkNotEqual(Vector3f delta) {
         boolean isUpdated;
 
-        if (useDecimalPrecision) {
-            isUpdated = (value.x != delta.x) || (value.y != delta.y) || (value.z != delta.z);
-        } else {
-            isUpdated = ((int) value.x != (int) delta.x) || ((int) value.y != (int) delta.y) || ((int) value.z != (int) delta.z);
-        }
+        isUpdated = (value.x != delta.x) || (value.y != delta.y) || (value.z != delta.z);
 
         return isUpdated;
     }

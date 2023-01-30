@@ -6,26 +6,15 @@ import org.lwjgl.util.vector.Vector2f;
 public class Vector2f16Record extends BaseRecord<Vector2f> {
     public static byte TYPE_ID;
 
-    private boolean useDecimalPrecision; // if the update checker cares about decimal stuff, use to reduce traffic
-
     public Vector2f16Record(Vector2f record) {
         super(record);
-    }
-
-    public Vector2f16Record setUseDecimalPrecision(boolean useDecimalPrecision) {
-        this.useDecimalPrecision = useDecimalPrecision;
-        return this;
     }
 
     @Override
     public boolean checkNotEqual(Vector2f delta) {
         boolean isUpdated;
 
-        if (useDecimalPrecision) {
-            isUpdated = (value.x != delta.x) || (value.y != delta.y);
-        } else {
-            isUpdated = ((int) value.x != (int) delta.x) || ((int) value.y != (int) delta.y);
-        }
+        isUpdated = (value.x != delta.x) || (value.y != delta.y);
 
         return isUpdated;
     }

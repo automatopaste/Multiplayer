@@ -133,6 +133,8 @@ public class DataDuplex {
                         outboundRecord = record;
                         outboundEntityRecords.put(id, outboundRecord);
                     }
+
+                    outboundRecord.overwrite(outboundRecord.getValue());
                 }
             }
         }
