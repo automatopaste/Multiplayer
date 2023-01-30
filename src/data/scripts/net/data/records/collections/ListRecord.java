@@ -108,11 +108,12 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
             max = Math.max(index, max);
 
-            reader.read(in);
-            E e = reader.getValue();
+            BaseRecord<E> v = reader.read(in);
+            E e = v.getValue();
 
             data.put(index, e);
         }
+        max++;
 
         List<E> value = new ArrayList<>(max);
         for (int i = 0; i < max; i++) {
