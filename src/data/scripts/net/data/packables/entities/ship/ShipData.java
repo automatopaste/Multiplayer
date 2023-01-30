@@ -10,6 +10,7 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.*;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
@@ -274,7 +275,7 @@ public class ShipData extends BasePackable {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, BaseEntityManager manager) {
 
     }
 

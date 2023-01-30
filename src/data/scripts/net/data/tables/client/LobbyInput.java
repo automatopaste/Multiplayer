@@ -23,6 +23,8 @@ public class LobbyInput implements InboundEntityManager {
     @Override
     public void update(float amount, MPPlugin plugin) {
         if (lobby != null) {
+            lobby.update(amount, this);
+
             short[] players = lobby.getPlayers();
 
             for (int i = 0; i < players.length; i++) {

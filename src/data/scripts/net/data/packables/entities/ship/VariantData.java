@@ -9,6 +9,7 @@ import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.collections.ListRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -132,7 +133,7 @@ public class VariantData extends BasePackable {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, BaseEntityManager manager) {
 
     }
 

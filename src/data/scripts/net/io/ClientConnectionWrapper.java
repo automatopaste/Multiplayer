@@ -104,10 +104,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        connectionData.sourceExecute();
-
         Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
-        instance.put(connectionID, connectionData.getDeltas());
+        instance.put(connectionID, connectionData.sourceExecute());
         outbound.put(ConnectionData.TYPE_ID, instance);
 
         ByteBuf data = initBuffer(tick, connectionID);

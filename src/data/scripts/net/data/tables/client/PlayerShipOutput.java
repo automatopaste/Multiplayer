@@ -28,7 +28,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-
+        playerShipData.update(amount, this);
     }
 
     @Override
@@ -40,8 +40,7 @@ public class PlayerShipOutput implements OutboundEntityManager {
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
-        playerShipData.sourceExecute();
-        Map<Byte, BaseRecord<?>> deltas = playerShipData.getDeltas();
+        Map<Byte, BaseRecord<?>> deltas = playerShipData.sourceExecute();
         if (deltas != null && !deltas.isEmpty()) {
             out.put(instanceID, deltas);
         }

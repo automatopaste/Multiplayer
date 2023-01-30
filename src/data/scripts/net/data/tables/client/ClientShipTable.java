@@ -48,9 +48,6 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
 
                 shieldData.init(plugin, this);
             } else {
-                if (shieldData.getShield() == null) {
-                    shieldData.setShield(table[instanceID].getShip().getShield());
-                }
                 shieldData.destExecute(toProcess);
             }
         }
@@ -59,10 +56,10 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     @Override
     public void update(float amount, MPPlugin plugin) {
         for (ShipData ship : table) {
-            if (ship != null) ship.update(amount);
+            if (ship != null) ship.update(amount, this);
         }
         for (ShieldData shieldData : shields.values()) {
-            shieldData.update(amount);
+            shieldData.update(amount, this);
         }
     }
 

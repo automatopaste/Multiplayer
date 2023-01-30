@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables;
 
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -78,7 +79,7 @@ public abstract class BasePackable {
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server
      */
-    public abstract void update(float amount);
+    public abstract void update(float amount, BaseEntityManager manager);
 
     /**
      * Called when entity is initialised

@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables.entities.projectiles;
 
 import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -16,7 +17,7 @@ public class ProjectileData extends BasePackable {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, BaseEntityManager manager) {
 
     }
 

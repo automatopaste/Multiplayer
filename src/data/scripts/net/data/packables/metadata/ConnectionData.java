@@ -7,6 +7,7 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPPlugin;
@@ -63,7 +64,7 @@ public class ConnectionData extends BasePackable {
     }
 
     @Override
-    public void update(float amount) {
+    public void update(float amount, BaseEntityManager manager) {
 
     }
 

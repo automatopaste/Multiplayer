@@ -32,7 +32,7 @@ public class PlayerShipMap implements InboundEntityManager {
 //        hostShip = Global.getCombatEngine().getPlayerShip();
 
         for (PlayerShipData playerShipData : playerShips.values()) {
-            playerShipData.update(amount);
+            playerShipData.update(amount, this);
         }
     }
 

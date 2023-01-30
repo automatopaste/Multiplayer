@@ -33,9 +33,8 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
             for (int i = 0; i < table.length; i++) {
                 ShipData data = table[i];
                 if (data != null) {
-                    data.sourceExecute();
+                    Map<Byte, BaseRecord<?>> deltas = data.sourceExecute();
 
-                    Map<Byte, BaseRecord<?>> deltas = data.getDeltas();
                     if (deltas != null && !deltas.isEmpty()) {
                         out.put((short) i, deltas);
                     }
@@ -44,15 +43,14 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
         } else if (typeID == ShieldData.TYPE_ID) {
             for (Short id : shields.keySet()) {
                 ShieldData shieldData = shields.get(id);
-                shieldData.sourceExecute();
 
-                Map<Byte, BaseRecord<?>> deltas = shieldData.getDeltas();
+                Map<Byte, BaseRecord<?>> deltas = shieldData.sourceExecute();
+
                 if (deltas != null && !deltas.isEmpty()) {
                     out.put(id, deltas);
                 }
             }
         }
-
 
         return out;
     }
@@ -73,6 +71,13 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
 
         for (String d : diff) {
             deleteEntry(d);
+        }
+
+        for (ShipData shipData : table) {
+            if (shipData != null) shipData.update(amount, this);
+        }
+        for (ShieldData shieldData : shields.values()) {
+            shieldData.update(amount, this);
         }
     }
 

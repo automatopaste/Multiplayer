@@ -48,9 +48,7 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
-        lobby.sourceExecute();
-
-        Map<Byte, BaseRecord<?>> deltas = lobby.getDeltas();
+        Map<Byte, BaseRecord<?>> deltas = lobby.sourceExecute();
         if (deltas != null && !deltas.isEmpty()) {
             out.put((short) -1, deltas);
         }
@@ -60,10 +58,10 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        host.update(amount);
-        lobby.update(amount);
+        host.update(amount, this);
+        lobby.update(amount, this);
         for (PlayerData playerData : players.values()) {
-            playerData.update(amount);
+            playerData.update(amount, this);
         }
     }
 

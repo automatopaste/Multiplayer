@@ -50,8 +50,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 Map<Short, Map<Byte, BaseRecord<?>>> variants = new HashMap<>();
                 for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
-                    variantData.sourceExecute();
-                    variants.put(variantData.getInstanceID(), variantData.getDeltas());
+                    variants.put(variantData.getInstanceID(), variantData.sourceExecute());
                 }
 
                 outbound.put(VariantData.TYPE_ID, variants);
@@ -77,10 +76,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        connectionData.sourceExecute();
-
         Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
-        instance.put(connectionID, connectionData.getDeltas());
+        instance.put(connectionID, connectionData.sourceExecute());
         outbound.put(ConnectionData.TYPE_ID, instance);
 
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);

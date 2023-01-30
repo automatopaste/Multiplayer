@@ -24,9 +24,8 @@ public class PlayerOutput implements OutboundEntityManager {
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
-        player.sourceExecute();
 
-        Map<Byte, BaseRecord<?>> deltas = player.getDeltas();
+        Map<Byte, BaseRecord<?>> deltas = player.sourceExecute();
         if (deltas != null && !deltas.isEmpty()) {
             out.put(instanceID, deltas);
         }
@@ -35,7 +34,7 @@ public class PlayerOutput implements OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-
+        player.update(amount, this);
     }
 
     @Override
