@@ -1,38 +1,35 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerShipMap implements InboundEntityManager, OutboundEntityManager {
+public class PlayerShipMap implements InboundEntityManager {
 
     private final Map<Short, PlayerShipData> playerShips;
-    private final PlayerShipData hostShipData;
-    private ShipAPI hostShip;
+//    private final PlayerShipData hostShipData;
+//    private ShipAPI hostShip;
 
     public PlayerShipMap() {
         playerShips = new HashMap<>();
-        hostShipData = new PlayerShipData((short) -1, new SourceExecute<String>() {
-            @Override
-            public String get() {
-                if (hostShip != null) return hostShip.getFleetMemberId();
-                return null;
-            }
-        });
+//        hostShipData = new PlayerShipData((short) -1, new SourceExecute<String>() {
+//            @Override
+//            public String get() {
+//                if (hostShip != null) return hostShip.getFleetMemberId();
+//                return null;
+//            }
+//        });
     }
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        hostShip = Global.getCombatEngine().getPlayerShip();
+//        hostShip = Global.getCombatEngine().getPlayerShip();
 
         for (PlayerShipData playerShipData : playerShips.values()) {
             playerShipData.update(amount);
@@ -42,7 +39,6 @@ public class PlayerShipMap implements InboundEntityManager, OutboundEntityManage
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(PlayerShipData.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(PlayerShipData.TYPE_ID, this);
     }
 
     public Map<Short, PlayerShipData> getPlayerShips() {
@@ -69,22 +65,17 @@ public class PlayerShipMap implements InboundEntityManager, OutboundEntityManage
         return Global.getCombatEngine().getPlayerShip().getFleetMemberId();
     }
 
-    @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
-        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
-
-        hostShipData.sourceExecute();
-
-        Map<Byte, BaseRecord<?>> deltas = hostShipData.getDeltas();
-        if (deltas != null && !deltas.isEmpty()) {
-            out.put((short) -1, deltas);
-        }
-
-        return out;
-    }
-
-    @Override
-    public PacketType getOutboundPacketType() {
-        return PacketType.DATAGRAM;
-    }
+//    @Override
+//    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+//        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+//
+//        hostShipData.sourceExecute();
+//
+//        Map<Byte, BaseRecord<?>> deltas = hostShipData.getDeltas();
+//        if (deltas != null && !deltas.isEmpty()) {
+//            out.put((short) -1, deltas);
+//        }
+//
+//        return out;
+//    }
 }

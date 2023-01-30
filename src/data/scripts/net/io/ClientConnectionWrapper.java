@@ -60,7 +60,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
             return null;
         }
 
-        connectionData.destExecute();
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundSocket();
@@ -142,7 +141,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities, int tick) {
         Map<Short, Map<Byte, BaseRecord<?>>> instance = entities.get(ConnectionData.TYPE_ID);
-        if (instance != null) connectionData.overwrite(instance.get(connectionID));
+        if (instance != null) connectionData.destExecute(instance.get(connectionID));
         entities.remove(ConnectionData.TYPE_ID);
 
         this.tick = tick;
