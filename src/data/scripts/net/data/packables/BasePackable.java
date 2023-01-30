@@ -48,6 +48,7 @@ public abstract class BasePackable {
      * @return deltas
      */
     public Map<Byte, BaseRecord<?>> getDeltas() {
+        init = true;
         if (init) {
             for (byte i = 0; i < records.size(); i++) {
                 RecordLambda<?> lambda = records.get(i);

@@ -218,6 +218,7 @@ public class ShipData extends BasePackable {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
+                        if (ship.getShield() == null) return (byte) 0;
                         return ConversionUtils.floatToByte(ship.getShield().getFacing(), 360f);
                     }
                 },
@@ -235,6 +236,7 @@ public class ShipData extends BasePackable {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
+                        if (ship.getShield() == null) return (byte) 0;
                         return ConversionUtils.floatToByte(ship.getShield().getActiveArc(), 360f);
                     }
                 },
