@@ -37,11 +37,15 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         this.port = port;
         dataDuplex = new DataDuplex();
 
+        tick = -1;
+
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
         socket.start();
 
-        tick = -1;
+        datagramClient = new DatagramClient(host, port, clientPort, this);
+        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
+        datagram.start();
     }
 
     @Override
@@ -53,6 +57,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
             connectionID = ConnectionData.getConnectionID(address);
             connectionData = new ConnectionData(connectionID, this);
             clientPort = socketClient.getLocalPort();
+            return null;
         }
 
         connectionData.destExecute();
@@ -91,8 +96,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
                 connectionState = ConnectionState.SIMULATING;
 
-                if (datagramClient == null) startDatagramClient();
-
                 break;
             case SIMULATING:
             default:
@@ -111,15 +114,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         return new MessageContainer(data, tick, true, null, socketBuffer, connectionID);
     }
 
-    private void startDatagramClient() {
-        datagramClient = new DatagramClient(host, port, clientPort, this);
-        datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
-        datagram.start();
-    }
-
     @Override
     public MessageContainer getDatagram() throws IOException {
-        if (connectionData == null) return null;
+        if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundDatagram();
 

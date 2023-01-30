@@ -89,7 +89,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public MessageContainer getDatagram() throws IOException {
-        if (connectionData == null) return null;
+        if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundDatagram();
 
