@@ -25,6 +25,8 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             table[instanceID] = shipData;
 
             shipData.overwrite(toProcess);
+
+            shipData.init(plugin);
         } else {
             data.overwrite(toProcess);
         }

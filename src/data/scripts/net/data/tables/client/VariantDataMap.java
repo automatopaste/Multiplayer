@@ -25,6 +25,8 @@ public class VariantDataMap implements InboundEntityManager {
             variantData.overwrite(toProcess);
 
             variants.put(instanceID, variantData);
+
+            variantData.init(plugin);
         } else {
             data.overwrite(toProcess);
         }

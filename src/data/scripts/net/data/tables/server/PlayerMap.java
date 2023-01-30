@@ -40,6 +40,8 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
             data.overwrite(toProcess);
 
             players.put(instanceID, data);
+
+            data.init(plugin);
         } else {
             data.overwrite(toProcess);
         }

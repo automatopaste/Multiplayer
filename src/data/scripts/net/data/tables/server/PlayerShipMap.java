@@ -67,6 +67,8 @@ public class PlayerShipMap implements InboundEntityManager {
             data.overwrite(toProcess);
 
             playerShips.put(instanceID, data);
+
+            data.init(plugin);
         } else {
             data.overwrite(toProcess);
         }
