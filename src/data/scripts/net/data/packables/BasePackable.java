@@ -16,14 +16,12 @@ public abstract class BasePackable {
 
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
-    protected final Map<Byte, BaseRecord<?>> deltas;
     private boolean init = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
 
         records = new ArrayList<>();
-        deltas = new HashMap<>();
     }
 
     public short getInstanceID() {
@@ -48,27 +46,20 @@ public abstract class BasePackable {
      * Returns a map of all records that are marked as updated since the last time
      * @return deltas
      */
-    public Map<Byte, BaseRecord<?>> getDeltas() {
-        init = true;
-        if (init) {
-            for (byte i = 0; i < records.size(); i++) {
-                RecordLambda<?> lambda = records.get(i);
-                deltas.put(i, lambda.record);
-            }
-
-            init = false;
-        }
-
-        return deltas;
-    }
-
-    public void sourceExecute() {
-        deltas.clear();
+    public Map<Byte, BaseRecord<?>> sourceExecute() {
+        Map<Byte, BaseRecord<?>> deltas = new HashMap<>();
 
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);
-            if (recordLambda.sourceExecute()) this.deltas.put(i, recordLambda.record);
+
+            if (recordLambda.sourceExecute() || init) {
+                deltas.put(i, recordLambda.record);
+            }
         }
+
+        init = false;
+
+        return deltas;
     }
 
     /**
@@ -84,13 +75,6 @@ public abstract class BasePackable {
         for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);
     }
 
-//    public void overwrite(Map<Byte, BaseRecord<?>> deltas) {
-//        for (byte k : deltas.keySet()) {
-//            RecordLambda<?> record = records.get(k);
-//            record.overwrite(deltas.get(k));
-//        }
-//    }
-
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server
      */
@@ -105,12 +89,4 @@ public abstract class BasePackable {
      * Called when entity is deleted
      */
     public abstract void delete();
-
-    public boolean isInit() {
-        return init;
-    }
-
-    public void setInit(boolean init) {
-        this.init = init;
-    }
 }

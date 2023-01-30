@@ -1,18 +1,22 @@
 package data.scripts.net.data.records.collections;
 
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.util.DataGenManager;
 import io.netty.buffer.ByteBuf;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ListRecord<E> extends BaseRecord<List<E>> {
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
     private final BaseRecord<E> writer;
-    private final Map<Byte, E> toWrite;
+
+    private Map<Byte, E> toWrite = new HashMap<>();
 
     public ListRecord(List<E> collection, byte elementTypeID) {
         super(collection);
@@ -23,42 +27,41 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
         } else {
             writer = null;
         }
-
-        toWrite = new HashMap<>();
     }
 
     @Override
-    protected boolean checkNotEqual(List<E> delta) {
-        if (value.size() > Byte.MAX_VALUE) throw new RuntimeException("Array size exceeded " + Byte.MAX_VALUE + " elements");
+    public boolean sourceExecute(SourceExecute<List<E>> sourceExecute) {
+        List<E> delta = sourceExecute.get();
 
-        toWrite.clear();
-
-        boolean update = delta.size() != value.size();
+        boolean update = false;
 
         for (byte i = 0; i < delta.size(); i++) {
             E d = delta.get(i);
 
-            if (i + 1> value.size()) {
+            if (i + 1 > value.size()) {
+                value.add(d);
+
                 toWrite.put(i, d);
-            } else {
-                if (!d.equals(value.get(i))) {
-                    toWrite.put(i, d);
-                    update = true;
-                }
+                update = true;
+            } else if (!d.equals(value.get(i))) {
+                value.set(i, d);
+
+                toWrite.put(i, d);
+                update = true;
             }
         }
 
         return update;
     }
 
+
     @Override
     public void write(ByteBuf dest) {
         if (value.size() > Byte.MAX_VALUE) {
             throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
         }
-        if (toWrite.isEmpty()) {
-            throw new RuntimeException("List Record writing with no updated data");
-        }
+
+        if (toWrite.size() == 0) return;
 
         dest.writeByte(elementTypeID);
         dest.writeByte(toWrite.size());
@@ -98,6 +101,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     @Override
     public void overwrite(Object delta) {
         List<E> d = (List<E>) delta;
+
         for (int i = 0; i < d.size(); i++) {
             E e = d.get(i);
 
@@ -116,5 +120,10 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     @Override
     public byte getTypeId() {
         return TYPE_ID;
+    }
+
+    @Override
+    protected boolean checkNotEqual(List<E> delta) {
+        return true;
     }
 }
