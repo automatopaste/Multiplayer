@@ -50,8 +50,6 @@ public abstract class BasePackable {
     public Map<Byte, BaseRecord<?>> sourceExecute() {
         Map<Byte, BaseRecord<?>> deltas = new HashMap<>();
 
-        init = true;
-
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);
 

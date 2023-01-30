@@ -1,6 +1,5 @@
 package data.scripts.net.io.udp;
 
-import data.scripts.net.io.CompressionUtils;
 import data.scripts.net.io.MessageContainer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -8,6 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
+import java.util.zip.DataFormatException;
 
 public class DatagramUtils {
 
@@ -24,17 +24,36 @@ public class DatagramUtils {
         if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
         sizeData.size = (short) bytes.length;
         buf.readBytes(bytes);
-        byte[] compressed = CompressionUtils.deflate(bytes);
-        sizeData.sizeCompressed = (short) compressed.length;
+//        byte[] compressed = CompressionUtils.deflate(bytes);
+//        sizeData.sizeCompressed = (short) compressed.length;
 
-        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer();
+        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length);
 
         out.writeShort(sizeData.size);
-        out.writeShort(sizeData.sizeCompressed);
-        out.writeBytes(compressed);
+//        out.writeShort(sizeData.sizeCompressed);
+//        out.writeBytes(compressed);
+
+        out.writeBytes(bytes);
 
         channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
         return sizeData;
+    }
+
+    public static byte[] read(DatagramPacket in) throws DataFormatException {
+        ByteBuf content = in.content();
+        int size = content.readShort();
+//        int sizeCompressed = content.readShort();
+
+        if (size == 0) return new byte[0];
+
+//        byte[] bytes = new byte[sizeCompressed];
+//        content.readBytes(bytes);
+
+        byte[] bytes = new byte[size];
+        content.readBytes(bytes);
+
+//        return CompressionUtils.inflate(bytes, size, sizeCompressed);
+        return bytes;
     }
 
     public static class SizeData {
