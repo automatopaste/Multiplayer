@@ -3,7 +3,6 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
@@ -31,6 +30,8 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
         for (int i = 0; i < table.length; i++) {
             ShipData data = table[i];
             if (data != null) {
+                data.sourceExecute();
+
                 Map<Byte, BaseRecord<?>> deltas = data.getDeltas();
                 if (deltas != null && !deltas.isEmpty()) {
                     out.put((short) i, deltas);
@@ -39,11 +40,6 @@ public class HostShipTable extends EntityTable<ShipData> implements OutboundEnti
         }
 
         return out;
-    }
-
-    @Override
-    public void execute(MPPlugin plugin) {
-        for (BasePackable p : table) if (p != null) p.sourceExecute();
     }
 
     @Override

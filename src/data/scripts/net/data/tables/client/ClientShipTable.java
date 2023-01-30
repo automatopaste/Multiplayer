@@ -1,6 +1,5 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
@@ -24,20 +23,11 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             ShipData shipData = new ShipData(instanceID, null);
             table[instanceID] = shipData;
 
-            shipData.overwrite(toProcess);
+            shipData.destExecute(toProcess);
 
             shipData.init(plugin);
         } else {
-            data.overwrite(toProcess);
-        }
-    }
-
-    @Override
-    public void execute(MPPlugin plugin) {
-        for (BasePackable p : table) {
-            if (p != null) {
-                p.destExecute();
-            }
+            data.destExecute(toProcess);
         }
     }
 

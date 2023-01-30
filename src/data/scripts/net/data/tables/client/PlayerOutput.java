@@ -23,16 +23,14 @@ public class PlayerOutput implements OutboundEntityManager {
     @Override
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+
+        player.sourceExecute();
+
         Map<Byte, BaseRecord<?>> deltas = player.getDeltas();
         if (deltas != null && !deltas.isEmpty()) {
             out.put(instanceID, deltas);
         }
         return out;
-    }
-
-    @Override
-    public void execute(MPPlugin plugin) {
-        player.sourceExecute();
     }
 
     @Override

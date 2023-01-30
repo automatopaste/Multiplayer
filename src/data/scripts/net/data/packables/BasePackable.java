@@ -70,20 +70,25 @@ public abstract class BasePackable {
         }
     }
 
-    public void destExecute() {
-        for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);
-    }
-
     /**
      * Update stored data with changes from a delta at dest
      * @param deltas incoming deltas
      */
-    public void overwrite(Map<Byte, BaseRecord<?>> deltas) {
+    public void destExecute(Map<Byte, BaseRecord<?>> deltas) {
         for (byte k : deltas.keySet()) {
             RecordLambda<?> record = records.get(k);
             record.overwrite(deltas.get(k));
         }
+
+        for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);
     }
+
+//    public void overwrite(Map<Byte, BaseRecord<?>> deltas) {
+//        for (byte k : deltas.keySet()) {
+//            RecordLambda<?> record = records.get(k);
+//            record.overwrite(deltas.get(k));
+//        }
+//    }
 
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server

@@ -22,13 +22,13 @@ public class VariantDataMap implements InboundEntityManager {
 
         if (data == null) {
             VariantData variantData = new VariantData(instanceID, null, null);
-            variantData.overwrite(toProcess);
-
             variants.put(instanceID, variantData);
+
+            variantData.destExecute(toProcess);
 
             variantData.init(plugin);
         } else {
-            data.overwrite(toProcess);
+            data.destExecute(toProcess);
         }
     }
 
@@ -37,13 +37,6 @@ public class VariantDataMap implements InboundEntityManager {
             if (variantData.getFleetMemberID().equals(shipID)) return variantData;
         }
         return null;
-    }
-
-    @Override
-    public void execute(MPPlugin plugin) {
-        for (VariantData v : variants.values()) {
-            v.destExecute();
-        }
     }
 
     @Override

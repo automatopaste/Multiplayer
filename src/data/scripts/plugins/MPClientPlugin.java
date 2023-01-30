@@ -4,8 +4,10 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.BaseEntityManager;
-import data.scripts.net.data.tables.client.*;
+import data.scripts.net.data.tables.client.ClientShipTable;
+import data.scripts.net.data.tables.client.LobbyInput;
+import data.scripts.net.data.tables.client.PlayerOutput;
+import data.scripts.net.data.tables.client.VariantDataMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
@@ -79,9 +81,6 @@ public class MPClientPlugin extends MPPlugin {
         // get inbound
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this);
-
-        // execute
-        for (BaseEntityManager entityManager : entityManagers) entityManager.execute(this);
 
         // update
         updateEntityManagers(amount);

@@ -8,7 +8,6 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.collections.ListRecord;
-import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.server.HostShipTable;
 import data.scripts.net.data.tables.server.PlayerMap;
 import data.scripts.net.data.tables.server.PlayerShipMap;
@@ -99,9 +98,6 @@ public class MPServerPlugin extends MPPlugin {
         // inbound data update
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this);
-
-        // execute
-        for (BaseEntityManager entityManager : entityManagers) entityManager.execute(this);
 
         // simulation update
         updateEntityManagers(amount);

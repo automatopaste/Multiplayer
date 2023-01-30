@@ -21,13 +21,6 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void execute(MPPlugin plugin) {
-        if (lobby != null) {
-            lobby.destExecute();
-        }
-    }
-
-    @Override
     public void update(float amount, MPPlugin plugin) {
         if (lobby != null) {
             short[] players = lobby.getPlayers();
@@ -57,11 +50,12 @@ public class LobbyInput implements InboundEntityManager {
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
         if (lobby == null) {
             lobby = new LobbyData(instanceID, null, null);
-            lobby.overwrite(toProcess);
+
+            lobby.destExecute(toProcess);
 
             lobby.init(plugin);
         } else {
-            lobby.overwrite(toProcess);
+            lobby.destExecute(toProcess);
         }
     }
 

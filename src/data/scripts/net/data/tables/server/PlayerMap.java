@@ -1,7 +1,6 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.packables.metadata.PlayerData;
 import data.scripts.net.data.records.BaseRecord;
@@ -16,13 +15,11 @@ import java.util.Map;
 
 public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     private final Map<Short, PlayerData> players;
-    private final MPServerPlugin serverPlugin;
 
     private final PlayerData host;
     private final LobbyData lobby;
 
     public PlayerMap(MPServerPlugin serverPlugin) {
-        this.serverPlugin = serverPlugin;
 
         players = new HashMap<>();
         host = new PlayerData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);
@@ -37,19 +34,21 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
 
         if (data == null) {
             data = new PlayerData(instanceID, null, null);
-            data.overwrite(toProcess);
-
             players.put(instanceID, data);
+
+            data.destExecute(toProcess);
 
             data.init(plugin);
         } else {
-            data.overwrite(toProcess);
+            data.destExecute(toProcess);
         }
     }
 
     @Override
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+
+        lobby.sourceExecute();
 
         Map<Byte, BaseRecord<?>> deltas = lobby.getDeltas();
         if (deltas != null && !deltas.isEmpty()) {
@@ -60,20 +59,9 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public void execute(MPPlugin plugin) {
-        host.sourceExecute();
-        lobby.sourceExecute();
-
-        for (BasePackable p : players.values()) {
-            if (p != null) {
-                p.destExecute();
-            }
-        }
-    }
-
-    @Override
     public void update(float amount, MPPlugin plugin) {
         host.update(amount);
+        lobby.update(amount);
         for (PlayerData playerData : players.values()) {
             playerData.update(amount);
         }

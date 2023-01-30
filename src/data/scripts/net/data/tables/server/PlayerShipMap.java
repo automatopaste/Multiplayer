@@ -2,18 +2,18 @@ package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerShipMap implements InboundEntityManager {
+public class PlayerShipMap implements InboundEntityManager, OutboundEntityManager {
 
     private final Map<Short, PlayerShipData> playerShips;
     private final PlayerShipData hostShipData;
@@ -31,16 +31,6 @@ public class PlayerShipMap implements InboundEntityManager {
     }
 
     @Override
-    public void execute(MPPlugin plugin) {
-        hostShipData.sourceExecute();
-        for (BasePackable p : playerShips.values()) {
-            if (p != null) {
-                p.destExecute();
-            }
-        }
-    }
-
-    @Override
     public void update(float amount, MPPlugin plugin) {
         hostShip = Global.getCombatEngine().getPlayerShip();
 
@@ -52,6 +42,7 @@ public class PlayerShipMap implements InboundEntityManager {
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(PlayerShipData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(PlayerShipData.TYPE_ID, this);
     }
 
     public Map<Short, PlayerShipData> getPlayerShips() {
@@ -64,17 +55,36 @@ public class PlayerShipMap implements InboundEntityManager {
 
         if (data == null) {
             data = new PlayerShipData(instanceID, null);
-            data.overwrite(toProcess);
 
             playerShips.put(instanceID, data);
 
+            data.destExecute(toProcess);
             data.init(plugin);
         } else {
-            data.overwrite(toProcess);
+            data.destExecute(toProcess);
         }
     }
 
     public String getHostShipID() {
         return Global.getCombatEngine().getPlayerShip().getFleetMemberId();
+    }
+
+    @Override
+    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+
+        hostShipData.sourceExecute();
+
+        Map<Byte, BaseRecord<?>> deltas = hostShipData.getDeltas();
+        if (deltas != null && !deltas.isEmpty()) {
+            out.put((short) -1, deltas);
+        }
+
+        return out;
+    }
+
+    @Override
+    public PacketType getOutboundPacketType() {
+        return PacketType.DATAGRAM;
     }
 }

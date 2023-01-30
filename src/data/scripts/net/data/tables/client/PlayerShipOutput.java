@@ -27,11 +27,6 @@ public class PlayerShipOutput implements OutboundEntityManager {
     }
 
     @Override
-    public void execute(MPPlugin plugin) {
-        playerShipData.sourceExecute();
-    }
-
-    @Override
     public void update(float amount, MPPlugin plugin) {
 
     }
@@ -44,10 +39,13 @@ public class PlayerShipOutput implements OutboundEntityManager {
     @Override
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+
+        playerShipData.sourceExecute();
         Map<Byte, BaseRecord<?>> deltas = playerShipData.getDeltas();
         if (deltas != null && !deltas.isEmpty()) {
             out.put(instanceID, deltas);
         }
+
         return out;
     }
 
