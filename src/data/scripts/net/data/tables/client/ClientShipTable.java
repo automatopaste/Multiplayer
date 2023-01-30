@@ -48,6 +48,9 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
 
                 shieldData.init(plugin, this);
             } else {
+                if (shieldData.getShield() == null) {
+                    shieldData.setShield(table[instanceID].getShip().getShield());
+                }
                 shieldData.destExecute(toProcess);
             }
         }
