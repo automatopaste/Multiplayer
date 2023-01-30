@@ -62,7 +62,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Vector2f32Record.getDefault().setUseDecimalPrecision(false).setDebugText("location"),
+                Vector2f32Record.getDefault().setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -181,7 +181,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                Vector2f32Record.getDefault().setUseDecimalPrecision(false).setDebugText("mouse target"),
+                Vector2f32Record.getDefault().setDebugText("mouse target"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
