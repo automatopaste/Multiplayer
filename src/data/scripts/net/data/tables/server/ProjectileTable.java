@@ -1,5 +1,6 @@
 package data.scripts.net.data.tables.server;
 
+import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -7,7 +8,11 @@ import data.scripts.plugins.MPPlugin;
 
 import java.util.Map;
 
-public class ProjectileTable extends EntityTable implements OutboundEntityManager {
+public class ProjectileTable extends EntityTable<ProjectileData> implements OutboundEntityManager {
+
+    public ProjectileTable(ProjectileData[] array) {
+        super(array);
+    }
 
     @Override
     public void execute(MPPlugin plugin) {
@@ -22,11 +27,6 @@ public class ProjectileTable extends EntityTable implements OutboundEntityManage
     @Override
     public void register() {
 
-    }
-
-    @Override
-    protected int getSize() {
-        return 0;
     }
 
     @Override

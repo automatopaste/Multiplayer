@@ -5,17 +5,20 @@ import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.server.HostShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.Map;
 
-public class ClientShipTable extends EntityTable implements InboundEntityManager {
+public class ClientShipTable extends EntityTable<ShipData> implements InboundEntityManager {
+
+    public ClientShipTable() {
+        super(new ShipData[100]);
+    }
 
     @Override
     public void processDelta(short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        ShipData data = (ShipData) table[instanceID];
+        ShipData data = table[instanceID];
 
         if (data == null) {
             ShipData shipData = new ShipData(instanceID, null);
@@ -38,15 +41,9 @@ public class ClientShipTable extends EntityTable implements InboundEntityManager
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        for (BasePackable p : table) {
-            ShipData ship = (ShipData) p;
+        for (ShipData ship : table) {
             if (ship != null) ship.update(amount);
         }
-    }
-
-    @Override
-    protected int getSize() {
-        return HostShipTable.MAX_ENTITIES;
     }
 
     @Override

@@ -23,7 +23,10 @@ public class PlayerOutput implements OutboundEntityManager {
     @Override
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
-        out.put(instanceID, player.getDeltas());
+        Map<Byte, BaseRecord<?>> deltas = player.getDeltas();
+        if (deltas != null && !deltas.isEmpty()) {
+            out.put(instanceID, deltas);
+        }
         return out;
     }
 

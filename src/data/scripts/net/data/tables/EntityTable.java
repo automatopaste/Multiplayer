@@ -8,26 +8,24 @@ import java.util.Queue;
 /**
  * No real difference in speed vs using lists
  */
-public abstract class EntityTable {
-    protected final BasePackable[] table;
-    private final Queue<Integer> vacant;
+public abstract class EntityTable<T extends BasePackable> {
+    protected final T[] table;
+    private final Queue<Short> vacant;
 
-    public EntityTable() {
-        table = new BasePackable[getSize()];
+    public EntityTable(T[] array) {
+        table = array;
         vacant = new LinkedList<>();
-        for (int i = 0; i < getSize(); i++) {
+        for (short i = 0; i < array.length; i++) {
             vacant.add(i);
         }
     }
 
-    protected abstract int getSize();
-
-    protected void markVacant(int i) {
+    protected void markVacant(short i) {
         vacant.add(i);
     }
 
     protected int getVacant() {
-        Integer i = vacant.poll();
+        Short i = vacant.poll();
         if (i == null) throw new NullPointerException("No vacant entity index found");
         return i;
     }

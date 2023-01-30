@@ -74,7 +74,7 @@ public class DataGenManager {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
                 Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound();
-                out.put(source, entities);
+                if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
 
@@ -93,7 +93,7 @@ public class DataGenManager {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
                 Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound();
-                out.put(source, entities);
+                if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
 

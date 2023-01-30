@@ -48,7 +48,12 @@ public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
     @Override
     public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound() {
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
-        out.put((short) -1, lobby.getDeltas());
+
+        Map<Byte, BaseRecord<?>> deltas = lobby.getDeltas();
+        if (deltas != null && !deltas.isEmpty()) {
+            out.put((short) -1, deltas);
+        }
+
         return out;
     }
 

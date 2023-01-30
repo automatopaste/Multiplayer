@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
+import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.packables.entities.ship.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
@@ -62,6 +63,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             //case SPAWNING_READY:
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
+
+                Map<Short, Map<Byte, BaseRecord<?>>> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
+
+                outbound.put(ShipData.TYPE_ID, ships);
 
                 connectionState = ConnectionState.SIMULATION_READY;
 

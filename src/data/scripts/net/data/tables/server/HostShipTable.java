@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ship.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
@@ -11,16 +12,15 @@ import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class HostShipTable extends EntityTable implements OutboundEntityManager {
+public class HostShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
     public static final int MAX_ENTITIES = Short.MAX_VALUE;
-    private final Map<String, Integer> registered;
+    private final Map<String, Short> registered;
 
     public HostShipTable() {
+        super(new ShipData[100]);
+
         registered = new HashMap<>();
     }
 
@@ -29,9 +29,12 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
         Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
 
         for (int i = 0; i < table.length; i++) {
-            ShipData data = (ShipData) table[i];
+            ShipData data = table[i];
             if (data != null) {
-                out.put((short) i, data.getDeltas());
+                Map<Byte, BaseRecord<?>> deltas = data.getDeltas();
+                if (deltas != null && !deltas.isEmpty()) {
+                    out.put((short) i, deltas);
+                }
             }
         }
 
@@ -65,12 +68,12 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
     private void createEntry(ShipAPI ship) {
         short id = (short) getVacant();
 
-        registered.put(ship.getId(), (int) id);
+        registered.put(ship.getId(), id);
         table[id] = new ShipData(id, ship);
     }
 
     private void deleteEntry(String id) {
-        int index = registered.get(id);
+        short index = registered.get(id);
 
         table[index] = null;
 
@@ -78,13 +81,27 @@ public class HostShipTable extends EntityTable implements OutboundEntityManager 
         markVacant(index);
     }
 
-    public Map<String, Integer> getRegistered() {
-        return registered;
+    public Map<Short, Map<Byte, BaseRecord<?>>> getShipsRegistered() {
+        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+
+        for (short id : registered.values()) {
+            ShipData shipData = table[id];
+
+            Map<Byte, BaseRecord<?>> records = new HashMap<>();
+            List<RecordLambda<?>> recordLambdas = shipData.getRecords();
+            for (byte i = 0; i < recordLambdas.size(); i++) {
+                RecordLambda<?> recordLambda = recordLambdas.get(i);
+                records.put(i, recordLambda.record);
+            }
+
+            out.put(id, records);
+        }
+
+        return out;
     }
 
-    @Override
-    protected int getSize() {
-        return MAX_ENTITIES;
+    public Map<String, Short> getRegistered() {
+        return registered;
     }
 
     @Override
