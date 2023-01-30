@@ -16,7 +16,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     private final BaseRecord<E> writer;
 
-    private Map<Byte, E> toWrite = new HashMap<>();
+    private final Map<Byte, E> toWrite = new HashMap<>();
 
     public ListRecord(List<E> collection, byte elementTypeID) {
         super(collection);
@@ -31,25 +31,27 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public boolean sourceExecute(SourceExecute<List<E>> sourceExecute) {
-        List<E> delta = sourceExecute.get();
-
-        boolean update = false;
-
-        for (byte i = 0; i < delta.size(); i++) {
-            E d = delta.get(i);
-
-            if (i + 1 > value.size()) {
-                toWrite.put(i, d);
-                update = true;
-            } else if (!d.equals(value.get(i))) {
-                toWrite.put(i, d);
-                update = true;
-            }
-        }
-
-        value = delta;
-
-        return update;
+//        List<E> delta = sourceExecute.get();
+//
+//        boolean update = false;
+//
+//        for (byte i = 0; i < delta.size(); i++) {
+//            E d = delta.get(i);
+//
+//            if (i + 1 > value.size()) {
+//                toWrite.put(i, d);
+//                update = true;
+//            } else if (!d.equals(value.get(i))) {
+//                toWrite.put(i, d);
+//                update = true;
+//            }
+//        }
+//
+//        value = delta;
+//
+//        return update;
+        value = sourceExecute.get();
+        return true;
     }
 
 
