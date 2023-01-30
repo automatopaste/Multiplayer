@@ -8,8 +8,7 @@ import java.util.zip.Inflater;
 public class CompressionUtils {
 
     public static byte[] deflate(byte[] bytes) {
-        Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION);
-        compressor.setStrategy(Deflater.FILTERED);
+        Deflater compressor = new Deflater(Deflater.BEST_SPEED);
         compressor.setInput(bytes);
         compressor.finish();
         byte[] compressed = new byte[bytes.length + 4];

@@ -16,6 +16,8 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
         int size = content.readShort();
         int sizeCompressed = content.readShort();
 
+        if (size == 0) return;
+
         byte[] bytes = new byte[sizeCompressed];
         content.readBytes(bytes);
 
