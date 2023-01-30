@@ -93,6 +93,13 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
                 break;
             case SIMULATING:
+                if (datagramClient == null && connectionData.getClientPort() != 0) {
+                    datagramClient = new DatagramClient(host, port, clientPort, this);
+                    datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
+                    datagram.start();
+                }
+
+                break;
             default:
                 break;
         }
@@ -112,12 +119,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     @Override
     public MessageContainer getDatagram() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
-
-        if (datagramClient == null && connectionData.getClientPort() != 0) {
-            datagramClient = new DatagramClient(host, port, clientPort, this);
-            datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
-            datagram.start();
-        }
 
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundDatagram();
 
