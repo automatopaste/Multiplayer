@@ -13,13 +13,13 @@ import data.scripts.plugins.MPServerPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerMap implements InboundEntityManager, OutboundEntityManager {
+public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
     private final Map<Short, PlayerData> players;
 
     private final PlayerData host;
     private final LobbyData lobby;
 
-    public PlayerMap(MPServerPlugin serverPlugin) {
+    public PlayerLobby(MPServerPlugin serverPlugin) {
 
         players = new HashMap<>();
         host = new PlayerData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);

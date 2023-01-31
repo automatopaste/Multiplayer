@@ -10,8 +10,8 @@ import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.collections.ListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.server.PlayerMap;
-import data.scripts.net.data.tables.server.PlayerShipMap;
+import data.scripts.net.data.tables.server.PlayerLobby;
+import data.scripts.net.data.tables.server.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class LobbyData extends BasePackable {
     private List<Short> players;
     private List<String> playerShipIDs;
 
-    public LobbyData(short instanceID, final PlayerMap playerMap, final PlayerShipMap playerShipMap) {
+    public LobbyData(short instanceID, final PlayerLobby playerLobby, final PlayerShips playerShips) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -40,7 +40,7 @@ public class LobbyData extends BasePackable {
                         // server ship
                         out.add((short) -1);
 
-                        out.addAll(playerMap.getPlayers().keySet());
+                        out.addAll(playerLobby.getPlayers().keySet());
 
                         return out;
                     }
@@ -61,9 +61,9 @@ public class LobbyData extends BasePackable {
                         List<String> out = new ArrayList<>();
 
                         // server ship
-                        out.add(playerShipMap.getHostShipID());
+                        out.add(playerShips.getHostShipID());
 
-                        for (PlayerShipData playerShipData : playerShipMap.getPlayerShips().values()) {
+                        for (PlayerShipData playerShipData : playerShips.getPlayerShips().values()) {
                             out.add(playerShipData.getPlayerShipID());
                         }
 

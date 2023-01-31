@@ -32,7 +32,7 @@ public class ConnectionData extends BasePackable {
                         return (byte) connection.getConnectionState().ordinal();
                     }
                 },
-                new DestExecute<java.lang.Byte>() {
+                new DestExecute<Byte>() {
                     @Override
                     public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
                         ConnectionData connectionData = (ConnectionData) packable;

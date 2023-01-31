@@ -4,8 +4,8 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.entities.ship.ShieldData;
-import data.scripts.net.data.packables.entities.ship.ShipData;
+import data.scripts.net.data.packables.entities.ships.ShieldData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -14,11 +14,11 @@ import data.scripts.plugins.MPPlugin;
 
 import java.util.*;
 
-public class HostShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
+public class ShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
     private final Map<String, Short> registered;
     private final Map<Short, ShieldData> shields;
 
-    public HostShipTable() {
+    public ShipTable() {
         super(new ShipData[100]);
 
         registered = new HashMap<>();

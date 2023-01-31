@@ -6,7 +6,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.data.tables.client.LobbyInput;
-import data.scripts.net.data.tables.client.PlayerOutput;
+import data.scripts.net.data.tables.client.Player;
 import data.scripts.net.data.tables.client.VariantDataMap;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
@@ -27,7 +27,7 @@ public class MPClientPlugin extends MPPlugin {
     private LobbyInput lobbyInput;
 
     //outbound
-    private PlayerOutput playerOutput;
+    private Player player;
 
     private final VariantDataGenerator dataStore;
 
@@ -73,9 +73,9 @@ public class MPClientPlugin extends MPPlugin {
             lobbyInput = new LobbyInput(connection.getConnectionID());
             initEntityManager(lobbyInput);
         }
-        if (playerOutput == null) {
-            playerOutput = new PlayerOutput(connection.getConnectionID(), this);
-            initEntityManager(playerOutput);
+        if (player == null) {
+            player = new Player(connection.getConnectionID(), this);
+            initEntityManager(player);
         }
 
         // get inbound
@@ -108,8 +108,8 @@ public class MPClientPlugin extends MPPlugin {
         return variantDataMap;
     }
 
-    public PlayerOutput getPlayerOutput() {
-        return playerOutput;
+    public Player getPlayerOutput() {
+        return player;
     }
 
     public LobbyInput getLobbyInput() {

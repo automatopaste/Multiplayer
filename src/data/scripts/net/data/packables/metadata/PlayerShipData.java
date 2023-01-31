@@ -10,10 +10,12 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.client.PlayerShip;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lwjgl.input.Keyboard;
@@ -29,7 +31,8 @@ public class PlayerShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private int controlBitmask;
-    private java.lang.String playerShipID;
+    private String playerShipID;
+    private boolean isActive;
 
     private ShipAPI playerShip;
 
@@ -38,11 +41,11 @@ public class PlayerShipData extends BasePackable {
      *
      * @param instanceID unique
      */
-    public PlayerShipData(short instanceID, final SourceExecute<java.lang.String> playerShipID) {
+    public PlayerShipData(short instanceID, final PlayerShip playerShip) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                IntRecord.getDefault(),
+                IntRecord.getDefault().setDebugText("control bitmask"),
                 new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
@@ -58,18 +61,35 @@ public class PlayerShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                StringRecord.getDefault(),
-                new SourceExecute<java.lang.String>() {
+                StringRecord.getDefault().setDebugText("player ship id"),
+                new SourceExecute<String>() {
                     @Override
-                    public java.lang.String get() {
-                        return playerShipID.get();
+                    public String get() {
+                        return playerShip.getPlayerShipID();
                     }
                 },
-                new DestExecute<java.lang.String>() {
+                new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<java.lang.String> record, BasePackable packable) {
+                    public void execute(BaseRecord<String> record, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
                         playerShipData.setPlayerShipID(record.getValue());
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("active"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        if (playerShip.getPlayerShipID() == null) return (byte) 0;
+                        return (byte) 1;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                        PlayerShipData playerShipData = (PlayerShipData) packable;
+                        playerShipData.setActive(record.getValue() == (byte) 1);
                     }
                 }
         ));
@@ -118,12 +138,20 @@ public class PlayerShipData extends BasePackable {
         this.controlBitmask = controlBitmask;
     }
 
-    public java.lang.String getPlayerShipID() {
+    public String getPlayerShipID() {
         return playerShipID;
     }
 
-    public void setPlayerShipID(java.lang.String playerShipID) {
+    public void setPlayerShipID(String playerShipID) {
         this.playerShipID = playerShipID;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public static int mask() {

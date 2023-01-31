@@ -8,9 +8,9 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.collections.ListRecord;
-import data.scripts.net.data.tables.server.HostShipTable;
-import data.scripts.net.data.tables.server.PlayerMap;
-import data.scripts.net.data.tables.server.PlayerShipMap;
+import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.server.PlayerLobby;
+import data.scripts.net.data.tables.server.PlayerShips;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
@@ -30,11 +30,11 @@ public class MPServerPlugin extends MPPlugin {
 
     //inbound
     private final ServerConnectionManager serverConnectionManager;
-    private final PlayerMap playerMap;
-    private final PlayerShipMap playerShipMap;
+    private final PlayerLobby playerLobby;
+    private final PlayerShips playerShips;
 
     //outbound
-    private final HostShipTable hostShipTable;
+    private final ShipTable shipTable;
 
     private final VariantDataGenerator dataStore;
 
@@ -45,15 +45,15 @@ public class MPServerPlugin extends MPPlugin {
         serverConnectionManager = new ServerConnectionManager(this, port);
 
         // inbound init
-        playerShipMap = new PlayerShipMap();
-        initEntityManager(playerShipMap);
+        playerShips = new PlayerShips();
+        initEntityManager(playerShips);
 
-        playerMap = new PlayerMap(this);
-        initEntityManager(playerMap);
+        playerLobby = new PlayerLobby(this);
+        initEntityManager(playerLobby);
 
         //outbound init
-        hostShipTable = new HostShipTable();
-        initEntityManager(hostShipTable);
+        shipTable = new ShipTable();
+        initEntityManager(shipTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
@@ -91,7 +91,7 @@ public class MPServerPlugin extends MPPlugin {
         GUIDebug guiDebug = CMUtils.getGuiDebug();
 
         guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
-        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + hostShipTable.getRegistered().size() + " ships in local table");
+        guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + shipTable.getRegistered().size() + " ships in local table");
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
@@ -156,15 +156,15 @@ public class MPServerPlugin extends MPPlugin {
         return PluginType.SERVER;
     }
 
-    public HostShipTable getServerShipTable() {
-        return hostShipTable;
+    public ShipTable getServerShipTable() {
+        return shipTable;
     }
 
-    public PlayerMap getPlayerMap() {
-        return playerMap;
+    public PlayerLobby getPlayerMap() {
+        return playerLobby;
     }
 
-    public PlayerShipMap getPlayerShipMap() {
-        return playerShipMap;
+    public PlayerShips getPlayerShipMap() {
+        return playerShips;
     }
 }

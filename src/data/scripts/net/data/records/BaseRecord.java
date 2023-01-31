@@ -60,4 +60,11 @@ public abstract class BaseRecord<T> {
     public String getDebugText() {
         return debug;
     }
+
+    @Override
+    public String toString() {
+        return  "value=" + value +
+                ", debug='" + debug + '\'' +
+                '}';
+    }
 }

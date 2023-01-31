@@ -6,7 +6,6 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
-import java.util.List;
 import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
@@ -25,28 +24,28 @@ public class LobbyInput implements InboundEntityManager {
     public void update(float amount, MPPlugin plugin) {
         if (lobby != null) {
             lobby.update(amount, this);
-
-            List<Short> players = lobby.getPlayers();
-            List<String> playerShipIDs = lobby.getPlayerShipIDs();
-
-            for (int i = 0; i < players.size(); i++) {
-                Short playerID = players.get(i);
-
-                if (i + 1 > playerShipIDs.size()) {
-                    break;
-                }
-
-                if (playerID != null && playerID == instanceID) {
-                    String playerShipID = playerShipIDs.get(i);
-
-                    if (!playerShipID.equals(clientPilotedShipID)) {
-                        clientPilotedShipID = playerShipID;
-
-                        plugin.removeEntityManager(PlayerShipOutput.class);
-                        plugin.initEntityManager(new PlayerShipOutput(instanceID, clientPilotedShipID));
-                    }
-                }
-            }
+//
+//            List<Short> players = lobby.getPlayers();
+//            List<String> playerShipIDs = lobby.getPlayerShipIDs();
+//
+//            for (int i = 0; i < players.size(); i++) {
+//                Short playerID = players.get(i);
+//
+//                if (i + 1 > playerShipIDs.size()) {
+//                    break;
+//                }
+//
+//                if (playerID != null && playerID == instanceID) {
+//                    String playerShipID = playerShipIDs.get(i);
+//
+//                    if (!playerShipID.equals(clientPilotedShipID)) {
+//                        clientPilotedShipID = playerShipID;
+//
+//                        plugin.removeEntityManager(PlayerShipOutput.class);
+//                        plugin.initEntityManager(new PlayerShipOutput(instanceID, clientPilotedShipID));
+//                    }
+//                }
+//            }
         }
     }
 

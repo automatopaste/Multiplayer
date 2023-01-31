@@ -10,11 +10,11 @@ import data.scripts.plugins.MPPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerOutput implements OutboundEntityManager {
+public class Player implements OutboundEntityManager {
     private final PlayerData player;
     private final short instanceID;
 
-    public PlayerOutput(short instanceID, MPPlugin plugin) {
+    public Player(short instanceID, MPPlugin plugin) {
         this.instanceID = instanceID;
 
         player = new PlayerData(instanceID, Global.getCombatEngine().getViewport(), plugin);

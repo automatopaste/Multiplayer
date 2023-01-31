@@ -1,8 +1,8 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
-import data.scripts.net.data.packables.entities.ship.ShipData;
-import data.scripts.net.data.packables.entities.ship.VariantData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.plugins.MPPlugin;

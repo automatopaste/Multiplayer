@@ -1,7 +1,7 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.entities.ship.ShieldData;
-import data.scripts.net.data.packables.entities.ship.ShipData;
+import data.scripts.net.data.packables.entities.ships.ShieldData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;

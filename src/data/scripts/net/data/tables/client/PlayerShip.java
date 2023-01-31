@@ -1,6 +1,5 @@
 package data.scripts.net.data.tables.client;
 
-import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -10,20 +9,17 @@ import data.scripts.plugins.MPPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerShipOutput implements OutboundEntityManager {
+public class PlayerShip implements OutboundEntityManager {
 
     private final PlayerShipData playerShipData;
     private final short instanceID;
 
-    public PlayerShipOutput(short instanceID, final String playerShipID) {
+    private String playerShipID;
+
+    public PlayerShip(short instanceID) {
         this.instanceID = instanceID;
 
-        playerShipData = new PlayerShipData(instanceID, new SourceExecute<String>() {
-            @Override
-            public String get() {
-                return playerShipID;
-            }
-        });
+        playerShipData = new PlayerShipData(instanceID, this);
     }
 
     @Override
@@ -51,5 +47,13 @@ public class PlayerShipOutput implements OutboundEntityManager {
     @Override
     public PacketType getOutboundPacketType() {
         return PacketType.DATAGRAM;
+    }
+
+    public String getPlayerShipID() {
+        return playerShipID;
+    }
+
+    public void setPlayerShipID(String playerShipID) {
+        this.playerShipID = playerShipID;
     }
 }

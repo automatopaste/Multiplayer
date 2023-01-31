@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables.entities.ship;
+package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import data.scripts.net.data.packables.BasePackable;
