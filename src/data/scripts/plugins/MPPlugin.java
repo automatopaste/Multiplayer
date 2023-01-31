@@ -1,7 +1,9 @@
 package data.scripts.plugins;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import data.scripts.net.data.tables.BaseEntityManager;
+import data.scripts.plugins.gui.MPUIPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,8 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
 
     public MPPlugin() {
         entityManagers = new HashMap<>();
+
+        Global.getCombatEngine().addPlugin(new MPUIPlugin(this));
     }
 
     public abstract PluginType getType();
