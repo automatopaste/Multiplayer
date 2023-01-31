@@ -142,6 +142,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         Panel.PanelParams panelParams = new Panel.PanelParams();
         panelParams.x = 300f;
         panelParams.y = 120f;
+        panelParams.update = true;
         panelParams.conformToListSize = true;
 
         return new Panel(panelParams, new Panel.PanelMaker() {
