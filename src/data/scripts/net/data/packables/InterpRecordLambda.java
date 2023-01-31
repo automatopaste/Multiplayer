@@ -45,6 +45,11 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         }
     }
 
+    @Override
+    public void destExecute(BasePackable packable) {
+
+    }
+
     public void interp(float amount, BasePackable packable) {
         progressive += amount;
 
