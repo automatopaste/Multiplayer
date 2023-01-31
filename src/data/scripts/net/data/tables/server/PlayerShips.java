@@ -7,6 +7,7 @@ import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
+import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +34,21 @@ public class PlayerShips implements InboundEntityManager {
             if (id != null) {
                 ShipAPI activeShip = activeShips.get(id);
 
-                if (activeShip == null || !activeShip.getFleetMemberId().equals(id)) {
+                boolean find = false;
+
+                if (activeShip == null) { // no ship yet selected
+                    find = true;
+                } else if (!activeShip.getFleetMemberId().equals(id)) { // switched ships
+                    activeShip.resetDefaultAI();
+                    find = true;
+                }
+
+                if (find) {
                     for (ShipAPI ship : Global.getCombatEngine().getShips()) {
                         if (ship.getFleetMemberId().equals(id)) {
                             activeShip = ship;
+
+                            activeShip.setShipAI(new MPDefaultShipAIPlugin());
 
                             activeShips.put(id, activeShip);
                             IDTrackerMap.put(playerShipData, id);
