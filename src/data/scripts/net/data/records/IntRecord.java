@@ -25,6 +25,11 @@ public class IntRecord extends BaseRecord<Integer> {
         return new IntRecord(value);
     }
 
+    @Override
+    public Integer linterp(float p, Integer v1, Integer v2) {
+        return (int) ((v2 - v1) * p) + v1;
+    }
+
     public static void setTypeId(byte typeId) {
         IntRecord.TYPE_ID = typeId;
     }

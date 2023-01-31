@@ -27,6 +27,14 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     }
 
     @Override
+    public Vector3f linterp(float p, Vector3f v1, Vector3f v2) {
+        float x = (p * (v2.x - v1.x)) + v1.x;
+        float y = (p * (v2.y - v1.y)) + v1.y;
+        float z = (p * (v2.z - v1.z)) + v1.z;
+        return new Vector3f(x, y, z);
+    }
+
+    @Override
     public boolean checkNotEqual(Vector3f delta) {
         boolean isUpdated;
 

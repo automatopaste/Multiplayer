@@ -54,6 +54,6 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         progressive += amount;
 
         float linterp = progressive * gapInv;
-        interpValue = record.linterp(linterp, v1, v2);
+        interpValue = record.linterp(linterp, v2, v1);
     }
 }

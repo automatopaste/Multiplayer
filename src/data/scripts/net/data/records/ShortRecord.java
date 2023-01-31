@@ -25,6 +25,11 @@ public class ShortRecord extends BaseRecord<Short> {
         return new ShortRecord(value);
     }
 
+    @Override
+    public Short linterp(float p, Short v1, Short v2) {
+        return (short) ((p * (v2 - v1)) + v1);
+    }
+
     public static void setTypeId(byte typeId) {
         ShortRecord.TYPE_ID = typeId;
     }

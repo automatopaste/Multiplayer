@@ -22,6 +22,13 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
+    public Byte linterp(float p, Byte v1, Byte v2) {
+        int i1 = v1 & 0xFF;
+        int i2 = v2 & 0xFF;
+        return (byte) ((int) ((i2 - i1) * p) + i1);
+    }
+
+    @Override
     public boolean checkNotEqual(Byte delta) {
         return (byte) value != delta;
     }

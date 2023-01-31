@@ -25,6 +25,11 @@ public class Float16Record extends BaseRecord<Float> {
     }
 
     @Override
+    public Float linterp(float p, Float v1, Float v2) {
+        return (p * (v2 - v1)) + v1;
+    }
+
+    @Override
     protected boolean checkNotEqual(Float delta) {
         return !value.equals(delta);
     }

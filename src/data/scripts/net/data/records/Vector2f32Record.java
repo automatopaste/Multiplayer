@@ -32,6 +32,13 @@ public class Vector2f32Record extends BaseRecord<Vector2f> {
         return new Vector2f32Record(new Vector2f(x, y));
     }
 
+    @Override
+    public Vector2f linterp(float p, Vector2f v1, Vector2f v2) {
+        float x = (p * (v2.x - v1.x)) + v1.x;
+        float y = (p * (v2.y - v1.y)) + v1.y;
+        return new Vector2f(x, y);
+    }
+
     public static void setTypeId(byte typeId) {
         Vector2f32Record.TYPE_ID = typeId;
     }
