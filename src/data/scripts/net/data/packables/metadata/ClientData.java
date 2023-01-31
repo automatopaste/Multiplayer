@@ -35,9 +35,9 @@ public class ClientData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
+                    public void execute(Vector2f value, BasePackable packable) {
                         ClientData clientData = (ClientData) packable;
-                        clientData.setViewportCenter(record.getValue());
+                        clientData.setViewportCenter(value);
                     }
                 }
         ));
@@ -51,9 +51,9 @@ public class ClientData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(BaseRecord<Float> record, BasePackable packable) {
+                    public void execute(Float value, BasePackable packable) {
                         ClientData clientData = (ClientData) packable;
-                        clientData.setViewMult(record.getValue());
+                        clientData.setViewMult(value);
                     }
                 }
         ));
@@ -73,9 +73,9 @@ public class ClientData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte record, BasePackable packable) {
                         ClientData clientData = (ClientData) packable;
-                        clientData.setConnectionType(record.getValue());
+                        clientData.setConnectionType(record);
                     }
                 }
         ));

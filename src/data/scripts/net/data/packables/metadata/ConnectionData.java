@@ -4,7 +4,6 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -34,9 +33,9 @@ public class ConnectionData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<java.lang.Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
-                        connectionData.setConnectionState(record.getValue());
+                        connectionData.setConnectionState(value);
                     }
                 }
         ));
@@ -50,9 +49,9 @@ public class ConnectionData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                    public void execute(Integer value, BasePackable packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
-                        connectionData.setClientPort(record.getValue());
+                        connectionData.setClientPort(value);
                     }
                 }
         ));

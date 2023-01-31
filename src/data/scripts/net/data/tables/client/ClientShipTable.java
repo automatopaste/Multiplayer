@@ -58,7 +58,10 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     @Override
     public void update(float amount, MPPlugin plugin) {
         for (ShipData ship : table) {
-            if (ship != null) ship.update(amount, this);
+            if (ship != null) {
+                ship.update(amount, this);
+                ship.interp(amount);
+            }
         }
         for (ShieldData shieldData : shields.values()) {
             shieldData.update(amount, this);

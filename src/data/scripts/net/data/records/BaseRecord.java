@@ -31,6 +31,10 @@ public abstract class BaseRecord<T> {
 
     public abstract BaseRecord<T> read(ByteBuf in);
 
+    public T linterp(float p, T v1, T v2) {
+        return value;
+    }
+
     public abstract byte getTypeId();
 
     /**

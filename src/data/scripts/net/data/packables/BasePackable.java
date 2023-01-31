@@ -17,12 +17,14 @@ public abstract class BasePackable {
 
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
+    protected final List<InterpRecordLambda<?>> interpolate;
     private boolean init = true;
 
     public BasePackable(short instanceID) {
         this.instanceID = instanceID;
 
         records = new ArrayList<>();
+        interpolate = new ArrayList<>();
     }
 
     public short getInstanceID() {
@@ -37,6 +39,11 @@ public abstract class BasePackable {
 
     protected void addRecord(RecordLambda<?> record) {
         records.add(record);
+    }
+
+    protected void addInterpRecord(InterpRecordLambda<?> recordLambda) {
+        addRecord(recordLambda);
+        interpolate.add(recordLambda);
     }
 
     public List<RecordLambda<?>> getRecords() {
@@ -74,6 +81,10 @@ public abstract class BasePackable {
         }
 
         for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);
+    }
+
+    public void interp(float delay) {
+        for (InterpRecordLambda<?> interpRecordLambda : interpolate) interpRecordLambda.interp(delay);
     }
 
     /**

@@ -38,7 +38,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         // DISCARD WHILE DEBUG
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = unpacked.getUnpacked();
 
-        connection.updateInbound(entities, serverTick);
+        connection.updateInbound(entities, -1);
     }
 
     @Override

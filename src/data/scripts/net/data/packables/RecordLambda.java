@@ -23,6 +23,6 @@ public class RecordLambda<T> {
     }
 
     public void destExecute(BasePackable packable) {
-        destExecute.execute(record, packable);
+        destExecute.execute(record.getValue(), packable);
     }
 }

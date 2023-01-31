@@ -5,10 +5,7 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.combat.entities.Ship;
-import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.DestExecute;
-import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceExecute;
+import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -41,9 +38,9 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(String value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
-                        shipData.setFleetMemberID(record.getValue());
+                        shipData.setFleetMemberID(value);
                     }
                 }
         ));
@@ -57,13 +54,13 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(String value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
-                        shipData.setHullID(record.getValue());
+                        shipData.setHullID(value);
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
+        addInterpRecord(new InterpRecordLambda<>(
                 Vector2f32Record.getDefault().setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
@@ -73,10 +70,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
+                    public void execute(Vector2f value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getLocation().set(record.getValue());
+                        if (ship != null) ship.getLocation().set(value);
                     }
                 }
         ));
@@ -90,10 +87,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
+                    public void execute(Vector2f value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getVelocity().set(record.getValue());
+                        if (ship != null) ship.getVelocity().set(value);
                     }
                 }
         ));
@@ -107,10 +104,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setFacing(ConversionUtils.byteToFloat(record.getValue(), 360f));
+                        if (ship != null) ship.setFacing(ConversionUtils.byteToFloat(value, 360f));
                     }
                 }
         ));
@@ -124,10 +121,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(BaseRecord<Float> record, BasePackable packable) {
+                    public void execute(Float value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setAngularVelocity(record.getValue());
+                        if (ship != null) ship.setAngularVelocity(value);
                     }
                 }
         ));
@@ -141,10 +138,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setHitpoints(ship.getMaxHitpoints() * ConversionUtils.byteToFloat(record.getValue(), 1f));
+                        if (ship != null) ship.setHitpoints(ship.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
                     }
                 }
         ));
@@ -158,10 +155,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * ConversionUtils.byteToFloat(record.getValue(), 1f));
+                        if (ship != null) ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * ConversionUtils.byteToFloat(value, 1f));
                     }
                 }
         ));
@@ -175,10 +172,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setCurrentCR(ConversionUtils.byteToFloat(record.getValue(), 1f));
+                        if (ship != null) ship.setCurrentCR(ConversionUtils.byteToFloat(value, 1f));
                     }
                 }
         ));
@@ -192,10 +189,10 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
+                    public void execute(Vector2f value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getMouseTarget().set(record.getValue());
+                        if (ship != null) ship.getMouseTarget().set(value);
                     }
                 }
         ));
@@ -209,11 +206,11 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setOwner(record.getValue());
-                        shipData.setOwner(record.getValue());
+                        if (ship != null) ship.setOwner(value);
+                        shipData.setOwner(value);
                     }
                 }
         ));

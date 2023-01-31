@@ -9,7 +9,6 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -54,9 +53,9 @@ public class PlayerShipData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                    public void execute(Integer value, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
-                        playerShipData.setControlBitmask(record.getValue());
+                        playerShipData.setControlBitmask(value);
                     }
                 }
         ));
@@ -72,13 +71,12 @@ public class PlayerShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(String value, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
-                        String s = record.getValue();
-                        if (s == null || s.equals(NULL_SHIP)) {
+                        if (value == null || value.equals(NULL_SHIP)) {
                             playerShipData.setPlayerShipID(null);
                         } else {
-                            playerShipData.setPlayerShipID(s);
+                            playerShipData.setPlayerShipID(value);
                         }
                     }
                 }

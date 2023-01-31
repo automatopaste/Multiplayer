@@ -5,10 +5,9 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.collections.ListRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.collections.ListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -39,9 +38,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                    public void execute(Integer value, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setNumFluxCapacitors(record.getValue());
+                        variantData.setNumFluxCapacitors(value);
                     }
                 }
         ));
@@ -55,9 +54,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(BaseRecord<Integer> record, BasePackable packable) {
+                    public void execute(Integer value, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setNumFluxVents(record.getValue());
+                        variantData.setNumFluxVents(value);
                     }
                 }
         ));
@@ -71,9 +70,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(BaseRecord<String> record, BasePackable packable) {
+                    public void execute(String value, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setFleetMemberID(record.getValue());
+                        variantData.setFleetMemberID(value);
                     }
                 }
         ));
@@ -95,9 +94,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<String>>() {
                     @Override
-                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                    public void execute(List<String> value, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setWeaponIDs(record.getValue());
+                        variantData.setWeaponIDs(value);
                     }
                 }
         ));
@@ -119,9 +118,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<String>>() {
                     @Override
-                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                    public void execute(List<String> value, BasePackable packable) {
                         VariantData variantData = (VariantData) packable;
-                        variantData.setWeaponSlots(record.getValue());
+                        variantData.setWeaponSlots(value);
                     }
                 }
         ));

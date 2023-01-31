@@ -453,7 +453,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         }, TODRAW14, buttonTextParams1);
 
                         Button.ButtonParams buttonParams1 = new Button.ButtonParams();
-                        buttonParams1.width = 200f;
+                        buttonParams1.width = 280f;
                         buttonParams1.height = 26f;
                         Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
                             @Override

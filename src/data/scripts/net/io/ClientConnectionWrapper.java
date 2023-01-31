@@ -145,7 +145,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         if (instance != null) connectionData.destExecute(instance.get(connectionID));
         entities.remove(ConnectionData.TYPE_ID);
 
-        this.tick = tick;
+        if (tick != -1) this.tick = tick;
         dataDuplex.updateInbound(entities);
     }
 

@@ -5,7 +5,6 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.ConversionUtils;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -39,11 +38,11 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            boolean active = record.getValue() == (byte) 1;
+                            boolean active = value == (byte) 1;
 
                             if (active) shield.toggleOn();
                             else shield.toggleOff();
@@ -61,11 +60,11 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            shield.forceFacing(ConversionUtils.byteToFloat(record.getValue(), 360f));
+                            shield.forceFacing(ConversionUtils.byteToFloat(value, 360f));
                         }
                     }
                 }
@@ -80,11 +79,11 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
+                    public void execute(Byte value, BasePackable packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            shield.setActiveArc(ConversionUtils.byteToFloat(record.getValue(), 360f));
+                            shield.setActiveArc(ConversionUtils.byteToFloat(value, 360f));
                         }
                     }
                 }

@@ -4,7 +4,6 @@ import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.collections.ListRecord;
@@ -47,9 +46,9 @@ public class LobbyData extends BasePackable {
                 },
                 new DestExecute<List<Short>>() {
                     @Override
-                    public void execute(BaseRecord<List<Short>> record, BasePackable packable) {
+                    public void execute(List<Short> value, BasePackable packable) {
                         LobbyData lobbyData = (LobbyData) packable;
-                        lobbyData.setPlayers(record.getValue());
+                        lobbyData.setPlayers(value);
                     }
                 }
         ));
@@ -72,9 +71,9 @@ public class LobbyData extends BasePackable {
                 },
                 new DestExecute<List<String>>() {
                     @Override
-                    public void execute(BaseRecord<List<String>> record, BasePackable packable) {
+                    public void execute(List<String> value, BasePackable packable) {
                         LobbyData lobbyData = (LobbyData) packable;
-                        lobbyData.setPlayerShipIDs(record.getValue());
+                        lobbyData.setPlayerShipIDs(value);
                     }
                 }
         ));
