@@ -84,7 +84,7 @@ public abstract class BasePackable {
     }
 
     public void interp(float delay) {
-        for (InterpRecordLambda<?> interpRecordLambda : interpolate) interpRecordLambda.interp(delay);
+        for (InterpRecordLambda<?> interpRecordLambda : interpolate) interpRecordLambda.interp(delay, this);
     }
 
     /**

@@ -27,11 +27,6 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     }
 
     @Override
-    public void destExecute(BasePackable packable) {
-        destExecute.execute(interpValue, packable);
-    }
-
-    @Override
     public void overwrite(int tick, BaseRecord<?> delta) {
         super.overwrite(tick, delta);
 
@@ -50,10 +45,12 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         }
     }
 
-    public void interp(float amount) {
+    public void interp(float amount, BasePackable packable) {
         progressive += amount;
 
         float linterp = progressive * gap;
         interpValue = record.linterp(linterp, v2, v1);
+
+        destExecute.execute(interpValue, packable);
     }
 }
