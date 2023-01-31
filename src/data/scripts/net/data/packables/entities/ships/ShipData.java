@@ -95,19 +95,19 @@ public class ShipData extends BasePackable {
                 }
         ));
         addInterpRecord(new InterpRecordLambda<>(
-                ByteRecord.getDefault().setDebugText("facing"),
-                new SourceExecute<Byte>() {
+                Float16Record.getDefault().setDebugText("facing"),
+                new SourceExecute<Float>() {
                     @Override
-                    public Byte get() {
-                        return ConversionUtils.floatToByte(ship.getFacing(), 360f);
+                    public Float get() {
+                        return ship.getFacing();
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<Float>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Float value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setFacing(ConversionUtils.byteToFloat(value, 360f));
+                        if (ship != null) ship.setFacing(value);
                     }
                 }
         ));
