@@ -446,25 +446,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         Text buttonText1 = new Text(new Execute<String>() {
                             @Override
                             public String get() {
-                                String type;
-                                switch (s.getHullSize()) {
-                                    case FRIGATE:
-                                        type = "FRIGATE";
-                                        break;
-                                    case DESTROYER:
-                                        type = "DESTROYER";
-                                        break;
-                                    case CRUISER:
-                                        type = "CRUISER";
-                                        break;
-                                    case CAPITAL_SHIP:
-                                        type = "CAPITAL";
-                                        break;
-                                    default:
-                                        type = "DEFAULT";
-                                        break;
-                                }
-                                return type + " " + s.getHullSpec().getDesignation() + ": " + s.getName();
+                                return s.getHullSpec().getNameWithDesignationWithDashClass();
                             }
                         }, TODRAW14, buttonTextParams1);
 
