@@ -22,6 +22,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
+        connection.stop();
     }
 
     @Override
@@ -48,6 +49,5 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
         Console.showMessage("Client channel handler removed");
-        connection.stop();
     }
 }

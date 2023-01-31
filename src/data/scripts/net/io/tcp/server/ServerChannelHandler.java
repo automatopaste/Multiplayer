@@ -22,6 +22,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
+        serverConnectionWrapper.stop();
     }
 
     @Override
@@ -57,12 +58,10 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        serverConnectionWrapper.close();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        serverConnectionWrapper.close();
     }
 
     /**

@@ -16,7 +16,7 @@ public class StringRecord extends BaseRecord<String> {
 
     @Override
     public void write(ByteBuf dest) {
-        byte[] bytes = value.getBytes(CHARSET);
+        byte[] bytes = value == null ? "NONE".getBytes(CHARSET) : value.getBytes(CHARSET);
 
         dest.writeInt(bytes.length);
         dest.writeBytes(bytes);
@@ -26,6 +26,7 @@ public class StringRecord extends BaseRecord<String> {
     public BaseRecord<String> read(ByteBuf in) {
         int length = in.readInt();
         String value = in.readCharSequence(length, CHARSET).toString();
+        if (value.equals("NONE")) value = null;
 
         return new StringRecord(value);
     }

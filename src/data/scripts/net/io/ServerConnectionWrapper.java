@@ -118,6 +118,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public void stop() {
+        connectionState = ConnectionState.CLOSED;
         connectionManager.removeConnection(connectionID);
     }
 
@@ -131,11 +132,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         entities.remove(ConnectionData.TYPE_ID);
 
         connectionManager.getDuplex().updateInbound(entities);
-    }
-
-    public void close() {
-        connectionState = ConnectionState.CLOSED;
-        connectionManager.removeConnection(connectionID);
     }
 
     public InetSocketAddress getRemoteAddress() {
