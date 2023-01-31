@@ -74,10 +74,10 @@ public abstract class BasePackable {
      * Update stored data with changes from a delta at dest
      * @param deltas incoming deltas
      */
-    public void destExecute(Map<Byte, BaseRecord<?>> deltas) {
+    public void destExecute(Map<Byte, BaseRecord<?>> deltas, int tick) {
         for (byte k : deltas.keySet()) {
             RecordLambda<?> record = records.get(k);
-            record.overwrite(deltas.get(k));
+            record.overwrite(tick, deltas.get(k));
         }
 
         for (RecordLambda<?> recordLambda : records) recordLambda.destExecute(this);

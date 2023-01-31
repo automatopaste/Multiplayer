@@ -17,18 +17,18 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
         VariantData data = variants.get(instanceID);
 
         if (data == null) {
             VariantData variantData = new VariantData(instanceID, null, null);
             variants.put(instanceID, variantData);
 
-            variantData.destExecute(toProcess);
+            variantData.destExecute(toProcess, tick);
 
             variantData.init(plugin, this);
         } else {
-            data.destExecute(toProcess);
+            data.destExecute(toProcess, tick);
         }
     }
 

@@ -142,7 +142,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities, int tick) {
         Map<Short, Map<Byte, BaseRecord<?>>> instance = entities.get(ConnectionData.TYPE_ID);
-        if (instance != null) connectionData.destExecute(instance.get(connectionID));
+        if (instance != null) connectionData.destExecute(instance.get(connectionID), tick);
         entities.remove(ConnectionData.TYPE_ID);
 
         if (tick != -1) this.tick = tick;

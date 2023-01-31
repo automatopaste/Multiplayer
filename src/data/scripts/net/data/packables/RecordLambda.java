@@ -7,6 +7,7 @@ public class RecordLambda<T> {
     public final BaseRecord<T> record;
     public final SourceExecute<T> sourceExecute;
     public final DestExecute<T> destExecute;
+    protected int tick;
 
     public RecordLambda(BaseRecord<T> record, SourceExecute<T> sourceExecute, DestExecute<T> destExecute) {
         this.record = record;
@@ -18,8 +19,11 @@ public class RecordLambda<T> {
         return record.sourceExecute(sourceExecute);
     }
 
-    public void overwrite(BaseRecord<?> delta) {
-        record.overwrite(delta.getValue());
+    public void overwrite(int tick, BaseRecord<?> delta) {
+        if (tick > this.tick) {
+            record.overwrite(delta.getValue());
+            this.tick = tick;
+        }
     }
 
     public void destExecute(BasePackable packable) {

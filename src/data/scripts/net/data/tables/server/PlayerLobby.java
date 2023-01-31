@@ -29,18 +29,18 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
         ClientData data = players.get(instanceID);
 
         if (data == null) {
             data = new ClientData(instanceID, null, null);
             players.put(instanceID, data);
 
-            data.destExecute(toProcess);
+            data.destExecute(toProcess, tick);
 
             data.init(plugin, this);
         } else {
-            data.destExecute(toProcess);
+            data.destExecute(toProcess, tick);
         }
     }
 

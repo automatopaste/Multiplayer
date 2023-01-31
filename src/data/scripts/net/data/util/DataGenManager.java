@@ -46,7 +46,7 @@ public class DataGenManager {
         outboundDataSources.put(dataTypeID, manager);
     }
 
-    public static void distributeInboundDeltas(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound, MPPlugin plugin) {
+    public static void distributeInboundDeltas(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound, MPPlugin plugin, int tick) {
         for (byte type : inbound.keySet()) {
             Map<Short, Map<Byte, BaseRecord<?>>> entities = inbound.get(type);
             InboundEntityManager manager = inboundDataDestinations.get(type);
@@ -57,7 +57,7 @@ public class DataGenManager {
             }
 
             for (short instance : entities.keySet()) {
-                manager.processDelta(type, instance, entities.get(instance), plugin);
+                manager.processDelta(type, instance, entities.get(instance), plugin, tick);
             }
         }
     }

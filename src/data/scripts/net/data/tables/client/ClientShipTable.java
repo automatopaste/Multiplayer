@@ -22,7 +22,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
         if (typeID == ShipData.TYPE_ID) {
             ShipData data = table[instanceID];
 
@@ -30,11 +30,11 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
                 data = new ShipData(instanceID, null);
                 table[instanceID] = data;
 
-                data.destExecute(toProcess);
+                data.destExecute(toProcess, tick);
 
                 data.init(plugin, this);
             } else {
-                data.destExecute(toProcess);
+                data.destExecute(toProcess, tick);
             }
         } else if (typeID == ShieldData.TYPE_ID) {
             ShieldData shieldData = shields.get(instanceID);
@@ -45,12 +45,12 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
                     shieldData = new ShieldData(instanceID, shipData.getShip().getShield());
                     shields.put(instanceID, shieldData);
 
-                    shieldData.destExecute(toProcess);
+                    shieldData.destExecute(toProcess, tick);
 
                     shieldData.init(plugin, this);
                 }
             } else {
-                shieldData.destExecute(toProcess);
+                shieldData.destExecute(toProcess, tick);
             }
         }
     }

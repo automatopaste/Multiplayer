@@ -128,7 +128,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
         Map<Short, Map<Byte, BaseRecord<?>>> instance = entities.get(ConnectionData.TYPE_ID);
-        if (instance != null) connectionData.destExecute(instance.get(connectionID));
+        if (instance != null) connectionData.destExecute(instance.get(connectionID), connectionManager.getTick());
         entities.remove(ConnectionData.TYPE_ID);
 
         connectionManager.getDuplex().updateInbound(entities);

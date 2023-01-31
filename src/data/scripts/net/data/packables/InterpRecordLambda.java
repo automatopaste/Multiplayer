@@ -30,19 +30,21 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     }
 
     @Override
-    public void overwrite(BaseRecord<?> delta) {
-        super.overwrite(delta);
+    public void overwrite(int tick, BaseRecord<?> delta) {
+        super.overwrite(tick, delta);
 
-        long n = System.nanoTime();
-        long diff = n - timestamp;
-        timestamp = n;
-        long milli = TimeUnit.MILLISECONDS.convert(diff, TimeUnit.NANOSECONDS);
-        gapInv = 1000f / milli;
+        if (tick > this.tick) {
+            long n = System.nanoTime();
+            long diff = n - timestamp;
+            timestamp = n;
+            long milli = TimeUnit.MILLISECONDS.convert(diff, TimeUnit.NANOSECONDS);
+            gapInv = 1000f / milli;
 
-        v1 = (T) delta.getValue();
-        v2 = v1;
+            v1 = (T) delta.getValue();
+            v2 = v1;
 
-        progressive = 0f;
+            progressive = 0f;
+        }
     }
 
     public void interp(float amount) {

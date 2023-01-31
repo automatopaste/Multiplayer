@@ -73,7 +73,7 @@ public class MPServerPlugin extends MPPlugin {
 
         // inbound data update
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
-        DataGenManager.distributeInboundDeltas(inbound, this);
+        DataGenManager.distributeInboundDeltas(inbound, this, serverConnectionManager.getTick());
 
         // simulation update
         updateEntityManagers(amount);

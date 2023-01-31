@@ -80,7 +80,7 @@ public class MPClientPlugin extends MPPlugin {
 
         // get inbound
         Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = connection.getDuplex().getDeltas();
-        DataGenManager.distributeInboundDeltas(entities, this);
+        DataGenManager.distributeInboundDeltas(entities, this, connection.getTick());
 
         // update
         updateEntityManagers(amount);
