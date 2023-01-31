@@ -12,6 +12,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     private T interpValue;
     private T v1;
     private T v2;
+    private int tick;
 
     public InterpRecordLambda(BaseRecord<T> record, SourceExecute<T> sourceExecute, DestExecute<T> destExecute) {
         super(record, sourceExecute, destExecute);
@@ -22,6 +23,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         timestamp = System.nanoTime();
         gapInv = 0f;
         progressive = 0f;
+        tick = -1;
     }
 
     @Override
@@ -44,6 +46,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
             v2 = v1;
 
             progressive = 0f;
+            this.tick = tick;
         }
     }
 
