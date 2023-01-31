@@ -77,7 +77,7 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
+        addInterpRecord(new InterpRecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
                     @Override
@@ -94,7 +94,7 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
+        addInterpRecord(new InterpRecordLambda<>(
                 ByteRecord.getDefault().setDebugText("facing"),
                 new SourceExecute<Byte>() {
                     @Override
@@ -111,7 +111,7 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
+        addInterpRecord(new InterpRecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
                     @Override
@@ -179,7 +179,7 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
+        addInterpRecord(new InterpRecordLambda<>(
                 Vector2f32Record.getDefault().setDebugText("mouse target"),
                 new SourceExecute<Vector2f>() {
                     @Override
