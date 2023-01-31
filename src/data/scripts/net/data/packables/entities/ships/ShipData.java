@@ -57,7 +57,6 @@ public class ShipData extends BasePackable {
                     public void execute(String value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         shipData.setHullID(value);
-                        WeaponAPI w =ship.getAllWeapons().get(0);
                     }
                 }
         ));
