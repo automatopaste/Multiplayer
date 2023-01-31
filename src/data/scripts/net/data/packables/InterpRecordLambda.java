@@ -42,8 +42,8 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
             long milli = TimeUnit.MILLISECONDS.convert(diff, TimeUnit.NANOSECONDS);
             gapInv = 1000f / milli;
 
-            v1 = (T) delta.getValue();
             v2 = v1;
+            v1 = (T) delta.getValue();
 
             progressive = 0f;
             this.tick = tick;
