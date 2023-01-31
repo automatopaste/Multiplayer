@@ -75,7 +75,7 @@ public class PlayerShipData extends BasePackable {
                     public void execute(BaseRecord<String> record, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
                         String s = record.getValue();
-                        if (s.equals(NULL_SHIP)) {
+                        if (s == null || s.equals(NULL_SHIP)) {
                             playerShipData.setPlayerShipID(null);
                         } else {
                             playerShipData.setPlayerShipID(s);
