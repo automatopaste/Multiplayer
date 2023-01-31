@@ -1,14 +1,16 @@
 package data.scripts.plugins;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import data.scripts.net.data.tables.BaseEntityManager;
-import data.scripts.plugins.gui.MPUIPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
+
+    public static final String DATA_KEY = "mp_plugin";
+
     public enum PluginType {
         SERVER,
         CLIENT
@@ -18,8 +20,11 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
 
     public MPPlugin() {
         entityManagers = new HashMap<>();
+    }
 
-        Global.getCombatEngine().addPlugin(new MPUIPlugin(this));
+    @Override
+    public void init(CombatEngineAPI engine) {
+        engine.getCustomData().put(DATA_KEY, this);
     }
 
     public abstract PluginType getType();

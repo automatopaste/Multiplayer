@@ -1,6 +1,6 @@
 {
 	"plugins" : {
-		#"MPUIPlugin": "data.scripts.plugins.MPUIPlugin",
+		"MPUIPlugin": "data.scripts.plugins.gui.MPUIPlugin",
 	},
 	"mpServerTickRate": 60, # rate at which server broadcasts packets
 	"mpClientTickrate": 30, # rate at which client will send command packets

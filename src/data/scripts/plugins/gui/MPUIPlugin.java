@@ -25,7 +25,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     private static LazyFont.DrawableString TODRAW14;
     private static LazyFont.DrawableString TODRAW24;
-    private final MPPlugin plugin;
 
     private Panel hostPanel;
     private Panel joinPanel;
@@ -40,10 +39,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         SHIP_SELECT
     }
     private ActivePanel active = ActivePanel.NONE;
-
-    public MPUIPlugin(MPPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
     public void init(CombatEngineAPI engine) {
@@ -68,7 +63,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         selectPanel = initSelect();
         hostPanel = initHostUI();
         joinPanel = initConnectionUI();
-        if (plugin instanceof MPClientPlugin) shipSelectionPanel = initShipSelectionUI();
     }
 
     @Override
@@ -77,6 +71,13 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
         if (TODRAW14 == null) return;
+
+        MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
+        if (plugin instanceof MPClientPlugin) {
+            if (shipSelectionPanel == null) shipSelectionPanel = initShipSelectionUI();
+        } else {
+            shipSelectionPanel = null;
+        }
 
         Vector2f root1 = new Vector2f(1558f, 752f);
         CMUKitUI.render(widgetPanel, root1, events);
@@ -195,6 +196,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 Button button2 = new Button(buttonParams2, buttonText2, buttonCallback2);
                 panel1.addChild(button2);
 
+                MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
                 if (plugin instanceof MPClientPlugin) {
                     Text.TextParams buttonTextParams3 = new Text.TextParams();
                     buttonTextParams3.align = LazyFont.TextAlignment.CENTER;
@@ -428,6 +430,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 }, TODRAW24, textParams);
                 panel.addChild(text);
 
+                MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
                 final MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
 
                 for (final ShipAPI s : Global.getCombatEngine().getShips()) {
