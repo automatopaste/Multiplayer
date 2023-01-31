@@ -79,31 +79,33 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             shipSelectionPanel = null;
         }
 
-        Vector2f root1 = new Vector2f(1558f, 752f);
+        Vector2f root1 = new Vector2f(1568f, 752f);
         CMUKitUI.render(widgetPanel, root1, events);
+
+        Vector2f root2 = new Vector2f(1294f, 725f);
 
         switch (active) {
             case NONE:
                 break;
             case SELECT:
-                CMUKitUI.render(selectPanel, new Vector2f(1290f, 720f), events);
+                CMUKitUI.render(selectPanel, root2, events);
                 break;
             case HOST:
-                CMUKitUI.render(hostPanel, new Vector2f(1290f, 720f), events);
+                CMUKitUI.render(hostPanel, root2, events);
                 break;
             case JOIN:
-                CMUKitUI.render(joinPanel, new Vector2f(1290f, 720f), events);
+                CMUKitUI.render(joinPanel, root2, events);
                 break;
             case SHIP_SELECT:
-                CMUKitUI.render(shipSelectionPanel, new Vector2f(1290f, 720f), events);
+                CMUKitUI.render(shipSelectionPanel, root2, events);
                 break;
         }
     }
 
     private Panel initWidget() {
         Panel.PanelParams panelParams = new Panel.PanelParams();
-        panelParams.x = 32f;
-        panelParams.y = 32f;
+        panelParams.x = 26f;
+        panelParams.y = 26f;
 
         return new Panel(panelParams, new Panel.PanelMaker() {
             @Override
