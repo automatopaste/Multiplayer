@@ -25,7 +25,9 @@ public class ByteRecord extends BaseRecord<Byte> {
     public Byte linterp(float p, Byte v1, Byte v2) {
         int i1 = v1 & 0xFF;
         int i2 = v2 & 0xFF;
-        return (byte) ((int) ((i2 - i1) * p) + i1);
+        int d = (i2 - i1);
+        d += 255;
+        return (byte) (Math.round(d * p) + i1 - 255);
     }
 
     @Override
