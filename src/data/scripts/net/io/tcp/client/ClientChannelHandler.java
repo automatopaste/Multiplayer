@@ -48,5 +48,6 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
         Console.showMessage("Client channel handler removed");
+        connection.stop();
     }
 }
