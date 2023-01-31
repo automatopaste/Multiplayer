@@ -10,10 +10,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="commons-compiler-jdk" level="project" />
-    <orderEntry type="library" name="lw_Console" level="project" />
-    <orderEntry type="library" name="LazyLib-Kotlin" level="project" />
     <orderEntry type="library" name="netty-buffer-4.1.69.Final" level="project" />
     <orderEntry type="library" name="CMUtils" level="project" />
+    <orderEntry type="library" name="LazyLib-Kotlin" level="project" />
+    <orderEntry type="library" name="commons-compiler-jdk" level="project" />
+    <orderEntry type="library" name="lw_Console" level="project" />
   </component>
 </module>
