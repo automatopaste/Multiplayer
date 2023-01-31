@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector2f;
 /**
  * Sends player camera data to the server
  */
-public class PlayerData extends BasePackable {
+public class ClientData extends BasePackable {
 
     public static byte TYPE_ID;
 
@@ -22,7 +22,7 @@ public class PlayerData extends BasePackable {
     private float viewMult;
     private int connectionType;
 
-    public PlayerData(short instanceID, final ViewportAPI viewport, final MPPlugin plugin) {
+    public ClientData(short instanceID, final ViewportAPI viewport, final MPPlugin plugin) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -36,8 +36,8 @@ public class PlayerData extends BasePackable {
                 new DestExecute<Vector2f>() {
                     @Override
                     public void execute(BaseRecord<Vector2f> record, BasePackable packable) {
-                        PlayerData playerData = (PlayerData) packable;
-                        playerData.setViewportCenter(record.getValue());
+                        ClientData clientData = (ClientData) packable;
+                        clientData.setViewportCenter(record.getValue());
                     }
                 }
         ));
@@ -52,8 +52,8 @@ public class PlayerData extends BasePackable {
                 new DestExecute<Float>() {
                     @Override
                     public void execute(BaseRecord<Float> record, BasePackable packable) {
-                        PlayerData playerData = (PlayerData) packable;
-                        playerData.setViewMult(record.getValue());
+                        ClientData clientData = (ClientData) packable;
+                        clientData.setViewMult(record.getValue());
                     }
                 }
         ));
@@ -74,8 +74,8 @@ public class PlayerData extends BasePackable {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(BaseRecord<Byte> record, BasePackable packable) {
-                        PlayerData playerData = (PlayerData) packable;
-                        playerData.setConnectionType(record.getValue());
+                        ClientData clientData = (ClientData) packable;
+                        clientData.setConnectionType(record.getValue());
                     }
                 }
         ));

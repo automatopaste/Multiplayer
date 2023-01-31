@@ -2,7 +2,7 @@ package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.metadata.LobbyData;
-import data.scripts.net.data.packables.metadata.PlayerData;
+import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
-    private final Map<Short, PlayerData> players;
+    private final Map<Short, ClientData> players;
 
-    private final PlayerData host;
+    private final ClientData host;
     private final LobbyData lobby;
 
     public PlayerLobby(MPServerPlugin serverPlugin) {
 
         players = new HashMap<>();
-        host = new PlayerData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);
+        host = new ClientData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);
         players.put((short) 0, host);
 
         lobby = new LobbyData((short) 0, this, serverPlugin.getPlayerShipMap());
@@ -30,10 +30,10 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin) {
-        PlayerData data = players.get(instanceID);
+        ClientData data = players.get(instanceID);
 
         if (data == null) {
-            data = new PlayerData(instanceID, null, null);
+            data = new ClientData(instanceID, null, null);
             players.put(instanceID, data);
 
             data.destExecute(toProcess);
@@ -60,18 +60,18 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     public void update(float amount, MPPlugin plugin) {
         host.update(amount, this);
         lobby.update(amount, this);
-        for (PlayerData playerData : players.values()) {
-            playerData.update(amount, this);
+        for (ClientData clientData : players.values()) {
+            clientData.update(amount, this);
         }
     }
 
-    public Map<Short, PlayerData> getPlayers() {
+    public Map<Short, ClientData> getPlayers() {
         return players;
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(PlayerData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ClientData.TYPE_ID, this);
         DataGenManager.registerOutboundEntityManager(LobbyData.TYPE_ID, this);
     }
 

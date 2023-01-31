@@ -11,7 +11,7 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.packables.metadata.LobbyData;
-import data.scripts.net.data.packables.metadata.PlayerData;
+import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListRecord;
@@ -32,7 +32,7 @@ public class MPModPlugin extends BaseModPlugin {
         ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
         ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
         VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
-        PlayerData.TYPE_ID = DataGenManager.registerEntityType(PlayerData.class);
+        ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
         PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
         ConnectionData.TYPE_ID = DataGenManager.registerEntityType(ConnectionData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);

@@ -1,6 +1,7 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -12,16 +13,50 @@ import java.util.Map;
 
 public class PlayerShips implements InboundEntityManager {
 
-    private final Map<Short, PlayerShipData> playerShips;
+    private final Map<Short, PlayerShipData> playerShips = new HashMap<>();
+
+    private final Map<PlayerShipData, String> IDTrackerMap = new HashMap<>();
+    private final Map<String, ShipAPI> activeShips = new HashMap<>();
 
     public PlayerShips() {
-        playerShips = new HashMap<>();
     }
 
     @Override
     public void update(float amount, MPPlugin plugin) {
         for (PlayerShipData playerShipData : playerShips.values()) {
             playerShipData.update(amount, this);
+        }
+
+        for (PlayerShipData playerShipData : playerShips.values()) {
+            String id = playerShipData.getPlayerShipID();
+
+            if (id != null) {
+                ShipAPI activeShip = activeShips.get(id);
+
+                if (activeShip == null || !activeShip.getFleetMemberId().equals(id)) {
+                    for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+                        if (ship.getFleetMemberId().equals(id)) {
+                            activeShip = ship;
+
+                            activeShips.put(id, activeShip);
+                            IDTrackerMap.put(playerShipData, id);
+
+                            break;
+                        }
+                    }
+                }
+
+                if (activeShip != null) {
+                    playerShipData.unmask(activeShip, playerShipData.getControlBitmask());
+                }
+            } else {
+                String s = IDTrackerMap.get(playerShipData);
+
+                if (s != null) {
+                    activeShips.remove(s);
+                    IDTrackerMap.remove(playerShipData);
+                }
+            }
         }
     }
 

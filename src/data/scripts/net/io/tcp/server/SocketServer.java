@@ -86,7 +86,7 @@ public class SocketServer implements Runnable {
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new SocketChannelInitializer(this, connectionManager))
                 .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
+                .childOption(ChannelOption.SO_KEEPALIVE, false);
 
         // Bind to TCP port and wait for channel from ready socket
         ChannelFuture future = server.bind(port).syncUninterruptibly();

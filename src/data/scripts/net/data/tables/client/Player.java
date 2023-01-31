@@ -1,7 +1,7 @@
 package data.scripts.net.data.tables.client;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.metadata.PlayerData;
+import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Player implements OutboundEntityManager {
-    private final PlayerData player;
+    private final ClientData player;
     private final short instanceID;
 
     public Player(short instanceID, MPPlugin plugin) {
         this.instanceID = instanceID;
 
-        player = new PlayerData(instanceID, Global.getCombatEngine().getViewport(), plugin);
+        player = new ClientData(instanceID, Global.getCombatEngine().getViewport(), plugin);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Player implements OutboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(PlayerData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ClientData.TYPE_ID, this);
     }
 
     @Override

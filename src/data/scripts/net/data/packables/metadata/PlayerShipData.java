@@ -10,7 +10,6 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -28,11 +27,12 @@ import java.util.List;
  */
 public class PlayerShipData extends BasePackable {
 
+    public static final String NULL_SHIP = "NONE";
+
     public static byte TYPE_ID;
 
     private int controlBitmask;
     private String playerShipID;
-    private boolean isActive;
 
     private ShipAPI playerShip;
 
@@ -65,31 +65,21 @@ public class PlayerShipData extends BasePackable {
                 new SourceExecute<String>() {
                     @Override
                     public String get() {
-                        return playerShip.getPlayerShipID();
+                        String s = playerShip.getPlayerShipID();
+                        if (s == null) return NULL_SHIP;
+                        return s;
                     }
                 },
                 new DestExecute<String>() {
                     @Override
                     public void execute(BaseRecord<String> record, BasePackable packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
-                        playerShipData.setPlayerShipID(record.getValue());
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("active"),
-                new SourceExecute<Byte>() {
-                    @Override
-                    public Byte get() {
-                        if (playerShip.getPlayerShipID() == null) return (byte) 0;
-                        return (byte) 1;
-                    }
-                },
-                new DestExecute<Byte>() {
-                    @Override
-                    public void execute(BaseRecord<Byte> record, BasePackable packable) {
-                        PlayerShipData playerShipData = (PlayerShipData) packable;
-                        playerShipData.setActive(record.getValue() == (byte) 1);
+                        String s = record.getValue();
+                        if (s.equals(NULL_SHIP)) {
+                            playerShipData.setPlayerShipID(null);
+                        } else {
+                            playerShipData.setPlayerShipID(s);
+                        }
                     }
                 }
         ));
@@ -144,14 +134,6 @@ public class PlayerShipData extends BasePackable {
 
     public void setPlayerShipID(String playerShipID) {
         this.playerShipID = playerShipID;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 
     public static int mask() {

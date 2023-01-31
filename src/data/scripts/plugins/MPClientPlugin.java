@@ -4,10 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.tables.client.ClientShipTable;
-import data.scripts.net.data.tables.client.LobbyInput;
-import data.scripts.net.data.tables.client.Player;
-import data.scripts.net.data.tables.client.VariantDataMap;
+import data.scripts.net.data.tables.client.*;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
@@ -25,6 +22,7 @@ public class MPClientPlugin extends MPPlugin {
     private final ClientShipTable shipTable;
     private final VariantDataMap variantDataMap;
     private LobbyInput lobbyInput;
+    private PlayerShip playerShip;
 
     //outbound
     private Player player;
@@ -48,6 +46,8 @@ public class MPClientPlugin extends MPPlugin {
         initEntityManager(variantDataMap);
 
         // outbound init
+        playerShip = new PlayerShip(connection.getConnectionID());
+        initEntityManager(playerShip);
     }
 
     @Override
@@ -110,6 +110,10 @@ public class MPClientPlugin extends MPPlugin {
 
     public Player getPlayerOutput() {
         return player;
+    }
+
+    public PlayerShip getPlayerShip() {
+        return playerShip;
     }
 
     public LobbyInput getLobbyInput() {
