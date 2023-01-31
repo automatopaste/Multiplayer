@@ -8,7 +8,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
 
     private long timestamp;
     private float progressive; // 0.0 to 1.0
-    private float gapInv;
+    private float gap;
     private T interpValue;
     private T v1;
     private T v2;
@@ -21,7 +21,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         v2 = record.getValue();
         interpValue = record.getValue();
         timestamp = System.nanoTime();
-        gapInv = 0f;
+        gap = 0f;
         progressive = 0f;
         tick = -1;
     }
@@ -40,7 +40,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
             long diff = n - timestamp;
             timestamp = n;
             long milli = TimeUnit.MILLISECONDS.convert(diff, TimeUnit.NANOSECONDS);
-            gapInv = 1000f / milli;
+            gap = milli * 0.001f;
 
             v2 = v1;
             v1 = (T) delta.getValue();
@@ -53,7 +53,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     public void interp(float amount) {
         progressive += amount;
 
-        float linterp = progressive * gapInv;
+        float linterp = progressive * gap;
         interpValue = record.linterp(linterp, v2, v1);
     }
 }
