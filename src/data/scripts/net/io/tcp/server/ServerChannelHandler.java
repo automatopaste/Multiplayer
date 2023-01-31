@@ -60,6 +60,11 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         serverConnectionWrapper.close();
     }
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        serverConnectionWrapper.close();
+    }
+
     /**
      * Called once read is complete. Is used to wait and send next packet.
      * @param ctx context

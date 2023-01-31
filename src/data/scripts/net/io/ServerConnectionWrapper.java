@@ -134,6 +134,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void close() {
+        connectionState = ConnectionState.CLOSED;
         connectionManager.removeConnection(connectionID);
     }
 
