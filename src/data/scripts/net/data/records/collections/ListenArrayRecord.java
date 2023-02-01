@@ -52,10 +52,6 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
         byte type = in.readByte();
         byte num = in.readByte();
 
-        if (num <= 0) {
-            throw new IndexOutOfBoundsException("Empty or negative list delta");
-        }
-
         BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
 
         for (byte i = 0; i < num; i++) {
