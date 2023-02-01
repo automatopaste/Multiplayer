@@ -25,6 +25,7 @@ public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private final Set<WeaponAPI> knownDisabled = new HashSet<>();
+    private final Set<WeaponAPI> knownActive = new HashSet<>();
 
     private float[][] prevArmourGrid = null;
 
@@ -236,11 +237,13 @@ public class ShipData extends BasePackable {
                         List<String> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isDisabled()) {
+                            if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
                                 out.add(weapon.getSlot().getId());
                                 knownDisabled.add(weapon);
+                                knownActive.remove(weapon);
                             } else {
                                 knownDisabled.remove(weapon);
+                                knownActive.add(weapon);
                             }
                         }
 
@@ -271,11 +274,10 @@ public class ShipData extends BasePackable {
                     public List<String> get() {
                         List<String> out = new ArrayList<>();
 
-                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (!weapon.isDisabled()) {
-                                out.add(weapon.getSlot().getId());
-                            }
+                        for (WeaponAPI weapon : knownActive) {
+                            out.add(weapon.getSlot().getId());
                         }
+                        knownActive.clear();
 
                         return out;
                     }
