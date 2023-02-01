@@ -55,8 +55,7 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
         BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
 
         for (byte i = 0; i < num; i++) {
-            reader.read(in);
-            out.add(reader.getValue());
+            out.add(reader.read(in));
         }
 
         return out;

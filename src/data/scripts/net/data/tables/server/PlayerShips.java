@@ -1,6 +1,7 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.ShipAIPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -17,6 +18,7 @@ public class PlayerShips implements InboundEntityManager {
 
     private final Map<PlayerShipData, String> IDTrackerMap = new HashMap<>();
     private final Map<String, ShipAPI> activeShips = new HashMap<>();
+    private final Map<String, ShipAIPlugin> aiPlugins = new HashMap<>();
 
     public PlayerShips() {
     }
@@ -46,6 +48,8 @@ public class PlayerShips implements InboundEntityManager {
                     for (ShipAPI ship : Global.getCombatEngine().getShips()) {
                         if (ship.getFleetMemberId().equals(id)) {
                             activeShip = ship;
+
+//                            activeShip.getShipAI()
 
                             activeShip.setShipAI(new MPDefaultShipAIPlugin());
 
