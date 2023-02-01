@@ -324,14 +324,9 @@ public class ShipData extends BasePackable {
                         List<Byte> out = new ArrayList<>();
                         // 2x6 bits for coordinates, 4 bits for armour fraction (16 discrete armour levels)
                         for (ArmourSyncData a : data) {
-                            byte b1, b2;
-                            b1 = (byte) ((a.x & 0b00111111) << 2);
-                            b1 |= (byte) ((a.y & 0b00110000) >>> 4);
-                            b2 = (byte) ((a.y & 0b00000011) << 6);
                             int v = Math.round(ship.getArmorGrid().getArmorFraction(a.x, a.y) * 0b00001111);
-                            b2 |= (byte) (v & 0b00001111);
-                            out.add(b1);
-                            out.add(b2);
+                            out.add((byte) ((a.x & 0b00111111) << 2 | (a.y & 0b00110000) >>> 4));
+                            out.add((byte) ((a.y & 0b00001111) << 4 | v & 0b00001111));
                         }
 
                         return out;
