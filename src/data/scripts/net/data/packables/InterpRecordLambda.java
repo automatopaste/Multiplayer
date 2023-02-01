@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class InterpRecordLambda<T> extends RecordLambda<T> {
 
-    private final InterpExecute<T> interpExecute;
+    private InterpExecute<T> interpExecute;
 
     private long timestamp;
     private float progressive; // 0.0 to 1.0
@@ -20,7 +20,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     public InterpRecordLambda(final BaseRecord<T> record, SourceExecute<T> sourceExecute, final DestExecute<T> destExecute) {
         super(record, sourceExecute, destExecute);
 
-        interpExecute = new Default();
+        this.interpExecute = new Default();
 
         v1 = record.getValue();
         v2 = record.getValue();
@@ -59,11 +59,12 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         progressive += amount;
 
         float linterp = progressive / gap;
+        linterp = Math.min(linterp, 1f);
         interpValue = interpExecute.interpExecute(linterp, v2, v1);
 
         destExecute.execute(interpValue, packable);
 
-        CMUtils.getGuiDebug().putText(InterpRecordLambda.class, "interp_" + this.hashCode(), gap  + "");
+        CMUtils.getGuiDebug().putText(InterpRecordLambda.class, "interp_" + this.hashCode(), record.getDebugText() + " gap:" + String.format("%.3f", gap)  + " P: " + String.format("%.4f", progressive));
     }
 
     public class Default implements InterpExecute<T> {
@@ -71,5 +72,10 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         public T interpExecute(float progressive, T v1, T v2) {
             return record.linterp(progressive, v1, v2);
         }
+    }
+
+    public InterpRecordLambda<T> setInterpExecute(InterpExecute<T> interpExecute) {
+        this.interpExecute = interpExecute;
+        return this;
     }
 }

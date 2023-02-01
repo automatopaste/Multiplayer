@@ -12,6 +12,7 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
+import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
@@ -110,7 +111,12 @@ public class ShipData extends BasePackable {
                         if (ship != null) ship.setFacing(value);
                     }
                 }
-        ));
+        ).setInterpExecute(new InterpExecute<Float>() {
+            @Override
+            public Float interpExecute(float progressive, Float v1, Float v2) {
+                return v1 + (progressive * MathUtils.getShortestRotation(v1, v2));
+            }
+        }));
         addInterpRecord(new InterpRecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
