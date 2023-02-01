@@ -318,6 +318,7 @@ public class ShipData extends BasePackable {
                             float[] tRow = t[i];
                             System.arraycopy(row, 0, tRow, 0, tRow.length);
                         }
+                        prevArmourGrid = t;
 
                         List<Byte> out = new ArrayList<>();
                         // 2x6 bits for coordinates, 4 bits for armour fraction (16 discrete armour levels)
