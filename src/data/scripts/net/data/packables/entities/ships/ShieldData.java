@@ -1,16 +1,14 @@
 package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShieldAPI;
-import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.packables.DestExecute;
-import data.scripts.net.data.packables.RecordLambda;
-import data.scripts.net.data.packables.SourceExecute;
+import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.ConversionUtils;
+import data.scripts.net.data.records.Float16Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.plugins.MPPlugin;
+import org.lazywizard.lazylib.MathUtils;
 
 public class ShieldData extends BasePackable {
 
@@ -50,44 +48,54 @@ public class ShieldData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("shield facing"),
-                new SourceExecute<Byte>() {
+        addInterpRecord(new InterpRecordLambda<>(
+                Float16Record.getDefault().setDebugText("shield facing"),
+                new SourceExecute<Float>() {
                     @Override
-                    public Byte get() {
-                        return ConversionUtils.floatToByte(shield.getFacing(), 360f);
+                    public Float get() {
+                        return shield.getFacing();
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<Float>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Float value, BasePackable packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            shield.forceFacing(ConversionUtils.byteToFloat(value, 360f));
+                            shield.forceFacing(value);
                         }
                     }
                 }
-        ));
-        addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("shield arc"),
-                new SourceExecute<Byte>() {
+        ).setInterpExecute(new InterpExecute<Float>() {
+            @Override
+            public Float interpExecute(float progressive, Float v1, Float v2) {
+                return v1 + (progressive * MathUtils.getShortestRotation(v1, v2));
+            }
+        }));
+        addInterpRecord(new InterpRecordLambda<>(
+                Float16Record.getDefault().setDebugText("shield arc"),
+                new SourceExecute<Float>() {
                     @Override
-                    public Byte get() {
-                        return ConversionUtils.floatToByte(shield.getActiveArc(), 360f);
+                    public Float get() {
+                        return shield.getActiveArc();
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<Float>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Float value, BasePackable packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            shield.setActiveArc(ConversionUtils.byteToFloat(value, 360f));
+                            shield.setActiveArc(value);
                         }
                     }
                 }
-        ));
+        ).setInterpExecute(new InterpExecute<Float>() {
+            @Override
+            public Float interpExecute(float progressive, Float v1, Float v2) {
+                return v1 + (progressive * MathUtils.getShortestRotation(v1, v2));
+            }
+        }));
     }
 
     @Override
