@@ -24,6 +24,7 @@ public class VariantData extends BasePackable {
     private String fleetMemberID;
     private List<String> weaponIDs;
     private List<String> weaponSlots;
+    private List<String> hullmods;
 
     public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
@@ -124,6 +125,22 @@ public class VariantData extends BasePackable {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("hullmods"),
+                new SourceExecute<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        return new ArrayList<>(variant.getHullMods());
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(List<String> value, BasePackable packable) {
+                        VariantData variantData = (VariantData) packable;
+                        variantData.setHullmods(value);
+                    }
+                }
+        ));
     }
 
     @Override
@@ -184,5 +201,13 @@ public class VariantData extends BasePackable {
 
     public void setWeaponSlots(List<String> weaponSlots) {
         this.weaponSlots = weaponSlots;
+    }
+
+    public List<String> getHullmods() {
+        return hullmods;
+    }
+
+    public void setHullmods(List<String> hullmods) {
+        this.hullmods = hullmods;
     }
 }

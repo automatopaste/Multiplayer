@@ -378,6 +378,10 @@ public class ShipData extends BasePackable {
             int numVents = variantData.getNumFluxVents();
             variant.setNumFluxVents(numVents);
 
+            for (String id : variantData.getHullmods()) {
+                variant.addMod(id);
+            }
+
             List<String> weaponSlots = variantData.getWeaponSlots();
             List<String> weaponIds = variantData.getWeaponIDs();
             for (int i = 0; i < weaponSlots.size(); i++) {
