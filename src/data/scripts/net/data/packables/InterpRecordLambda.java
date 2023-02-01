@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 public class InterpRecordLambda<T> extends RecordLambda<T> {
 
+    public static final boolean DEBUG_MODE = true;
+
     private InterpExecute<T> interpExecute;
 
     private long timestamp;
@@ -64,7 +66,13 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
 
         destExecute.execute(interpValue, packable);
 
-        CMUtils.getGuiDebug().putText(InterpRecordLambda.class, "interp_" + this.hashCode(), record.getDebugText() + " gap:" + String.format("%.3f", gap)  + " P: " + String.format("%.4f", progressive));
+        if (DEBUG_MODE) {
+            CMUtils.getGuiDebug().putText(
+                    InterpRecordLambda.class,
+                    "interp_" + this.hashCode(),
+                    record.getDebugText() + " gap:" + String.format("%.3f", gap)  + " P: " + String.format("%.4f", progressive)
+            );
+        }
     }
 
     public class Default implements InterpExecute<T> {
