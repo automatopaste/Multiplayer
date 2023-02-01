@@ -32,8 +32,8 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
 
     @Override
     public void write(ByteBuf dest) {
-        if (value.size() > Byte.MAX_VALUE) {
-            throw new RuntimeException("List size exceeded " + Byte.MAX_VALUE + " elements");
+        if (value.size() > 0b11111111) {
+            throw new RuntimeException("List size exceeded " + 0b11111111 + " elements");
         }
 
         dest.writeByte(elementTypeID);
@@ -50,11 +50,11 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
         List<E> out = new ArrayList<>();
 
         byte type = in.readByte();
-        byte num = in.readByte();
+        int num = in.readByte() & 0xFF;
 
         BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
 
-        for (byte i = 0; i < num; i++) {
+        for (int i = 0; i < num; i++) {
             out.add(reader.read(in));
         }
 

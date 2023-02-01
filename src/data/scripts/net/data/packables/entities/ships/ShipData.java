@@ -306,6 +306,7 @@ public class ShipData extends BasePackable {
                             float[] row = g[i];
                             for (int j = 0; j < row.length; j++) {
                                 float v = row[j];
+
                                 if (v != prevArmourGrid[i][j]) {
                                     data.add(new ArmourSyncData(i, j, v));
                                 }
