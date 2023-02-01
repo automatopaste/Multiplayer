@@ -240,6 +240,7 @@ public class ShipData extends BasePackable {
                             if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
                                 out.add(weapon.getSlot().getId());
                                 knownDisabled.add(weapon);
+                                knownActive.remove(weapon);
                             }
                         }
 
@@ -270,6 +271,7 @@ public class ShipData extends BasePackable {
                             if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
                                 out.add(weapon.getSlot().getId());
                                 knownActive.add(weapon);
+                                knownDisabled.remove(weapon);
                             }
                         }
 
