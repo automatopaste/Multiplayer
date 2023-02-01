@@ -15,11 +15,14 @@ import data.scripts.plugins.MPPlugin;
 import java.util.*;
 
 public class ShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
+
+    public static final int MAX_SHIPS = 200;
+
     private final Map<String, Short> registered;
     private final Map<Short, ShieldData> shields;
 
     public ShipTable() {
-        super(new ShipData[100]);
+        super(new ShipData[MAX_SHIPS]);
 
         registered = new HashMap<>();
         shields = new HashMap<>();

@@ -8,6 +8,7 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.tables.server.ProjectileTable;
 import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.data.tables.server.PlayerLobby;
 import data.scripts.net.data.tables.server.PlayerShips;
@@ -35,6 +36,7 @@ public class MPServerPlugin extends MPPlugin {
 
     //outbound
     private final ShipTable shipTable;
+    private final ProjectileTable projectileTable;
 
     private final VariantDataGenerator dataStore;
 
@@ -54,6 +56,9 @@ public class MPServerPlugin extends MPPlugin {
         //outbound init
         shipTable = new ShipTable();
         initEntityManager(shipTable);
+
+        projectileTable = new ProjectileTable();
+        initEntityManager(projectileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
