@@ -1,10 +1,13 @@
 package data.scripts.net.data.packables;
 
+import cmu.CMUtils;
 import data.scripts.net.data.records.BaseRecord;
 
 import java.util.concurrent.TimeUnit;
 
 public class InterpRecordLambda<T> extends RecordLambda<T> {
+
+    private final InterpExecute<T> interpExecute;
 
     private long timestamp;
     private float progressive; // 0.0 to 1.0
@@ -14,8 +17,10 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     private T v2;
     private int tick;
 
-    public InterpRecordLambda(BaseRecord<T> record, SourceExecute<T> sourceExecute, DestExecute<T> destExecute) {
+    public InterpRecordLambda(final BaseRecord<T> record, SourceExecute<T> sourceExecute, final DestExecute<T> destExecute) {
         super(record, sourceExecute, destExecute);
+
+        interpExecute = new Default();
 
         v1 = record.getValue();
         v2 = record.getValue();
@@ -53,9 +58,18 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     public void interp(float amount, BasePackable packable) {
         progressive += amount;
 
-        float linterp = progressive * gap;
-        interpValue = record.linterp(linterp, v2, v1);
+        float linterp = progressive / gap;
+        interpValue = interpExecute.interpExecute(linterp, v2, v1);
 
         destExecute.execute(interpValue, packable);
+
+        CMUtils.getGuiDebug().putText(InterpRecordLambda.class, "interp_" + this.hashCode(), gap  + "");
+    }
+
+    public class Default implements InterpExecute<T> {
+        @Override
+        public T interpExecute(float progressive, T v1, T v2) {
+            return record.linterp(progressive, v1, v2);
+        }
     }
 }
