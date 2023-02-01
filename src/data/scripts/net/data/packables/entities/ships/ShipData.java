@@ -240,10 +240,8 @@ public class ShipData extends BasePackable {
                             if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
                                 out.add(weapon.getSlot().getId());
                                 knownDisabled.add(weapon);
-                                knownActive.remove(weapon);
                             } else {
                                 knownDisabled.remove(weapon);
-                                knownActive.add(weapon);
                             }
                         }
 
@@ -274,10 +272,14 @@ public class ShipData extends BasePackable {
                     public List<String> get() {
                         List<String> out = new ArrayList<>();
 
-                        for (WeaponAPI weapon : knownActive) {
-                            out.add(weapon.getSlot().getId());
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
+                                out.add(weapon.getSlot().getId());
+                                knownActive.add(weapon);
+                            } else {
+                                knownActive.remove(weapon);
+                            }
                         }
-                        knownActive.clear();
 
                         return out;
                     }
