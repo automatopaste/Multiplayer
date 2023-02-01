@@ -19,9 +19,9 @@ public class Float16Record extends BaseRecord<Float> {
     }
 
     @Override
-    public BaseRecord<Float> read(ByteBuf in) {
+    public Float read(ByteBuf in) {
         short value = in.readShort();
-        return new Float16Record(ConversionUtils.toFloat(value));
+        return ConversionUtils.toFloat(value);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class Float16Record extends BaseRecord<Float> {
     }
 
     @Override
-    protected boolean checkNotEqual(Float delta) {
+    protected boolean checkUpdate(Float delta) {
         return !value.equals(delta);
     }
 

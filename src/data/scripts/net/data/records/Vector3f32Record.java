@@ -19,11 +19,11 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     }
 
     @Override
-    public BaseRecord<Vector3f> read(ByteBuf in) {
+    public Vector3f read(ByteBuf in) {
         float x = in.readFloat();
         float y = in.readFloat();
         float z = in.readFloat();
-        return new Vector3f32Record(new Vector3f(x, y, z));
+        return new Vector3f(x, y, z);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Vector3f32Record extends BaseRecord<Vector3f> {
     }
 
     @Override
-    public boolean checkNotEqual(Vector3f delta) {
+    public boolean checkUpdate(Vector3f delta) {
         boolean isUpdated;
 
         isUpdated = (value.x != delta.x) || (value.y != delta.y) || (value.z != delta.z);

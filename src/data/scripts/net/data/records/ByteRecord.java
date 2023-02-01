@@ -16,9 +16,8 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
-    public BaseRecord<Byte> read(ByteBuf in) {
-        byte value = in.readByte();
-        return new ByteRecord(value);
+    public Byte read(ByteBuf in) {
+        return in.readByte();
     }
 
     @Override
@@ -31,7 +30,7 @@ public class ByteRecord extends BaseRecord<Byte> {
     }
 
     @Override
-    public boolean checkNotEqual(Byte delta) {
+    public boolean checkUpdate(Byte delta) {
         return (byte) value != delta;
     }
 

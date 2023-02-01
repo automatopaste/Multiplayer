@@ -1,8 +1,8 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.packables.metadata.ClientData;
+import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -29,7 +29,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
         ClientData data = players.get(instanceID);
 
         if (data == null) {

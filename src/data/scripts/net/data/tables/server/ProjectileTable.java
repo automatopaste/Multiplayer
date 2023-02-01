@@ -1,6 +1,5 @@
 package data.scripts.net.data.tables.server;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.records.BaseRecord;
@@ -24,13 +23,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
-            if (!tracked.contains(projectile)) {
-                tracked.add(projectile);
 
-                String id = projectile.getWeapon().getId();
-            }
-        }
     }
 
     @Override

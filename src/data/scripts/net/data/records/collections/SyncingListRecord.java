@@ -10,7 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ListRecord<E> extends BaseRecord<List<E>> {
+/**
+ * Attempts to sync a List of values
+ * @param <E> Value type
+ */
+public class SyncingListRecord<E> extends BaseRecord<List<E>> {
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
@@ -18,7 +22,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
     private final Map<Byte, E> toWrite = new HashMap<>();
 
-    public ListRecord(List<E> collection, byte elementTypeID) {
+    public SyncingListRecord(List<E> collection, byte elementTypeID) {
         super(collection);
         this.elementTypeID = elementTypeID;
 
@@ -91,12 +95,12 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     @Override
-    public BaseRecord<List<E>> read(ByteBuf in) {
+    public List<E> read(ByteBuf in) {
         byte type = in.readByte();
         byte num = in.readByte();
 
-        if (num == 0) {
-            throw new IndexOutOfBoundsException("Empty list delta");
+        if (num <= 0) {
+            throw new IndexOutOfBoundsException("Empty or negative list delta");
         }
 
         BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
@@ -108,8 +112,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
 
             max = Math.max(index, max);
 
-            BaseRecord<E> v = reader.read(in);
-            E e = v.getValue();
+            E e = reader.read(in);
 
             data.put(index, e);
         }
@@ -124,7 +127,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
             value.set(b, data.get(b));
         }
 
-        return new ListRecord<>(value, type);
+        return value;
     }
 
     @Override
@@ -153,7 +156,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     public static void setTypeId(byte typeId) {
-        ListRecord.TYPE_ID = typeId;
+        SyncingListRecord.TYPE_ID = typeId;
     }
 
     @Override
@@ -162,7 +165,7 @@ public class ListRecord<E> extends BaseRecord<List<E>> {
     }
 
     @Override
-    protected boolean checkNotEqual(List<E> delta) {
+    protected boolean checkUpdate(List<E> delta) {
         return true;
     }
 }

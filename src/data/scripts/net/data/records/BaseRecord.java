@@ -18,7 +18,7 @@ public abstract class BaseRecord<T> {
      */
     public boolean sourceExecute(SourceExecute<T> sourceExecute) {
         T t = sourceExecute.get();
-        boolean isUpdated = checkNotEqual(t);
+        boolean isUpdated = checkUpdate(t);
         value = t;
         return isUpdated;
     }
@@ -29,7 +29,7 @@ public abstract class BaseRecord<T> {
      */
     public abstract void write(ByteBuf dest);
 
-    public abstract BaseRecord<T> read(ByteBuf in);
+    public abstract T read(ByteBuf in);
 
     public T linterp(float p, T v1, T v2) {
         return value;
@@ -42,7 +42,7 @@ public abstract class BaseRecord<T> {
      * @param delta incoming delta
      * @return result
      */
-    protected abstract boolean checkNotEqual(T delta);
+    protected abstract boolean checkUpdate(T delta);
 
     public T getValue() {
         return value;

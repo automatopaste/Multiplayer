@@ -1,6 +1,5 @@
 package data.scripts.net.io.udp.server;
 
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.ServerConnectionWrapper;
 import data.scripts.net.io.Unpacked;
@@ -23,7 +22,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
             connectionWrapper = serverConnectionManager.getConnection(in.getConnectionID());
         }
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = in.getUnpacked();
+        Map<Byte, Map<Short, Map<Byte, Object>>> entities = in.getUnpacked();
         connectionWrapper.updateInbound(entities);
     }
 

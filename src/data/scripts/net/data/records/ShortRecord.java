@@ -10,7 +10,7 @@ public class ShortRecord extends BaseRecord<Short> {
     }
 
     @Override
-    public boolean checkNotEqual(Short delta) {
+    public boolean checkUpdate(Short delta) {
         return value != (short) delta;
     }
 
@@ -20,9 +20,8 @@ public class ShortRecord extends BaseRecord<Short> {
     }
 
     @Override
-    public BaseRecord<Short> read(ByteBuf in) {
-        short value = in.readShort();
-        return new ShortRecord(value);
+    public Short read(ByteBuf in) {
+        return in.readShort();
     }
 
     @Override

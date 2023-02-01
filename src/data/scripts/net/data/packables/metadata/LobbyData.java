@@ -6,7 +6,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.server.PlayerLobby;
@@ -30,7 +30,7 @@ public class LobbyData extends BasePackable {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                new ListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
                 new SourceExecute<List<Short>>() {
                     @Override
                     public List<Short> get() {
@@ -53,7 +53,7 @@ public class LobbyData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
                 new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {

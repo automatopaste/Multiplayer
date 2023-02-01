@@ -40,7 +40,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Unpacked> 
         int clientTick = unpacked.getTick();
         //Console.showMessage("Received TCP client tick notice: " + clientTick);
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities = unpacked.getUnpacked();
+        Map<Byte, Map<Short, Map<Byte, Object>>> entities = unpacked.getUnpacked();
 
         serverConnectionWrapper.updateInbound(entities);
     }

@@ -18,8 +18,8 @@ public class RecordLambda<T> {
         return record.sourceExecute(sourceExecute);
     }
 
-    public void overwrite(int tick, BaseRecord<?> delta) {
-        record.overwrite(delta.getValue());
+    public void overwrite(int tick, Object delta) {
+        record.overwrite(delta);
     }
 
     public void destExecute(BasePackable packable) {

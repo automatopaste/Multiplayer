@@ -1,7 +1,6 @@
 package data.scripts.net.data.tables.client;
 
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -25,7 +24,7 @@ public class ClientProjectileTable extends EntityTable<ProjectileData> implement
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
 
     }
 }

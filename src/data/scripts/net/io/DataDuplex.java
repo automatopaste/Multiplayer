@@ -12,7 +12,7 @@ public class DataDuplex {
     /**
      * Map Type ID to
      */
-    private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound;
+    private final Map<Byte, Map<Short, Map<Byte, Object>>> inbound;
     private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket;
     private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram;
 
@@ -26,9 +26,9 @@ public class DataDuplex {
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getDeltas() {
+    public Map<Byte, Map<Short, Map<Byte, Object>>> getDeltas() {
         synchronized (inbound) {
-            HashMap<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>(inbound);
+            HashMap<Byte, Map<Short, Map<Byte, Object>>> out = new HashMap<>(inbound);
             inbound.clear();
             return out;
         }
@@ -62,11 +62,11 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param entities new entities copy
      */
-    public void updateInbound(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
+    public void updateInbound(Map<Byte, Map<Short, Map<Byte, Object>>> entities) {
         synchronized (this.inbound) {
             for (Byte type : entities.keySet()) {
-                Map<Short, Map<Byte, BaseRecord<?>>> inboundEntities = inbound.get(type);
-                Map<Short, Map<Byte, BaseRecord<?>>> deltas = entities.get(type);
+                Map<Short, Map<Byte, Object>> inboundEntities = inbound.get(type);
+                Map<Short, Map<Byte, Object>> deltas = entities.get(type);
 
                 if (inboundEntities == null) {
                     inboundEntities = new HashMap<>();
@@ -74,14 +74,14 @@ public class DataDuplex {
                 }
 
                 for (Short instance : deltas.keySet()) {
-                    Map<Byte, BaseRecord<?>> p = inboundEntities.get(instance);
-                    Map<Byte, BaseRecord<?>> d = deltas.get(instance);
+                    Map<Byte, Object> p = inboundEntities.get(instance);
+                    Map<Byte, Object> d = deltas.get(instance);
 
                     if (p == null) {
                         inboundEntities.put(instance, d);
                     } else {
                         for (Byte k : p.keySet()) {
-                            BaseRecord<?> delta = d.get(k);
+                            Object delta = d.get(k);
                             if (delta != null) p.put(k, delta);
                         }
                     }

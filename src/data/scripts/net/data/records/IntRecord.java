@@ -10,7 +10,7 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    protected boolean checkNotEqual(Integer delta) {
+    protected boolean checkUpdate(Integer delta) {
         return value != (int) delta;
     }
 
@@ -20,9 +20,8 @@ public class IntRecord extends BaseRecord<Integer> {
     }
 
     @Override
-    public BaseRecord<Integer> read(ByteBuf in) {
-        int value = in.readInt();
-        return new IntRecord(value);
+    public Integer read(ByteBuf in) {
+        return in.readInt();
     }
 
     @Override

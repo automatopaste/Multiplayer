@@ -34,7 +34,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     }
 
     @Override
-    public void overwrite(int tick, BaseRecord<?> delta) {
+    public void overwrite(int tick, Object delta) {
         super.overwrite(tick, delta);
 
         if (tick > this.tick) {
@@ -45,7 +45,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
             gap = milli * 0.001f;
 
             v2 = v1;
-            v1 = (T) delta.getValue();
+            v1 = (T) delta;
 
             progressive = 0f;
             this.tick = tick;

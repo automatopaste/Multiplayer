@@ -7,6 +7,7 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.*;
+import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPClientPlugin;
@@ -15,10 +16,13 @@ import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.List;
+import java.util.*;
 
 public class ShipData extends BasePackable {
     public static byte TYPE_ID;
+
+    private final Set<WeaponAPI> knownDisabled = new HashSet<>();
+    private final Set<WeaponAPI> knownActive = new HashSet<>();
 
     private ShipAPI ship;
     private String hullID;
@@ -217,6 +221,66 @@ public class ShipData extends BasePackable {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setOwner(value);
                         shipData.setOwner(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("disabled weapon ids"),
+                new SourceExecute<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>();
+
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
+                                out.add(weapon.getSlot().getId());
+                                knownDisabled.add(weapon);
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(List<String> value, BasePackable packable) {
+                        for (String id : value) {
+                            for (WeaponAPI weapon : getShip().getAllWeapons()) {
+                                if (weapon.getSlot().getId().equals(id)) {
+                                    weapon.disable();
+                                }
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("active weapon ids"),
+                new SourceExecute<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>();
+
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
+                                out.add(weapon.getSlot().getId());
+                                knownActive.add(weapon);
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(List<String> value, BasePackable packable) {
+                        for (String id : value) {
+                            for (WeaponAPI weapon : getShip().getAllWeapons()) {
+                                if (weapon.getSlot().getId().equals(id)) {
+                                    weapon.repair();
+                                }
+                            }
+                        }
                     }
                 }
         ));

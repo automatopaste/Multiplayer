@@ -3,7 +3,6 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
@@ -82,7 +81,7 @@ public class PlayerShips implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
         PlayerShipData data = playerShips.get(instanceID);
 
         if (data == null) {

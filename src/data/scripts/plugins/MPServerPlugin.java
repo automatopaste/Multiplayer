@@ -7,7 +7,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.records.Float32Record;
-import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.server.ProjectileTable;
 import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.data.tables.server.PlayerLobby;
@@ -77,7 +77,7 @@ public class MPServerPlugin extends MPPlugin {
         }
 
         // inbound data update
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> inbound = serverConnectionManager.getDuplex().getDeltas();
+        Map<Byte, Map<Short, Map<Byte, Object>>> inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this, serverConnectionManager.getTick());
 
         // simulation update
@@ -104,8 +104,8 @@ public class MPServerPlugin extends MPPlugin {
     float f = 0f;
 
     private void testInit() {
-        ListRecord<Float> listRecord = new ListRecord<>(new ArrayList<Float>(), Float32Record.TYPE_ID);
-        listRecord.sourceExecute(new SourceExecute<List<Float>>() {
+        SyncingListRecord<Float> syncingListRecord = new SyncingListRecord<>(new ArrayList<Float>(), Float32Record.TYPE_ID);
+        syncingListRecord.sourceExecute(new SourceExecute<List<Float>>() {
             @Override
             public List<Float> get() {
                 List<Float> data = new ArrayList<>();
@@ -117,7 +117,7 @@ public class MPServerPlugin extends MPPlugin {
             }
         });
         Map<Byte, BaseRecord<?>> t = new HashMap<>();
-        t.put((byte) 3, listRecord);
+        t.put((byte) 3, syncingListRecord);
         Map<Short, Map<Byte, BaseRecord<?>>> i = new HashMap<>();
         i.put((short) 10, t);
         m = new HashMap<>();
@@ -127,8 +127,8 @@ public class MPServerPlugin extends MPPlugin {
     private void test() {
         f += 10f;
 
-        ListRecord<Float> listRecord = (ListRecord<Float>) m.get((byte) 69).get((short) 10).get((byte) 3);
-        listRecord.sourceExecute(new SourceExecute<List<Float>>() {
+        SyncingListRecord<Float> syncingListRecord = (SyncingListRecord<Float>) m.get((byte) 69).get((short) 10).get((byte) 3);
+        syncingListRecord.sourceExecute(new SourceExecute<List<Float>>() {
             @Override
             public List<Float> get() {
                 List<Float> data = new ArrayList<>();
@@ -143,7 +143,7 @@ public class MPServerPlugin extends MPPlugin {
 
         ByteBuf buf = UnpooledByteBufAllocator.DEFAULT.buffer();
         BaseConnectionWrapper.writeBuffer(m, buf);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> output;
+        Map<Byte, Map<Short, Map<Byte, Object>>> output;
         try {
             output = BaseConnectionWrapper.readBuffer(buf);
         } catch (IOException e) {

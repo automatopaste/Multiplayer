@@ -11,7 +11,7 @@ public class Vector2f32Record extends BaseRecord<Vector2f> {
     }
 
     @Override
-    public boolean checkNotEqual(Vector2f delta) {
+    public boolean checkUpdate(Vector2f delta) {
         boolean isUpdated;
 
         isUpdated = (value.x != delta.x) || (value.y != delta.y);
@@ -26,10 +26,10 @@ public class Vector2f32Record extends BaseRecord<Vector2f> {
     }
 
     @Override
-    public BaseRecord<Vector2f> read(ByteBuf in) {
+    public Vector2f read(ByteBuf in) {
         float x = in.readFloat();
         float y = in.readFloat();
-        return new Vector2f32Record(new Vector2f(x, y));
+        return new Vector2f(x, y);
     }
 
     @Override

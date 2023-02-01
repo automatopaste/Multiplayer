@@ -3,6 +3,7 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
@@ -20,12 +21,14 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
     private final Map<String, Short> registered;
     private final Map<Short, ShieldData> shields;
+    Map<String, List<WeaponAPI>> weapons;
 
     public ShipTable() {
         super(new ShipData[MAX_SHIPS]);
 
         registered = new HashMap<>();
         shields = new HashMap<>();
+        weapons = new HashMap<>();
     }
 
     @Override

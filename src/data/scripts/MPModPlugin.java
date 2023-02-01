@@ -14,7 +14,8 @@ import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
-import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.records.collections.ListenArrayRecord;
+import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
@@ -42,11 +43,12 @@ public class MPModPlugin extends BaseModPlugin {
         StringRecord.setTypeId(DataGenManager.registerRecordType(StringRecord.class.getSimpleName(), StringRecord.getDefault()));
         Vector2f32Record.setTypeId(DataGenManager.registerRecordType(Vector2f32Record.class.getSimpleName(), Vector2f32Record.getDefault()));
         Vector3f32Record.setTypeId(DataGenManager.registerRecordType(Vector3f32Record.class.getSimpleName(), Vector3f32Record.getDefault()));
-        ListRecord.setTypeId(DataGenManager.registerRecordType(ListRecord.class.getSimpleName(), new ListRecord<>(new ArrayList<>(), (byte) -1)));
+        SyncingListRecord.setTypeId(DataGenManager.registerRecordType(SyncingListRecord.class.getSimpleName(), new SyncingListRecord<>(new ArrayList<>(), (byte) -1)));
         Float16Record.setTypeId(DataGenManager.registerRecordType(Float16Record.class.getSimpleName(), Float16Record.getDefault()));
         ByteRecord.setTypeId(DataGenManager.registerRecordType(ByteRecord.class.getSimpleName(), ByteRecord.getDefault()));
         Vector2f16Record.setTypeId(DataGenManager.registerRecordType(Vector2f16Record.class.getSimpleName(), Vector2f16Record.getDefault()));
         ShortRecord.setTypeId(DataGenManager.registerRecordType(ShortRecord.class.getSimpleName(), ShortRecord.getDefault()));
+        ListenArrayRecord.setTypeId(DataGenManager.registerRecordType(ListenArrayRecord.class.getSimpleName(), new ListenArrayRecord<>(new ArrayList<>(), (byte) -1)));
     }
 
     @Override

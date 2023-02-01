@@ -1,6 +1,5 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.records.BaseRecord;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 
@@ -10,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Unpacked {
-    private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> unpacked;
+    private final Map<Byte, Map<Short, Map<Byte, Object>>> unpacked;
     private final int tick;
 
     private final InetSocketAddress sender;
@@ -24,7 +23,7 @@ public class Unpacked {
         tick = data.readInt();
         connectionID = data.readInt();
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> m;
+        Map<Byte, Map<Short, Map<Byte, Object>>> m;
         try {
             m = BaseConnectionWrapper.readBuffer(data);
         } catch (IOException | DecoderException i) {
@@ -35,7 +34,7 @@ public class Unpacked {
         unpacked = m;
     }
 
-    public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getUnpacked() {
+    public Map<Byte, Map<Short, Map<Byte, Object>>> getUnpacked() {
         return unpacked;
     }
 

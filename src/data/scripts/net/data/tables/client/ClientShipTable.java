@@ -2,7 +2,6 @@ package data.scripts.net.data.tables.client;
 
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.util.DataGenManager;
@@ -22,7 +21,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, BaseRecord<?>> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
         if (typeID == ShipData.TYPE_ID) {
             ShipData data = table[instanceID];
 

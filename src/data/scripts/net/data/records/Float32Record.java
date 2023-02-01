@@ -12,7 +12,7 @@ public class Float32Record extends BaseRecord<Float> {
     }
 
     @Override
-    protected boolean checkNotEqual(Float delta) {
+    protected boolean checkUpdate(Float delta) {
         return !Objects.equals(value, delta);
     }
 
@@ -22,9 +22,8 @@ public class Float32Record extends BaseRecord<Float> {
     }
 
     @Override
-    public BaseRecord<Float> read(ByteBuf in) {
-        float value = in.readFloat();
-        return new Float32Record(value);
+    public Float read(ByteBuf in) {
+        return in.readFloat();
     }
 
     @Override

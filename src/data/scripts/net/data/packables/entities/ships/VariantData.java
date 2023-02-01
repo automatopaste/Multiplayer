@@ -7,7 +7,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
-import data.scripts.net.data.records.collections.ListRecord;
+import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -77,7 +77,7 @@ public class VariantData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("weapon ids"),
                 new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {
@@ -101,7 +101,7 @@ public class VariantData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("weapon slot ids"),
                 new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {

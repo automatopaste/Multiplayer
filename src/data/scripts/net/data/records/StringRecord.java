@@ -18,21 +18,27 @@ public class StringRecord extends BaseRecord<String> {
     public void write(ByteBuf dest) {
         byte[] bytes = value == null ? "NONE".getBytes(CHARSET) : value.getBytes(CHARSET);
 
-        dest.writeInt(bytes.length);
+        if (bytes.length > Byte.MAX_VALUE) {
+            byte[] b = new byte[Byte.MAX_VALUE];
+            System.arraycopy(bytes, 0, b, 0, b.length);
+            bytes = b;
+        }
+
+        dest.writeByte(bytes.length);
         dest.writeBytes(bytes);
     }
 
     @Override
-    public BaseRecord<String> read(ByteBuf in) {
-        int length = in.readInt();
+    public String read(ByteBuf in) {
+        int length = in.readByte();
         String value = in.readCharSequence(length, CHARSET).toString();
         if (value.equals("NONE")) value = null;
 
-        return new StringRecord(value);
+        return value;
     }
 
     @Override
-    public boolean checkNotEqual(String delta) {
+    public boolean checkUpdate(String delta) {
         return value != null && !value.equals(delta);
     }
 

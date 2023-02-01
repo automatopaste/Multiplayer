@@ -132,13 +132,13 @@ public abstract class BaseConnectionWrapper {
         }
     }
 
-    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> readBuffer(ByteBuf data) throws IOException {
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
+    public static Map<Byte, Map<Short, Map<Byte, Object>>> readBuffer(ByteBuf data) throws IOException {
+        Map<Byte, Map<Short, Map<Byte, Object>>> out = new HashMap<>();
 
         while (data.readableBytes() > 0) {
             byte typeID = data.readByte();
 
-            Map<Short, Map<Byte, BaseRecord<?>>> instances = out.get(typeID);
+            Map<Short, Map<Byte, Object>> instances = out.get(typeID);
             if (instances == null) {
                 instances = new HashMap<>();
                 out.put(typeID, instances);
@@ -149,7 +149,7 @@ public abstract class BaseConnectionWrapper {
             for (short i = 0; i < numInstances; i++) {
                 short instanceID = data.readShort();
 
-                Map<Byte, BaseRecord<?>> records = instances.get(instanceID);
+                Map<Byte, Object> records = instances.get(instanceID);
                 if (records == null) {
                     records = new HashMap<>();
                     instances.put(instanceID, records);
@@ -162,8 +162,8 @@ public abstract class BaseConnectionWrapper {
                     byte recordTypeID = data.readByte();
 
                     try {
-                        BaseRecord<?> record = DataGenManager.recordFactory(recordTypeID).read(data);
-                        records.put(recordID, record);
+                        Object value = DataGenManager.recordFactory(recordTypeID).read(data);
+                        records.put(recordID, value);
                     } catch (NullPointerException e) {
                         throw new IOException(
                                 "Incorrect record type ID for destination " +
