@@ -27,7 +27,7 @@ public class ShipData extends BasePackable {
     private final Set<WeaponAPI> knownDisabled = new HashSet<>();
     private final Set<WeaponAPI> knownActive = new HashSet<>();
 
-    private float[][] prevArmourGrid;
+    private float[][] prevArmourGrid = null;
 
     private ShipAPI ship;
     private String hullID;
@@ -37,8 +37,6 @@ public class ShipData extends BasePackable {
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
         this.ship = ship;
-
-        prevArmourGrid = ship.getArmorGrid().getGrid();
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
@@ -298,6 +296,11 @@ public class ShipData extends BasePackable {
                     public List<Byte> get() {
                         List<ArmourSyncData> data = new ArrayList<>();
 
+                        if (prevArmourGrid == null) {
+                            prevArmourGrid = ship.getArmorGrid().getGrid();
+                            return new ArrayList<>();
+                        }
+
                         float[][] g = ship.getArmorGrid().getGrid();
                         for (int i = 0; i < g.length; i++) {
                             float[] row = g[i];
@@ -308,11 +311,9 @@ public class ShipData extends BasePackable {
                                 }
                             }
                         }
-
                         prevArmourGrid = g;
 
                         List<Byte> out = new ArrayList<>();
-
                         // 2x6 bits for coordinates, 4 bits for armour fraction (16 discrete armour levels)
                         for (ArmourSyncData a : data) {
                             byte b1, b2;
