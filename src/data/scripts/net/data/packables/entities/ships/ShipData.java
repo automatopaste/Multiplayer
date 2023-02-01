@@ -25,7 +25,6 @@ public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private final Set<WeaponAPI> knownDisabled = new HashSet<>();
-    private final Set<WeaponAPI> knownActive = new HashSet<>();
 
     private float[][] prevArmourGrid = null;
 
@@ -230,47 +229,17 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("disabled weapon ids"),
+                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("disabled weapon slot ids"),
                 new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {
                         List<String> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
+                            if (weapon.isDisabled()) {
                                 out.add(weapon.getSlot().getId());
                                 knownDisabled.add(weapon);
-                                knownActive.remove(weapon);
-                            }
-                        }
-
-                        return out;
-                    }
-                },
-                new DestExecute<List<String>>() {
-                    @Override
-                    public void execute(List<String> value, BasePackable packable) {
-                        for (String id : value) {
-                            for (WeaponAPI weapon : getShip().getAllWeapons()) {
-                                if (weapon.getSlot().getId().equals(id)) {
-                                    weapon.disable();
-                                }
-                            }
-                        }
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("active weapon ids"),
-                new SourceExecute<List<String>>() {
-                    @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>();
-
-                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
-                                out.add(weapon.getSlot().getId());
-                                knownActive.add(weapon);
+                            } else {
                                 knownDisabled.remove(weapon);
                             }
                         }
@@ -281,10 +250,47 @@ public class ShipData extends BasePackable {
                 new DestExecute<List<String>>() {
                     @Override
                     public void execute(List<String> value, BasePackable packable) {
-                        for (String id : value) {
-                            for (WeaponAPI weapon : getShip().getAllWeapons()) {
-                                if (weapon.getSlot().getId().equals(id)) {
-                                    weapon.repair();
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (String id : value) {
+                                for (WeaponAPI weapon : ship.getAllWeapons()) {
+                                    if (weapon.getSlot().getId().equals(id)) {
+                                        weapon.disable();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("active weapon slot ids"),
+                new SourceExecute<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>();
+
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (!weapon.isDisabled()) {
+                                out.add(weapon.getSlot().getId());
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(List<String> value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (String id : value) {
+                                for (WeaponAPI weapon : ship.getAllWeapons()) {
+                                    if (weapon.getSlot().getId().equals(id)) {
+                                        weapon.repair();
+                                    }
                                 }
                             }
                         }
