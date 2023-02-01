@@ -16,13 +16,18 @@ import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
     private final Set<WeaponAPI> knownDisabled = new HashSet<>();
     private final Set<WeaponAPI> knownActive = new HashSet<>();
+
+    private float[][] prevArmourGrid;
 
     private ShipAPI ship;
     private String hullID;
@@ -32,6 +37,8 @@ public class ShipData extends BasePackable {
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
         this.ship = ship;
+
+        prevArmourGrid = ship.getArmorGrid().getGrid();
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
@@ -284,6 +291,60 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("armour grid"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<ArmourSyncData> data = new ArrayList<>();
+
+                        float[][] g = ship.getArmorGrid().getGrid();
+                        for (int i = 0; i < g.length; i++) {
+                            float[] row = g[i];
+                            for (int j = 0; j < row.length; j++) {
+                                float v = row[j];
+                                if (v != prevArmourGrid[i][j]) {
+                                    data.add(new ArmourSyncData(i, j, v));
+                                }
+                            }
+                        }
+
+                        prevArmourGrid = g;
+
+                        List<Byte> out = new ArrayList<>();
+
+                        // 2x6 bits for coordinates, 4 bits for armour fraction (16 discrete armour levels)
+                        for (ArmourSyncData a : data) {
+                            byte b1, b2;
+                            b1 = (byte) ((a.x & 0b00111111) << 2);
+                            b1 |= (byte) ((a.y & 0b00110000) >>> 4);
+                            b2 = (byte) ((a.y & 0b00000011) << 6);
+                            int v = Math.round(ship.getArmorGrid().getArmorFraction(a.x, a.y) * 0b00001111);
+                            b2 |= (byte) (v & 0b00001111);
+                            out.add(b1);
+                            out.add(b2);
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        for (int i = 0; i < value.size(); i += 2) {
+                            byte b1 = value.get(i);
+                            byte b2 = value.get(i + 1);
+
+                            int x = (b1 & 0b11111100) >>> 2;
+                            int y = ((b1 & 0b00000011) << 4) | ((b2 & 0b11110000) >>> 4);
+                            int v = b2 & 0b00001111;
+                            float a = getShip().getArmorGrid().getMaxArmorInCell() * v / 16f;
+
+                            getShip().getArmorGrid().setArmorValue(x, y, a);
+                        }
+                    }
+                }
+        ));
     }
 
     @Override
@@ -372,5 +433,17 @@ public class ShipData extends BasePackable {
 
     public void setOwner(int owner) {
         this.owner = owner;
+    }
+
+    public static class ArmourSyncData {
+        public int x;
+        public int y;
+        public float v;
+
+        public ArmourSyncData(int x, int y, float v) {
+            this.x = x;
+            this.y = y;
+            this.v = v;
+        }
     }
 }
