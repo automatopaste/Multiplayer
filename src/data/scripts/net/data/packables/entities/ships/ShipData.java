@@ -78,7 +78,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addInterpRecord(new InterpRecordLambda<>(
-                Vector2f32Record.getDefault().setDebugText("location"),
+                Vector2f16Record.getDefault().setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -202,7 +202,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addInterpRecord(new InterpRecordLambda<>(
-                Vector2f32Record.getDefault().setDebugText("mouse target"),
+                Vector2f16Record.getDefault().setDebugText("mouse target"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
