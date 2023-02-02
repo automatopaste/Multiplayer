@@ -33,8 +33,8 @@ public class DatagramClient implements Runnable {
     private boolean running;
 
     private final DebugGraphContainer dataGraph;
-    private final DebugGraphContainer dataGraphCompressed;
-    private final DebugGraphContainer dataGraphRatio;
+//    private final DebugGraphContainer dataGraphCompressed;
+//    private final DebugGraphContainer dataGraphRatio;
 
 
     public DatagramClient(String host, int remotePort, int localPort, ClientConnectionWrapper connection) {
@@ -45,9 +45,9 @@ public class DatagramClient implements Runnable {
 
         clock = new Clock(TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE, 50f);
-        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
-        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
+        dataGraph = new DebugGraphContainer("Outbound Packet Size", ServerConnectionManager.TICK_RATE * 2, 60f);
+//        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
+//        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
 
         running = false;
@@ -88,10 +88,10 @@ public class DatagramClient implements Runnable {
 
                 dataGraph.increment(size);
                 CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraph", dataGraph);
-                dataGraphCompressed.increment(sizeCompressed);
-                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphCompressed", dataGraphCompressed);
-                dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphRatio", dataGraphRatio);
+//                dataGraphCompressed.increment(sizeCompressed);
+//                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphCompressed", dataGraphCompressed);
+//                dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+//                CMUtils.getGuiDebug().putContainer(DatagramClient.class, "dataGraphRatio", dataGraphRatio);
             }
 
             closeFuture.sync();
@@ -121,7 +121,6 @@ public class DatagramClient implements Runnable {
             }
         });
 
-        // ushort bit conversion
         ChannelFuture channelFuture = bootstrap.bind(localPort).syncUninterruptibly();
         channelFuture.syncUninterruptibly();
 

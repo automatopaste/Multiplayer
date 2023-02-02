@@ -15,10 +15,13 @@ public class Unpacked {
     private final InetSocketAddress sender;
     private final InetSocketAddress recipient;
     private final int connectionID;
+    private final int size;
 
     public Unpacked(ByteBuf data, InetSocketAddress sender, InetSocketAddress recipient) {
         this.sender = sender;
         this.recipient = recipient;
+
+        size = data.readableBytes();
 
         tick = data.readInt();
         connectionID = data.readInt();
@@ -52,5 +55,9 @@ public class Unpacked {
 
     public int getConnectionID() {
         return connectionID;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
