@@ -16,10 +16,7 @@ import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ShipData extends BasePackable {
     public static byte TYPE_ID;
@@ -34,9 +31,14 @@ public class ShipData extends BasePackable {
     private String fleetMemberID;
     private int owner;
 
+    private Map<String, Integer> slotIDs;
+    private Map<Integer, String> slotIntIDs;
+
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
         this.ship = ship;
+
+        final Map<String, Integer> slotIDs = VariantData.getSlotIDs(ship.getVariant());
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
@@ -230,15 +232,15 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("disabled weapon slot ids"),
-                new SourceExecute<List<String>>() {
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("disabled weapon slot ids"),
+                new SourceExecute<List<Byte>>() {
                     @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>();
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
                             if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
-                                out.add(weapon.getSlot().getId());
+                                out.add((byte) (int) slotIDs.get(weapon.getSlot().getId()));
                                 knownDisabled.add(weapon);
                             } else {
                                 knownDisabled.remove(weapon);
@@ -248,15 +250,18 @@ public class ShipData extends BasePackable {
                         return out;
                     }
                 },
-                new DestExecute<List<String>>() {
+                new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<String> value, BasePackable packable) {
+                    public void execute(List<Byte> value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
-                            for (String id : value) {
+                            for (byte b : value) {
+                                int id = b & 0xFF;
+                                String slotID = slotIntIDs.get(id);
+
                                 for (WeaponAPI weapon : ship.getAllWeapons()) {
-                                    if (weapon.getSlot().getId().equals(id)) {
+                                    if (weapon.getSlot().getId().equals(slotID)) {
                                         weapon.disable();
                                     }
                                 }
@@ -266,15 +271,15 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("active weapon slot ids"),
-                new SourceExecute<List<String>>() {
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("active weapon slot ids"),
+                new SourceExecute<List<Byte>>() {
                     @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>();
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
                             if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
-                                out.add(weapon.getSlot().getId());
+                                out.add((byte) (int) slotIDs.get(weapon.getSlot().getId()));
                                 knownActive.add(weapon);
                             } else {
                                 knownActive.remove(weapon);
@@ -284,15 +289,18 @@ public class ShipData extends BasePackable {
                         return out;
                     }
                 },
-                new DestExecute<List<String>>() {
+                new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<String> value, BasePackable packable) {
+                    public void execute(List<Byte> value, BasePackable packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
-                            for (String id : value) {
+                            for (byte b : value) {
+                                int id = b & 0xFF;
+                                String slotID = slotIntIDs.get(id);
+
                                 for (WeaponAPI weapon : ship.getAllWeapons()) {
-                                    if (weapon.getSlot().getId().equals(id)) {
+                                    if (weapon.getSlot().getId().equals(slotID)) {
                                         weapon.repair();
                                     }
                                 }
@@ -394,11 +402,17 @@ public class ShipData extends BasePackable {
                 variant.addMod(id);
             }
 
-            List<String> weaponSlots = variantData.getWeaponSlots();
-            List<String> weaponIds = variantData.getWeaponIDs();
-            for (int i = 0; i < weaponSlots.size(); i++) {
-                String slot = weaponSlots.get(i);
-                variant.addWeapon(slot, weaponIds.get(i));
+            slotIDs = new HashMap<>(variantData.getSlotIDs());
+            slotIntIDs = new HashMap<>();
+            Map<Integer, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
+
+            for (String id : slotIDs.keySet()) {
+                int s = slotIDs.get(id);
+
+                slotIntIDs.put(s, id);
+
+                String weaponID = fittedWeaponSlots.get(s);
+                if (weaponID != null) variant.addWeapon(id, weaponID);
             }
 
             variant.autoGenerateWeaponGroups();
