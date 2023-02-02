@@ -31,16 +31,17 @@ public class VariantData extends BasePackable {
     public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
 
-        if (variant == null) return;
-
-        final Map<String, Integer> slotIDs = VariantData.getSlotIDs(variant);
-
+        final Map<String, Integer> slotIDs;
         final Map<Integer, String> weaponSlots = new HashMap<>();
-        List<String> fitted = new ArrayList<>(variant.getFittedWeaponSlots());
-        for (String s : fitted) {
-            String weaponID = variant.getWeaponId(s);
-            int slotID = slotIDs.get(s);
-            weaponSlots.put(slotID, weaponID);
+        if (variant != null ) {
+            slotIDs = VariantData.getSlotIDs(variant);
+
+            List<String> fitted = new ArrayList<>(variant.getFittedWeaponSlots());
+            for (String s : fitted) {
+                String weaponID = variant.getWeaponId(s);
+                int slotID = slotIDs.get(s);
+                weaponSlots.put(slotID, weaponID);
+            }
         }
 
         addRecord(new RecordLambda<>(
