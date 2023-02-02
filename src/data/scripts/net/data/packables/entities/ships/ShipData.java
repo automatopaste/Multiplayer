@@ -22,8 +22,7 @@ import java.util.*;
 public class ShipData extends BasePackable {
     public static byte TYPE_ID;
 
-    private final Set<WeaponAPI> knownDisabled = new HashSet<>();
-    private final Set<WeaponAPI> knownActive = new HashSet<>();
+    private final Map<Integer, Boolean> prevStates = new HashMap<>();
     private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownDisabledEngines = new HashSet<>();
 
     private float[][] prevArmourGrid = null;
@@ -80,7 +79,7 @@ public class ShipData extends BasePackable {
                 }
         ));
         addInterpRecord(new InterpRecordLambda<>(
-                Vector2f16Record.getDefault().setDebugText("location"),
+                Vector2f32Record.getDefault().setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
@@ -273,19 +272,30 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("disabled weapon slot ids"),
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon slot id status"),
                 new SourceExecute<List<Byte>>() {
                     @Override
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isDisabled() && !knownDisabled.contains(weapon)) {
-                                out.add((byte) (int) slotIDs.get(weapon.getSlot().getId()));
-                                knownDisabled.add(weapon);
-                            } else {
-                                knownDisabled.remove(weapon);
+                            int slotID = slotIDs.get(weapon.getSlot().getId());
+
+                            Boolean p = prevStates.get(slotID);
+                            if (p == null) {
+                                prevStates.put(slotID, weapon.isDisabled());
+                                p = weapon.isDisabled();
                             }
+                            boolean prevDisabled = p;
+
+                            if (weapon.isDisabled() != prevDisabled) {
+                                byte b = (byte) slotID;
+                                b &= 0b01111111;
+                                if (!weapon.isDisabled()) b |= 0b10000000;
+                                out.add(b);
+                            }
+
+                            prevStates.put(slotID, weapon.isDisabled());
                         }
 
                         return out;
@@ -298,52 +308,14 @@ public class ShipData extends BasePackable {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             for (byte b : value) {
-                                int id = b & 0xFF;
-                                String slotID = slotIntIDs.get(id);
+                                int id = b & 0b01111111;
 
-                                for (WeaponAPI weapon : ship.getAllWeapons()) {
-                                    if (weapon.getSlot().getId().equals(slotID)) {
-                                        weapon.disable();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("active weapon slot ids"),
-                new SourceExecute<List<Byte>>() {
-                    @Override
-                    public List<Byte> get() {
-                        List<Byte> out = new ArrayList<>();
+                                boolean isActive = (b & 0b10000000) >>> 7 == 1;
 
-                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (!weapon.isDisabled() && !knownActive.contains(weapon)) {
-                                out.add((byte) (int) slotIDs.get(weapon.getSlot().getId()));
-                                knownActive.add(weapon);
-                            } else {
-                                knownActive.remove(weapon);
-                            }
-                        }
-
-                        return out;
-                    }
-                },
-                new DestExecute<List<Byte>>() {
-                    @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) {
-                            for (byte b : value) {
-                                int id = b & 0xFF;
-                                String slotID = slotIntIDs.get(id);
-
-                                for (WeaponAPI weapon : ship.getAllWeapons()) {
-                                    if (weapon.getSlot().getId().equals(slotID)) {
-                                        weapon.repair();
-                                    }
+                                if (isActive) {
+                                    weaponSlots.get(id).repair();
+                                } else {
+                                    weaponSlots.get(id).disable();
                                 }
                             }
                         }
@@ -502,6 +474,7 @@ public class ShipData extends BasePackable {
                             if (engine.isDisabled() && !knownDisabledEngines.contains(engine)) {
                                 out.add((byte) i);
                                 knownDisabledEngines.add(engine);
+                                engine.setHitpoints(engine.getMaxHitpoints());
                             } else {
                                 knownDisabledEngines.remove(engine);
                             }
