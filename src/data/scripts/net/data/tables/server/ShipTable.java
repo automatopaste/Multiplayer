@@ -93,7 +93,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         registered.put(ship.getId(), id);
         table[id] = new ShipData(id, ship);
         if (ship.getShield() != null) {
-            shields.put(id, new ShieldData(id, ship.getShield()));
+            shields.put(id, new ShieldData(id, ship.getShield(), ship));
         }
     }
 

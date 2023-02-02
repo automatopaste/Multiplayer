@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShieldAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.Float16Record;
@@ -20,7 +21,7 @@ public class ShieldData extends BasePackable {
     /**
      * Shield must be passed in constructor
      */
-    public ShieldData(short instanceID, final ShieldAPI shield) {
+    public ShieldData(short instanceID, final ShieldAPI shield, final ShipAPI ship) {
         super(instanceID);
         this.instanceID = instanceID;
 
@@ -53,7 +54,7 @@ public class ShieldData extends BasePackable {
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
-                        return shield.getFacing();
+                        return shield.getFacing() - ship.getFacing();
                     }
                 },
                 new DestExecute<Float>() {

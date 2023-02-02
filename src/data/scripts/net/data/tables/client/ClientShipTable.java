@@ -41,7 +41,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             if (shieldData == null) {
                 ShipData shipData = table[instanceID];
                 if (shipData != null && shipData.getShip() != null) {
-                    shieldData = new ShieldData(instanceID, shipData.getShip().getShield());
+                    shieldData = new ShieldData(instanceID, shipData.getShip().getShield(), shipData.getShip());
                     shields.put(instanceID, shieldData);
 
                     shieldData.destExecute(toProcess, tick);

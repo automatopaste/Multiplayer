@@ -201,6 +201,7 @@ public class PlayerShipData extends BasePackable {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).equals(ship.getSelectedGroupAPI())) {
                 selected = i;
+                break;
             }
         }
 
@@ -208,12 +209,12 @@ public class PlayerShipData extends BasePackable {
         if (controls[11]) ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
         if (controls[12]) ship.giveCommand(ShipCommand.HOLD_FIRE, null, 0);
         if (controls[13]) ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
-        if (controls[14]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 0);
-        if (controls[15]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 1);
-        if (controls[16]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 2);
-        if (controls[17]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 3);
-        if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 4);
-        if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 5);
-        if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, null, 6);
+        if (controls[14]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 0);
+        if (controls[15]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 1);
+        if (controls[16]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 2);
+        if (controls[17]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 3);
+        if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 4);
+        if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 5);
+        if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 6);
     }
 }
