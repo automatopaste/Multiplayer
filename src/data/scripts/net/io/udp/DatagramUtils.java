@@ -22,15 +22,15 @@ public class DatagramUtils {
 
         byte[] bytes = new byte[buf.readableBytes()];
         if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
-        sizeData.size = (short) bytes.length;
+        sizeData.size = bytes.length;
         buf.readBytes(bytes);
 //        byte[] compressed = CompressionUtils.deflate(bytes);
 //        sizeData.sizeCompressed = (short) compressed.length;
 
         ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length);
 
-        out.writeShort(sizeData.size);
-//        out.writeShort(sizeData.sizeCompressed);
+        out.writeInt(sizeData.size);
+//        out.writeInt(sizeData.sizeCompressed);
 //        out.writeBytes(compressed);
 
         out.writeBytes(bytes);
@@ -41,8 +41,8 @@ public class DatagramUtils {
 
     public static byte[] read(DatagramPacket in) throws DataFormatException {
         ByteBuf content = in.content();
-        int size = content.readShort();
-//        int sizeCompressed = content.readShort();
+        int size = content.readInt();
+//        int sizeCompressed = content.readInt();
 
         if (size == 0) return new byte[0];
 
@@ -57,7 +57,7 @@ public class DatagramUtils {
     }
 
     public static class SizeData {
-        public short size;
-        public short sizeCompressed;
+        public int size;
+        public int sizeCompressed;
     }
 }
