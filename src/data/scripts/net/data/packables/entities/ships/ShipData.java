@@ -187,6 +187,40 @@ public class ShipData extends BasePackable {
                 }
         ));
         addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("flux vent, overload, engine boost flags"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        byte b = 0x00;
+//                        if (ship.getFluxTracker().isEngineBoostActive()) b |= 0b10000000;
+                        if (ship.getFluxTracker().isOverloaded()) b |= 0b01000000;
+                        if (ship.getFluxTracker().isVenting()) b |= 0b00100000;
+                        return b;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            byte b = value;
+                            //if ((b & 0b10000000) >>> 7 != 0) // engine boost
+
+                            if ((b & 0b01000000) >>> 6 != 0) {
+                                ship.getFluxTracker().forceOverload(999f);
+                            } else if (ship.getFluxTracker().isOverloaded()) {
+                                ship.getFluxTracker().stopOverload();
+                            }
+
+                            if ((b & 0b00100000) >>> 5 != 0 && !ship.getFluxTracker().isVenting()) {
+                                ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("cr level"),
                 new SourceExecute<Byte>() {
                     @Override
