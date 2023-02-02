@@ -38,7 +38,10 @@ public class ShipData extends BasePackable {
         super(instanceID);
         this.ship = ship;
 
-        final Map<String, Integer> slotIDs = VariantData.getSlotIDs(ship.getVariant());
+        final Map<String, Integer> slotIDs = new HashMap<>();
+        if (ship != null) {
+             slotIDs.putAll(VariantData.getSlotIDs(ship.getVariant()));
+        }
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
