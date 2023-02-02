@@ -16,8 +16,9 @@ import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-import com.fs.starfarer.combat.entities.ship.A.OOoO;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class ShipData extends BasePackable {
@@ -491,7 +492,12 @@ public class ShipData extends BasePackable {
                         if (ship != null) {
                             for (byte b : value) {
                                 WeaponAPI weapon = weaponSlots.get(b & 0xFF);
-                                if (weapon instanceof OOoO) ((OOoO) weapon).fire(1f);
+                                try {
+                                    Method fire = weapon.getClass().getMethod("fire", float.class);
+                                    fire.invoke(null, 1f);
+                                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         }
                     }
