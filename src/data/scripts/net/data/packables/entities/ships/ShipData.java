@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
+import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.*;
@@ -35,6 +36,7 @@ public class ShipData extends BasePackable {
 
     private Map<String, Integer> slotIDs;
     private Map<Integer, String> slotIntIDs;
+    private Map<Integer, WeaponAPI> weaponSlots;
 
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
@@ -404,8 +406,51 @@ public class ShipData extends BasePackable {
                                 ship.getMutableStats().getCombatEngineRepairTimeMult().modifyMult("mp", 0f);
                             } else if (value == (byte) 1) {
                                 if (!(ship.getEngineController().isFlamingOut() || ship.getEngineController().isFlamedOut())) ship.getEngineController().forceFlameout();
+                            } else if (value == (byte) 0) {
+                                ship.getMutableStats().getCombatEngineRepairTimeMult().unmodify("mp");
                             }
-                            //else if (value == (byte) 0) {} // do nothing, default value
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("disabled engine ids"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+
+                        List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
+                        for (int i = 0; i < shipEngines.size(); i++) {
+                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+                            if (engine.isDisabled() && !knownDisabledEngines.contains(engine)) {
+                                out.add((byte) i);
+                                knownDisabledEngines.add(engine);
+                            } else {
+                                knownDisabledEngines.remove(engine);
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (byte b : value) {
+                                int id = b & 0xFF;
+
+                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
+                                for (int i = 0; i < shipEngines.size(); i++) {
+                                    if (i == id) {
+                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+                                        engine.disable();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -498,7 +543,8 @@ public class ShipData extends BasePackable {
                 if (weaponID != null) variant.addWeapon(id, weaponID);
             }
 
-            variant.autoGenerateWeaponGroups();
+            List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
+            for (WeaponGroupSpec spec : groupSpecs) variant.addWeaponGroup(spec);
 
             FleetMemberType fleetMemberType = FleetMemberType.SHIP;
             FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
@@ -510,6 +556,17 @@ public class ShipData extends BasePackable {
             ship = fleetManager.spawnFleetMember(fleetMember, new Vector2f(0f, 0f), 0f, 0f);
             ship.setCRAtDeployment(0.7f);
             ship.setControlsLocked(false);
+
+            List<WeaponAPI> weapons = ship.getAllWeapons();
+            outer:
+            for (WeaponAPI w : weapons) {
+                for (String id : slotIDs.keySet()) {
+                    if (id.equals(w.getSlot().getId())) {
+                        weaponSlots.put(slotIDs.get(id), w);
+                        continue outer;
+                    }
+                }
+            }
 
             // set fleetmember id to sync with server
             Ship s = (Ship) ship;

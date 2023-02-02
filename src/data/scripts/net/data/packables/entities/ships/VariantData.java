@@ -1,6 +1,8 @@
 package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShipVariantAPI;
+import com.fs.starfarer.api.loading.WeaponGroupSpec;
+import com.fs.starfarer.api.loading.WeaponGroupType;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
 import data.scripts.net.data.packables.BasePackable;
 import data.scripts.net.data.packables.DestExecute;
@@ -26,14 +28,16 @@ public class VariantData extends BasePackable {
     private String fleetMemberID;
     private List<String> hullmods;
     private Map<String, Integer> slotIDs;
+    private Map<Integer, String> slotIntIDs;
     private Map<Integer, String> weaponSlots;
+    private List<WeaponGroupSpec> weaponGroups;
 
     public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
         super(instanceID);
 
         final Map<String, Integer> slotIDs = new HashMap<>();
         final Map<Integer, String> weaponSlots = new HashMap<>();
-        if (variant != null ) {
+        try {
             slotIDs.putAll(VariantData.getSlotIDs(variant));
 
             List<String> fitted = new ArrayList<>(variant.getFittedWeaponSlots());
@@ -42,7 +46,7 @@ public class VariantData extends BasePackable {
                 int slotID = slotIDs.get(s);
                 weaponSlots.put(slotID, weaponID);
             }
-        }
+        } catch (NullPointerException ignored) {}
 
         addRecord(new RecordLambda<>(
                 IntRecord.getDefault(),
@@ -135,6 +139,7 @@ public class VariantData extends BasePackable {
                     @Override
                     public void execute(List<Byte> value, BasePackable packable) {
                         Map<String, Integer> slots = new HashMap<>();
+                        Map<Integer, String> intSlots = new HashMap<>();
 
                         for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
                             int size = iterator.next() & 0xFF;
@@ -146,9 +151,11 @@ public class VariantData extends BasePackable {
                             int id = iterator.next();
 
                             slots.put(idString, id);
+                            intSlots.put(id, idString);
                         }
 
                         setSlotIDs(slots);
+                        setSlotIntIDs(intSlots);
                     }
                 }
         ));
@@ -193,6 +200,59 @@ public class VariantData extends BasePackable {
                         }
 
                         setWeaponSlots(slots);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon groups"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+
+                        List<WeaponGroupSpec> weaponGroups = variant.getWeaponGroups();
+                        for (WeaponGroupSpec group : weaponGroups) {
+                            byte config = 0x00;
+                            if (group.getType() == WeaponGroupType.ALTERNATING) config |= 0b10000000;
+                            if (group.isAutofireOnByDefault()) config |= 0b01000000;
+
+                            List<String> slots = group.getSlots();
+                            config |= slots.size() & 0b00111111; // 6 bit int for group size (max size 64 weapons)
+                            out.add(config);
+
+                            for (String slotID : slots) {
+                                out.add((byte) (int) slotIDs.get(slotID));
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        List<WeaponGroupSpec> weaponGroupSpecs = new ArrayList<>();
+
+                        for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
+                            WeaponGroupSpec spec = new WeaponGroupSpec();
+
+                            Byte config = iterator.next();
+                            boolean alternating = (config & 0b10000000) >>> 7 > 0;
+                            boolean autofire = (config & 0b01000000) >>> 6 > 0;
+
+                            spec.setAutofireOnByDefault(autofire);
+                            spec.setType(alternating ? WeaponGroupType.ALTERNATING : WeaponGroupType.LINKED);
+
+                            int numSlots = config & 0b00111111;
+                            for (int i = 0; i < numSlots; i++) {
+                                int slotID = iterator.next() & 0xFF;
+                                spec.addSlot(getSlotIntIDs().get(slotID));
+                            }
+
+                            weaponGroupSpecs.add(spec);
+                        }
+
+                        setWeaponGroups(weaponGroupSpecs);
                     }
                 }
         ));
@@ -258,12 +318,28 @@ public class VariantData extends BasePackable {
         this.slotIDs = slotIDs;
     }
 
+    public Map<Integer, String> getSlotIntIDs() {
+        return slotIntIDs;
+    }
+
+    public void setSlotIntIDs(Map<Integer, String> slotIntIDs) {
+        this.slotIntIDs = slotIntIDs;
+    }
+
     public Map<Integer, String> getWeaponSlots() {
         return weaponSlots;
     }
 
     public void setWeaponSlots(Map<Integer, String> weaponSlots) {
         this.weaponSlots = weaponSlots;
+    }
+
+    public void setWeaponGroups(List<WeaponGroupSpec> weaponGroups) {
+        this.weaponGroups = weaponGroups;
+    }
+
+    public List<WeaponGroupSpec> getWeaponGroups() {
+        return weaponGroups;
     }
 
     public static Map<String, Integer> getSlotIDs(ShipVariantAPI variant) {
