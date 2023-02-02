@@ -521,66 +521,62 @@ public class ShipData extends BasePackable {
 
         CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner);
 
-        if (hullSpec.getHullSize() != ShipAPI.HullSize.FIGHTER) {
-            String hullVariantId = hullID + "_Hull";
-            ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
-                    hullVariantId,
-                    hullSpec
-            );
+        String hullVariantId = hullID + "_Hull";
+        ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
+                hullVariantId,
+                hullSpec
+        );
 
-            int numCapacitors = variantData.getNumFluxCapacitors();
-            variant.setNumFluxCapacitors(numCapacitors);
-            int numVents = variantData.getNumFluxVents();
-            variant.setNumFluxVents(numVents);
+        int numCapacitors = variantData.getNumFluxCapacitors();
+        variant.setNumFluxCapacitors(numCapacitors);
+        int numVents = variantData.getNumFluxVents();
+        variant.setNumFluxVents(numVents);
 
-            for (String id : variantData.getHullmods()) {
-                variant.addMod(id);
-            }
+        for (String id : variantData.getHullmods()) {
+            variant.addMod(id);
+        }
 
-            slotIDs = new HashMap<>(variantData.getSlotIDs());
-            slotIntIDs = new HashMap<>();
-            Map<Integer, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
+        slotIDs = new HashMap<>(variantData.getSlotIDs());
+        slotIntIDs = new HashMap<>();
+        Map<Integer, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
 
+        for (String id : slotIDs.keySet()) {
+            int s = slotIDs.get(id);
+
+            slotIntIDs.put(s, id);
+
+            String weaponID = fittedWeaponSlots.get(s);
+            if (weaponID != null) variant.addWeapon(id, weaponID);
+        }
+
+        List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
+        for (WeaponGroupSpec spec : groupSpecs) variant.addWeaponGroup(spec);
+
+        FleetMemberType fleetMemberType = FleetMemberType.SHIP;
+        FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
+
+        fleetManager.addToReserves(fleetMember);
+
+        fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
+
+        ship = fleetManager.spawnFleetMember(fleetMember, new Vector2f(0f, 0f), 0f, 0f);
+        ship.setCRAtDeployment(0.7f);
+        ship.setControlsLocked(false);
+
+        List<WeaponAPI> weapons = ship.getAllWeapons();
+        outer:
+        for (WeaponAPI w : weapons) {
             for (String id : slotIDs.keySet()) {
-                int s = slotIDs.get(id);
-
-                slotIntIDs.put(s, id);
-
-                String weaponID = fittedWeaponSlots.get(s);
-                if (weaponID != null) variant.addWeapon(id, weaponID);
-            }
-
-            List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
-            for (WeaponGroupSpec spec : groupSpecs) variant.addWeaponGroup(spec);
-
-            FleetMemberType fleetMemberType = FleetMemberType.SHIP;
-            FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
-
-            fleetManager.addToReserves(fleetMember);
-
-            fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
-
-            ship = fleetManager.spawnFleetMember(fleetMember, new Vector2f(0f, 0f), 0f, 0f);
-            ship.setCRAtDeployment(0.7f);
-            ship.setControlsLocked(false);
-
-            List<WeaponAPI> weapons = ship.getAllWeapons();
-            outer:
-            for (WeaponAPI w : weapons) {
-                for (String id : slotIDs.keySet()) {
-                    if (id.equals(w.getSlot().getId())) {
-                        weaponSlots.put(slotIDs.get(id), w);
-                        continue outer;
-                    }
+                if (id.equals(w.getSlot().getId())) {
+                    weaponSlots.put(slotIDs.get(id), w);
+                    continue outer;
                 }
             }
-
-            // set fleetmember id to sync with server
-            Ship s = (Ship) ship;
-            s.setFleetMemberId(fleetMemberID);
-        } else {
-            throw new NullPointerException("Attempted fighter init in ship data");
         }
+
+        // set fleetmember id to sync with server
+        Ship s = (Ship) ship;
+        s.setFleetMemberId(fleetMemberID);
 
         ship.setShipAI(new MPDefaultShipAIPlugin());
     }
