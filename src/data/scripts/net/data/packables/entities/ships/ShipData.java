@@ -36,7 +36,7 @@ public class ShipData extends BasePackable {
 
     private Map<String, Integer> slotIDs;
     private Map<Integer, String> slotIntIDs;
-    private Map<Integer, WeaponAPI> weaponSlots;
+    private Map<Integer, WeaponAPI> weaponSlots = new HashMap<>();
 
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
