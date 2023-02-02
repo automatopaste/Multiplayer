@@ -416,48 +416,50 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("active engines"),
-                new SourceExecute<List<Byte>>() {
-                    @Override
-                    public List<Byte> get() {
-                        List<Byte> out = new ArrayList<>();
-
-                        List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
-                        for (int i = 0; i < shipEngines.size(); i++) {
-                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                            if (engine.isActive() && !knownActiveEngines.contains(engine)) {
-                                out.add((byte) i);
-                                knownActiveEngines.add(engine);
-                            } else {
-                                knownActiveEngines.remove(engine);
-                            }
-                        }
-
-                        return out;
-                    }
-                },
-                new DestExecute<List<Byte>>() {
-                    @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) {
-                            for (byte b : value) {
-                                int id = b & 0xFF;
-
-                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
-                                for (int i = 0; i < shipEngines.size(); i++) {
-                                    if (i == id) {
-                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                                        engine.disable();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        ));
+//        addRecord(new RecordLambda<>(
+//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("active engines"),
+//                new SourceExecute<List<Byte>>() {
+//                    @Override
+//                    public List<Byte> get() {
+//                        List<Byte> out = new ArrayList<>();
+//
+//                        List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
+//                        for (int i = 0; i < shipEngines.size(); i++) {
+//                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+//                            if (engine.isActive() && !knownActiveEngines.contains(engine)) {
+//                                out.add((byte) i);
+//                                knownActiveEngines.add(engine);
+//                            } else {
+//                                knownActiveEngines.remove(engine);
+//                            }
+//                        }
+//
+//                        return out;
+//                    }
+//                },
+//                new DestExecute<List<Byte>>() {
+//                    @Override
+//                    public void execute(List<Byte> value, BasePackable packable) {
+//                        ShipData shipData = (ShipData) packable;
+//                        ShipAPI ship = shipData.getShip();
+//                        if (ship != null) {
+//                            for (byte b : value) {
+//                                int id = b & 0xFF;
+//
+//                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
+//                                for (int i = 0; i < shipEngines.size(); i++) {
+//                                    if (i == id) {
+//                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+//                                        OooO.oo o = (OooO.oo) engine;
+//                                        OooO s = (OooO) ship.getEngineController();
+//                                        ship.getEngineController().
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//        ));
     }
 
     @Override
