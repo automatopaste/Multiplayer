@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class InterpRecordLambda<T> extends RecordLambda<T> {
 
-    public static final boolean DEBUG_MODE = true;
+    public static final boolean DEBUG_MODE = false;
 
     private InterpExecute<T> interpExecute;
 
