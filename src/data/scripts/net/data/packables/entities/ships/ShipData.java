@@ -279,7 +279,13 @@ public class ShipData extends BasePackable {
                         List<Byte> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            int slotID = slotIDs.get(weapon.getSlot().getId());
+                            int slotID;
+                            try {
+                                slotID = slotIDs.get(weapon.getSlot().getId());
+                            } catch (NullPointerException n) {
+                                n.printStackTrace();
+                                continue;
+                            }
 
                             Boolean p = prevStates.get(slotID);
                             if (p == null) {

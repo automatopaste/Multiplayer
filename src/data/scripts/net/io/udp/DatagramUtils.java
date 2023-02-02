@@ -21,13 +21,13 @@ public class DatagramUtils {
         SizeData sizeData = new SizeData();
 
         byte[] bytes = new byte[buf.readableBytes()];
-        if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
+        //if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
         sizeData.size = bytes.length;
         buf.readBytes(bytes);
 //        byte[] compressed = CompressionUtils.deflate(bytes);
 //        sizeData.sizeCompressed = (short) compressed.length;
 
-        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length);
+        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 8);
 
         out.writeInt(sizeData.size);
 //        out.writeInt(sizeData.sizeCompressed);
