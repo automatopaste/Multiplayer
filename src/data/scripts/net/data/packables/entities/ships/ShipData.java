@@ -582,7 +582,10 @@ public class ShipData extends BasePackable {
         }
 
         List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
-        for (WeaponGroupSpec spec : groupSpecs) variant.addWeaponGroup(spec);
+        for (WeaponGroupSpec spec : groupSpecs) {
+            spec.setAutofireOnByDefault(true);
+            variant.addWeaponGroup(spec);
+        }
 
         FleetMemberType fleetMemberType = FleetMemberType.SHIP;
         FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
