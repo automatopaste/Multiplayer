@@ -477,6 +477,7 @@ public class ShipData extends BasePackable {
                     @Override
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
+
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
                             if (weapon.isFiring()) {
                                 int id = slotIDs.get(weapon.getSlot().getId());
@@ -508,8 +509,8 @@ public class ShipData extends BasePackable {
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            int id = slotIDs.get(weapon.getSlot().getId());
-                            out.add((byte) id);
+                            byte id = (byte) (int) slotIDs.get(weapon.getSlot().getId());
+                            out.add(id);
 
                             int v = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
                             out.add((byte) v);
@@ -529,6 +530,47 @@ public class ShipData extends BasePackable {
 
                                 MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
                                 if (plugin != null) plugin.setTargetFacing(facing);
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("non autofiring weapon groups"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+
+                        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
+                        for (int i = 0; i < groups.size(); i++) {
+                            WeaponGroupAPI group = groups.get(i);
+
+                            byte g = (byte) (i & 0b00111111);
+                            if (group.isAutofiring()) g |= 0b10000000;
+                            if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
+
+                            out.add(g);
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (Byte aByte : value) {
+                                int g = aByte & 0xFF;
+
+                                int i = g & 0b00111111;
+                                boolean autofiring = (g & 0b10000000) != 0;
+                                boolean firing = (g & 0b01000000) != 0;
+
+                                if (firing) ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
+                                if (autofiring) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
                             }
                         }
                     }
