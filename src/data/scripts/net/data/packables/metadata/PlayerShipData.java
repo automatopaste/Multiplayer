@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
+import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
@@ -16,7 +17,6 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.PlayerShip;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
-import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -192,9 +192,8 @@ public class PlayerShipData extends BasePackable {
         if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
         if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
         if (controls[5]) {
-            float r = MathUtils.getShortestRotation(ship.getFacing(), VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget()));
-            if (r > 0f) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
-            else if (r < 0f) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+            float target = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
+            DroneAIUtils.rotate(target, ship, new Default());
         }
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
         if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
@@ -221,5 +220,27 @@ public class PlayerShipData extends BasePackable {
         if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 4);
         if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 5);
         if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 6);
+    }
+
+    public static class Default extends DroneAIUtils.PDControl {
+
+        @Override
+        public float getKp() {
+            return 10f;
+        }
+        @Override
+        public float getKd() {
+            return 3f;
+        }
+
+        @Override
+        public float getRp() {
+            return 3f;
+        }
+
+        @Override
+        public float getRd() {
+            return 1f;
+        }
     }
 }
