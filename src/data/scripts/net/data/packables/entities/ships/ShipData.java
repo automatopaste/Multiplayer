@@ -494,35 +494,6 @@ public class ShipData extends BasePackable {
                         if (ship != null) {
                             for (byte b : value) {
                                 int id = b & 0xFF;
-                                autofirePluginSlots.get(id).trigger();
-                            }
-                        }
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("firing weapon ids"),
-                new SourceExecute<List<Byte>>() {
-                    @Override
-                    public List<Byte> get() {
-                        List<Byte> out = new ArrayList<>();
-                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isFiring()) {
-                                int id = slotIDs.get(weapon.getSlot().getId());
-                                out.add((byte) id);
-                            }
-                        }
-                        return out;
-                    }
-                },
-                new DestExecute<List<Byte>>() {
-                    @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) {
-                            for (byte b : value) {
-                                int id = b & 0xFF;
                                 MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
                                 if (plugin != null) plugin.trigger();
                             }
