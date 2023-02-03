@@ -508,13 +508,11 @@ public class ShipData extends BasePackable {
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isFiring()) {
-                                int id = slotIDs.get(weapon.getSlot().getId());
-                                out.add((byte) id);
+                            int id = slotIDs.get(weapon.getSlot().getId());
+                            out.add((byte) id);
 
-                                int v = ConversionUtils.floatToByte(weapon.getArcFacing(), 360f);
-                                out.add((byte) v);
-                            }
+                            int v = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
+                            out.add((byte) v);
                         }
                         return out;
                     }

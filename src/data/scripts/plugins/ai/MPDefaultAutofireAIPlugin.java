@@ -13,7 +13,6 @@ public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     private float targetFacing;
     private boolean t1;
-    private boolean t2;
 
     public MPDefaultAutofireAIPlugin(WeaponAPI weapon) {
         this.weapon = weapon;
@@ -26,8 +25,7 @@ public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     @Override
     public boolean shouldFire() {
-        boolean fire = t1 && !t2;
-        t2 = t1;
+        boolean fire = t1;
         t1 = false;
         return fire;
     }
