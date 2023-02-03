@@ -2,7 +2,6 @@ package data.scripts.net.data.tables.client;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.BaseRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -44,7 +43,7 @@ public class PlayerShip implements OutboundEntityManager {
         playerShipIDPrev = playerShipID;
 
         if (playerShip != null) {
-            playerShip.blockCommandForOneFrame(ShipCommand.FIRE);
+//            playerShip.blockCommandForOneFrame(ShipCommand.FIRE);
         }
     }
 

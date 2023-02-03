@@ -500,6 +500,71 @@ public class ShipData extends BasePackable {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("firing weapon ids"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (weapon.isFiring()) {
+                                int id = slotIDs.get(weapon.getSlot().getId());
+                                out.add((byte) id);
+                            }
+                        }
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (byte b : value) {
+                                int id = b & 0xFF;
+                                MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
+                                if (plugin != null) plugin.trigger();
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon facing"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            if (weapon.isFiring()) {
+                                int id = slotIDs.get(weapon.getSlot().getId());
+                                out.add((byte) id);
+
+                                int v = ConversionUtils.floatToByte(weapon.getArcFacing(), 360f);
+                                out.add((byte) v);
+                            }
+                        }
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, BasePackable packable) {
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+                        if (ship != null) {
+                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
+                                int id = iterator.next() & 0xFF;
+                                float facing = ConversionUtils.byteToFloat(iterator.next(), 360f);
+
+                                MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
+                                if (plugin != null) plugin.setTargetFacing(facing);
+                            }
+                        }
+                    }
+                }
+        ));
     }
 
     @Override
