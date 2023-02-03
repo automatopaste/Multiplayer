@@ -562,6 +562,7 @@ public class ShipData extends BasePackable {
         ship.setControlsLocked(false);
 
         autofirePluginSlotIDs = shipTable.getTempAutofirePlugins().get(ship.getId());
+        autofirePluginSlots = new HashMap<>();
 
         List<WeaponAPI> weapons = ship.getAllWeapons();
         outer:
