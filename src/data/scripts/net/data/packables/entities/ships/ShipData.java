@@ -570,7 +570,14 @@ public class ShipData extends BasePackable {
                                 boolean firing = (g & 0b01000000) != 0;
 
                                 if (firing) ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
-                                if (autofiring) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
+
+                                List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
+                                for (int j = 0; j < weaponGroupsCopy.size(); j++) {
+                                    WeaponGroupAPI group = weaponGroupsCopy.get(j);
+                                    if (j == i && (group.isAutofiring() != autofiring)) {
+                                        ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
+                                    }
+                                }
                             }
                         }
                     }
