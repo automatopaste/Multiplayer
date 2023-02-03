@@ -12,6 +12,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.PlayerShip;
@@ -20,6 +21,7 @@ import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.util.List;
 
@@ -83,6 +85,23 @@ public class PlayerShipData extends BasePackable {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                Vector2f32Record.getDefault().setDebugText("player mouse target"),
+                new SourceExecute<Vector2f>() {
+                    @Override
+                    public Vector2f get() {
+                        if (playerShip.getPlayerShip() != null) return playerShip.getPlayerShip().getMouseTarget();
+                        return new Vector2f(0f, 0f);
+                    }
+                },
+                new DestExecute<Vector2f>() {
+                    @Override
+                    public void execute(Vector2f value, BasePackable packable) {
+                        ShipAPI ship = getPlayerShip();
+                        if (ship != null) ship.getMouseTarget().set(value);
+                    }
+                }
+        ));
     }
 
     @Override
@@ -118,6 +137,10 @@ public class PlayerShipData extends BasePackable {
     @Override
     public byte getTypeID() {
         return TYPE_ID;
+    }
+
+    public ShipAPI getPlayerShip() {
+        return playerShip;
     }
 
     public int getControlBitmask() {

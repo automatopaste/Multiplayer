@@ -73,6 +73,10 @@ public class PlayerShip implements OutboundEntityManager {
         return playerShipID;
     }
 
+    public ShipAPI getPlayerShip() {
+        return playerShip;
+    }
+
     public void setPlayerShipID(String playerShipID) {
         this.playerShipID = playerShipID;
     }
