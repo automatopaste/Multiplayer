@@ -5,22 +5,26 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.PluginPick;
 import com.fs.starfarer.api.campaign.CampaignPlugin;
 import com.fs.starfarer.api.combat.AutofireAIPlugin;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
+import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.packables.metadata.LobbyData;
-import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.util.DataGenManager;
+import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MPModPlugin extends BaseModPlugin {
 
@@ -54,7 +58,16 @@ public class MPModPlugin extends BaseModPlugin {
     @Override
     public PluginPick<AutofireAIPlugin> pickWeaponAutofireAI(WeaponAPI weapon) {
         if (getPlugin() != null && getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
-            return new PluginPick<>((AutofireAIPlugin) new MPDefaultAutofireAIPlugin(weapon), CampaignPlugin.PickPriority.HIGHEST);
+            MPDefaultAutofireAIPlugin plugin = new MPDefaultAutofireAIPlugin(weapon);
+
+            ShipAPI ship = weapon.getShip();
+            MPClientPlugin clientPlugin = (MPClientPlugin) getPlugin();
+            Map<String, MPDefaultAutofireAIPlugin> plugins = clientPlugin.getShipTable().getTempAutofirePlugins().get(ship.getId());
+            if (plugins == null) plugins = new HashMap<>();
+            plugins.put(weapon.getSlot().getId(), plugin);
+            clientPlugin.getShipTable().getTempAutofirePlugins().put(ship.getId(), plugins);
+
+            return new PluginPick<>((AutofireAIPlugin) plugin, CampaignPlugin.PickPriority.HIGHEST);
         }
         return null;
     }

@@ -17,7 +17,7 @@ import java.util.*;
 
 public class ShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
 
-    public static final int MAX_SHIPS = 200;
+    public static final int MAX_SHIPS = 500;
 
     private final Map<String, Short> registered;
     private final Map<Short, ShieldData> shields;

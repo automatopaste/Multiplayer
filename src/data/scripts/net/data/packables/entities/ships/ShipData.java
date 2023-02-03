@@ -11,14 +11,14 @@ import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
+import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class ShipData extends BasePackable {
@@ -37,7 +37,9 @@ public class ShipData extends BasePackable {
 
     private Map<String, Integer> slotIDs;
     private Map<Integer, String> slotIntIDs;
-    private Map<Integer, WeaponAPI> weaponSlots = new HashMap<>();
+    private final Map<Integer, WeaponAPI> weaponSlots = new HashMap<>();
+    private Map<String, MPDefaultAutofireAIPlugin> autofirePluginSlotIDs;
+    private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
     public ShipData(short instanceID, final ShipAPI ship) {
         super(instanceID);
@@ -491,13 +493,8 @@ public class ShipData extends BasePackable {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             for (byte b : value) {
-                                WeaponAPI weapon = weaponSlots.get(b & 0xFF);
-                                try {
-                                    Method fire = weapon.getClass().getMethod("fire", float.class);
-                                    fire.invoke(null, 1f);
-                                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                int id = b & 0xFF;
+                                autofirePluginSlots.get(id).trigger();
                             }
                         }
                     }
@@ -509,6 +506,8 @@ public class ShipData extends BasePackable {
     public void init(MPPlugin plugin, InboundEntityManager manager) {
         if (plugin.getType() != MPPlugin.PluginType.CLIENT) return;
         MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+
+        ClientShipTable shipTable = (ClientShipTable) manager;
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
@@ -562,12 +561,19 @@ public class ShipData extends BasePackable {
         ship.setCRAtDeployment(0.7f);
         ship.setControlsLocked(false);
 
+        autofirePluginSlotIDs = shipTable.getTempAutofirePlugins().get(ship.getId());
+
         List<WeaponAPI> weapons = ship.getAllWeapons();
         outer:
         for (WeaponAPI w : weapons) {
             for (String id : slotIDs.keySet()) {
                 if (id.equals(w.getSlot().getId())) {
-                    weaponSlots.put(slotIDs.get(id), w);
+                    int i = slotIDs.get(id);
+                    weaponSlots.put(i, w);
+
+                    MPDefaultAutofireAIPlugin autofireAIPlugin = autofirePluginSlotIDs.get(id);
+                    if (autofireAIPlugin != null) autofirePluginSlots.put(i, autofireAIPlugin);
+
                     continue outer;
                 }
             }
@@ -597,6 +603,10 @@ public class ShipData extends BasePackable {
 
     public ShipAPI getShip() {
         return ship;
+    }
+
+    public String getFleetMemberID() {
+        return fleetMemberID;
     }
 
     public void setHullID(String hullID) {

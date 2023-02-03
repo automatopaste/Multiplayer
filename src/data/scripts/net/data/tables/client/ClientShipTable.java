@@ -4,8 +4,10 @@ import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
+import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,11 +15,13 @@ import java.util.Map;
 public class ClientShipTable extends EntityTable<ShipData> implements InboundEntityManager {
 
     private final Map<Short, ShieldData> shields;
+    private final Map<String, Map<String, MPDefaultAutofireAIPlugin>> tempAutofirePlugins;
 
     public ClientShipTable() {
-        super(new ShipData[100]);
+        super(new ShipData[ShipTable.MAX_SHIPS]);
 
         shields = new HashMap<>();
+        tempAutofirePlugins = new HashMap<>();
     }
 
     @Override
@@ -75,5 +79,9 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
 
     public Map<Short, ShieldData> getShields() {
         return shields;
+    }
+
+    public Map<String, Map<String, MPDefaultAutofireAIPlugin>> getTempAutofirePlugins() {
+        return tempAutofirePlugins;
     }
 }
