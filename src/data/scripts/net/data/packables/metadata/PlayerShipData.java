@@ -16,6 +16,8 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.PlayerShip;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
+import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -145,8 +147,7 @@ public class PlayerShipData extends BasePackable {
         controls[3] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_TURN_RIGHT")));
         controls[4] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_DECELERATE")));
 
-        //not sure
-        //controls[5] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_STRAFE_KEY")));
+        controls[5] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_STRAFE_KEY")));
 
         controls[6] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_STRAFE_LEFT_NOTURN")));
         controls[7] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_STRAFE_RIGHT_NOTURN")));
@@ -190,7 +191,11 @@ public class PlayerShipData extends BasePackable {
         if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
         if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
         if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
-        //if (controls[5]) ship.giveCommand(ShipCommand., null, 0); STRAFE_KEY
+        if (controls[5]) {
+            float r = MathUtils.getShortestRotation(ship.getFacing(), VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget()));
+            if (r > 0f) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
+            else if (r < 0f) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+        }
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
         if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
         if (controls[8]) ship.giveCommand(ShipCommand.USE_SYSTEM, null, 0);
