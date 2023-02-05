@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 
 public abstract class DataRecord<T> {
     protected T value;
-    private String debug;
+    private String debug = "default record description";
 
     public DataRecord(T value) {
         this.value = value;
@@ -18,7 +18,13 @@ public abstract class DataRecord<T> {
      */
     public boolean sourceExecute(SourceExecute<T> sourceExecute) {
         T t = sourceExecute.get();
-        boolean isUpdated = checkUpdate(t);
+        boolean isUpdated;
+        try {
+             isUpdated = checkUpdate(t);
+        } catch (NullPointerException n) {
+            throw new NullPointerException("Null value in record delta check: " + debug);
+        }
+
         value = t;
         return isUpdated;
     }
