@@ -27,4 +27,9 @@ public class ClientProjectileTable extends EntityTable<ProjectileData> implement
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
 
     }
+
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+
+    }
 }

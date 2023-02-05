@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.Objects;
 
-public class Float32Record extends BaseRecord<Float> {
+public class Float32Record extends DataRecord<Float> {
     public static byte TYPE_ID;
 
     public Float32Record(Float record) {
@@ -40,7 +40,7 @@ public class Float32Record extends BaseRecord<Float> {
         return TYPE_ID;
     }
 
-    public static BaseRecord<Float> getDefault() {
+    public static DataRecord<Float> getDefault() {
         return new Float32Record(0f);
     }
 }

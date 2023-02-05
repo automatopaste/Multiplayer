@@ -1,7 +1,7 @@
 package data.scripts.net.data.records.collections;
 
-import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.records.DataRecord;
+import data.scripts.net.data.DataGenManager;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -11,12 +11,12 @@ import java.util.List;
  * Sends a one-way list of values
  * @param <E> Value type
  */
-public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
+public class ListenArrayRecord<E> extends DataRecord<List<E>> {
 
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
-    private final BaseRecord<E> writer;
+    private final DataRecord<E> writer;
 
     public ListenArrayRecord(List<E> value, byte elementTypeID) {
         super(value);
@@ -24,7 +24,7 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
         this.elementTypeID = elementTypeID;
 
         if (elementTypeID != (byte) -1) {
-            writer = (BaseRecord<E>) DataGenManager.recordFactory(elementTypeID);
+            writer = (DataRecord<E>) DataGenManager.recordFactory(elementTypeID);
         } else {
             writer = null;
         }
@@ -52,7 +52,7 @@ public class ListenArrayRecord<E> extends BaseRecord<List<E>> {
         byte type = in.readByte();
         int num = in.readByte() & 0xFF;
 
-        BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
+        DataRecord<E> reader = (DataRecord<E>) DataGenManager.recordFactory(type);
 
         for (int i = 0; i < num; i++) {
             out.add(reader.read(in));

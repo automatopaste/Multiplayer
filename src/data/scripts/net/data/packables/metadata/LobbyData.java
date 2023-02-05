@@ -1,6 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Sends information about lobby data to clients
  */
-public class LobbyData extends BasePackable {
+public class LobbyData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -46,7 +46,7 @@ public class LobbyData extends BasePackable {
                 },
                 new DestExecute<List<Short>>() {
                     @Override
-                    public void execute(List<Short> value, BasePackable packable) {
+                    public void execute(List<Short> value, EntityData packable) {
                         LobbyData lobbyData = (LobbyData) packable;
                         lobbyData.setPlayers(value);
                     }
@@ -71,7 +71,7 @@ public class LobbyData extends BasePackable {
                 },
                 new DestExecute<List<String>>() {
                     @Override
-                    public void execute(List<String> value, BasePackable packable) {
+                    public void execute(List<String> value, EntityData packable) {
                         LobbyData lobbyData = (LobbyData) packable;
                         lobbyData.setPlayerShipIDs(value);
                     }

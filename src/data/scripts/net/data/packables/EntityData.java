@@ -1,6 +1,6 @@
 package data.scripts.net.data.packables;
 
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -13,14 +13,14 @@ import java.util.Map;
 /**
  * Used to read/write data
  */
-public abstract class BasePackable {
+public abstract class EntityData {
 
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final List<InterpRecordLambda<?>> interpolate;
     private boolean init = true;
 
-    public BasePackable(short instanceID) {
+    public EntityData(short instanceID) {
         this.instanceID = instanceID;
 
         records = new ArrayList<>();
@@ -54,8 +54,8 @@ public abstract class BasePackable {
      * Returns a map of all records that are marked as updated since the last time
      * @return deltas
      */
-    public Map<Byte, BaseRecord<?>> sourceExecute() {
-        Map<Byte, BaseRecord<?>> deltas = new HashMap<>();
+    public Map<Byte, DataRecord<?>> sourceExecute() {
+        Map<Byte, DataRecord<?>> deltas = new HashMap<>();
 
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);

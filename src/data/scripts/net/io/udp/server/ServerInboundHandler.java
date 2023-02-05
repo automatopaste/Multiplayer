@@ -1,12 +1,11 @@
 package data.scripts.net.io.udp.server;
 
+import data.scripts.net.data.InboundData;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.ServerConnectionWrapper;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-
-import java.util.Map;
 
 public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
     private final ServerConnectionManager serverConnectionManager;
@@ -22,7 +21,7 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
             connectionWrapper = serverConnectionManager.getConnection(in.getConnectionID());
         }
 
-        Map<Byte, Map<Short, Map<Byte, Object>>> entities = in.getUnpacked();
+        InboundData entities = in.getUnpacked();
         connectionWrapper.updateInbound(entities);
     }
 

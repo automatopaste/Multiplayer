@@ -3,11 +3,11 @@ package data.scripts.net.data.records;
 import data.scripts.net.data.packables.SourceExecute;
 import io.netty.buffer.ByteBuf;
 
-public abstract class BaseRecord<T> {
+public abstract class DataRecord<T> {
     protected T value;
     private String debug;
 
-    public BaseRecord(T value) {
+    public DataRecord(T value) {
         this.value = value;
     }
 
@@ -56,7 +56,7 @@ public abstract class BaseRecord<T> {
         value = (T) delta;
     }
 
-    public BaseRecord<T> setDebugText(String debug) {
+    public DataRecord<T> setDebugText(String debug) {
         this.debug = debug;
         return this;
     }

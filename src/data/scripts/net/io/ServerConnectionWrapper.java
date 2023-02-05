@@ -1,10 +1,12 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 
@@ -34,7 +36,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
         clientPort = connectionData.getClientPort();
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundSocket();
+        OutboundData outbound = connectionManager.getDuplex().getOutboundSocket();
 
         switch (connectionState) {
             //case INITIALISATION_READY:
@@ -48,12 +50,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case LOADING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": sending client data over socket...");
 
-                Map<Short, Map<Byte, BaseRecord<?>>> variants = new HashMap<>();
+                Map<Short, Map<Byte, DataRecord<?>>> variants = new HashMap<>();
                 for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
                     variants.put(variantData.getInstanceID(), variantData.sourceExecute());
                 }
 
-                outbound.put(VariantData.TYPE_ID, variants);
+                outbound.out.put(VariantData.TYPE_ID, variants);
 
                 connectionState = ConnectionState.SPAWNING_READY;
 
@@ -62,9 +64,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
 
-                Map<Short, Map<Byte, BaseRecord<?>>> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
+                Map<Short, Map<Byte, DataRecord<?>>> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
 
-                outbound.put(ShipData.TYPE_ID, ships);
+                outbound.out.put(ShipData.TYPE_ID, ships);
 
                 connectionState = ConnectionState.SIMULATION_READY;
 
@@ -76,9 +78,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
+        Map<Short, Map<Byte, DataRecord<?>>> instance = new HashMap<>();
         instance.put(connectionID, connectionData.sourceExecute());
-        outbound.put(ConnectionData.TYPE_ID, instance);
+        outbound.out.put(ConnectionData.TYPE_ID, instance);
 
         ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
         writeBuffer(outbound, data);
@@ -92,7 +94,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public MessageContainer getDatagram() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = connectionManager.getDuplex().getOutboundDatagram();
+        OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -126,10 +128,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.connectionState = connectionState;
     }
 
-    public void updateInbound(Map<Byte, Map<Short, Map<Byte, Object>>> entities) {
-        Map<Short, Map<Byte, Object>> instance = entities.get(ConnectionData.TYPE_ID);
+    public void updateInbound(InboundData entities) {
+        Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
         if (instance != null) connectionData.destExecute(instance.get(connectionID), connectionManager.getTick());
-        entities.remove(ConnectionData.TYPE_ID);
+        entities.in.remove(ConnectionData.TYPE_ID);
 
         connectionManager.getDuplex().updateInbound(entities);
     }

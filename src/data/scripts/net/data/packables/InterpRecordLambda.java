@@ -1,7 +1,7 @@
 package data.scripts.net.data.packables;
 
 import cmu.CMUtils;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.DataRecord;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +19,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     private T v2;
     private int tick;
 
-    public InterpRecordLambda(final BaseRecord<T> record, SourceExecute<T> sourceExecute, final DestExecute<T> destExecute) {
+    public InterpRecordLambda(final DataRecord<T> record, SourceExecute<T> sourceExecute, final DestExecute<T> destExecute) {
         super(record, sourceExecute, destExecute);
 
         this.interpExecute = new Default();
@@ -53,11 +53,11 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     }
 
     @Override
-    public void destExecute(BasePackable packable) {
+    public void destExecute(EntityData packable) {
 
     }
 
-    public void interp(float amount, BasePackable packable) {
+    public void interp(float amount, EntityData packable) {
         progressive += amount;
 
         float linterp = progressive / gap;

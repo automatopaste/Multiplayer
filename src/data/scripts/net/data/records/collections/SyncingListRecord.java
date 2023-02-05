@@ -1,8 +1,8 @@
 package data.scripts.net.data.records.collections;
 
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.records.DataRecord;
+import data.scripts.net.data.DataGenManager;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ import java.util.Map;
  * Attempts to sync a List of values
  * @param <E> Value type
  */
-public class SyncingListRecord<E> extends BaseRecord<List<E>> {
+public class SyncingListRecord<E> extends DataRecord<List<E>> {
     public static byte TYPE_ID;
     private final byte elementTypeID;
 
-    private final BaseRecord<E> writer;
+    private final DataRecord<E> writer;
 
     private final Map<Byte, E> toWrite = new HashMap<>();
 
@@ -27,7 +27,7 @@ public class SyncingListRecord<E> extends BaseRecord<List<E>> {
         this.elementTypeID = elementTypeID;
 
         if (elementTypeID != (byte) -1) {
-            writer = (BaseRecord<E>) DataGenManager.recordFactory(elementTypeID);
+            writer = (DataRecord<E>) DataGenManager.recordFactory(elementTypeID);
         } else {
             writer = null;
         }
@@ -99,7 +99,7 @@ public class SyncingListRecord<E> extends BaseRecord<List<E>> {
         byte type = in.readByte();
         byte num = in.readByte();
 
-        BaseRecord<E> reader = (BaseRecord<E>) DataGenManager.recordFactory(type);
+        DataRecord<E> reader = (DataRecord<E>) DataGenManager.recordFactory(type);
 
         Map<Byte, E> data = new HashMap<>();
         int max = 0;

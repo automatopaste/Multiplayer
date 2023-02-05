@@ -1,11 +1,11 @@
 package data.scripts.net.data.tables.client;
 
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.server.ShipTable;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 
@@ -55,6 +55,18 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             } else {
                 shieldData.destExecute(toProcess, tick);
             }
+        }
+    }
+
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+        ShipData data = table[instanceID];
+
+        if (data != null) {
+            data.delete();
+
+            table[instanceID] = null;
+            markVacant(instanceID);
         }
     }
 

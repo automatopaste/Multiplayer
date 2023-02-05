@@ -11,7 +11,7 @@ import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.lazylib.MathUtils;
 
-public class ShieldData extends BasePackable {
+public class ShieldData extends EntityData {
 
     public static byte TYPE_ID;
     private final short instanceID;
@@ -37,7 +37,7 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
@@ -59,7 +59,7 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(Float value, BasePackable packable) {
+                    public void execute(Float value, EntityData packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
@@ -83,7 +83,7 @@ public class ShieldData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(Float value, BasePackable packable) {
+                    public void execute(Float value, EntityData packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {

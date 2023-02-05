@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 /**
  * 16 bit float
  */
-public class Float16Record extends BaseRecord<Float> {
+public class Float16Record extends DataRecord<Float> {
 
     public static byte TYPE_ID;
 
@@ -34,7 +34,7 @@ public class Float16Record extends BaseRecord<Float> {
         return !value.equals(delta);
     }
 
-    public static BaseRecord<Float> getDefault() {
+    public static DataRecord<Float> getDefault() {
         return new Float16Record(0f);
     }
 

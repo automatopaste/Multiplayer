@@ -7,6 +7,7 @@ import com.fs.starfarer.api.campaign.CampaignPlugin;
 import com.fs.starfarer.api.combat.AutofireAIPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
@@ -17,7 +18,7 @@ import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
-import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
@@ -41,6 +42,7 @@ public class MPModPlugin extends BaseModPlugin {
         PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
         ConnectionData.TYPE_ID = DataGenManager.registerEntityType(ConnectionData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
+        ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
 
         Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault()));
         IntRecord.setTypeId(DataGenManager.registerRecordType(IntRecord.class.getSimpleName(), IntRecord.getDefault()));

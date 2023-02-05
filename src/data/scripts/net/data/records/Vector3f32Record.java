@@ -3,7 +3,7 @@ package data.scripts.net.data.records;
 import io.netty.buffer.ByteBuf;
 import org.lwjgl.util.vector.Vector3f;
 
-public class Vector3f32Record extends BaseRecord<Vector3f> {
+public class Vector3f32Record extends DataRecord<Vector3f> {
 
     public static byte TYPE_ID;
 

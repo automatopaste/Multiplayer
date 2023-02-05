@@ -4,16 +4,19 @@ import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.input.InputEventAPI;
+import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.pregen.ProjectileDatastore;
+import data.scripts.net.data.pregen.VariantDataGenerator;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.records.Float32Record;
 import data.scripts.net.data.records.collections.SyncingListRecord;
-import data.scripts.net.data.tables.server.ProjectileTable;
-import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.data.tables.server.PlayerLobby;
 import data.scripts.net.data.tables.server.PlayerShips;
-import data.scripts.net.data.util.DataGenManager;
-import data.scripts.net.data.util.VariantDataGenerator;
+import data.scripts.net.data.tables.server.ProjectileTable;
+import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ServerConnectionManager;
 import io.netty.buffer.ByteBuf;
@@ -22,10 +25,7 @@ import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MPServerPlugin extends MPPlugin {
 
@@ -38,11 +38,15 @@ public class MPServerPlugin extends MPPlugin {
     private final ShipTable shipTable;
     private final ProjectileTable projectileTable;
 
-    private final VariantDataGenerator dataStore;
+    private final VariantDataGenerator variantDatastore;
+    private final ProjectileDatastore projectileDatastore;
 
     public MPServerPlugin(int port) {
-        dataStore = new VariantDataGenerator();
-        dataStore.generate(Global.getCombatEngine());
+        variantDatastore = new VariantDataGenerator();
+        variantDatastore.generate(this);
+
+        projectileDatastore = new ProjectileDatastore();
+        projectileDatastore.generate(this);
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
@@ -57,7 +61,7 @@ public class MPServerPlugin extends MPPlugin {
         shipTable = new ShipTable();
         initEntityManager(shipTable);
 
-        projectileTable = new ProjectileTable();
+        projectileTable = new ProjectileTable(projectileDatastore.getGeneratedWeaponIDs(), shipTable);
         initEntityManager(projectileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
@@ -77,16 +81,16 @@ public class MPServerPlugin extends MPPlugin {
         }
 
         // inbound data update
-        Map<Byte, Map<Short, Map<Byte, Object>>> inbound = serverConnectionManager.getDuplex().getDeltas();
+        InboundData inbound = serverConnectionManager.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(inbound, this, serverConnectionManager.getTick());
 
         // simulation update
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();
@@ -100,7 +104,7 @@ public class MPServerPlugin extends MPPlugin {
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
-    Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> m;
+    Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> m;
     float f = 0f;
 
     private void testInit() {
@@ -116,9 +120,9 @@ public class MPServerPlugin extends MPPlugin {
                 return data;
             }
         });
-        Map<Byte, BaseRecord<?>> t = new HashMap<>();
+        Map<Byte, DataRecord<?>> t = new HashMap<>();
         t.put((byte) 3, syncingListRecord);
-        Map<Short, Map<Byte, BaseRecord<?>>> i = new HashMap<>();
+        Map<Short, Map<Byte, DataRecord<?>>> i = new HashMap<>();
         i.put((short) 10, t);
         m = new HashMap<>();
         m.put((byte) 69, i);
@@ -142,8 +146,8 @@ public class MPServerPlugin extends MPPlugin {
         });
 
         ByteBuf buf = UnpooledByteBufAllocator.DEFAULT.buffer();
-        BaseConnectionWrapper.writeBuffer(m, buf);
-        Map<Byte, Map<Short, Map<Byte, Object>>> output;
+        BaseConnectionWrapper.writeBuffer(new OutboundData(m, new HashMap<Byte, Set<Short>>()), buf);
+        InboundData output;
         try {
             output = BaseConnectionWrapper.readBuffer(buf);
         } catch (IOException e) {
@@ -153,7 +157,7 @@ public class MPServerPlugin extends MPPlugin {
     }
 
     public VariantDataGenerator getVariantStore() {
-        return dataStore;
+        return variantDatastore;
     }
 
     @Override

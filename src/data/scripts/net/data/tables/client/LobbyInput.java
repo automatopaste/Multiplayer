@@ -1,8 +1,8 @@
 package data.scripts.net.data.tables.client;
 
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.Map;
@@ -63,6 +63,16 @@ public class LobbyInput implements InboundEntityManager {
             lobby.init(plugin, this);
         } else {
             lobby.destExecute(toProcess, tick);
+        }
+    }
+
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+        LobbyData data = lobby;
+
+        if (data != null) {
+            data.delete();
+            lobby = null;
         }
     }
 

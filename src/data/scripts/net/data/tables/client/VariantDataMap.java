@@ -1,8 +1,8 @@
 package data.scripts.net.data.tables.client;
 
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -28,6 +28,17 @@ public class VariantDataMap implements InboundEntityManager {
             variantData.init(plugin, this);
         } else {
             data.destExecute(toProcess, tick);
+        }
+    }
+
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+        VariantData data = variants.get(instanceID);
+
+        if (data != null) {
+            data.delete();
+
+            variants.remove(instanceID);
         }
     }
 

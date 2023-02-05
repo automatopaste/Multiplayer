@@ -2,7 +2,7 @@ package data.scripts.net.data.records;
 
 import io.netty.buffer.ByteBuf;
 
-public class ShortRecord extends BaseRecord<Short> {
+public class ShortRecord extends DataRecord<Short> {
     public static byte TYPE_ID;
 
     public ShortRecord(Short record) {

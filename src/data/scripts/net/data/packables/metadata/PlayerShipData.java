@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Sends player ship commands to the server
  */
-public class PlayerShipData extends BasePackable {
+public class PlayerShipData extends EntityData {
 
     public static final String NULL_SHIP = "NONE";
 
@@ -57,7 +57,7 @@ public class PlayerShipData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(Integer value, BasePackable packable) {
+                    public void execute(Integer value, EntityData packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
                         playerShipData.setControlBitmask(value);
                     }
@@ -75,7 +75,7 @@ public class PlayerShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(String value, BasePackable packable) {
+                    public void execute(String value, EntityData packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
                         if (value == null || value.equals(NULL_SHIP)) {
                             playerShipData.setPlayerShipID(null);
@@ -96,7 +96,7 @@ public class PlayerShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(Vector2f value, BasePackable packable) {
+                    public void execute(Vector2f value, EntityData packable) {
                         ShipAPI ship = getPlayerShip();
                         if (ship != null) ship.getMouseTarget().set(value);
                     }

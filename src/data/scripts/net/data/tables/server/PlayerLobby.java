@@ -1,17 +1,18 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.ClientData;
 import data.scripts.net.data.packables.metadata.LobbyData;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
     private final Map<Short, ClientData> players;
@@ -45,15 +46,31 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public Map<Short, Map<Byte, BaseRecord<?>>> getOutbound(byte typeID) {
-        Map<Short, Map<Byte, BaseRecord<?>>> out = new HashMap<>();
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+        ClientData data = players.get(instanceID);
 
-        Map<Byte, BaseRecord<?>> deltas = lobby.sourceExecute();
+        if (data != null) {
+            data.delete();
+
+            players.remove(instanceID);
+        }
+    }
+
+    @Override
+    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID) {
+        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+
+        Map<Byte, DataRecord<?>> deltas = lobby.sourceExecute();
         if (deltas != null && !deltas.isEmpty()) {
             out.put((short) -1, deltas);
         }
 
         return out;
+    }
+
+    @Override
+    public Set<Short> getDeleted(byte typeID) {
+        return null;
     }
 
     @Override

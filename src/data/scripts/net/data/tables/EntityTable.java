@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables;
 
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.EntityData;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -8,7 +8,7 @@ import java.util.Queue;
 /**
  * No real difference in speed vs using lists
  */
-public abstract class EntityTable<T extends BasePackable> {
+public abstract class EntityTable<T extends EntityData> {
     protected final T[] table;
     private final Queue<Short> vacant;
 

@@ -1,15 +1,16 @@
 package data.scripts.net.io;
 
+import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.BaseRecord;
-import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseConnectionWrapper {
     public static final short DEFAULT_CONNECTION_ID = -10;
@@ -96,12 +97,15 @@ public abstract class BaseConnectionWrapper {
         return buf;
     }
 
-    public static void writeBuffer(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> map, ByteBuf dest) {
-        for (byte type : map.keySet()) {
+    public static void writeBuffer(OutboundData data, ByteBuf dest) {
+        // write num types
+        dest.writeByte(data.out.size());
+
+        for (byte type : data.out.keySet()) {
             // write type byte
             dest.writeByte(type);
 
-            Map<Short, Map<Byte, BaseRecord<?>>> instances = map.get(type);
+            Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
 
             // write num instances short
             dest.writeShort(instances.size());
@@ -110,13 +114,13 @@ public abstract class BaseConnectionWrapper {
                 // write instance short
                 dest.writeShort(instance);
 
-                Map<Byte, BaseRecord<?>> records = instances.get(instance);
+                Map<Byte, DataRecord<?>> records = instances.get(instance);
 
                 // write num records byte
                 dest.writeByte(records.size());
 
                 for (byte id : records.keySet()) {
-                    BaseRecord<?> record = records.get(id);
+                    DataRecord<?> record = records.get(id);
 
                     // write record id byte
                     dest.writeByte(id);
@@ -130,23 +134,41 @@ public abstract class BaseConnectionWrapper {
                 }
             }
         }
+
+        // write num deleted types
+        dest.writeByte(data.deleted.size());
+
+        for (byte type : data.deleted.keySet()) {
+            // write type byte
+            dest.writeByte(type);
+
+            Set<Short> instances = data.deleted.get(type);
+
+            // write num instances short
+            dest.writeShort(instances.size());
+
+            for (short instance : instances) {
+                // write deleted instance ids
+                dest.writeShort(instance);
+            }
+        }
     }
 
-    public static Map<Byte, Map<Short, Map<Byte, Object>>> readBuffer(ByteBuf data) throws IOException {
-        Map<Byte, Map<Short, Map<Byte, Object>>> out = new HashMap<>();
+    public static InboundData readBuffer(ByteBuf data) throws IOException {
+        Map<Byte, Map<Short, Map<Byte, Object>>> inbound = new HashMap<>();
+        Map<Byte, Set<Short>> deleted = new HashMap<>();
 
-        while (data.readableBytes() > 0) {
+        byte numTypes = data.readByte();
+
+        for (byte i = 0; i < numTypes; i++) {
             byte typeID = data.readByte();
 
-            Map<Short, Map<Byte, Object>> instances = out.get(typeID);
-            if (instances == null) {
-                instances = new HashMap<>();
-                out.put(typeID, instances);
-            }
+            Map<Short, Map<Byte, Object>> instances = new HashMap<>();
+            inbound.put(typeID, instances);
 
             short numInstances = data.readShort();
 
-            for (short i = 0; i < numInstances; i++) {
+            for (short j = 0; j < numInstances; j++) {
                 short instanceID = data.readShort();
 
                 Map<Byte, Object> records = instances.get(instanceID);
@@ -157,7 +179,7 @@ public abstract class BaseConnectionWrapper {
 
                 byte numRecords = data.readByte();
 
-                for (byte j = 0; j < numRecords; j++) {
+                for (byte k = 0; k < numRecords; k++) {
                     byte recordID = data.readByte();
                     byte recordTypeID = data.readByte();
 
@@ -175,7 +197,23 @@ public abstract class BaseConnectionWrapper {
             }
         }
 
-        return out;
+        byte numDeletedTypes = data.readByte();
+
+        for (byte i = 0; i < numDeletedTypes; i++) {
+            byte typeID = data.readByte();
+
+            Set<Short> instances = new HashSet<>();
+            deleted.put(typeID, instances);
+
+            short numDeleted = data.readShort();
+
+            for (int j = 0; j < numDeleted; j++) {
+                short instance = data.readShort();
+                instances.add(instance);
+            }
+        }
+
+        return new InboundData(inbound, deleted);
     }
 
     public abstract void stop();

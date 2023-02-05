@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.ShipAIPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.util.DataGenManager;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 
@@ -97,6 +97,17 @@ public class PlayerShips implements InboundEntityManager {
             data.init(plugin, this);
         } else {
             data.destExecute(toProcess, tick);
+        }
+    }
+
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+        PlayerShipData data = playerShips.get(instanceID);
+
+        if (data != null) {
+            data.delete();
+
+            playerShips.remove(instanceID);
         }
     }
 

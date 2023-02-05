@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class StringRecord extends BaseRecord<String> {
+public class StringRecord extends DataRecord<String> {
     public static byte TYPE_ID;
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;

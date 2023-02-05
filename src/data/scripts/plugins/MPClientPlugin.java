@@ -3,17 +3,17 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.pregen.ProjectileDatastore;
 import data.scripts.net.data.tables.client.*;
-import data.scripts.net.data.util.DataGenManager;
-import data.scripts.net.data.util.VariantDataGenerator;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
-import java.util.Map;
 
 public class MPClientPlugin extends MPPlugin {
 
@@ -22,19 +22,20 @@ public class MPClientPlugin extends MPPlugin {
     private final ClientShipTable shipTable;
     private final VariantDataMap variantDataMap;
     private LobbyInput lobbyInput;
-    private PlayerShip playerShip;
+    private final PlayerShip playerShip;
 
     //outbound
     private Player player;
 
-    private final VariantDataGenerator dataStore;
+    private final ProjectileDatastore projectileDatastore;
 
     public MPClientPlugin(String host, int port) {
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             Global.getCombatEngine().removeEntity(ship);
         }
 
-        dataStore = new VariantDataGenerator();
+        projectileDatastore = new ProjectileDatastore();
+        projectileDatastore.generate(this);
 
         connection = new ClientConnectionWrapper(host, port, this);
 
@@ -79,25 +80,21 @@ public class MPClientPlugin extends MPPlugin {
         }
 
         // get inbound
-        Map<Byte, Map<Short, Map<Byte, Object>>> entities = connection.getDuplex().getDeltas();
+        InboundData entities = connection.getDuplex().getDeltas();
         DataGenManager.distributeInboundDeltas(entities, this, connection.getTick());
 
         // update
         updateEntityManagers(amount);
 
         // outbound data update
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket();
         connection.getDuplex().updateOutboundSocket(outboundSocket);
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
         connection.getDuplex().updateOutboundDatagram(outboundDatagram);
     }
 
     public ClientConnectionWrapper getConnection() {
         return connection;
-    }
-
-    public VariantDataGenerator getDataStore() {
-        return dataStore;
     }
 
     public ClientShipTable getShipTable() {

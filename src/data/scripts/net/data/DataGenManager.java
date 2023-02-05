@@ -1,36 +1,37 @@
-package data.scripts.net.data.util;
+package data.scripts.net.data;
 
-import data.scripts.net.data.packables.BasePackable;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.packables.EntityData;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Allows mods to specify entity types and record types at runtime
  */
 public class DataGenManager {
-    public static Map<Class<? extends BasePackable>, Byte> entityTypeIDs = new HashMap<>();
+    public static Map<Class<? extends EntityData>, Byte> entityTypeIDs = new HashMap<>();
 
     public static Map<String, Byte> recordTypeIDs = new HashMap<>();
-    public static Map<Byte, BaseRecord<?>> recordInstances = new HashMap<>();
+    public static Map<Byte, DataRecord<?>> recordInstances = new HashMap<>();
 
     public static Map<Byte, InboundEntityManager> inboundDataDestinations = new HashMap<>();
     public static Map<Byte, OutboundEntityManager> outboundDataSources = new HashMap<>();
 
     private static byte idIncrementer = 1;
 
-    public static byte registerEntityType(Class<? extends BasePackable> clazz) {
+    public static byte registerEntityType(Class<? extends EntityData> clazz) {
         byte id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         idIncrementer++;
         return id;
     }
 
-    public static byte registerRecordType(String c, BaseRecord<?> instance) {
+    public static byte registerRecordType(String c, DataRecord<?> instance) {
         byte id = idIncrementer;
         recordTypeIDs.put(c, id);
         recordInstances.put(id, instance);
@@ -46,9 +47,9 @@ public class DataGenManager {
         outboundDataSources.put(dataTypeID, manager);
     }
 
-    public static void distributeInboundDeltas(Map<Byte, Map<Short, Map<Byte, Object>>> inbound, MPPlugin plugin, int tick) {
-        for (byte type : inbound.keySet()) {
-            Map<Short, Map<Byte, Object>> entities = inbound.get(type);
+    public static void distributeInboundDeltas(InboundData inbound, MPPlugin plugin, int tick) {
+        for (byte type : inbound.in.keySet()) {
+            Map<Short, Map<Byte, Object>> entities = inbound.in.get(type);
             InboundEntityManager manager = inboundDataDestinations.get(type);
 
             if (manager == null) {
@@ -60,6 +61,20 @@ public class DataGenManager {
                 manager.processDelta(type, instance, entities.get(instance), plugin, tick);
             }
         }
+
+        for (byte type : inbound.deleted.keySet()) {
+            Set<Short> instances = inbound.deleted.get(type);
+            InboundEntityManager manager = inboundDataDestinations.get(type);
+
+            if (manager == null) {
+                System.err.println("MANAGER NOT FOUND");
+                continue;
+            }
+
+            for (short instance : instances) {
+                manager.processDeletion(type, instance, plugin, tick);
+            }
+        }
     }
 
     /**
@@ -67,18 +82,27 @@ public class DataGenManager {
      * Order: Type ID -> Instance ID -> Record ID
      * @return data hierarchy
      */
-    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasSocket() {
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
+    public static OutboundData collectOutboundDeltasSocket() {
+        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> out = new HashMap<>();
+        Map<Byte, Set<Short>> deleted = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound(source);
+                Map<Short, Map<Byte, DataRecord<?>>> entities = manager.getOutbound(source);
                 if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
 
-        return out;
+        for (byte source : outboundDataSources.keySet()) {
+            OutboundEntityManager manager = outboundDataSources.get(source);
+            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
+                Set<Short> instances = manager.getDeleted(source);
+                if (instances != null && !instances.isEmpty()) deleted.put(source, instances);
+            }
+        }
+
+        return new OutboundData(out, deleted);
     }
 
     /**
@@ -86,18 +110,27 @@ public class DataGenManager {
      * Order: Type ID -> Instance ID -> Record ID
      * @return data hierarchy
      */
-    public static Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> collectOutboundDeltasDatagram() {
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> out = new HashMap<>();
+    public static OutboundData collectOutboundDeltasDatagram() {
+        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> out = new HashMap<>();
+        Map<Byte, Set<Short>> deleted = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Short, Map<Byte, BaseRecord<?>>> entities = manager.getOutbound(source);
+                Map<Short, Map<Byte, DataRecord<?>>> entities = manager.getOutbound(source);
                 if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
 
-        return out;
+        for (byte source : outboundDataSources.keySet()) {
+            OutboundEntityManager manager = outboundDataSources.get(source);
+            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
+                Set<Short> instances = manager.getDeleted(source);
+                if (instances != null && !instances.isEmpty()) deleted.put(source, instances);
+            }
+        }
+
+        return new OutboundData(out, deleted);
     }
 
     /**
@@ -105,8 +138,8 @@ public class DataGenManager {
      * @param typeID id
      * @return new empty instance
      */
-    public static BaseRecord<?> recordFactory(byte typeID) {
-        BaseRecord<?> out = recordInstances.get(typeID);
+    public static DataRecord<?> recordFactory(byte typeID) {
+        DataRecord<?> out = recordInstances.get(typeID);
         if (out == null) {
             throw new NullPointerException("No record type found at ID: " + typeID);
         }

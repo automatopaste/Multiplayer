@@ -1,6 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
@@ -13,7 +13,7 @@ import data.scripts.plugins.MPPlugin;
 
 import java.net.InetSocketAddress;
 
-public class ConnectionData extends BasePackable {
+public class ConnectionData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -33,7 +33,7 @@ public class ConnectionData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
                         connectionData.setConnectionState(value);
                     }
@@ -49,7 +49,7 @@ public class ConnectionData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(Integer value, BasePackable packable) {
+                    public void execute(Integer value, EntityData packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
                         connectionData.setClientPort(value);
                     }

@@ -2,8 +2,10 @@ package data.scripts.net.io;
 
 import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
@@ -58,7 +60,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundSocket();
+        OutboundData outbound = dataDuplex.getOutboundSocket();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -104,9 +106,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        Map<Short, Map<Byte, BaseRecord<?>>> instance = new HashMap<>();
+        Map<Short, Map<Byte, DataRecord<?>>> instance = new HashMap<>();
         instance.put(connectionID, connectionData.sourceExecute());
-        outbound.put(ConnectionData.TYPE_ID, instance);
+        outbound.out.put(ConnectionData.TYPE_ID, instance);
 
         ByteBuf data = initBuffer(tick, connectionID);
         writeBuffer(outbound, data);
@@ -118,7 +120,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     public MessageContainer getDatagram() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outbound = dataDuplex.getOutboundDatagram();
+        OutboundData outbound = dataDuplex.getOutboundDatagram();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -140,10 +142,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
     }
 
-    public void updateInbound(Map<Byte, Map<Short, Map<Byte, Object>>> entities, int tick) {
-        Map<Short, Map<Byte, Object>> instance = entities.get(ConnectionData.TYPE_ID);
+    public void updateInbound(InboundData entities, int tick) {
+        Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
         if (instance != null) connectionData.destExecute(instance.get(connectionID), tick);
-        entities.remove(ConnectionData.TYPE_ID);
+        entities.in.remove(ConnectionData.TYPE_ID);
 
         if (tick != -1) this.tick = tick;
         dataDuplex.updateInbound(entities);

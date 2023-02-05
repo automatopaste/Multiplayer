@@ -1,9 +1,10 @@
 package data.scripts.net.io;
 
-import data.scripts.net.data.records.BaseRecord;
+import data.scripts.net.data.InboundData;
+import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.records.DataRecord;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manage data between game and network threads
@@ -13,60 +14,86 @@ public class DataDuplex {
      * Map Type ID to
      */
     private final Map<Byte, Map<Short, Map<Byte, Object>>> inbound;
-    private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundSocket;
-    private final Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outboundDatagram;
+    private final Map<Byte, Set<Short>> inboundDeleted;
+    private final Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outboundSocket;
+    private final Map<Byte, Set<Short>> outboundSocketDeleted;
+    private final Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outboundDatagram;
+    private final Map<Byte, Set<Short>> outboundDatagramDeleted;
 
     public DataDuplex() {
         inbound = new HashMap<>();
+        inboundDeleted = new HashMap<>();
         outboundSocket = new HashMap<>();
+        outboundSocketDeleted = new HashMap<>();
         outboundDatagram = new HashMap<>();
+        outboundDatagramDeleted = new HashMap<>();
     }
 
     /**
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public Map<Byte, Map<Short, Map<Byte, Object>>> getDeltas() {
+    public InboundData getDeltas() {
+        HashMap<Byte, Map<Short, Map<Byte, Object>>> in;
+        HashMap<Byte, Set<Short>> deleted;
+
         synchronized (inbound) {
-            HashMap<Byte, Map<Short, Map<Byte, Object>>> out = new HashMap<>(inbound);
+            in = new HashMap<>(inbound);
             inbound.clear();
-            return out;
         }
+        synchronized (inboundDeleted) {
+            deleted = new HashMap<>(inboundDeleted);
+            inboundDeleted.clear();
+        }
+
+        return new InboundData(in, deleted);
     }
 
     /**
      * Get outbound data and clear store
      * @return outbound entities
      */
-    public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getOutboundSocket() {
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outEntities;
+    public OutboundData getOutboundSocket() {
+        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outEntities;
         synchronized (outboundSocket) {
             outEntities = new HashMap<>(outboundSocket);
             outboundSocket.clear();
         }
 
-        return outEntities;
+        Map<Byte, Set<Short>> outDeleted;
+        synchronized (outboundSocketDeleted) {
+            outDeleted = new HashMap<>(outboundSocketDeleted);
+            outboundSocketDeleted.clear();
+        }
+
+        return new OutboundData(outEntities, outDeleted);
     }
 
-    public Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> getOutboundDatagram() {
-        Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> outEntities;
+    public OutboundData getOutboundDatagram() {
+        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outEntities;
         synchronized (outboundDatagram) {
             outEntities = new HashMap<>(outboundDatagram);
             outboundDatagram.clear();
         }
 
-        return outEntities;
+        Map<Byte, Set<Short>> outDeleted;
+        synchronized (outboundDatagramDeleted) {
+            outDeleted = new HashMap<>(outboundDatagramDeleted);
+            outboundDatagramDeleted.clear();
+        }
+
+        return new OutboundData(outEntities, outDeleted);
     }
 
     /**
      * Synchronises update of current data store
-     * @param entities new entities copy
+     * @param data inbound data
      */
-    public void updateInbound(Map<Byte, Map<Short, Map<Byte, Object>>> entities) {
-        synchronized (this.inbound) {
-            for (Byte type : entities.keySet()) {
+    public void updateInbound(InboundData data) {
+        synchronized (inbound) {
+            for (Byte type : data.in.keySet()) {
                 Map<Short, Map<Byte, Object>> inboundEntities = inbound.get(type);
-                Map<Short, Map<Byte, Object>> deltas = entities.get(type);
+                Map<Short, Map<Byte, Object>> deltas = data.in.get(type);
 
                 if (inboundEntities == null) {
                     inboundEntities = new HashMap<>();
@@ -88,28 +115,44 @@ public class DataDuplex {
                 }
             }
         }
+
+        synchronized (inboundDeleted) {
+            for (Byte type : data.deleted.keySet()) {
+                Set<Short> deleted = inboundDeleted.get(type);
+                Set<Short> deltas = data.deleted.get(type);
+
+                if (deleted == null) {
+                    deleted = new HashSet<>();
+                    inboundDeleted.put(type, deleted);
+                }
+
+                deleted.addAll(deltas);
+            }
+        }
     }
 
-    /**
-     * Synchronises update of current data store
-     * @param entities new entities copy
-     */
-    public void updateOutboundSocket(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
+    public void updateOutboundSocket(OutboundData bufferData) {
         synchronized (outboundSocket) {
-            updateMap(outboundSocket, entities);
+            updateEntities(outboundSocket, bufferData.out);
+        }
+        synchronized (outboundSocketDeleted) {
+            updateDeleted(outboundSocketDeleted, bufferData.deleted);
         }
     }
 
-    public void updateOutboundDatagram(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> entities) {
+    public void updateOutboundDatagram(OutboundData bufferData) {
         synchronized (outboundDatagram) {
-            updateMap(outboundDatagram, entities);
+            updateEntities(outboundDatagram, bufferData.out);
+        }
+        synchronized (outboundDatagramDeleted) {
+            updateDeleted(outboundDatagramDeleted, bufferData.deleted);
         }
     }
 
-    private void updateMap(Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> dest, Map<Byte, Map<Short, Map<Byte, BaseRecord<?>>>> delta) {
+    private void updateEntities(Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> dest, Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> delta) {
         for (byte type : delta.keySet()) {
-            Map<Short, Map<Byte, BaseRecord<?>>> outboundEntities = dest.get(type);
-            Map<Short, Map<Byte, BaseRecord<?>>> deltas = delta.get(type);
+            Map<Short, Map<Byte, DataRecord<?>>> outboundEntities = dest.get(type);
+            Map<Short, Map<Byte, DataRecord<?>>> deltas = delta.get(type);
 
             if (outboundEntities == null) {
                 outboundEntities = new HashMap<>();
@@ -117,8 +160,8 @@ public class DataDuplex {
             }
 
             for (short instance : deltas.keySet()) {
-                Map<Byte, BaseRecord<?>> outboundEntityRecords = outboundEntities.get(instance);
-                Map<Byte, BaseRecord<?>> records = deltas.get(instance);
+                Map<Byte, DataRecord<?>> outboundEntityRecords = outboundEntities.get(instance);
+                Map<Byte, DataRecord<?>> records = deltas.get(instance);
 
                 if (outboundEntityRecords == null) {
                     outboundEntityRecords = new HashMap<>();
@@ -126,8 +169,8 @@ public class DataDuplex {
                 }
 
                 for (byte id : records.keySet()) {
-                    BaseRecord<?> outboundRecord = outboundEntityRecords.get(id);
-                    BaseRecord<?> record = records.get(id);
+                    DataRecord<?> outboundRecord = outboundEntityRecords.get(id);
+                    DataRecord<?> record = records.get(id);
 
                     if (outboundRecord == null) {
                         outboundRecord = record;
@@ -137,6 +180,20 @@ public class DataDuplex {
                     outboundRecord.overwrite(outboundRecord.getValue());
                 }
             }
+        }
+    }
+
+    private void updateDeleted(Map<Byte, Set<Short>> destMap, Map<Byte, Set<Short>> deltaMap) {
+        for (byte type : deltaMap.keySet()) {
+            Set<Short> dest = destMap.get(type);
+            Set<Short> deltas = deltaMap.get(type);
+
+            if (dest == null) {
+                dest = new HashSet<>();
+                destMap.put(type, dest);
+            }
+
+            dest.addAll(deltas);
         }
     }
 }

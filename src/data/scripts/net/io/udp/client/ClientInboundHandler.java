@@ -2,13 +2,12 @@ package data.scripts.net.io.udp.client;
 
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
+import data.scripts.net.data.InboundData;
 import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.net.io.Unpacked;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-
-import java.util.Map;
 
 public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> {
     private final ClientConnectionWrapper connection;
@@ -26,8 +25,7 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
         int serverTick = in.getTick();
         //Console.showMessage("Received UDP unpacked with tick: " + serverTick);
 
-        // DISCARD WHILE DEBUG
-        Map<Byte, Map<Short, Map<Byte, Object>>> entities = in.getUnpacked();
+        InboundData entities = in.getUnpacked();
 
         dataGraph.increment(in.getSize());
         CMUtils.getGuiDebug().putContainer(ClientInboundHandler.class, "dataGraph", dataGraph);

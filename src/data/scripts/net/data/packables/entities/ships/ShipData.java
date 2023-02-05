@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.util.*;
 
-public class ShipData extends BasePackable {
+public class ShipData extends EntityData {
     public static byte TYPE_ID;
 
     private final Map<Integer, Boolean> prevStates = new HashMap<>();
@@ -34,11 +34,13 @@ public class ShipData extends BasePackable {
     private String hullID;
     private String fleetMemberID;
     private int owner;
+    private Vector2f location = new Vector2f(0f, 0f);
+    private float facing = 0f;
 
-    private Map<String, Integer> slotIDs;
-    private Map<Integer, String> slotIntIDs;
-    private final Map<Integer, WeaponAPI> weaponSlots = new HashMap<>();
-    private Map<String, MPDefaultAutofireAIPlugin> autofirePluginSlotIDs;
+    private Map<String, Byte> slotIDs;
+    private Map<Byte, String> slotIntIDs;
+    private final Map<Byte, WeaponAPI> weaponSlots = new HashMap<>();
+    private final Map<WeaponAPI, Byte> weaponSlotIDs = new HashMap<>();
     private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
     public ShipData(short instanceID, final ShipAPI ship) {
@@ -60,7 +62,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(String value, BasePackable packable) {
+                    public void execute(String value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         shipData.setFleetMemberID(value);
                     }
@@ -76,7 +78,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(String value, BasePackable packable) {
+                    public void execute(String value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         shipData.setHullID(value);
                     }
@@ -92,10 +94,13 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(Vector2f value, BasePackable packable) {
+                    public void execute(Vector2f value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getLocation().set(value);
+                        if (ship != null) {
+                            ship.getLocation().set(value);
+                            setLocation(new Vector2f(value));
+                        }
                     }
                 }
         ));
@@ -109,7 +114,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(Vector2f value, BasePackable packable) {
+                    public void execute(Vector2f value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.getVelocity().set(value);
@@ -126,10 +131,13 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(Float value, BasePackable packable) {
+                    public void execute(Float value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setFacing(value);
+                        if (ship != null) {
+                            ship.setFacing(value);
+                            setFacing(value);
+                        }
                     }
                 }
         ).setInterpExecute(new InterpExecute<Float>() {
@@ -148,7 +156,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Float>() {
                     @Override
-                    public void execute(Float value, BasePackable packable) {
+                    public void execute(Float value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setAngularVelocity(value);
@@ -165,7 +173,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setHitpoints(ship.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
@@ -182,7 +190,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.getFluxTracker().setCurrFlux(ship.getMaxFlux() * ConversionUtils.byteToFloat(value, 1f));
@@ -203,7 +211,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -233,7 +241,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setCurrentCR(ConversionUtils.byteToFloat(value, 1f));
@@ -250,7 +258,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Vector2f>() {
                     @Override
-                    public void execute(Vector2f value, BasePackable packable) {
+                    public void execute(Vector2f value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.getMouseTarget().set(value);
@@ -267,7 +275,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) ship.setOwner(value);
@@ -313,7 +321,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -377,7 +385,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -414,7 +422,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<Byte>() {
                     @Override
-                    public void execute(Byte value, BasePackable packable) {
+                    public void execute(Byte value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -452,7 +460,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -489,7 +497,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -520,7 +528,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -558,7 +566,7 @@ public class ShipData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
@@ -622,10 +630,10 @@ public class ShipData extends BasePackable {
 
         slotIDs = new HashMap<>(variantData.getSlotIDs());
         slotIntIDs = new HashMap<>();
-        Map<Integer, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
+        Map<Byte, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
 
         for (String id : slotIDs.keySet()) {
-            int s = slotIDs.get(id);
+            byte s = slotIDs.get(id);
 
             slotIntIDs.put(s, id);
 
@@ -646,11 +654,11 @@ public class ShipData extends BasePackable {
 
         fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
 
-        ship = fleetManager.spawnFleetMember(fleetMember, new Vector2f(0f, 0f), 0f, 0f);
+        ship = fleetManager.spawnFleetMember(fleetMember, location, facing, 0f);
         ship.setCRAtDeployment(0.7f);
         ship.setControlsLocked(false);
 
-        autofirePluginSlotIDs = shipTable.getTempAutofirePlugins().get(ship.getId());
+        Map<String, MPDefaultAutofireAIPlugin> autofirePluginSlotIDs = shipTable.getTempAutofirePlugins().get(ship.getId());
         autofirePluginSlots = new HashMap<>();
 
         List<WeaponAPI> weapons = ship.getAllWeapons();
@@ -658,16 +666,18 @@ public class ShipData extends BasePackable {
         for (WeaponAPI w : weapons) {
             for (String id : slotIDs.keySet()) {
                 if (id.equals(w.getSlot().getId())) {
-                    int i = slotIDs.get(id);
+                    byte i = (byte) (int) slotIDs.get(id);
                     weaponSlots.put(i, w);
 
                     MPDefaultAutofireAIPlugin autofireAIPlugin = autofirePluginSlotIDs.get(id);
-                    if (autofireAIPlugin != null) autofirePluginSlots.put(i, autofireAIPlugin);
+                    if (autofireAIPlugin != null) autofirePluginSlots.put((int) i, autofireAIPlugin);
 
                     continue outer;
                 }
             }
         }
+
+        shipTable.getTempAutofirePlugins().remove(ship.getId());
 
         // set fleetmember id to sync with server
         Ship s = (Ship) ship;
@@ -709,6 +719,22 @@ public class ShipData extends BasePackable {
 
     public void setOwner(int owner) {
         this.owner = owner;
+    }
+
+    public void setLocation(Vector2f location) {
+        this.location = location;
+    }
+
+    public void setFacing(float facing) {
+        this.facing = facing;
+    }
+
+    public Map<WeaponAPI, Byte> getWeaponSlotIDs() {
+        return weaponSlotIDs;
+    }
+
+    public Map<Byte, WeaponAPI> getWeaponSlots() {
+        return weaponSlots;
     }
 
     public static class ArmourSyncData {

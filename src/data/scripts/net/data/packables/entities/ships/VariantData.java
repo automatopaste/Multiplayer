@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.api.loading.WeaponGroupType;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
-import data.scripts.net.data.packables.BasePackable;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
@@ -19,7 +19,7 @@ import data.scripts.plugins.MPPlugin;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class VariantData extends BasePackable {
+public class VariantData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -27,9 +27,9 @@ public class VariantData extends BasePackable {
     private int numFluxVents;
     private String fleetMemberID;
     private List<String> hullmods;
-    private Map<String, Integer> slotIDs;
-    private Map<Integer, String> slotIntIDs;
-    private Map<Integer, String> weaponSlots;
+    private Map<String, Byte> slotIDs;
+    private Map<Byte, String> slotIntIDs;
+    private Map<Byte, String> weaponSlots;
     private List<WeaponGroupSpec> weaponGroups;
 
     public VariantData(short instanceID, final ShipVariantAPI variant, final String id) {
@@ -58,7 +58,7 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(Integer value, BasePackable packable) {
+                    public void execute(Integer value, EntityData packable) {
                         VariantData variantData = (VariantData) packable;
                         variantData.setNumFluxCapacitors(value);
                     }
@@ -74,7 +74,7 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<Integer>() {
                     @Override
-                    public void execute(Integer value, BasePackable packable) {
+                    public void execute(Integer value, EntityData packable) {
                         VariantData variantData = (VariantData) packable;
                         variantData.setNumFluxVents(value);
                     }
@@ -90,7 +90,7 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<String>() {
                     @Override
-                    public void execute(String value, BasePackable packable) {
+                    public void execute(String value, EntityData packable) {
                         VariantData variantData = (VariantData) packable;
                         variantData.setFleetMemberID(value);
                     }
@@ -106,7 +106,7 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<String>>() {
                     @Override
-                    public void execute(List<String> value, BasePackable packable) {
+                    public void execute(List<String> value, EntityData packable) {
                         VariantData variantData = (VariantData) packable;
                         variantData.setHullmods(value);
                     }
@@ -137,9 +137,9 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
-                        Map<String, Integer> slots = new HashMap<>();
-                        Map<Integer, String> intSlots = new HashMap<>();
+                    public void execute(List<Byte> value, EntityData packable) {
+                        Map<String, Byte> slots = new HashMap<>();
+                        Map<Byte, String> intSlots = new HashMap<>();
 
                         for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
                             int size = iterator.next() & 0xFF;
@@ -150,8 +150,8 @@ public class VariantData extends BasePackable {
 
                             int id = iterator.next();
 
-                            slots.put(idString, id);
-                            intSlots.put(id, idString);
+                            slots.put(idString, (byte) id);
+                            intSlots.put((byte) id, idString);
                         }
 
                         setSlotIDs(slots);
@@ -184,8 +184,8 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
-                        Map<Integer, String> slots = new HashMap<>();
+                    public void execute(List<Byte> value, EntityData packable) {
+                        Map<Byte, String> slots = new HashMap<>();
 
                         for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
                             int size = iterator.next() & 0xFF;
@@ -194,7 +194,7 @@ public class VariantData extends BasePackable {
 
                             String idString = new String(bytes, StandardCharsets.UTF_8);
 
-                            int slot = iterator.next();
+                            byte slot = iterator.next();
 
                             slots.put(slot, idString);
                         }
@@ -230,7 +230,7 @@ public class VariantData extends BasePackable {
                 },
                 new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<Byte> value, BasePackable packable) {
+                    public void execute(List<Byte> value, EntityData packable) {
                         List<WeaponGroupSpec> weaponGroupSpecs = new ArrayList<>();
 
                         for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
@@ -246,7 +246,7 @@ public class VariantData extends BasePackable {
                             int numSlots = config & 0b00111111;
                             for (int i = 0; i < numSlots; i++) {
                                 int slotID = iterator.next() & 0xFF;
-                                spec.addSlot(getSlotIntIDs().get(slotID));
+                                spec.addSlot(getSlotIntIDs().get((byte) slotID));
                             }
 
                             weaponGroupSpecs.add(spec);
@@ -310,27 +310,27 @@ public class VariantData extends BasePackable {
         this.hullmods = hullmods;
     }
 
-    public Map<String, Integer> getSlotIDs() {
+    public Map<String, Byte> getSlotIDs() {
         return slotIDs;
     }
 
-    public void setSlotIDs(Map<String, Integer> slotIDs) {
+    public void setSlotIDs(Map<String, Byte> slotIDs) {
         this.slotIDs = slotIDs;
     }
 
-    public Map<Integer, String> getSlotIntIDs() {
+    public Map<Byte, String> getSlotIntIDs() {
         return slotIntIDs;
     }
 
-    public void setSlotIntIDs(Map<Integer, String> slotIntIDs) {
+    public void setSlotIntIDs(Map<Byte, String> slotIntIDs) {
         this.slotIntIDs = slotIntIDs;
     }
 
-    public Map<Integer, String> getWeaponSlots() {
+    public Map<Byte, String> getWeaponSlots() {
         return weaponSlots;
     }
 
-    public void setWeaponSlots(Map<Integer, String> weaponSlots) {
+    public void setWeaponSlots(Map<Byte, String> weaponSlots) {
         this.weaponSlots = weaponSlots;
     }
 
