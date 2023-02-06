@@ -3,6 +3,7 @@ package data.scripts.net.io;
 import cmu.CMUtils;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
@@ -62,11 +63,13 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case SPAWNING_READY:
             case SPAWNING:
-                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning ships on client...");
+                CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning entities on client...");
 
                 Map<Short, Map<Byte, DataRecord<?>>> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
-
                 outbound.out.put(ShipData.TYPE_ID, ships);
+
+                Map<Short, Map<Byte, DataRecord<?>>> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
+                outbound.out.put(ProjectileData.TYPE_ID, projectiles);
 
                 connectionState = ConnectionState.SIMULATION_READY;
 

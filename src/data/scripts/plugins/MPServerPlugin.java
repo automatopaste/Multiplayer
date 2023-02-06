@@ -169,6 +169,10 @@ public class MPServerPlugin extends MPPlugin {
         return shipTable;
     }
 
+    public ProjectileTable getProjectileTable() {
+        return projectileTable;
+    }
+
     public PlayerLobby getPlayerMap() {
         return playerLobby;
     }

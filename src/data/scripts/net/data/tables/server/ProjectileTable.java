@@ -3,11 +3,12 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
+import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.*;
@@ -102,5 +103,26 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     @Override
     public PacketType getOutboundPacketType() {
         return PacketType.DATAGRAM;
+    }
+
+    public Map<Short, Map<Byte, DataRecord<?>>> getProjectilesRegistered() {
+        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+
+        for (short id : registered.values()) {
+            ProjectileData projectileData = table[id];
+
+            projectileData.sourceExecute();
+
+            Map<Byte, DataRecord<?>> records = new HashMap<>();
+            List<RecordLambda<?>> recordLambdas = projectileData.getRecords();
+            for (byte i = 0; i < recordLambdas.size(); i++) {
+                RecordLambda<?> recordLambda = recordLambdas.get(i);
+                records.put(i, recordLambda.record);
+            }
+
+            out.put(id, records);
+        }
+
+        return out;
     }
 }
