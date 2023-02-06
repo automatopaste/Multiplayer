@@ -47,9 +47,12 @@ public class ShipData extends EntityData {
         super(instanceID);
         this.ship = ship;
 
-        final Map<String, Integer> slotIDs = new HashMap<>();
+        slotIDs = new HashMap<>();
         try {
-            slotIDs.putAll(VariantData.getSlotIDs(ship.getVariant()));
+            Map<String, Integer> m = VariantData.getSlotIDs(ship.getVariant());
+            for (String s : m.keySet()) {
+                slotIDs.put(s, (byte) (int) m.get(s));
+            }
 
             genSlotIDs();
         } catch (NullPointerException ignored) {}
