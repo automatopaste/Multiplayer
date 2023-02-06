@@ -3,10 +3,7 @@ package data.scripts.plugins;
 import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import com.fs.starfarer.api.loading.ProjectileSpecAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
@@ -25,9 +22,7 @@ import data.scripts.net.io.ServerConnectionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import org.lazywizard.console.Console;
-import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.util.vector.Vector2f;
 
 import java.io.IOException;
 import java.util.*;
@@ -99,25 +94,6 @@ public class MPServerPlugin extends MPPlugin {
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();
-
-        for (ShipAPI s : Global.getCombatEngine().getShips()) {
-            for (WeaponAPI w : s.getAllWeapons()) {
-                Object o = w.getSpec().getProjectileSpec();
-                if (!(o instanceof ProjectileSpecAPI)) continue;
-                ProjectileSpecAPI p = (ProjectileSpecAPI) o;
-
-                String ws = w.getId();
-                String ps = p.getId();
-                Vector2f l = MathUtils.getPointOnCircumference(s.getLocation(), 500f, 90f);
-                Vector2f v = new Vector2f(s.getVelocity());
-
-                try {
-                    Global.getCombatEngine().spawnProjectile(s, w, ws, l, 90f, v);
-                } catch (NullPointerException n) {
-                    float f = 0f;
-                }
-            }
-        }
     }
 
     private void debug() {
