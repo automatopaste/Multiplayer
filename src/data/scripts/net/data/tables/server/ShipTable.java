@@ -21,9 +21,11 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     private final Map<ShipAPI, Short> registered;
     private final Set<Short> deleted;
     private final Map<Short, ShieldData> shields;
+    private final PlayerShips playerShips;
 
-    public ShipTable() {
+    public ShipTable(PlayerShips playerShips) {
         super(new ShipData[MAX_SHIPS]);
+        this.playerShips = playerShips;
 
         registered = new HashMap<>();
         deleted = new HashSet<>();
@@ -97,7 +99,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         short id = (short) getVacant();
 
         registered.put(ship, id);
-        table[id] = new ShipData(id, ship);
+        table[id] = new ShipData(id, ship, playerShips);
         if (ship.getShield() != null) {
             shields.put(id, new ShieldData(id, ship.getShield(), ship));
         }

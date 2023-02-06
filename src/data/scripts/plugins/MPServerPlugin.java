@@ -50,7 +50,7 @@ public class MPServerPlugin extends MPPlugin {
         initEntityManager(playerLobby);
 
         //outbound init
-        shipTable = new ShipTable();
+        shipTable = new ShipTable(playerShips);
         initEntityManager(shipTable);
 
         projectileTable = new ProjectileTable(projectileSpecDatastore.getGeneratedIDs(), shipTable);

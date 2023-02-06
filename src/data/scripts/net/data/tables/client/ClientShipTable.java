@@ -30,7 +30,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
             ShipData data = table[instanceID];
 
             if (data == null) {
-                data = new ShipData(instanceID, null);
+                data = new ShipData(instanceID, null, null);
                 table[instanceID] = data;
 
                 data.destExecute(toProcess, tick);
