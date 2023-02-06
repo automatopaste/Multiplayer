@@ -313,7 +313,8 @@ public class ShipData extends EntityData {
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
                             int slotID;
                             try {
-                                slotID = slotIDs.get(weapon.getSlot().getId());
+                                String s = weapon.getSlot().getId();
+                                slotID = slotIDs.get(s);
                             } catch (NullPointerException n) {
                                 n.printStackTrace();
                                 continue;

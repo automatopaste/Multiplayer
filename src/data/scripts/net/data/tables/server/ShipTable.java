@@ -76,6 +76,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         Set<ShipAPI> diff = new HashSet<>(registered.keySet());
 
         for (ShipAPI ship : engine.getShips()) {
+            if (ship.isFighter()) continue;
+
             if (registered.containsKey(ship)) {
                 diff.remove(ship);
             } else {
