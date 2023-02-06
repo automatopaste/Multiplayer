@@ -50,6 +50,7 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
 
     public void initDatastore(PregenDatastore datastore) {
         datastores.put(datastore.getClass(), datastore);
+        datastore.generate(this);
     }
 
     public void genData() {
