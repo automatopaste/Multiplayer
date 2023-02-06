@@ -65,6 +65,8 @@ public class SocketServer implements Runnable {
                             return address == messageAddress;
                         }
                     });
+
+                    message.getData().release();
                 }
             }
 

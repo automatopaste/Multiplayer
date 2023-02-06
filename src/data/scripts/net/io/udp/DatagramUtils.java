@@ -36,6 +36,9 @@ public class DatagramUtils {
         out.writeBytes(bytes);
 
         channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
+
+        buf.release();
+
         return sizeData;
     }
 
