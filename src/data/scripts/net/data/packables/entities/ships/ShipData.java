@@ -50,6 +50,8 @@ public class ShipData extends EntityData {
         final Map<String, Integer> slotIDs = new HashMap<>();
         try {
             slotIDs.putAll(VariantData.getSlotIDs(ship.getVariant()));
+
+            genSlotIDs();
         } catch (NullPointerException ignored) {}
 
         addRecord(new RecordLambda<>(
@@ -667,7 +669,6 @@ public class ShipData extends EntityData {
             for (String id : slotIDs.keySet()) {
                 if (id.equals(w.getSlot().getId())) {
                     byte i = (byte) (int) slotIDs.get(id);
-                    weaponSlots.put(i, w);
 
                     MPDefaultAutofireAIPlugin autofireAIPlugin = autofirePluginSlotIDs.get(id);
                     if (autofireAIPlugin != null) autofirePluginSlots.put((int) i, autofireAIPlugin);
@@ -677,6 +678,8 @@ public class ShipData extends EntityData {
             }
         }
 
+        genSlotIDs();
+
         shipTable.getTempAutofirePlugins().remove(ship.getId());
 
         // set fleetmember id to sync with server
@@ -684,6 +687,22 @@ public class ShipData extends EntityData {
         s.setFleetMemberId(fleetMemberID);
 
         ship.setShipAI(new MPDefaultShipAIPlugin());
+    }
+
+    private void genSlotIDs() {
+        List<WeaponAPI> weapons = ship.getAllWeapons();
+        outer:
+        for (WeaponAPI w : weapons) {
+            for (String id : slotIDs.keySet()) {
+                if (id.equals(w.getSlot().getId())) {
+                    byte i = (byte) (int) slotIDs.get(id);
+                    weaponSlots.put(i, w);
+                    weaponSlotIDs.put(w, i);
+
+                    continue outer;
+                }
+            }
+        }
     }
 
     @Override
