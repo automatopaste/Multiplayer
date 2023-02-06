@@ -36,7 +36,7 @@ public class MPClientPlugin extends MPPlugin {
         }
 
         projectileSpecDatastore = new ProjectileSpecDatastore();
-        projectileSpecDatastore.generate(this);
+        initDatastore(projectileSpecDatastore);
 
         connection = new ClientConnectionWrapper(host, port, this);
 

@@ -43,10 +43,10 @@ public class MPServerPlugin extends MPPlugin {
 
     public MPServerPlugin(int port) {
         variantDatastore = new VariantDataGenerator();
-        variantDatastore.generate(this);
+        initDatastore(variantDatastore);
 
         projectileSpecDatastore = new ProjectileSpecDatastore();
-        projectileSpecDatastore.generate(this);
+        initDatastore(projectileSpecDatastore);
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
