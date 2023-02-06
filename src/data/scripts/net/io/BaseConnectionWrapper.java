@@ -108,8 +108,6 @@ public abstract class BaseConnectionWrapper {
         ByteBuf temp = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
 
         for (byte type : data.out.keySet()) {
-            numTypes++;
-
             // write type byte
             temp.writeByte(type);
 
@@ -151,36 +149,38 @@ public abstract class BaseConnectionWrapper {
 
             entities.writeBytes(temp);
             temp.clear();
+
+            numTypes++;
         }
 
-//        for (byte type : data.deleted.keySet()) {
-//            numDeletedTypes++;
-//
-//            // write type byte
-//            temp.writeByte(type);
-//
-//            Set<Short> instances = data.deleted.get(type);
-//
-//            // write num instances short
-//            temp.writeShort(instances.size());
-//
-//            for (short instance : instances) {
-//                // write deleted instance ids
-//                temp.writeShort(instance);
-//            }
-//
-//            // check if buffer will breach cap
-//            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
-//                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-//                entities.clear();
-//                deleted.clear();
-//                numTypes = 0;
-//                numDeletedTypes = 0;
-//            }
-//
-//            deleted.writeBytes(temp);
-//            temp.clear();
-//        }
+        for (byte type : data.deleted.keySet()) {
+            // write type byte
+            temp.writeByte(type);
+
+            Set<Short> instances = data.deleted.get(type);
+
+            // write num instances short
+            temp.writeShort(instances.size());
+
+            for (short instance : instances) {
+                // write deleted instance ids
+                temp.writeShort(instance);
+            }
+
+            // check if buffer will breach cap
+            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
+                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+                entities.clear();
+                deleted.clear();
+                numTypes = 0;
+                numDeletedTypes = 0;
+            }
+
+            deleted.writeBytes(temp);
+            temp.clear();
+
+            numDeletedTypes++;
+        }
 
         if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
             out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
