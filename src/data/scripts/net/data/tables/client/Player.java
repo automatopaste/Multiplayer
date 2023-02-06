@@ -22,11 +22,11 @@ public class Player implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID) {
+    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
         Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
 
 
-        Map<Byte, DataRecord<?>> deltas = player.sourceExecute();
+        Map<Byte, DataRecord<?>> deltas = player.sourceExecute(amount);
         if (deltas != null && !deltas.isEmpty()) {
             out.put(instanceID, deltas);
         }

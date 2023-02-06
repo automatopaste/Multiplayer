@@ -12,7 +12,7 @@ public interface OutboundEntityManager extends BaseEntityManager {
         DATAGRAM
     }
 
-    Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID);
+    Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount);
 
     Set<Short> getDeleted(byte typeID);
 

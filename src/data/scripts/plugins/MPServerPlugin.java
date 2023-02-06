@@ -88,9 +88,9 @@ public class MPServerPlugin extends MPPlugin {
         updateEntityManagers(amount);
 
         // outbound data update
-        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket();
+        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket(amount);
         serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
-        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram();
+        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram(amount);
         serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
 
         debug();

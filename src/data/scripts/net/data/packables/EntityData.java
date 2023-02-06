@@ -54,13 +54,13 @@ public abstract class EntityData {
      * Returns a map of all records that are marked as updated since the last time
      * @return deltas
      */
-    public Map<Byte, DataRecord<?>> sourceExecute() {
+    public Map<Byte, DataRecord<?>> sourceExecute(float amount) {
         Map<Byte, DataRecord<?>> deltas = new HashMap<>();
 
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);
 
-            if (recordLambda.sourceExecute() || init) {
+            if (recordLambda.sourceExecute(amount) || init) {
                 deltas.put(i, recordLambda.record);
             }
         }

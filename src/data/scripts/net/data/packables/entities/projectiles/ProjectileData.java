@@ -14,7 +14,6 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
-import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.Map;
@@ -94,7 +93,7 @@ public class ProjectileData extends EntityData {
                     }
                 }
         ));
-        addInterpRecord(new InterpRecordLambda<>(
+        addRecord(new RecordLambda<>(
                 Vector2f32Record.getDefault().setDebugText("location"),
                 new SourceExecute<Vector2f>() {
                     @Override
@@ -114,8 +113,8 @@ public class ProjectileData extends EntityData {
                         }
                     }
                 }
-        ));
-        addInterpRecord(new InterpRecordLambda<>(
+        ).setRate(5f));
+        addRecord(new RecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
                     @Override
@@ -131,8 +130,8 @@ public class ProjectileData extends EntityData {
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
-        ));
-        addInterpRecord(new InterpRecordLambda<>(
+        ).setRate(0.2f));
+        addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("facing"),
                 new SourceExecute<Float>() {
                     @Override
@@ -152,13 +151,8 @@ public class ProjectileData extends EntityData {
                         }
                     }
                 }
-        ).setInterpExecute(new InterpExecute<Float>() {
-            @Override
-            public Float interpExecute(float progressive, Float v1, Float v2) {
-                return v1 + (progressive * MathUtils.getShortestRotation(v1, v2));
-            }
-        }));
-        addInterpRecord(new InterpRecordLambda<>(
+        ).setRate(0.2f));
+        addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
                     @Override

@@ -31,14 +31,14 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID) {
+    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
         Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
 
         if (typeID == ShipData.TYPE_ID) {
             for (int i = 0; i < table.length; i++) {
                 ShipData data = table[i];
                 if (data != null) {
-                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute();
+                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute(amount);
 
                     if (deltas != null && !deltas.isEmpty()) {
                         out.put((short) i, deltas);
@@ -49,7 +49,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
             for (Short id : shields.keySet()) {
                 ShieldData shieldData = shields.get(id);
 
-                Map<Byte, DataRecord<?>> deltas = shieldData.sourceExecute();
+                Map<Byte, DataRecord<?>> deltas = shieldData.sourceExecute(amount);
 
                 if (deltas != null && !deltas.isEmpty()) {
                     out.put(id, deltas);
@@ -121,7 +121,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         for (short id : registered.values()) {
             ShipData shipData = table[id];
 
-            shipData.sourceExecute();
+            shipData.sourceExecute(0f);
 
             Map<Byte, DataRecord<?>> records = new HashMap<>();
             List<RecordLambda<?>> recordLambdas = shipData.getRecords();

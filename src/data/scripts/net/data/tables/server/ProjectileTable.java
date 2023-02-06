@@ -77,14 +77,14 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID) {
+    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
         Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
 
         if (typeID == ProjectileData.TYPE_ID) {
             for (int i = 0; i < table.length; i++) {
                 ProjectileData data = table[i];
                 if (data != null) {
-                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute();
+                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute(amount);
 
                     if (deltas != null && !deltas.isEmpty()) {
                         out.put((short) i, deltas);
@@ -112,7 +112,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         for (short id : registered.values()) {
             ProjectileData projectileData = table[id];
 
-            projectileData.sourceExecute();
+            projectileData.sourceExecute(0f);
 
             Map<Byte, DataRecord<?>> records = new HashMap<>();
             List<RecordLambda<?>> recordLambdas = projectileData.getRecords();
