@@ -20,6 +20,7 @@ public class MPClientPlugin extends MPPlugin {
     //inbound
     private final ClientConnectionWrapper connection;
     private final ClientShipTable shipTable;
+    private final ClientProjectileTable projectileTable;
     private final VariantDataMap variantDataMap;
     private LobbyInput lobbyInput;
     private final PlayerShip playerShip;
@@ -42,6 +43,9 @@ public class MPClientPlugin extends MPPlugin {
         // inbound init
         shipTable = new ClientShipTable();
         initEntityManager(shipTable);
+
+        projectileTable = new ClientProjectileTable();
+        initEntityManager(projectileTable);
 
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
