@@ -54,7 +54,8 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     private void createEntry(DamagingProjectileAPI projectile) {
         short id = (short) getVacant();
         registered.put(projectile, id);
-        table[id] = new ProjectileData(id, projectile, specIDs.get(projectile.getProjectileSpecId()), shipTable);
+        short s = specIDs.get(projectile.getProjectileSpecId());
+        table[id] = new ProjectileData(id, projectile, s, shipTable);
     }
 
     private void deleteEntry(DamagingProjectileAPI projectile) {
