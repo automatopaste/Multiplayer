@@ -181,9 +181,9 @@ public class ProjectileData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.setHitpoints(ship.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
+                        ProjectileData projectileData = (ProjectileData) packable;
+                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        if (projectile != null) projectile.setHitpoints(projectile.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
                     }
                 }
         ));
