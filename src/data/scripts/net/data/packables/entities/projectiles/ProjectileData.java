@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.loading.ProjectileSpecAPI;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.pregen.ProjectileSpecDatastore;
@@ -15,6 +16,8 @@ import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
+
+import java.util.Map;
 
 public class ProjectileData extends EntityData {
 
@@ -215,7 +218,8 @@ public class ProjectileData extends EntityData {
         }
 
         ProjectileSpecDatastore projectileSpecDatastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
-        String projSpecID = projectileSpecDatastore.getProjectiles().get(specID).getId();
+        Map<Short, ProjectileSpecAPI> m = projectileSpecDatastore.getProjectiles();
+        String projSpecID = m.get(specID).getId();
 
         projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(ship, weapon, weapon.getId(), projSpecID, location, facing, ship.getVelocity());
     }
