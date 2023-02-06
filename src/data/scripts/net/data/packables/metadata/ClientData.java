@@ -5,7 +5,7 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.pregen.ProjectileDatastore;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -28,8 +28,8 @@ public class ClientData extends EntityData {
         super(instanceID);
 
         try {
-            ProjectileDatastore datastore = (ProjectileDatastore) plugin.getDatastore(ProjectileDatastore.class);
-            numSpecs = (short) datastore.getGeneratedWeaponIDs().size();
+            ProjectileSpecDatastore datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
+            numSpecs = (short) datastore.getWeapons().size();
         } catch (NullPointerException ignored) {}
 
         addRecord(new RecordLambda<>(

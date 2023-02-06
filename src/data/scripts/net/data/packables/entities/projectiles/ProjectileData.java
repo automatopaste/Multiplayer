@@ -6,7 +6,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.pregen.ProjectileDatastore;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -15,8 +15,6 @@ import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-
-import java.util.Map;
 
 public class ProjectileData extends EntityData {
 
@@ -31,7 +29,7 @@ public class ProjectileData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public ProjectileData(short instanceID, final DamagingProjectileAPI projectile, final Map<String, Short> specIDs, final ShipTable shipTable) {
+    public ProjectileData(short instanceID, final DamagingProjectileAPI projectile, final short specID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -39,7 +37,7 @@ public class ProjectileData extends EntityData {
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
-                        return specIDs.get(projectile.getProjectileSpecId());
+                        return specID;
                     }
                 },
                 new DestExecute<Short>() {
@@ -54,10 +52,13 @@ public class ProjectileData extends EntityData {
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
-                        if (projectile.getWeapon() != null && projectile.getWeapon().getShip() != null) {
-                            return shipTable.getRegistered().get(projectile.getWeapon().getShip());
+                        try {
+                            Short s = shipTable.getRegistered().get(projectile.getWeapon().getShip());
+                            if (s == null) return -1;
+                            else return s;
+                        } catch (NullPointerException ignored) {
+                            return -1;
                         }
-                        return -1;
                     }
                 },
                 new DestExecute<Short>() {
@@ -72,12 +73,15 @@ public class ProjectileData extends EntityData {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
-                        if (projectile.getWeapon() != null && projectile.getWeapon().getShip() != null) {
+                        try {
                             short id = shipTable.getRegistered().get(projectile.getWeapon().getShip());
                             ShipData data = shipTable.getTable()[id];
-                            return data.getWeaponSlotIDs().get(projectile.getWeapon());
+                            Byte b = data.getWeaponSlotIDs().get(projectile.getWeapon());
+                            if (b == null) return -1;
+                            else return b;
+                        } catch (NullPointerException ignored) {
+                            return -1;
                         }
-                        return -1;
                     }
                 },
                 new DestExecute<Byte>() {
@@ -210,8 +214,8 @@ public class ProjectileData extends EntityData {
             }
         }
 
-        ProjectileDatastore projectileDatastore = (ProjectileDatastore) plugin.getDatastore(ProjectileDatastore.class);
-        String projSpecID = projectileDatastore.getGeneratedProjectileSpecs().get(specID).getId();
+        ProjectileSpecDatastore projectileSpecDatastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
+        String projSpecID = projectileSpecDatastore.getProjectiles().get(specID).getId();
 
         projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(ship, weapon, weapon.getId(), projSpecID, location, facing, ship.getVelocity());
     }

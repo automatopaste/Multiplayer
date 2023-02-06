@@ -6,7 +6,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.pregen.ProjectileDatastore;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.tables.client.*;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
@@ -27,15 +27,15 @@ public class MPClientPlugin extends MPPlugin {
     //outbound
     private Player player;
 
-    private final ProjectileDatastore projectileDatastore;
+    private final ProjectileSpecDatastore projectileSpecDatastore;
 
     public MPClientPlugin(String host, int port) {
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             Global.getCombatEngine().removeEntity(ship);
         }
 
-        projectileDatastore = new ProjectileDatastore();
-        projectileDatastore.generate(this);
+        projectileSpecDatastore = new ProjectileSpecDatastore();
+        projectileSpecDatastore.generate(this);
 
         connection = new ClientConnectionWrapper(host, port, this);
 

@@ -8,7 +8,7 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.pregen.ProjectileDatastore;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.pregen.VariantDataGenerator;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.records.Float32Record;
@@ -39,14 +39,14 @@ public class MPServerPlugin extends MPPlugin {
     private final ProjectileTable projectileTable;
 
     private final VariantDataGenerator variantDatastore;
-    private final ProjectileDatastore projectileDatastore;
+    private final ProjectileSpecDatastore projectileSpecDatastore;
 
     public MPServerPlugin(int port) {
         variantDatastore = new VariantDataGenerator();
         variantDatastore.generate(this);
 
-        projectileDatastore = new ProjectileDatastore();
-        projectileDatastore.generate(this);
+        projectileSpecDatastore = new ProjectileSpecDatastore();
+        projectileSpecDatastore.generate(this);
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
@@ -61,7 +61,7 @@ public class MPServerPlugin extends MPPlugin {
         shipTable = new ShipTable();
         initEntityManager(shipTable);
 
-        projectileTable = new ProjectileTable(projectileDatastore.getGeneratedWeaponIDs(), shipTable);
+        projectileTable = new ProjectileTable(projectileSpecDatastore.getGeneratedIDs(), shipTable);
         initEntityManager(projectileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");

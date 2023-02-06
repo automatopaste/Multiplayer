@@ -33,6 +33,8 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         Set<DamagingProjectileAPI> diff = new HashSet<>(registered.keySet());
 
         for (DamagingProjectileAPI projectile : engine.getProjectiles()) {
+            if (projectile.isFromMissile()) continue;
+
             if (registered.containsKey(projectile)) {
                 diff.remove(projectile);
             } else {
@@ -52,7 +54,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     private void createEntry(DamagingProjectileAPI projectile) {
         short id = (short) getVacant();
         registered.put(projectile, id);
-        table[id] = new ProjectileData(id, projectile, specIDs, shipTable);
+        table[id] = new ProjectileData(id, projectile, specIDs.get(projectile.getProjectileSpecId()), shipTable);
     }
 
     private void deleteEntry(DamagingProjectileAPI projectile) {
