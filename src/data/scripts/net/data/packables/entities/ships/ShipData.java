@@ -563,7 +563,7 @@ public class ShipData extends EntityData {
                             if (group.isAutofiring()) g |= 0b10000000;
                             if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
 
-                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), 1f);
+                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), group.getActiveWeapon().getCooldown());
 
                             out.add(g);
                             out.add(cooldown);
@@ -591,13 +591,15 @@ public class ShipData extends EntityData {
                                     ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
                                 }
 
-                                float cooldown = ConversionUtils.byteToFloat(iterator.next(), 1f);
+
 
                                 List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
                                 for (int j = 0; j < weaponGroupsCopy.size(); j++) {
                                     WeaponGroupAPI group = weaponGroupsCopy.get(j);
 
                                     if (j == i) {
+                                        float cooldown = ConversionUtils.byteToFloat(iterator.next(), group.getActiveWeapon().getCooldown());
+
                                         group.getActiveWeapon().setRemainingCooldownTo(cooldown);
 
                                         if (group.isAutofiring() != autofiring) {
