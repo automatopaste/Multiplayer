@@ -105,11 +105,12 @@ public class ProjectileData extends EntityData {
                 new DestExecute<Vector2f>() {
                     @Override
                     public void execute(Vector2f value, EntityData packable) {
+                        setLocation(new Vector2f(value));
+
                         ProjectileData projectileData = (ProjectileData) packable;
                         DamagingProjectileAPI projectile = projectileData.getProjectile();
                         if (projectile != null) {
                             projectile.getLocation().set(value);
-                            setLocation(new Vector2f(value));
                         }
                     }
                 }
@@ -142,11 +143,12 @@ public class ProjectileData extends EntityData {
                 new DestExecute<Float>() {
                     @Override
                     public void execute(Float value, EntityData packable) {
+                        setFacing(value);
+
                         ProjectileData projectileData = (ProjectileData) packable;
                         DamagingProjectileAPI projectile = projectileData.getProjectile();
                         if (projectile != null) {
                             projectile.setFacing(value);
-                            setFacing(value);
                         }
                     }
                 }
