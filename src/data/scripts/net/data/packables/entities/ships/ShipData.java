@@ -566,6 +566,7 @@ public class ShipData extends EntityData {
                             byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), 1f);
 
                             out.add(g);
+                            out.add(cooldown);
                         }
 
                         return out;
