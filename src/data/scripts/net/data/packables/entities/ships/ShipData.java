@@ -7,11 +7,13 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.packables.*;
+import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.ClientShipTable;
+import data.scripts.net.data.tables.server.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
@@ -43,7 +45,7 @@ public class ShipData extends EntityData {
     private final Map<WeaponAPI, Byte> weaponSlotIDs = new HashMap<>();
     private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
-    public ShipData(short instanceID, final ShipAPI ship) {
+    public ShipData(short instanceID, final ShipAPI ship, final PlayerShips playerShips) {
         super(instanceID);
         this.ship = ship;
 
@@ -100,11 +102,12 @@ public class ShipData extends EntityData {
                 new DestExecute<Vector2f>() {
                     @Override
                     public void execute(Vector2f value, EntityData packable) {
+                        setLocation(new Vector2f(value));
+
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             ship.getLocation().set(value);
-                            setLocation(new Vector2f(value));
                         }
                     }
                 }
@@ -137,11 +140,12 @@ public class ShipData extends EntityData {
                 new DestExecute<Float>() {
                     @Override
                     public void execute(Float value, EntityData packable) {
+                        setFacing(value);
+
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             ship.setFacing(value);
-                            setFacing(value);
                         }
                     }
                 }
@@ -266,7 +270,18 @@ public class ShipData extends EntityData {
                     public void execute(Vector2f value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
-                        if (ship != null) ship.getMouseTarget().set(value);
+                        if (ship != null) {
+                            if (playerShips != null) {
+                                for (PlayerShipData d : playerShips.getPlayerShips().values()) {
+                                    if (d.getPlayerShip().equals(ship)) {
+                                        ship.getMouseTarget().set(d.getMouseTarget());
+                                        return;
+                                    }
+                                }
+                            }
+
+                            ship.getMouseTarget().set(value);
+                        }
                     }
                 }
         ));

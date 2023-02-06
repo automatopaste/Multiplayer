@@ -42,14 +42,16 @@ public class MPServerPlugin extends MPPlugin {
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
+        // inbound init
+        playerShips = new PlayerShips();
+        initEntityManager(playerShips);
+
         playerLobby = new PlayerLobby(this);
         initEntityManager(playerLobby);
 
+        //outbound init
         shipTable = new ShipTable();
         initEntityManager(shipTable);
-
-        playerShips = new PlayerShips();
-        initEntityManager(playerShips);
 
         projectileTable = new ProjectileTable(projectileSpecDatastore.getGeneratedIDs(), shipTable);
         initEntityManager(projectileTable);

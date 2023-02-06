@@ -38,6 +38,7 @@ public class PlayerShipData extends EntityData {
     private String playerShipID;
 
     private ShipAPI playerShip;
+    private Vector2f mouseTarget = new Vector2f(0f, 0f);
 
     /**
      * Source constructor
@@ -97,6 +98,8 @@ public class PlayerShipData extends EntityData {
                 new DestExecute<Vector2f>() {
                     @Override
                     public void execute(Vector2f value, EntityData packable) {
+                        setMouseTarget(value);
+
                         ShipAPI ship = getPlayerShip();
                         if (ship != null) ship.getMouseTarget().set(value);
                     }
@@ -245,5 +248,13 @@ public class PlayerShipData extends EntityData {
         if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 4);
         if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 5);
         if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 6);
+    }
+
+    public void setMouseTarget(Vector2f mouseTarget) {
+        this.mouseTarget = mouseTarget;
+    }
+
+    public Vector2f getMouseTarget() {
+        return mouseTarget;
     }
 }
