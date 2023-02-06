@@ -16,6 +16,7 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class DatagramClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -45,7 +46,7 @@ public class DatagramClient implements Runnable {
 
         clock = new Clock(TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Outbound Packet Size", ServerConnectionManager.TICK_RATE * 2, 60f);
+        dataGraph = new DebugGraphContainer("Outbound Packet Size", ServerConnectionManager.TICK_RATE, 60f);
 //        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
 //        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
@@ -76,14 +77,16 @@ public class DatagramClient implements Runnable {
 
                 clock.sleepUntilTick();
 
-                MessageContainer message = connection.getDatagram();
+                List<MessageContainer> messages = connection.getDatagrams();
 
-                if (message == null || message.isEmpty()) continue;
+                if (messages == null || messages.isEmpty()) continue;
 
-                DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, remoteAddress, message.getConnectionID());
-                if (sizeData != null) {
-                    size += sizeData.size;
-                    sizeCompressed += sizeData.sizeCompressed;
+                for (MessageContainer message : messages) {
+                    DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, remoteAddress, message.getConnectionID());
+                    if (sizeData != null) {
+                        size += sizeData.size;
+                        sizeCompressed += sizeData.sizeCompressed;
+                    }
                 }
 
                 dataGraph.increment(size);

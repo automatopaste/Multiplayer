@@ -1,5 +1,6 @@
 package data.scripts.net.io;
 
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
@@ -8,12 +9,16 @@ import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.UnpooledByteBufAllocator;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public abstract class BaseConnectionWrapper {
     public static final short DEFAULT_CONNECTION_ID = -10;
+
+    public static final int MAX_PACKET_SIZE = Math.min(2048, Global.getSettings().getInt("MP_PacketSize"));
 
     public enum ConnectionState {
         INITIALISATION_READY,
@@ -35,14 +40,8 @@ public abstract class BaseConnectionWrapper {
 
     protected MPPlugin localPlugin;
 
-    protected final ByteBuf socketBuffer;
-    protected final ByteBuf datagramBuffer;
-
     public BaseConnectionWrapper(MPPlugin localPlugin) {
         this.localPlugin = localPlugin;
-
-        socketBuffer = PooledByteBufAllocator.DEFAULT.buffer();
-        datagramBuffer = PooledByteBufAllocator.DEFAULT.buffer();
     }
 
     public void setConnectionState(ConnectionState connectionState) {
@@ -61,9 +60,9 @@ public abstract class BaseConnectionWrapper {
         return connectionState;
     }
 
-    public abstract MessageContainer getSocketMessage() throws IOException;
+    public abstract List<MessageContainer> getSocketMessages() throws IOException;
 
-    public abstract MessageContainer getDatagram() throws IOException;
+    public abstract List<MessageContainer> getDatagrams() throws IOException;
 
     public static BaseConnectionWrapper.ConnectionState ordinalToConnectionState(int state) {
         switch (state) {
@@ -97,61 +96,114 @@ public abstract class BaseConnectionWrapper {
         return buf;
     }
 
-    public static void writeBuffer(OutboundData data, ByteBuf dest) {
-        // write num types
-        dest.writeByte(data.out.size());
+    public static List<MessageContainer> writeBuffer(OutboundData data, int tick, InetSocketAddress address, int connectionID) throws IOException {
+        List<MessageContainer> out = new ArrayList<>();
+
+        int numTypes = 0;
+        int numDeletedTypes = 0;
+
+        ByteBuf entities = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+        ByteBuf deleted = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+
+        ByteBuf temp = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
 
         for (byte type : data.out.keySet()) {
+            numTypes++;
+
             // write type byte
-            dest.writeByte(type);
+            temp.writeByte(type);
 
             Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
 
             // write num instances short
-            dest.writeShort(instances.size());
+            temp.writeShort(instances.size());
 
             for (short instance : instances.keySet()) {
                 // write instance short
-                dest.writeShort(instance);
+                temp.writeShort(instance);
 
                 Map<Byte, DataRecord<?>> records = instances.get(instance);
 
                 // write num records byte
-                dest.writeByte(records.size());
+                temp.writeByte(records.size());
 
                 for (byte id : records.keySet()) {
                     DataRecord<?> record = records.get(id);
 
                     // write record id byte
-                    dest.writeByte(id);
+                    temp.writeByte(id);
 
                     //write record type byte
                     byte typeID = record.getTypeId();
-                    dest.writeByte(typeID);
+                    temp.writeByte(typeID);
 
                     // write record data bytes
-                    record.write(dest);
+                    record.write(temp);
                 }
             }
+
+            // check if buffer will breach cap
+            if (entities.writerIndex() + temp.writerIndex() > entities.capacity()) {
+                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+                entities.clear();
+                numTypes = 0;
+            }
+
+            entities.writeBytes(temp);
+            temp.clear();
         }
 
-        // write num deleted types
-        dest.writeByte(data.deleted.size());
-
         for (byte type : data.deleted.keySet()) {
+            numDeletedTypes++;
+
             // write type byte
-            dest.writeByte(type);
+            temp.writeByte(type);
 
             Set<Short> instances = data.deleted.get(type);
 
             // write num instances short
-            dest.writeShort(instances.size());
+            temp.writeShort(instances.size());
 
             for (short instance : instances) {
                 // write deleted instance ids
-                dest.writeShort(instance);
+                temp.writeShort(instance);
             }
+
+            // check if buffer will breach cap
+            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
+                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+                entities.clear();
+                deleted.clear();
+                numTypes = 0;
+                numDeletedTypes = 0;
+            }
+
+            deleted.writeBytes(temp);
+            temp.clear();
         }
+
+        if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
+            out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+            entities.clear();
+            deleted.clear();
+        }
+
+        entities.release();
+        deleted.release();
+        temp.release();
+
+        return out;
+    }
+
+    private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, int connectionID) throws IOException {
+        ByteBuf dest = initBuffer(tick, connectionID);
+
+        dest.writeByte(numTypes);
+        dest.writeBytes(entities);
+        dest.writeByte(numDeletedTypes);
+        dest.writeBytes(deleted);
+
+        return new MessageContainer(dest, tick, address, connectionID);
     }
 
     public static InboundData readBuffer(ByteBuf data) throws IOException {

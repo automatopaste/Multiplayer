@@ -82,8 +82,8 @@ public class ServerConnectionManager implements Runnable {
         List<MessageContainer> output = new ArrayList<>();
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
-            MessageContainer message = connection.getSocketMessage();
-            if (message != null) output.add(message);
+            List<MessageContainer> messages = connection.getSocketMessages();
+            if (messages != null) output.addAll(messages);
         }
 
         return output;
@@ -93,8 +93,8 @@ public class ServerConnectionManager implements Runnable {
         List<MessageContainer> output = new ArrayList<>();
 
         for (ServerConnectionWrapper connection : serverConnectionWrappers.values()) {
-            MessageContainer message = connection.getDatagram();
-            if (message != null) output.add(message);
+            List<MessageContainer> messages = connection.getDatagrams();
+            if (messages != null) output.addAll(messages);
         }
 
         return output;

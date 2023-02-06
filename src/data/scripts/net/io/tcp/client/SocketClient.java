@@ -15,6 +15,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.lazywizard.console.Console;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class SocketClient implements Runnable {
     public static final int TICK_RATE = Global.getSettings().getInt("mpClientTickrate");
@@ -58,10 +59,12 @@ public class SocketClient implements Runnable {
             while (connection.getConnectionState() != ClientConnectionWrapper.ConnectionState.CLOSED) {
                 clock.sleepUntilTick();
 
-                MessageContainer container = connection.getSocketMessage();
-                if (container == null || container.isEmpty()) continue;
+                List<MessageContainer> containers = connection.getSocketMessages();
+                if (containers == null || containers.isEmpty()) continue;
 
-                write(container);
+                for (MessageContainer message : containers) {
+                    write(message);
+                }
             }
 
             // Wait for channel to close

@@ -8,4 +8,6 @@
 
 	"mpSocketQueueLimit": 32,
 	"mpDatagramQueueLimit": 64,
+
+	"MP_PacketSize": 600,
 }

@@ -9,11 +9,11 @@ import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
-import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,7 +47,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     }
 
     @Override
-    public MessageContainer getSocketMessage() throws IOException {
+    public List<MessageContainer> getSocketMessages() throws IOException {
         if (connectionData == null) {
             InetSocketAddress address = socketClient.getLocal();
             if (address == null) return null;
@@ -110,14 +110,11 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         instance.put(connectionID, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 
-        ByteBuf data = initBuffer(tick, connectionID);
-        writeBuffer(outbound, data);
-
-        return new MessageContainer(data, tick, true, null, socketBuffer, connectionID);
+        return writeBuffer(outbound, tick, null, connectionID);
     }
 
     @Override
-    public MessageContainer getDatagram() throws IOException {
+    public List<MessageContainer> getDatagrams() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
         OutboundData outbound = dataDuplex.getOutboundDatagram();
@@ -136,10 +133,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        ByteBuf data = initBuffer(tick, connectionID);
-        writeBuffer(outbound, data);
-
-        return new MessageContainer(data, tick, false, null, datagramBuffer, connectionID);
+        return writeBuffer(outbound, tick, null, connectionID);
     }
 
     public void updateInbound(InboundData entities, int tick) {

@@ -9,11 +9,11 @@ import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
-import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
@@ -31,7 +31,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     @Override
-    public MessageContainer getSocketMessage() throws IOException {
+    public List<MessageContainer> getSocketMessages() throws IOException {
         if (connectionData == null) return null;
 
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
@@ -85,16 +85,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         instance.put(connectionID, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 
-        ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
-        writeBuffer(outbound, data);
-
-        return new MessageContainer(
-                data, connectionManager.getTick(), true, remoteAddress, socketBuffer, connectionID
-        );
+        return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
     }
 
     @Override
-    public MessageContainer getDatagram() throws IOException {
+    public List<MessageContainer> getDatagrams() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
         OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram();
@@ -113,12 +108,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        ByteBuf data = initBuffer(connectionManager.getTick(), connectionID);
-        writeBuffer(outbound, data);
-
-        return new MessageContainer(
-                data, connectionManager.getTick(), false, remoteAddress, datagramBuffer, connectionID
-        );
+        return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
     }
 
     @Override
