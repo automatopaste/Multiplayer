@@ -222,7 +222,8 @@ public class ProjectileData extends EntityData {
         String projSpecID = m.get(specID).getId();
 
         try {
-            projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(ship, weapon, weapon.getId(), projSpecID, location, facing, ship.getVelocity());
+            String w = weapon == null ? null : weapon.getId();
+            projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(ship, weapon, w, projSpecID, location, facing, ship.getVelocity());
         } catch (NullPointerException n) {
             n.printStackTrace();
         }
