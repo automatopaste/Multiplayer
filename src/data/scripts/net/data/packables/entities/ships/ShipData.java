@@ -331,7 +331,7 @@ public class ShipData extends EntityData {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             for (byte b : value) {
-                                int id = b & 0b01111111;
+                                byte id = (byte) (b & 0b01111111);
 
                                 boolean isActive = (b & 0b10000000) >>> 7 == 1;
 
