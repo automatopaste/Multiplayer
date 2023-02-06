@@ -215,7 +215,6 @@ public class ProjectileData extends EntityData {
 
         ProjectileSpecDatastore projectileSpecDatastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
         Map<Short, ProjectileSpecAPI> m = projectileSpecDatastore.getProjectiles();
-        String projSpecID = m.get(specID).getId();
 
         try {
             String w = weapon == null ? null : weapon.getId();
@@ -230,10 +229,6 @@ public class ProjectileData extends EntityData {
     @Override
     public void delete() {
 
-    }
-
-    public short getSpecID() {
-        return specID;
     }
 
     public void setSpecID(short specID) {

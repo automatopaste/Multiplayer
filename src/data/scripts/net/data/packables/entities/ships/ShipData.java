@@ -563,6 +563,8 @@ public class ShipData extends EntityData {
                             if (group.isAutofiring()) g |= 0b10000000;
                             if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
 
+                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), 1f);
+
                             out.add(g);
                         }
 
@@ -575,7 +577,8 @@ public class ShipData extends EntityData {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
-                            for (Byte aByte : value) {
+                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
+                                byte aByte = iterator.next();
                                 int g = aByte & 0xFF;
 
                                 int i = g & 0b00111111;
@@ -587,11 +590,18 @@ public class ShipData extends EntityData {
                                     ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
                                 }
 
+                                float cooldown = ConversionUtils.byteToFloat(iterator.next(), 1f);
+
                                 List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
                                 for (int j = 0; j < weaponGroupsCopy.size(); j++) {
                                     WeaponGroupAPI group = weaponGroupsCopy.get(j);
-                                    if (j == i && (group.isAutofiring() != autofiring)) {
-                                        ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
+
+                                    if (j == i) {
+                                        group.getActiveWeapon().setRemainingCooldownTo(cooldown);
+
+                                        if (group.isAutofiring() != autofiring) {
+                                            ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
+                                        }
                                     }
                                 }
                             }
