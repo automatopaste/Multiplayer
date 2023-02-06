@@ -153,34 +153,34 @@ public abstract class BaseConnectionWrapper {
             temp.clear();
         }
 
-        for (byte type : data.deleted.keySet()) {
-            numDeletedTypes++;
-
-            // write type byte
-            temp.writeByte(type);
-
-            Set<Short> instances = data.deleted.get(type);
-
-            // write num instances short
-            temp.writeShort(instances.size());
-
-            for (short instance : instances) {
-                // write deleted instance ids
-                temp.writeShort(instance);
-            }
-
-            // check if buffer will breach cap
-            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
-                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-                entities.clear();
-                deleted.clear();
-                numTypes = 0;
-                numDeletedTypes = 0;
-            }
-
-            deleted.writeBytes(temp);
-            temp.clear();
-        }
+//        for (byte type : data.deleted.keySet()) {
+//            numDeletedTypes++;
+//
+//            // write type byte
+//            temp.writeByte(type);
+//
+//            Set<Short> instances = data.deleted.get(type);
+//
+//            // write num instances short
+//            temp.writeShort(instances.size());
+//
+//            for (short instance : instances) {
+//                // write deleted instance ids
+//                temp.writeShort(instance);
+//            }
+//
+//            // check if buffer will breach cap
+//            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
+//                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+//                entities.clear();
+//                deleted.clear();
+//                numTypes = 0;
+//                numDeletedTypes = 0;
+//            }
+//
+//            deleted.writeBytes(temp);
+//            temp.clear();
+//        }
 
         if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
             out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
