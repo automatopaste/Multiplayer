@@ -3,6 +3,7 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
+import com.fs.starfarer.api.combat.MissileAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
@@ -34,7 +35,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         Set<DamagingProjectileAPI> diff = new HashSet<>(registered.keySet());
 
         for (DamagingProjectileAPI projectile : engine.getProjectiles()) {
-            if (projectile.isFromMissile()) continue;
+            if (projectile instanceof MissileAPI) continue;
 
             if (registered.containsKey(projectile)) {
                 diff.remove(projectile);
