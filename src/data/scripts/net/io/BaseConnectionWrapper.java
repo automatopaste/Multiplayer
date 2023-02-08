@@ -19,6 +19,7 @@ public abstract class BaseConnectionWrapper {
     public static final short DEFAULT_CONNECTION_ID = -10;
 
     public static final int MAX_PACKET_SIZE = Math.min(2048, Global.getSettings().getInt("MP_PacketSize"));
+    public static final int MAX_ENTITIES_PER_PACKET = 5;
 
     public enum ConnectionState {
         INITIALISATION_READY,
@@ -102,90 +103,98 @@ public abstract class BaseConnectionWrapper {
         int numTypes = 0;
         int numDeletedTypes = 0;
 
+        List<Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>>> toWrite = new ArrayList<>();
+        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> t = new HashMap<>();
+
+        for (byte type : data.out.keySet()) {
+            Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
+            Map<Short, Map<Byte, DataRecord<?>>> limitedInstances = new HashMap<>();
+
+            int n = 0;
+            int limit = DataGenManager.getEntityLimit(type);
+
+            for (short instance : instances.keySet()) {
+                n++;
+                Map<Byte, DataRecord<?>> records = instances.get(instance);
+                limitedInstances.put(instance, records);
+
+                if (n == limit) {
+                    t.put(type, limitedInstances);
+                    limitedInstances = new HashMap<>();
+                    toWrite.add(t);
+                }
+            }
+        }
+
         ByteBuf entities = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
         ByteBuf deleted = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
 
         ByteBuf temp = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
 
-        for (byte type : data.out.keySet()) {
-            // write type byte
-            temp.writeByte(type);
+        for (Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> map : toWrite) {
+            for (byte type : map.keySet()) {
+                // write type byte
+                temp.writeByte(type);
 
-            Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
+                Map<Short, Map<Byte, DataRecord<?>>> instances = map.get(type);
 
-            // write num instances short
-            temp.writeShort(instances.size());
+                int size = instances.size();
 
-            for (short instance : instances.keySet()) {
-                // write instance short
-                temp.writeShort(instance);
+                // write num instances short
+                temp.writeShort(size);
 
-                Map<Byte, DataRecord<?>> records = instances.get(instance);
-
-                // write num records byte
-                temp.writeByte(records.size());
-
-                for (byte id : records.keySet()) {
-                    DataRecord<?> record = records.get(id);
-
-                    // write record id byte
-                    temp.writeByte(id);
-
-                    //write record type byte
-                    byte typeID = record.getTypeId();
-                    temp.writeByte(typeID);
-
-                    // write record data bytes
-                    record.write(temp);
+                for (short instance : instances.keySet()) {
+                    Map<Byte, DataRecord<?>> records = instances.get(instance);
+                    writeInstance(temp, records, instance);
                 }
+
+                // check if buffer will breach cap
+                if (entities.writerIndex() + temp.writerIndex() > entities.capacity()) {
+                    out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+                    entities.clear();
+                    numTypes = 0;
+                }
+
+                entities.writeBytes(temp);
+                temp.clear();
+
+                numTypes++;
             }
 
-            // check if buffer will breach cap
-            if (entities.writerIndex() + temp.writerIndex() > entities.capacity()) {
-                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-                entities.clear();
-                numTypes = 0;
+            for (byte type : data.deleted.keySet()) {
+                // write type byte
+                temp.writeByte(type);
+
+                Set<Short> instances = data.deleted.get(type);
+
+                // write num instances short
+                temp.writeShort(instances.size());
+
+                for (short instance : instances) {
+                    // write deleted instance ids
+                    temp.writeShort(instance);
+                }
+
+                // check if buffer will breach cap
+                if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
+                    out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
+                    entities.clear();
+                    deleted.clear();
+                    numTypes = 0;
+                    numDeletedTypes = 0;
+                }
+
+                deleted.writeBytes(temp);
+                temp.clear();
+
+                numDeletedTypes++;
             }
 
-            entities.writeBytes(temp);
-            temp.clear();
-
-            numTypes++;
-        }
-
-        for (byte type : data.deleted.keySet()) {
-            // write type byte
-            temp.writeByte(type);
-
-            Set<Short> instances = data.deleted.get(type);
-
-            // write num instances short
-            temp.writeShort(instances.size());
-
-            for (short instance : instances) {
-                // write deleted instance ids
-                temp.writeShort(instance);
-            }
-
-            // check if buffer will breach cap
-            if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
+            if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
                 out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
                 entities.clear();
                 deleted.clear();
-                numTypes = 0;
-                numDeletedTypes = 0;
             }
-
-            deleted.writeBytes(temp);
-            temp.clear();
-
-            numDeletedTypes++;
-        }
-
-        if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
-            out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-            entities.clear();
-            deleted.clear();
         }
 
         entities.release();
@@ -193,6 +202,28 @@ public abstract class BaseConnectionWrapper {
         temp.release();
 
         return out;
+    }
+
+    private static void writeInstance(ByteBuf dest, Map<Byte, DataRecord<?>> records, short instanceID) {
+        // write instance short
+        dest.writeShort(instanceID);
+
+        // write num records byte
+        dest.writeByte(records.size());
+
+        for (byte id : records.keySet()) {
+            DataRecord<?> record = records.get(id);
+
+            // write record id byte
+            dest.writeByte(id);
+
+            //write record type byte
+            byte typeID = record.getTypeId();
+            dest.writeByte(typeID);
+
+            // write record data bytes
+            record.write(dest);
+        }
     }
 
     private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, int connectionID) throws IOException {

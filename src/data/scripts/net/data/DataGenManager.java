@@ -15,6 +15,7 @@ import java.util.Set;
  */
 public class DataGenManager {
     public static Map<Class<? extends EntityData>, Byte> entityTypeIDs = new HashMap<>();
+    public static Map<Byte, Integer> maxEntitiesPerPacket = new HashMap<>();
 
     public static Map<String, Byte> recordTypeIDs = new HashMap<>();
     public static Map<Byte, DataRecord<?>> recordInstances = new HashMap<>();
@@ -24,10 +25,13 @@ public class DataGenManager {
 
     private static byte idIncrementer = 1;
 
-    public static byte registerEntityType(Class<? extends EntityData> clazz) {
+    public static byte registerEntityType(Class<? extends EntityData> clazz, int maxEntities) {
         byte id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         idIncrementer++;
+
+        maxEntitiesPerPacket.put(id, maxEntities);
+
         return id;
     }
 
@@ -144,5 +148,9 @@ public class DataGenManager {
             throw new NullPointerException("No record type found at ID: " + typeID);
         }
         return out;
+    }
+
+    public static int getEntityLimit(byte typeID) {
+        return maxEntitiesPerPacket.get(typeID);
     }
 }

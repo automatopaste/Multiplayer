@@ -35,14 +35,14 @@ public class MPModPlugin extends BaseModPlugin {
 
     @Override
     public void onApplicationLoad() {
-        ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
-        ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
-        VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
-        ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
-        PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
-        ConnectionData.TYPE_ID = DataGenManager.registerEntityType(ConnectionData.class);
-        LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
-        ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
+        ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class, 5);
+        ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class, 10);
+        VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class, 9999);
+        ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class, 9999);
+        PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class, 9999);
+        ConnectionData.TYPE_ID = DataGenManager.registerEntityType(ConnectionData.class, 9999);
+        LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class, 9999);
+        ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class, 50);
 
         Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault()));
         IntRecord.setTypeId(DataGenManager.registerRecordType(IntRecord.class.getSimpleName(), IntRecord.getDefault()));
