@@ -112,22 +112,21 @@ public abstract class BaseConnectionWrapper {
 
             int n = 0;
             int limit = DataGenManager.getEntityLimit(type);
-            int remaining = instances.size();
 
             for (short instance : instances.keySet()) {
                 n++;
-                Map<Byte, DataRecord<?>> records = instances.get(instance);
-                limitedInstances.put(instance, records);
+                limitedInstances.put(instance, instances.get(instance));
 
                 if (n == limit) {
                     t.put(type, limitedInstances);
                     limitedInstances = new HashMap<>();
                     toWrite.add(t);
-                    remaining -= limit;
+                    t = new HashMap<>();
+                    n = 0;
                 }
             }
 
-            if (remaining > 0) {
+            if (n > 0) {
                 t.put(type, limitedInstances);
                 toWrite.add(t);
             }
