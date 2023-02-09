@@ -33,8 +33,9 @@ public class DatagramServer implements Runnable {
     private boolean running;
 
     private final DebugGraphContainer dataGraph;
-    private final DebugGraphContainer dataGraphCompressed;
-    private final DebugGraphContainer dataGraphRatio;
+    private final DebugGraphContainer dataGraph2;
+//    private final DebugGraphContainer dataGraphCompressed;
+//    private final DebugGraphContainer dataGraphRatio;
 
     public DatagramServer(int port, ServerConnectionManager connectionManager) {
         this.port = port;
@@ -44,9 +45,10 @@ public class DatagramServer implements Runnable {
 
         clock = new Clock(ServerConnectionManager.TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE, 50f);
-        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
-        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
+        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE, 40f);
+        dataGraph2 = new DebugGraphContainer("Packet Count", ServerConnectionManager.TICK_RATE, 40f);
+//        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
+//        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
         running = false;
     }
@@ -66,12 +68,15 @@ public class DatagramServer implements Runnable {
             int sizeCompressed = 0;
 
             while (connectionManager.isActive()) {
+                int num = 0;
                 while (!messageQueue.isEmpty()) {
                     MessageContainer message = messageQueue.poll();
 
                     if (message == null || message.isEmpty()) continue;
 
                     DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, message.getDest(), message.getConnectionID());
+                    num++;
+
                     if (sizeData != null) {
                         size += sizeData.size;
                         sizeCompressed += sizeData.sizeCompressed;
@@ -79,12 +84,13 @@ public class DatagramServer implements Runnable {
                 }
 
                 if (clock.mark()) {
+                    dataGraph2.increment(num);
                     dataGraph.increment(size);
                     CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
-                    dataGraphCompressed.increment(sizeCompressed);
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
-                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
-                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
+//                    dataGraphCompressed.increment(sizeCompressed);
+//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
+//                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));
+//                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphRatio", dataGraphRatio);
 
                     size = 0;
                     sizeCompressed = 0;
@@ -129,8 +135,9 @@ public class DatagramServer implements Runnable {
         running = false;
 
         dataGraph.expire();
-        dataGraphCompressed.expire();
-        dataGraphRatio.expire();
+        dataGraph2.expire();
+//        dataGraphCompressed.expire();
+//        dataGraphRatio.expire();
 
         System.err.println("CLOSED DATAGRAM THREAD SYNC GRACEFULLY");
     }
