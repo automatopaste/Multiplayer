@@ -104,33 +104,26 @@ public abstract class BaseConnectionWrapper {
         int numDeletedTypes = 0;
 
         List<Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>>> toWrite = new ArrayList<>();
-        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> t = new HashMap<>();
 
         for (byte type : data.out.keySet()) {
             Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
-            Map<Short, Map<Byte, DataRecord<?>>> limitedInstances = new HashMap<>();
 
             int n = 0;
             int limit = DataGenManager.getEntityLimit(type);
 
             for (short instance : instances.keySet()) {
-                n++;
-                limitedInstances.put(instance, instances.get(instance));
+                int index = n / limit;
 
-                if (n == limit) {
-                    limitedInstances = new HashMap<>();
-                    n = 0;
+                if (toWrite.size() - 1 < index) toWrite.add(new HashMap<Byte, Map<Short, Map<Byte, DataRecord<?>>>>());
+                Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> t = toWrite.get(index);
 
-                    t.put(type, limitedInstances);
-                    toWrite.add(t);
-                    t = new HashMap<>();
+                Map<Short, Map<Byte, DataRecord<?>>> i = t.get(type);
+                if (i == null) {
+                    i = new HashMap<>();
+                    t.put(type, i);
                 }
-            }
-
-            if (n > 0) {
-                t.put(type, limitedInstances);
-                toWrite.add(t);
-                t = new HashMap<>();
+                i.put(instance, instances.get(instance));
+                n++;
             }
         }
 
