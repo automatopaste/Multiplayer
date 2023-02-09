@@ -32,6 +32,7 @@ public class Unpacked {
         try {
             m = BaseConnectionWrapper.readBuffer(data);
         } catch (IOException | DecoderException i) {
+            System.err.println("Decode failed for buffer with size " + size + " from " + connectionID);
             i.printStackTrace();
             m = new InboundData(new HashMap<Byte, Map<Short, Map<Byte, Object>>>(), new HashMap<Byte, Set<Short>>());
         }
