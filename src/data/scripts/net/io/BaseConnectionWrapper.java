@@ -118,17 +118,19 @@ public abstract class BaseConnectionWrapper {
                 limitedInstances.put(instance, instances.get(instance));
 
                 if (n == limit) {
-                    t.put(type, limitedInstances);
                     limitedInstances = new HashMap<>();
+                    n = 0;
+
+                    t.put(type, limitedInstances);
                     toWrite.add(t);
                     t = new HashMap<>();
-                    n = 0;
                 }
             }
 
             if (n > 0) {
                 t.put(type, limitedInstances);
                 toWrite.add(t);
+                t = new HashMap<>();
             }
         }
 
