@@ -3,6 +3,7 @@ package data.scripts.net.io;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.DataRecord;
@@ -100,120 +101,79 @@ public abstract class BaseConnectionWrapper {
     public static List<MessageContainer> writeBuffer(OutboundData data, int tick, InetSocketAddress address, int connectionID) throws IOException {
         List<MessageContainer> out = new ArrayList<>();
 
-        int numTypes = 0;
-        int numDeletedTypes = 0;
+        List<Map<Byte, Map<Short, InstanceData>>> toWrite = new ArrayList<>();
+        Map<Byte, Map<Short, InstanceData>> activeDest = new HashMap<>();
+        toWrite.add(activeDest);
 
-        List<Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>>> toWrite = new ArrayList<>();
-
+        int size = 0;
         for (byte type : data.out.keySet()) {
-            Map<Short, Map<Byte, DataRecord<?>>> instances = data.out.get(type);
+            Map<Short, InstanceData> instances = data.out.get(type);
 
-            int n = 0;
-            int limit = DataGenManager.getEntityLimit(type);
+            Map<Short, InstanceData> activeInstanceDest = activeDest.get(type);
+            if (activeInstanceDest == null) {
+                activeInstanceDest = new HashMap<>();
+                activeDest.put(type, activeInstanceDest);
+            }
 
             for (short instance : instances.keySet()) {
-                int index = n / limit;
+                InstanceData instanceData = instances.get(instance);
 
-                if (toWrite.size() - 1 < index) toWrite.add(new HashMap<Byte, Map<Short, Map<Byte, DataRecord<?>>>>());
-                Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> t = toWrite.get(index);
+                if (size + instanceData.size > MAX_PACKET_SIZE) {
+                    activeDest = new HashMap<>();
+                    toWrite.add(activeDest);
 
-                Map<Short, Map<Byte, DataRecord<?>>> i = t.get(type);
-                if (i == null) {
-                    i = new HashMap<>();
-                    t.put(type, i);
+                    activeInstanceDest = new HashMap<>();
+                    activeDest.put(type, activeInstanceDest);
+
+                    size = 0;
                 }
-                i.put(instance, instances.get(instance));
-                n++;
+
+                size += instanceData.size;
+
+                activeInstanceDest.put(instance, instanceData);
             }
         }
 
-        ByteBuf entities = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
-        ByteBuf deleted = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+        for (byte type : data.deleted.keySet()) {
+            Set<Short> deleted = data.deleted.get(type);
 
-        ByteBuf temp = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
 
-        for (Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> map : toWrite) {
+        }
+
+        for (Map<Byte, Map<Short, InstanceData>> map : toWrite) {
+            ByteBuf dest = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+
             for (byte type : map.keySet()) {
                 // write type byte
-                temp.writeByte(type);
+                dest.writeByte(type);
 
-                Map<Short, Map<Byte, DataRecord<?>>> instances = map.get(type);
-
-                int size = instances.size();
+                Map<Short, InstanceData> instances = map.get(type);
 
                 // write num instances short
-                temp.writeShort(size);
+                dest.writeShort(instances.size());
 
                 for (short instance : instances.keySet()) {
-                    Map<Byte, DataRecord<?>> records = instances.get(instance);
-                    writeInstance(temp, records, instance);
+                    writeInstance(dest, instances.get(instance), instance);
                 }
-
-                // check if buffer will breach cap
-                if (entities.writerIndex() + temp.writerIndex() > entities.capacity()) {
-                    out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-                    entities.clear();
-                    numTypes = 0;
-                }
-
-                entities.writeBytes(temp);
-                temp.clear();
-
-                numTypes++;
             }
 
-            for (byte type : data.deleted.keySet()) {
-                // write type byte
-                temp.writeByte(type);
+            out.add(container(map.size(), dest, 0, null, tick, address, connectionID));
 
-                Set<Short> instances = data.deleted.get(type);
-
-                // write num instances short
-                temp.writeShort(instances.size());
-
-                for (short instance : instances) {
-                    // write deleted instance ids
-                    temp.writeShort(instance);
-                }
-
-                // check if buffer will breach cap
-                if (deleted.writerIndex() + entities.writerIndex() + temp.writerIndex() > deleted.capacity() + entities.capacity()) {
-                    out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-                    entities.clear();
-                    deleted.clear();
-                    numTypes = 0;
-                    numDeletedTypes = 0;
-                }
-
-                deleted.writeBytes(temp);
-                temp.clear();
-
-                numDeletedTypes++;
-            }
-
-            if (entities.writerIndex() > 0 || deleted.writerIndex() > 0) {
-                out.add(container(numTypes, entities, numDeletedTypes, deleted, tick, address, connectionID));
-                entities.clear();
-                deleted.clear();
-            }
+            dest.release();
         }
-
-        entities.release();
-        deleted.release();
-        temp.release();
 
         return out;
     }
 
-    private static void writeInstance(ByteBuf dest, Map<Byte, DataRecord<?>> records, short instanceID) {
+    private static void writeInstance(ByteBuf dest, InstanceData instanceData, short instanceID) {
         // write instance short
         dest.writeShort(instanceID);
 
         // write num records byte
-        dest.writeByte(records.size());
+        dest.writeByte(instanceData.records.size());
 
-        for (byte id : records.keySet()) {
-            DataRecord<?> record = records.get(id);
+        for (byte id : instanceData.records.keySet()) {
+            DataRecord<?> record = instanceData.records.get(id);
 
             // write record id byte
             dest.writeByte(id);
@@ -232,8 +192,8 @@ public abstract class BaseConnectionWrapper {
 
         dest.writeByte(numTypes);
         dest.writeBytes(entities);
-        dest.writeByte(numDeletedTypes);
-        dest.writeBytes(deleted);
+//        dest.writeByte(numDeletedTypes);
+//        dest.writeBytes(deleted);
 
         return new MessageContainer(dest, tick, address, connectionID);
     }
@@ -281,21 +241,21 @@ public abstract class BaseConnectionWrapper {
             }
         }
 
-        byte numDeletedTypes = data.readByte();
-
-        for (byte i = 0; i < numDeletedTypes; i++) {
-            byte typeID = data.readByte();
-
-            Set<Short> instances = new HashSet<>();
-            deleted.put(typeID, instances);
-
-            short numDeleted = data.readShort();
-
-            for (int j = 0; j < numDeleted; j++) {
-                short instance = data.readShort();
-                instances.add(instance);
-            }
-        }
+//        byte numDeletedTypes = data.readByte();
+//
+//        for (byte i = 0; i < numDeletedTypes; i++) {
+//            byte typeID = data.readByte();
+//
+//            Set<Short> instances = new HashSet<>();
+//            deleted.put(typeID, instances);
+//
+//            short numDeleted = data.readShort();
+//
+//            for (int j = 0; j < numDeleted; j++) {
+//                short instance = data.readShort();
+//                instances.add(instance);
+//            }
+//        }
 
         return new InboundData(inbound, deleted);
     }

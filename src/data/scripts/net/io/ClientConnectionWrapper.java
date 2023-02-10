@@ -3,9 +3,9 @@ package data.scripts.net.io;
 import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.InboundData;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPPlugin;
@@ -106,7 +106,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        Map<Short, Map<Byte, DataRecord<?>>> instance = new HashMap<>();
+        Map<Short, InstanceData> instance = new HashMap<>();
         instance.put(connectionID, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 

@@ -46,4 +46,9 @@ public class Float16Record extends DataRecord<Float> {
     public byte getTypeId() {
         return TYPE_ID;
     }
+
+    @Override
+    public int size() {
+        return 2;
+    }
 }

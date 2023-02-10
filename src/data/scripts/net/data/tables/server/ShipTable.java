@@ -3,6 +3,7 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
@@ -33,17 +34,17 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
-        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+        Map<Short, InstanceData> out = new HashMap<>();
 
         if (typeID == ShipData.TYPE_ID) {
             for (int i = 0; i < table.length; i++) {
                 ShipData data = table[i];
                 if (data != null) {
-                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute(amount);
+                    InstanceData instanceData = data.sourceExecute(amount);
 
-                    if (deltas != null && !deltas.isEmpty()) {
-                        out.put((short) i, deltas);
+                    if (instanceData.records != null && !instanceData.records.isEmpty()) {
+                        out.put((short) i, instanceData);
                     }
                 }
             }
@@ -51,10 +52,10 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
             for (Short id : shields.keySet()) {
                 ShieldData shieldData = shields.get(id);
 
-                Map<Byte, DataRecord<?>> deltas = shieldData.sourceExecute(amount);
+                InstanceData instanceData = shieldData.sourceExecute(amount);
 
-                if (deltas != null && !deltas.isEmpty()) {
-                    out.put(id, deltas);
+                if (instanceData.records != null && !instanceData.records.isEmpty()) {
+                    out.put(id, instanceData);
                 }
             }
         }
@@ -119,8 +120,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         deleted.add(index);
     }
 
-    public Map<Short, Map<Byte, DataRecord<?>>> getShipsRegistered() {
-        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+    public Map<Short, InstanceData> getShipsRegistered() {
+        Map<Short, InstanceData> out = new HashMap<>();
 
         for (short id : registered.values()) {
             ShipData shipData = table[id];
@@ -128,13 +129,15 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
             shipData.sourceExecute(0f);
 
             Map<Byte, DataRecord<?>> records = new HashMap<>();
+            int size = 0;
             List<RecordLambda<?>> recordLambdas = shipData.getRecords();
             for (byte i = 0; i < recordLambdas.size(); i++) {
                 RecordLambda<?> recordLambda = recordLambdas.get(i);
                 records.put(i, recordLambda.record);
+                size += recordLambda.record.size();
             }
 
-            out.put(id, records);
+            out.put(id, new InstanceData(size, records));
         }
 
         return out;

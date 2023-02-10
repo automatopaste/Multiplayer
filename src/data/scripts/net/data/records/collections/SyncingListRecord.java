@@ -164,4 +164,9 @@ public class SyncingListRecord<E> extends DataRecord<List<E>> {
     protected boolean checkUpdate(List<E> delta) {
         return true;
     }
+
+    @Override
+    public int size() {
+        return 2 + (value.size() * writer.size());
+    }
 }

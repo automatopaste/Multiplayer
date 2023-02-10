@@ -41,4 +41,9 @@ public class ShortRecord extends DataRecord<Short> {
     public static ShortRecord getDefault() {
         return new ShortRecord((short) 0);
     }
+
+    @Override
+    public int size() {
+        return 2;
+    }
 }

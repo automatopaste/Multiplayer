@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables;
 
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -54,20 +55,22 @@ public abstract class EntityData {
      * Returns a map of all records that are marked as updated since the last time
      * @return deltas
      */
-    public Map<Byte, DataRecord<?>> sourceExecute(float amount) {
+    public InstanceData sourceExecute(float amount) {
         Map<Byte, DataRecord<?>> deltas = new HashMap<>();
+        int size = 0;
 
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);
 
             if (recordLambda.sourceExecute(amount) || init) {
                 deltas.put(i, recordLambda.record);
+                size += recordLambda.record.size();
             }
         }
 
         init = false;
 
-        return deltas;
+        return new InstanceData(size, deltas);
     }
 
     /**

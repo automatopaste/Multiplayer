@@ -2,9 +2,7 @@ package data.scripts.net.io;
 
 import data.scripts.net.data.InboundData;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.DecoderException;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +29,9 @@ public class Unpacked {
         InboundData m;
         try {
             m = BaseConnectionWrapper.readBuffer(data);
-        } catch (IOException | DecoderException i) {
+        } catch (Exception e) {
             System.err.println("Decode failed for buffer with size " + size + " from " + connectionID);
-            i.printStackTrace();
+            e.printStackTrace();
             m = new InboundData(new HashMap<Byte, Map<Short, Map<Byte, Object>>>(), new HashMap<Byte, Set<Short>>());
         }
 

@@ -46,4 +46,9 @@ public class ByteRecord extends DataRecord<Byte> {
     public byte getTypeId() {
         return TYPE_ID;
     }
+
+    @Override
+    public int size() {
+        return 1;
+    }
 }

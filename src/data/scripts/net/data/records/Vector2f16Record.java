@@ -51,4 +51,9 @@ public class Vector2f16Record extends DataRecord<Vector2f> {
     public static Vector2f16Record getDefault() {
         return new Vector2f16Record(new Vector2f(0f, 0f));
     }
+
+    @Override
+    public int size() {
+        return 4;
+    }
 }

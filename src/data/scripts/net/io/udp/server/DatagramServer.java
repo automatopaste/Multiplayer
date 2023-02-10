@@ -87,6 +87,7 @@ public class DatagramServer implements Runnable {
                     dataGraph2.increment(num);
                     dataGraph.increment(size);
                     CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph", dataGraph);
+                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraph2", dataGraph2);
 //                    dataGraphCompressed.increment(sizeCompressed);
 //                    CMUtils.getGuiDebug().putContainer(DatagramServer.class, "dataGraphCompressed", dataGraphCompressed);
 //                    dataGraphRatio.increment(100f * ((float) sizeCompressed / size));

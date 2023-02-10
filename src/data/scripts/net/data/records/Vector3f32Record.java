@@ -62,4 +62,9 @@ public class Vector3f32Record extends DataRecord<Vector3f> {
                 "value=" + value +
                 '}';
     }
+
+    @Override
+    public int size() {
+        return 12;
+    }
 }

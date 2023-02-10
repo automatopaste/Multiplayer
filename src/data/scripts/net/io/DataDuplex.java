@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import data.scripts.net.data.InboundData;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.records.DataRecord;
 
@@ -15,9 +16,9 @@ public class DataDuplex {
      */
     private final Map<Byte, Map<Short, Map<Byte, Object>>> inbound;
     private final Map<Byte, Set<Short>> inboundDeleted;
-    private final Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outboundSocket;
+    private final Map<Byte, Map<Short, InstanceData>> outboundSocket;
     private final Map<Byte, Set<Short>> outboundSocketDeleted;
-    private final Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outboundDatagram;
+    private final Map<Byte, Map<Short, InstanceData>> outboundDatagram;
     private final Map<Byte, Set<Short>> outboundDatagramDeleted;
 
     public DataDuplex() {
@@ -54,7 +55,7 @@ public class DataDuplex {
      * @return outbound entities
      */
     public OutboundData getOutboundSocket() {
-        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outEntities;
+        Map<Byte, Map<Short, InstanceData>> outEntities;
         synchronized (outboundSocket) {
             outEntities = new HashMap<>(outboundSocket);
             outboundSocket.clear();
@@ -70,7 +71,7 @@ public class DataDuplex {
     }
 
     public OutboundData getOutboundDatagram() {
-        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> outEntities;
+        Map<Byte, Map<Short, InstanceData>> outEntities;
         synchronized (outboundDatagram) {
             outEntities = new HashMap<>(outboundDatagram);
             outboundDatagram.clear();
@@ -149,10 +150,10 @@ public class DataDuplex {
         }
     }
 
-    private void updateEntities(Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> dest, Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> delta) {
-        for (byte type : delta.keySet()) {
-            Map<Short, Map<Byte, DataRecord<?>>> outboundEntities = dest.get(type);
-            Map<Short, Map<Byte, DataRecord<?>>> deltas = delta.get(type);
+    private void updateEntities(Map<Byte, Map<Short, InstanceData>> dest, Map<Byte, Map<Short, InstanceData>> deltaMap) {
+        for (byte type : deltaMap.keySet()) {
+            Map<Short, InstanceData> outboundEntities = dest.get(type);
+            Map<Short, InstanceData> deltas = deltaMap.get(type);
 
             if (outboundEntities == null) {
                 outboundEntities = new HashMap<>();
@@ -160,24 +161,25 @@ public class DataDuplex {
             }
 
             for (short instance : deltas.keySet()) {
-                Map<Byte, DataRecord<?>> outboundEntityRecords = outboundEntities.get(instance);
-                Map<Byte, DataRecord<?>> records = deltas.get(instance);
+                InstanceData outboundInstanceData = outboundEntities.get(instance);
+                InstanceData deltaInstanceData = deltas.get(instance);
 
-                if (outboundEntityRecords == null) {
-                    outboundEntityRecords = new HashMap<>();
-                    outboundEntities.put(instance, outboundEntityRecords);
-                }
+                if (outboundInstanceData == null) {
+                    outboundInstanceData = deltaInstanceData;
+                    outboundEntities.put(instance, outboundInstanceData);
+                } else {
+                    for (byte id : deltaInstanceData.records.keySet()) {
+                        DataRecord<?> outboundRecord = outboundInstanceData.records.get(id);
+                        DataRecord<?> delta = deltaInstanceData.records.get(id);
 
-                for (byte id : records.keySet()) {
-                    DataRecord<?> outboundRecord = outboundEntityRecords.get(id);
-                    DataRecord<?> record = records.get(id);
+                        if (outboundRecord == null) {
+                            outboundRecord = delta;
+                            outboundInstanceData.records.put(id, outboundRecord);
+                            outboundInstanceData.size += delta.size();
+                        }
 
-                    if (outboundRecord == null) {
-                        outboundRecord = record;
-                        outboundEntityRecords.put(id, outboundRecord);
+                        outboundRecord.overwrite(outboundRecord.getValue());
                     }
-
-                    outboundRecord.overwrite(outboundRecord.getValue());
                 }
             }
         }

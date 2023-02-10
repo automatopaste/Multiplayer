@@ -3,8 +3,8 @@ package data.scripts.net.data.tables.client;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
-import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -54,12 +54,12 @@ public class PlayerShip implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
-        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+        Map<Short, InstanceData> out = new HashMap<>();
 
-        Map<Byte, DataRecord<?>> deltas = playerShipData.sourceExecute(amount);
-        if (deltas != null && !deltas.isEmpty()) {
-            out.put(instanceID, deltas);
+        InstanceData instanceData = playerShipData.sourceExecute(amount);
+        if (instanceData.records != null && !instanceData.records.isEmpty()) {
+            out.put(instanceID, instanceData);
         }
 
         return out;

@@ -2,6 +2,7 @@ package data.scripts.net.io;
 
 import cmu.CMUtils;
 import data.scripts.net.data.InboundData;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
@@ -51,7 +52,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case LOADING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": sending client data over socket...");
 
-                Map<Short, Map<Byte, DataRecord<?>>> variants = new HashMap<>();
+                Map<Short, InstanceData> variants = new HashMap<>();
                 for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
                     variants.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
                 }
@@ -65,10 +66,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning entities on client...");
 
-                Map<Short, Map<Byte, DataRecord<?>>> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
+                Map<Short, InstanceData> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
                 outbound.out.put(ShipData.TYPE_ID, ships);
 
-                Map<Short, Map<Byte, DataRecord<?>>> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
+                Map<Short, InstanceData> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
                 outbound.out.put(ProjectileData.TYPE_ID, projectiles);
 
                 connectionState = ConnectionState.SIMULATION_READY;
@@ -81,7 +82,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        Map<Short, Map<Byte, DataRecord<?>>> instance = new HashMap<>();
+        Map<Short, InstanceData> instance = new HashMap<>();
         instance.put(connectionID, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 

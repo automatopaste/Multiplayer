@@ -43,4 +43,9 @@ public class Float32Record extends DataRecord<Float> {
     public static DataRecord<Float> getDefault() {
         return new Float32Record(0f);
     }
+
+    @Override
+    public int size() {
+        return 4;
+    }
 }

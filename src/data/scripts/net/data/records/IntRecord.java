@@ -48,4 +48,9 @@ public class IntRecord extends DataRecord<Integer> {
                 "record=" + value +
                 '}';
     }
+
+    @Override
+    public int size() {
+        return 4;
+    }
 }

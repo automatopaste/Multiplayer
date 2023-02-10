@@ -43,6 +43,8 @@ public abstract class DataRecord<T> {
 
     public abstract byte getTypeId();
 
+    public abstract int size();
+
     /**
      * Return true if updated
      * @param delta incoming delta

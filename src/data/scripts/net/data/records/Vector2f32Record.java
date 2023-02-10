@@ -58,4 +58,9 @@ public class Vector2f32Record extends DataRecord<Vector2f> {
                 "record=" + value +
                 '}';
     }
+
+    @Override
+    public int size() {
+        return 8;
+    }
 }

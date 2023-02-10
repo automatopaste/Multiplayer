@@ -74,4 +74,9 @@ public class ListenArrayRecord<E> extends DataRecord<List<E>> {
     public static void setTypeId(byte typeId) {
         ListenArrayRecord.TYPE_ID = typeId;
     }
+
+    @Override
+    public int size() {
+        return 2 + (value.size() * writer.size());
+    }
 }

@@ -1,6 +1,6 @@
 package data.scripts.net.data.tables;
 
-import data.scripts.net.data.records.DataRecord;
+import data.scripts.net.data.InstanceData;
 
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +12,7 @@ public interface OutboundEntityManager extends BaseEntityManager {
         DATAGRAM
     }
 
-    Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount);
+    Map<Short, InstanceData> getOutbound(byte typeID, float amount);
 
     Set<Short> getDeleted(byte typeID);
 

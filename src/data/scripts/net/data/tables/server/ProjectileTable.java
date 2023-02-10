@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.MissileAPI;
 import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.records.DataRecord;
@@ -77,17 +78,17 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     }
 
     @Override
-    public Map<Short, Map<Byte, DataRecord<?>>> getOutbound(byte typeID, float amount) {
-        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+        Map<Short, InstanceData> out = new HashMap<>();
 
         if (typeID == ProjectileData.TYPE_ID) {
             for (int i = 0; i < table.length; i++) {
                 ProjectileData data = table[i];
                 if (data != null) {
-                    Map<Byte, DataRecord<?>> deltas = data.sourceExecute(amount);
+                    InstanceData instanceData = data.sourceExecute(amount);
 
-                    if (deltas != null && !deltas.isEmpty()) {
-                        out.put((short) i, deltas);
+                    if (instanceData.records != null && !instanceData.records.isEmpty()) {
+                        out.put((short) i, instanceData);
                     }
                 }
             }
@@ -106,8 +107,8 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         return PacketType.DATAGRAM;
     }
 
-    public Map<Short, Map<Byte, DataRecord<?>>> getProjectilesRegistered() {
-        Map<Short, Map<Byte, DataRecord<?>>> out = new HashMap<>();
+    public Map<Short, InstanceData> getProjectilesRegistered() {
+        Map<Short, InstanceData> out = new HashMap<>();
 
         for (short id : registered.values()) {
             ProjectileData projectileData = table[id];
@@ -115,13 +116,15 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
             projectileData.sourceExecute(0f);
 
             Map<Byte, DataRecord<?>> records = new HashMap<>();
+            int size = 0;
             List<RecordLambda<?>> recordLambdas = projectileData.getRecords();
             for (byte i = 0; i < recordLambdas.size(); i++) {
                 RecordLambda<?> recordLambda = recordLambdas.get(i);
                 records.put(i, recordLambda.record);
+                size += recordLambda.record.size();
             }
 
-            out.put(id, records);
+            out.put(id, new InstanceData(size, records));
         }
 
         return out;

@@ -61,4 +61,9 @@ public class StringRecord extends DataRecord<String> {
                 "record='" + value + '\'' +
                 '}';
     }
+
+    @Override
+    public int size() {
+        return 1 + value.getBytes(CHARSET).length;
+    }
 }

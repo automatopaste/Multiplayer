@@ -15,7 +15,6 @@ import java.util.Set;
  */
 public class DataGenManager {
     public static Map<Class<? extends EntityData>, Byte> entityTypeIDs = new HashMap<>();
-    public static Map<Byte, Integer> maxEntitiesPerPacket = new HashMap<>();
 
     public static Map<String, Byte> recordTypeIDs = new HashMap<>();
     public static Map<Byte, DataRecord<?>> recordInstances = new HashMap<>();
@@ -25,12 +24,10 @@ public class DataGenManager {
 
     private static byte idIncrementer = 1;
 
-    public static byte registerEntityType(Class<? extends EntityData> clazz, int maxEntities) {
+    public static byte registerEntityType(Class<? extends EntityData> clazz) {
         byte id = idIncrementer;
         entityTypeIDs.put(clazz, id);
         idIncrementer++;
-
-        maxEntitiesPerPacket.put(id, maxEntities);
 
         return id;
     }
@@ -87,13 +84,13 @@ public class DataGenManager {
      * @return data hierarchy
      */
     public static OutboundData collectOutboundDeltasSocket(float amount) {
-        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> out = new HashMap<>();
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
         Map<Byte, Set<Short>> deleted = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Short, Map<Byte, DataRecord<?>>> entities = manager.getOutbound(source, amount);
+                Map<Short, InstanceData> entities = manager.getOutbound(source, amount);
                 if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
@@ -115,13 +112,13 @@ public class DataGenManager {
      * @return data hierarchy
      */
     public static OutboundData collectOutboundDeltasDatagram(float amount) {
-        Map<Byte, Map<Short, Map<Byte, DataRecord<?>>>> out = new HashMap<>();
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
         Map<Byte, Set<Short>> deleted = new HashMap<>();
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
             if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Short, Map<Byte, DataRecord<?>>> entities = manager.getOutbound(source, amount);
+                Map<Short, InstanceData> entities = manager.getOutbound(source, amount);
                 if (entities != null && !entities.isEmpty()) out.put(source, entities);
             }
         }
@@ -148,9 +145,5 @@ public class DataGenManager {
             throw new NullPointerException("No record type found at ID: " + typeID);
         }
         return out;
-    }
-
-    public static int getEntityLimit(byte typeID) {
-        return maxEntitiesPerPacket.get(typeID);
     }
 }
