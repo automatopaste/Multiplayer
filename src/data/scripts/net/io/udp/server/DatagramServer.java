@@ -66,9 +66,9 @@ public class DatagramServer implements Runnable {
         try {
             int size = 0;
             int sizeCompressed = 0;
+            int num = 0;
 
             while (connectionManager.isActive()) {
-                int num = 0;
                 while (!messageQueue.isEmpty()) {
                     MessageContainer message = messageQueue.poll();
 
@@ -95,6 +95,7 @@ public class DatagramServer implements Runnable {
 
                     size = 0;
                     sizeCompressed = 0;
+                    num = 0;
                 }
             }
 

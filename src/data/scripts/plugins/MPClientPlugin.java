@@ -1,5 +1,7 @@
 package data.scripts.plugins;
 
+import cmu.CMUtils;
+import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
@@ -30,6 +32,10 @@ public class MPClientPlugin extends MPPlugin {
 
     private final ProjectileSpecDatastore projectileSpecDatastore;
 
+    //debug
+    private final DebugGraphContainer dataGraph;
+    private final DebugGraphContainer dataGraph2;
+
     public MPClientPlugin(String host, int port) {
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             Global.getCombatEngine().removeEntity(ship);
@@ -53,6 +59,9 @@ public class MPClientPlugin extends MPPlugin {
         // outbound init
         playerShip = new PlayerShip(connection.getConnectionID());
         initEntityManager(playerShip);
+
+        dataGraph = new DebugGraphContainer("Inbound Packet Size", 120, 60f);
+        dataGraph2 = new DebugGraphContainer("Inbound Packet Count", 120, 60f);
     }
 
     @Override
@@ -85,6 +94,11 @@ public class MPClientPlugin extends MPPlugin {
 
         // get inbound
         InboundData entities = connection.getDuplex().getDeltas();
+        dataGraph.increment(entities.size);
+        dataGraph2.increment(connection.getDuplex().getNumSinceTick());
+        CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph", dataGraph);
+        CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph2", dataGraph2);
+
         DataGenManager.distributeInboundDeltas(entities, this, connection.getTick());
 
         // update

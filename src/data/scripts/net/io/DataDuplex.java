@@ -20,6 +20,8 @@ public class DataDuplex {
     private final Map<Byte, Set<Short>> outboundSocketDeleted;
     private final Map<Byte, Map<Short, InstanceData>> outboundDatagram;
     private final Map<Byte, Set<Short>> outboundDatagramDeleted;
+    private int inboundSize;
+    private int numSinceTick;
 
     public DataDuplex() {
         inbound = new HashMap<>();
@@ -34,7 +36,7 @@ public class DataDuplex {
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public InboundData getDeltas() {
+    public synchronized InboundData getDeltas() {
         HashMap<Byte, Map<Short, Map<Byte, Object>>> in;
         HashMap<Byte, Set<Short>> deleted;
 
@@ -90,7 +92,7 @@ public class DataDuplex {
      * Synchronises update of current data store
      * @param data inbound data
      */
-    public void updateInbound(InboundData data) {
+    public synchronized void updateInbound(InboundData data) {
         synchronized (inbound) {
             for (Byte type : data.in.keySet()) {
                 Map<Short, Map<Byte, Object>> inboundEntities = inbound.get(type);
@@ -130,6 +132,8 @@ public class DataDuplex {
                 deleted.addAll(deltas);
             }
         }
+
+        numSinceTick++;
     }
 
     public void updateOutboundSocket(OutboundData bufferData) {
@@ -197,5 +201,11 @@ public class DataDuplex {
 
             dest.addAll(deltas);
         }
+    }
+
+    public synchronized int getNumSinceTick() {
+        int n = numSinceTick;
+        numSinceTick = 0;
+        return n;
     }
 }
