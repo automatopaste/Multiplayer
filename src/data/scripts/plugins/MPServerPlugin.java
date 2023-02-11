@@ -9,10 +9,7 @@ import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.pregen.VariantDataGenerator;
-import data.scripts.net.data.tables.server.PlayerLobby;
-import data.scripts.net.data.tables.server.PlayerShips;
-import data.scripts.net.data.tables.server.ProjectileTable;
-import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.server.*;
 import data.scripts.net.io.ServerConnectionManager;
 import org.lazywizard.console.Console;
 import org.lwjgl.input.Keyboard;
@@ -29,6 +26,7 @@ public class MPServerPlugin extends MPPlugin {
     //outbound
     private final ShipTable shipTable;
     private final ProjectileTable projectileTable;
+//    private final MissileTable missileTable;
 
     private final VariantDataGenerator variantDatastore;
     private final ProjectileSpecDatastore projectileSpecDatastore;
@@ -55,6 +53,9 @@ public class MPServerPlugin extends MPPlugin {
 
         projectileTable = new ProjectileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
         initEntityManager(projectileTable);
+
+//        missileTable = new MissileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
+//        initEntityManager(missileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();
