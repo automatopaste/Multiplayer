@@ -212,9 +212,10 @@ public class ProjectileData extends EntityData {
             }
         }
 
+        String w = weapon == null ? null : weapon.getId();
+        Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
+
         try {
-            String w = weapon == null ? null : weapon.getId();
-            Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
                     ship, weapon, w, new Vector2f(location), facing, vel
             );
