@@ -218,7 +218,7 @@ public class ProjectileData extends EntityData {
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
                     ship, weapon, w, new Vector2f(location), facing, vel
             );
-        } catch (NullPointerException n) {
+        } catch (Throwable n) {
             n.printStackTrace();
         }
     }
