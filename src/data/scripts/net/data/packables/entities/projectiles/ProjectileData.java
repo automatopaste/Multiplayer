@@ -4,10 +4,11 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
-import com.fs.starfarer.api.loading.ProjectileSpecAPI;
-import data.scripts.net.data.packables.*;
+import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.EntityData;
+import data.scripts.net.data.packables.RecordLambda;
+import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -15,8 +16,6 @@ import data.scripts.net.data.tables.client.ClientShipTable;
 import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
-
-import java.util.Map;
 
 public class ProjectileData extends EntityData {
 
@@ -213,13 +212,11 @@ public class ProjectileData extends EntityData {
             }
         }
 
-        ProjectileSpecDatastore projectileSpecDatastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
-        Map<Short, ProjectileSpecAPI> m = projectileSpecDatastore.getProjectiles();
-
         try {
             String w = weapon == null ? null : weapon.getId();
+            Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
-                    ship, weapon, w, new Vector2f(location), facing, new Vector2f(ship.getVelocity())
+                    ship, weapon, w, new Vector2f(location), facing, vel
             );
         } catch (NullPointerException n) {
             n.printStackTrace();
@@ -233,6 +230,10 @@ public class ProjectileData extends EntityData {
 
     public void setSpecID(short specID) {
         this.specID = specID;
+    }
+
+    public short getSpecID() {
+        return specID;
     }
 
     public ShipAPI getShip() {

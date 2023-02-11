@@ -101,29 +101,31 @@ public abstract class BaseConnectionWrapper {
     public static List<MessageContainer> writeBuffer(OutboundData data, int tick, InetSocketAddress address, int connectionID) throws IOException {
         List<MessageContainer> out = new ArrayList<>();
 
-        List<Map<Byte, Map<Short, InstanceData>>> toWrite = new ArrayList<>();
-        Map<Byte, Map<Short, InstanceData>> activeDest = new HashMap<>();
+        List<OutboundData> toWrite = new ArrayList<>();
+        OutboundData activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>());
         toWrite.add(activeDest);
 
         int size = 0;
         for (byte type : data.out.keySet()) {
             Map<Short, InstanceData> instances = data.out.get(type);
 
-            Map<Short, InstanceData> activeInstanceDest = activeDest.get(type);
+            Map<Short, InstanceData> activeInstanceDest = activeDest.out.get(type);
             if (activeInstanceDest == null) {
                 activeInstanceDest = new HashMap<>();
-                activeDest.put(type, activeInstanceDest);
+                activeDest.out.put(type, activeInstanceDest);
             }
 
             for (short instance : instances.keySet()) {
                 InstanceData instanceData = instances.get(instance);
 
                 if (size + instanceData.size > MAX_PACKET_SIZE) {
-                    activeDest = new HashMap<>();
+                    activeDest.setSize(size);
+
+                    activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>());
                     toWrite.add(activeDest);
 
                     activeInstanceDest = new HashMap<>();
-                    activeDest.put(type, activeInstanceDest);
+                    activeDest.out.put(type, activeInstanceDest);
 
                     size = 0;
                 }
@@ -134,32 +136,66 @@ public abstract class BaseConnectionWrapper {
             }
         }
 
+        outer:
         for (byte type : data.deleted.keySet()) {
             Set<Short> deleted = data.deleted.get(type);
 
+            int bigness = (1 + deleted.size()) * 2;
 
-        }
+            if (bigness >= MAX_PACKET_SIZE) {
+                throw new RuntimeException("Deleted instance buffer of size " + bigness + " exceeded maximum buffer size " + MAX_PACKET_SIZE);
+            }
 
-        for (Map<Byte, Map<Short, InstanceData>> map : toWrite) {
-            ByteBuf dest = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+            for (OutboundData outboundData : toWrite) {
+                int d = MAX_PACKET_SIZE - outboundData.size;
 
-            for (byte type : map.keySet()) {
-                // write type byte
-                dest.writeByte(type);
-
-                Map<Short, InstanceData> instances = map.get(type);
-
-                // write num instances short
-                dest.writeShort(instances.size());
-
-                for (short instance : instances.keySet()) {
-                    writeInstance(dest, instances.get(instance), instance);
+                if (d > bigness) {
+                    outboundData.deleted.put(type, deleted);
+                    continue outer;
                 }
             }
 
-            out.add(container(map.size(), dest, 0, null, tick, address, connectionID));
+            // unable to find packet to fit in at this point
+            Map<Byte, Set<Short>> d = new HashMap<>();
+            d.put(type, deleted);
+            toWrite.add(new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), d));
+        }
 
-            dest.release();
+        for (OutboundData outboundData : toWrite) {
+            ByteBuf entities = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+            ByteBuf deleted = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+
+            for (byte type : outboundData.out.keySet()) {
+                // write type byte
+                entities.writeByte(type);
+
+                Map<Short, InstanceData> instances = outboundData.out.get(type);
+
+                // write num instances short
+                entities.writeShort(instances.size());
+
+                for (short instance : instances.keySet()) {
+                    writeInstance(entities, instances.get(instance), instance);
+                }
+            }
+
+            for (byte type : outboundData.deleted.keySet()) {
+                // write type byte
+                deleted.writeByte(type);
+
+                Set<Short> instances = outboundData.deleted.get(type);
+
+                // write num instances short
+                entities.writeShort(instances.size());
+
+                for (short instance : instances) {
+                    deleted.writeShort(instance);
+                }
+            }
+
+            out.add(container(outboundData.out.size(), entities, outboundData.deleted.size(), deleted, tick, address, connectionID));
+
+            entities.release();
         }
 
         return out;

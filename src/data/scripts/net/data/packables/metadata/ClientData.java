@@ -29,7 +29,7 @@ public class ClientData extends EntityData {
 
         try {
             ProjectileSpecDatastore datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
-            numSpecs = (short) datastore.getWeapons().size();
+            numSpecs = (short) datastore.getWeaponIDs().size();
         } catch (NullPointerException ignored) {}
 
         addRecord(new RecordLambda<>(

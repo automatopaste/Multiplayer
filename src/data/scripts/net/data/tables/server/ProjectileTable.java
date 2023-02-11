@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.MissileAPI;
+import com.fs.starfarer.combat.entities.DamagingExplosion;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -36,7 +37,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         Set<DamagingProjectileAPI> diff = new HashSet<>(registered.keySet());
 
         for (DamagingProjectileAPI projectile : engine.getProjectiles()) {
-            if (projectile instanceof MissileAPI) continue;
+            if (projectile instanceof MissileAPI || projectile instanceof DamagingExplosion) continue;
 
             if (registered.containsKey(projectile)) {
                 diff.remove(projectile);
@@ -57,12 +58,9 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
     private void createEntry(DamagingProjectileAPI projectile) {
         short id = (short) getVacant();
         registered.put(projectile, id);
-        try {
-            short s = specIDs.get(projectile.getProjectileSpecId());
-            table[id] = new ProjectileData(id, projectile, s, shipTable);
-        } catch (NullPointerException n) {
-            n.printStackTrace();
-        }
+        String projectileID = projectile.getProjectileSpecId();
+        short s = specIDs.get(projectileID);
+        table[id] = new ProjectileData(id, projectile, s, shipTable);
     }
 
     private void deleteEntry(DamagingProjectileAPI projectile) {

@@ -53,7 +53,7 @@ public class MPServerPlugin extends MPPlugin {
         shipTable = new ShipTable(playerShips);
         initEntityManager(shipTable);
 
-        projectileTable = new ProjectileTable(projectileSpecDatastore.getGeneratedIDs(), shipTable);
+        projectileTable = new ProjectileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
         initEntityManager(projectileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
