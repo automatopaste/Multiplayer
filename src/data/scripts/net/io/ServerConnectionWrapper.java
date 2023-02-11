@@ -8,7 +8,6 @@ import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -124,7 +123,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
     public void updateInbound(InboundData entities) {
         Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
-        if (instance != null) connectionData.destExecute(instance.get(connectionID), connectionManager.getTick());
+        if (instance != null) {
+            Map<Byte, Object> data = instance.get(connectionID);
+            if (data != null) {
+                connectionData.destExecute(data, connectionManager.getTick());
+            }
+        }
         entities.in.remove(ConnectionData.TYPE_ID);
 
         connectionManager.getDuplex().updateInbound(entities);

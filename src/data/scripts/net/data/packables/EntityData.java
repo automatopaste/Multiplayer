@@ -78,6 +78,10 @@ public abstract class EntityData {
      * @param deltas incoming deltas
      */
     public void destExecute(Map<Byte, Object> deltas, int tick) {
+        if (deltas == null) {
+            float f = 0f;
+        }
+
         for (byte k : deltas.keySet()) {
             RecordLambda<?> record = records.get(k);
             record.overwrite(tick, deltas.get(k));
