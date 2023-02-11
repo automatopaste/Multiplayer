@@ -3,8 +3,8 @@ package data.scripts.net.data.tables.server;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
-import com.fs.starfarer.api.combat.MissileAPI;
-import com.fs.starfarer.combat.entities.DamagingExplosion;
+import com.fs.starfarer.combat.entities.BallisticProjectile;
+import com.fs.starfarer.combat.entities.MovingRay;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -22,12 +22,15 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
 
     private final Map<DamagingProjectileAPI, Short> registered = new HashMap<>();
     private final Map<String, Short> specIDs;
+    private final Set<Short> deleted;
     private final ShipTable shipTable;
 
     public ProjectileTable(Map<String, Short> specIDs, ShipTable shipTable) {
         super(new ProjectileData[MAX_PROJECTILES]);
         this.specIDs = specIDs;
         this.shipTable = shipTable;
+
+        deleted = new HashSet<>();
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         Set<DamagingProjectileAPI> diff = new HashSet<>(registered.keySet());
 
         for (DamagingProjectileAPI projectile : engine.getProjectiles()) {
-            if (projectile instanceof MissileAPI || projectile instanceof DamagingExplosion) continue;
+            if (!(projectile instanceof BallisticProjectile || projectile instanceof MovingRay)) continue;
 
             if (registered.containsKey(projectile)) {
                 diff.remove(projectile);
@@ -68,6 +71,8 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
         table[index] = null;
         registered.remove(projectile);
         markVacant(index);
+
+        deleted.add(index);
     }
 
     @Override
@@ -97,7 +102,9 @@ public class ProjectileTable extends EntityTable<ProjectileData> implements Outb
 
     @Override
     public Set<Short> getDeleted(byte typeID) {
-        return null;
+        Set<Short> out = new HashSet<>(deleted);
+        deleted.clear();
+        return out;
     }
 
     @Override
