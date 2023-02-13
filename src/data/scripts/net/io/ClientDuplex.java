@@ -11,9 +11,9 @@ import java.util.Set;
 
 public class ClientDuplex {
 
-    private InboundData inbound;
-    private OutboundData outboundSocket;
-    private OutboundData outboundDatagram;
+    private InboundData inbound = new InboundData();
+    private OutboundData outboundSocket = new OutboundData((byte) -1);
+    private OutboundData outboundDatagram = new OutboundData((byte) -1);
     private int inboundSize;
     private int numSinceTick;
 
