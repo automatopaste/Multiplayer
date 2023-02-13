@@ -66,7 +66,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
     }
 
     @Override
-    public void advance(float amount, List<InputEventAPI> events) {
+    public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
         if (Global.getCurrentState() == GameState.TITLE) {
             return;
         }
