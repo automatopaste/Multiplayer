@@ -35,8 +35,7 @@ public class ClientConnectionData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        ServerConnectionData serverConnectionData = (ServerConnectionData) packable;
-                        serverConnectionData.setConnectionState(value);
+                        setConnectionState(value);
                     }
                 }
         ));
