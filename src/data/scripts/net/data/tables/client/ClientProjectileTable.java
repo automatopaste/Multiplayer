@@ -38,7 +38,7 @@ public class ClientProjectileTable implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         if (typeID == ProjectileData.TYPE_ID) {
             ProjectileData data = projectiles.get(instanceID);
 
@@ -56,7 +56,7 @@ public class ClientProjectileTable implements InboundEntityManager {
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         ProjectileData data = projectiles.get(instanceID);
 
         if (data != null) {

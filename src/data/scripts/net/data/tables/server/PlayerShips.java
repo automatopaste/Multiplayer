@@ -85,7 +85,7 @@ public class PlayerShips implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         PlayerShipData data = playerShips.get(instanceID);
 
         if (data == null) {
@@ -101,7 +101,7 @@ public class PlayerShips implements InboundEntityManager {
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         PlayerShipData data = playerShips.get(instanceID);
 
         if (data != null) {

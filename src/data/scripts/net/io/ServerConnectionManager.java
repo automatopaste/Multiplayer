@@ -1,7 +1,6 @@
 package data.scripts.net.io;
 
 import com.fs.starfarer.api.Global;
-import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.io.tcp.server.SocketServer;
 import data.scripts.net.io.udp.server.DatagramServer;
 import data.scripts.plugins.MPServerPlugin;
@@ -20,7 +19,7 @@ public class ServerConnectionManager implements Runnable {
 //    public final static int PORT = Global.getSettings().getInt("mpLocalPortTCP");
     public static final int TICK_RATE = Global.getSettings().getInt("mpServerTickRate");
 
-    private final DataDuplex dataDuplex;
+    private final ServerDuplex duplex;
     private final MPServerPlugin serverPlugin;
     private boolean active;
 
@@ -30,14 +29,15 @@ public class ServerConnectionManager implements Runnable {
     private final SocketServer socketServer;
     private final Thread socket;
 
-    private final Map<Short, ServerConnectionWrapper> serverConnectionWrappers;
+    private final Map<Byte, ServerConnectionWrapper> serverConnectionWrappers;
+    private byte inc = 0;
 
     private int tick;
     private final Clock clock;
 
     public ServerConnectionManager(MPServerPlugin serverPlugin, int port) {
         this.serverPlugin = serverPlugin;
-        dataDuplex = new DataDuplex();
+        duplex = new ServerDuplex();
         active = true;
 
         serverConnectionWrappers = new HashMap<>();
@@ -100,10 +100,10 @@ public class ServerConnectionManager implements Runnable {
         return output;
     }
 
-    public ServerConnectionWrapper getConnection(int connectionID) {
-        for (Short id : serverConnectionWrappers.keySet()) {
+    public ServerConnectionWrapper getConnection(byte connectionID) {
+        for (byte id : serverConnectionWrappers.keySet()) {
             ServerConnectionWrapper wrapper = serverConnectionWrappers.get(id);
-            if (wrapper.connectionID == connectionID) {
+            if (id == connectionID) {
                 return wrapper;
             }
         }
@@ -117,8 +117,9 @@ public class ServerConnectionManager implements Runnable {
             if (serverConnectionWrappers.size() >= MP_MAX_CONNECTIONS) return null;
         }
 
-        short id = ConnectionData.getConnectionID(remoteAddress);
+        byte id = inc;
         ServerConnectionWrapper serverConnectionWrapper = new ServerConnectionWrapper(this, id, remoteAddress, serverPlugin);
+        inc++;
 
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.put(id, serverConnectionWrapper);
@@ -148,8 +149,8 @@ public class ServerConnectionManager implements Runnable {
         return tick;
     }
 
-    public synchronized DataDuplex getDuplex() {
-        return dataDuplex;
+    public synchronized ServerDuplex getDuplex() {
+        return duplex;
     }
 
     public synchronized boolean isActive() {
@@ -160,7 +161,7 @@ public class ServerConnectionManager implements Runnable {
         return serverPlugin;
     }
 
-    public Map<Short, ServerConnectionWrapper> getServerConnectionWrappers() {
+    public Map<Byte, ServerConnectionWrapper> getServerConnectionWrappers() {
         return serverConnectionWrappers;
     }
 }

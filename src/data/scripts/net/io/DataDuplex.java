@@ -69,7 +69,7 @@ public class DataDuplex {
             outboundSocketDeleted.clear();
         }
 
-        return new OutboundData(outEntities, outDeleted);
+        return new OutboundData(outEntities, outDeleted, (byte) -1);
     }
 
     public OutboundData getOutboundDatagram() {
@@ -85,7 +85,7 @@ public class DataDuplex {
             outboundDatagramDeleted.clear();
         }
 
-        return new OutboundData(outEntities, outDeleted);
+        return new OutboundData(outEntities, outDeleted, (byte) -1);
     }
 
     /**

@@ -54,7 +54,7 @@ public class PlayerShip implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
         InstanceData instanceData = playerShipData.sourceExecute(amount);
@@ -66,7 +66,7 @@ public class PlayerShip implements OutboundEntityManager {
     }
 
     @Override
-    public Set<Short> getDeleted(byte typeID) {
+    public Set<Short> getDeleted(byte typeID, byte connectionID) {
         return null;
     }
 

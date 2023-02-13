@@ -10,4 +10,5 @@
 	"mpDatagramQueueLimit": 64,
 
 	"MP_PacketSize": 600,
+	"MP_UsernameString": "tomatopaste" #max 12 characters
 }

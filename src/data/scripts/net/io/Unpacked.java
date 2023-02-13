@@ -4,9 +4,6 @@ import data.scripts.net.data.InboundData;
 import io.netty.buffer.ByteBuf;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class Unpacked {
     private final InboundData unpacked;
@@ -14,7 +11,7 @@ public class Unpacked {
 
     private final InetSocketAddress sender;
     private final InetSocketAddress recipient;
-    private final int connectionID;
+    private final byte connectionID;
     private final int size;
 
     public Unpacked(ByteBuf data, InetSocketAddress sender, InetSocketAddress recipient) {
@@ -24,7 +21,7 @@ public class Unpacked {
         size = data.readableBytes();
 
         tick = data.readInt();
-        connectionID = data.readInt();
+        connectionID = data.readByte();
 
         InboundData m;
         try {
@@ -32,7 +29,7 @@ public class Unpacked {
         } catch (Exception e) {
             System.err.println("Decode failed for buffer with size " + size + " from " + connectionID);
             e.printStackTrace();
-            m = new InboundData(new HashMap<Byte, Map<Short, Map<Byte, Object>>>(), new HashMap<Byte, Set<Short>>());
+            m = new InboundData();
         }
 
         unpacked = m;
@@ -54,7 +51,7 @@ public class Unpacked {
         return sender;
     }
 
-    public int getConnectionID() {
+    public byte getConnectionID() {
         return connectionID;
     }
 

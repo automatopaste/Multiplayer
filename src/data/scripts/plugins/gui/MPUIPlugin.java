@@ -79,10 +79,13 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             shipSelectionPanel = null;
         }
 
-        Vector2f root1 = new Vector2f(1568f, 752f);
+        float w = Global.getSettings().getScreenWidthPixels();
+        float h = Global.getSettings().getScreenHeightPixels();
+
+        Vector2f root1 = new Vector2f(w - 32f, h - 148f);
         CMUKitUI.render(widgetPanel, root1, events);
 
-        Vector2f root2 = new Vector2f(1294f, 725f);
+        Vector2f root2 = new Vector2f(w - 306f, h - 175f);
 
         switch (active) {
             case NONE:
@@ -129,7 +132,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                             Global.getCombatEngine().setPaused(true);
                             active = ActivePanel.SELECT;
                         } else {
-                            Global.getCombatEngine().setPaused(false);
                             active = ActivePanel.NONE;
                         }
 
@@ -199,7 +201,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 Button button2 = new Button(buttonParams2, buttonText2, buttonCallback2);
                 panel1.addChild(button2);
 
-                MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
+                final MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
                 if (plugin instanceof MPClientPlugin) {
                     Text.TextParams buttonTextParams3 = new Text.TextParams();
                     buttonTextParams3.align = LazyFont.TextAlignment.CENTER;
@@ -220,6 +222,50 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     };
                     Button button3 = new Button(buttonParams3, buttonText3, buttonCallback3);
                     panel1.addChild(button3);
+
+                    Text.TextParams buttonTextParams4 = new Text.TextParams();
+                    buttonTextParams4.align = LazyFont.TextAlignment.CENTER;
+                    buttonTextParams4.color = Color.ORANGE;
+                    Text buttonText4 = new Text(new Execute<String>() {
+                        @Override
+                        public String get() {
+                            return "DISCONNECT";
+                        }
+                    }, TODRAW14, buttonTextParams4);
+                    Button.ButtonParams buttonParams4 = new Button.ButtonParams();
+                    buttonParams4.width = 120f;
+                    buttonParams4.height = 24f;
+                    Button.ButtonCallback buttonCallback4 = new Button.ButtonCallback() {
+                        @Override
+                        public void onClick() {
+                            active = ActivePanel.NONE;
+                            plugin.stop();
+                        }
+                    };
+                    Button button4 = new Button(buttonParams4, buttonText4, buttonCallback4);
+                    panel1.addChild(button4);
+                } else if (plugin instanceof MPServerPlugin) {
+                    Text.TextParams buttonTextParams4 = new Text.TextParams();
+                    buttonTextParams4.align = LazyFont.TextAlignment.CENTER;
+                    buttonTextParams4.color = Color.ORANGE;
+                    Text buttonText4 = new Text(new Execute<String>() {
+                        @Override
+                        public String get() {
+                            return "STOP SERVER";
+                        }
+                    }, TODRAW14, buttonTextParams4);
+                    Button.ButtonParams buttonParams4 = new Button.ButtonParams();
+                    buttonParams4.width = 120f;
+                    buttonParams4.height = 24f;
+                    Button.ButtonCallback buttonCallback4 = new Button.ButtonCallback() {
+                        @Override
+                        public void onClick() {
+                            active = ActivePanel.NONE;
+                            plugin.stop();
+                        }
+                    };
+                    Button button4 = new Button(buttonParams4, buttonText4, buttonCallback4);
+                    panel1.addChild(button4);
                 }
             }
         });

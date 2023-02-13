@@ -29,6 +29,8 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
         engine.getCustomData().put(DATA_KEY, this);
     }
 
+    public abstract void stop();
+
     public abstract PluginType getType();
 
     public void initEntityManager(BaseEntityManager manager) {

@@ -1,7 +1,7 @@
 package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
@@ -11,20 +11,19 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPPlugin;
 
-import java.net.InetSocketAddress;
-
 public class ConnectionData extends EntityData {
 
     public static byte TYPE_ID;
 
     private byte connectionState;
     private int clientPort;
+    private byte connectionID;
 
-    public ConnectionData(short connectionID, final BaseConnectionWrapper connection) {
-        super(connectionID);
+    public ConnectionData(short instanceID, final byte connectionID, final BaseConnectionWrapper connection) {
+        super(instanceID);
 
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault(),
+                ByteRecord.getDefault().setDebugText("connection state"),
                 new SourceExecute<java.lang.Byte>() {
                     @Override
                     public java.lang.Byte get() {
@@ -40,7 +39,7 @@ public class ConnectionData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                IntRecord.getDefault(),
+                IntRecord.getDefault().setDebugText("client port"),
                 new SourceExecute<Integer>() {
                     @Override
                     public Integer get() {
@@ -52,6 +51,22 @@ public class ConnectionData extends EntityData {
                     public void execute(Integer value, EntityData packable) {
                         ConnectionData connectionData = (ConnectionData) packable;
                         connectionData.setClientPort(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("connection id"),
+                new SourceExecute<java.lang.Byte>() {
+                    @Override
+                    public java.lang.Byte get() {
+                        return connectionID;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        ConnectionData connectionData = (ConnectionData) packable;
+                        connectionData.setConnectionID(value);
                     }
                 }
         ));
@@ -93,20 +108,11 @@ public class ConnectionData extends EntityData {
         this.clientPort = clientPort;
     }
 
-    public static short getConnectionID(InetSocketAddress address) {
-        byte[] ids = address.getAddress().getAddress();
+    public void setConnectionID(byte connectionID) {
+        this.connectionID = connectionID;
+    }
 
-        short id = 0;
-        byte o = 0;
-        for (int i = 0; i < 4; i++) {
-            byte d = ids[i];
-            id <<= (4 - i) * 4;
-            id += o ^ d;
-            o = d;
-        }
-
-        id = (short) ~ id;
-
-        return id;
+    public byte getConnectionID() {
+        return connectionID;
     }
 }

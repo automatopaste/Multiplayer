@@ -34,7 +34,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
         if (typeID == ShipData.TYPE_ID) {
@@ -64,7 +64,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     }
 
     @Override
-    public Set<Short> getDeleted(byte typeID) {
+    public Set<Short> getDeleted(byte typeID, byte connectionID) {
         Set<Short> out = new HashSet<>(deleted);
         deleted.clear();
         return out;

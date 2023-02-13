@@ -3,6 +3,7 @@ package data.scripts.plugins;
 import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
@@ -12,39 +13,54 @@ import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.tables.client.*;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;
+import data.scripts.plugins.gui.MPChatboxPlugin;
 import org.lazywizard.console.Console;
-import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
 public class MPClientPlugin extends MPPlugin {
 
+    private final String host;
+    private final int port;
+
+    private boolean init = false;
+
     //inbound
-    private final ClientConnectionWrapper connection;
-    private final ClientShipTable shipTable;
-    private final ClientProjectileTable projectileTable;
-    private final VariantDataMap variantDataMap;
+    private ClientConnectionWrapper connection;
+    private ClientShipTable shipTable;
+    private ClientProjectileTable projectileTable;
+    private VariantDataMap variantDataMap;
     private LobbyInput lobbyInput;
-    private final PlayerShip playerShip;
+    private PlayerShip playerShip;
 
     //outbound
     private Player player;
 
-    private final ProjectileSpecDatastore projectileSpecDatastore;
+    private ProjectileSpecDatastore projectileSpecDatastore;
 
     //debug
-    private final DebugGraphContainer dataGraph;
-    private final DebugGraphContainer dataGraph2;
+    private DebugGraphContainer dataGraph;
+    private DebugGraphContainer dataGraph2;
 
     public MPClientPlugin(String host, int port) {
+        this.host = host;
+        this.port = port;
+
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
+        engine.addPlugin(chatboxPlugin);
+
+        connection = new ClientConnectionWrapper(host, port, this);
+    }
+
+    public void init() {
         for (ShipAPI ship : Global.getCombatEngine().getShips()) {
             Global.getCombatEngine().removeEntity(ship);
         }
 
         projectileSpecDatastore = new ProjectileSpecDatastore();
         initDatastore(projectileSpecDatastore);
-
-        connection = new ClientConnectionWrapper(host, port, this);
 
         // inbound init
         shipTable = new ClientShipTable();
@@ -62,11 +78,13 @@ public class MPClientPlugin extends MPPlugin {
 
         dataGraph = new DebugGraphContainer("Inbound Packet Size", 120, 60f);
         dataGraph2 = new DebugGraphContainer("Inbound Packet Count", 120, 60f);
+
+        init = true;
     }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
-        if (connection.getConnectionID() == ClientConnectionWrapper.DEFAULT_CONNECTION_ID) {
+        if (!init) {
             return;
         }
 
@@ -76,15 +94,8 @@ public class MPClientPlugin extends MPPlugin {
             return;
         }
 
-        if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
-            connection.stop();
-            Global.getCombatEngine().removePlugin(this);
-            Console.showMessage("Closed client");
-            return;
-        }
-
         if (lobbyInput == null) {
-            lobbyInput = new LobbyInput(connection.getConnectionID());
+            lobbyInput = new LobbyInput();
             initEntityManager(lobbyInput);
         }
         if (player == null) {
@@ -99,16 +110,23 @@ public class MPClientPlugin extends MPPlugin {
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph", dataGraph);
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph2", dataGraph2);
 
-        DataGenManager.distributeInboundDeltas(entities, this, connection.getTick());
+        DataGenManager.distributeInboundDeltas(entities, this, connection.getTick(), connection.getConnectionID());
 
         // update
         updateEntityManagers(amount);
 
         // outbound data update
-        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket(amount);
+        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket(amount, connection.getConnectionID());
         connection.getDuplex().updateOutboundSocket(outboundSocket);
-        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram(amount);
+        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram(amount, connection.getConnectionID());
         connection.getDuplex().updateOutboundDatagram(outboundDatagram);
+    }
+
+    @Override
+    public void stop() {
+        connection.stop();
+        Global.getCombatEngine().removePlugin(this);
+        Console.showMessage("Closed client");
     }
 
     public ClientConnectionWrapper getConnection() {

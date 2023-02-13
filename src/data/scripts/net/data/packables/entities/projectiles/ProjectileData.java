@@ -112,7 +112,7 @@ public class ProjectileData extends EntityData {
                         }
                     }
                 }
-        ).setRate(5f));
+        ));
         addRecord(new RecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
@@ -129,7 +129,7 @@ public class ProjectileData extends EntityData {
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
-        ).setRate(0.2f));
+        ));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("facing"),
                 new SourceExecute<Float>() {
@@ -150,7 +150,7 @@ public class ProjectileData extends EntityData {
                         }
                     }
                 }
-        ).setRate(0.2f));
+        ));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {

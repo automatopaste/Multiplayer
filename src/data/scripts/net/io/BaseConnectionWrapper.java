@@ -17,10 +17,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 public abstract class BaseConnectionWrapper {
-    public static final short DEFAULT_CONNECTION_ID = -10;
-
-    public static final int MAX_PACKET_SIZE = Math.min(2048, Global.getSettings().getInt("MP_PacketSize"));
-    public static final int MAX_ENTITIES_PER_PACKET = 5;
+    public static final int MAX_PACKET_SIZE = Math.min(2012, Global.getSettings().getInt("MP_PacketSize"));
 
     public enum ConnectionState {
         INITIALISATION_READY,
@@ -37,7 +34,6 @@ public abstract class BaseConnectionWrapper {
 
     protected ConnectionData connectionData;
 
-    protected short connectionID = DEFAULT_CONNECTION_ID;
     protected int clientPort;
 
     protected MPPlugin localPlugin;
@@ -48,14 +44,6 @@ public abstract class BaseConnectionWrapper {
 
     public void setConnectionState(ConnectionState connectionState) {
         this.connectionState = connectionState;
-    }
-
-    public void setConnectionID(short connectionID) {
-        this.connectionID = connectionID;
-    }
-
-    public short getConnectionID() {
-        return connectionID;
     }
 
     public ConnectionState getConnectionState() {
@@ -98,11 +86,11 @@ public abstract class BaseConnectionWrapper {
         return buf;
     }
 
-    public static List<MessageContainer> writeBuffer(OutboundData data, int tick, InetSocketAddress address, int connectionID) throws IOException {
+    public static List<MessageContainer> writeBuffer(OutboundData data, int tick, InetSocketAddress address, byte connectionID) throws IOException {
         List<MessageContainer> out = new ArrayList<>();
 
         List<OutboundData> toWrite = new ArrayList<>();
-        OutboundData activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>());
+        OutboundData activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), connectionID);
         toWrite.add(activeDest);
 
         int size = 0;
@@ -121,7 +109,7 @@ public abstract class BaseConnectionWrapper {
                 if (size + instanceData.size > MAX_PACKET_SIZE) {
                     activeDest.setSize(size);
 
-                    activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>());
+                    activeDest = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), connectionID);
                     toWrite.add(activeDest);
 
                     activeInstanceDest = new HashMap<>();
@@ -158,7 +146,7 @@ public abstract class BaseConnectionWrapper {
             // unable to find packet to fit in at this point
             Map<Byte, Set<Short>> d = new HashMap<>();
             d.put(type, deleted);
-            toWrite.add(new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), d));
+            toWrite.add(new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), d, connectionID));
         }
 
         for (OutboundData outboundData : toWrite) {
@@ -223,7 +211,7 @@ public abstract class BaseConnectionWrapper {
         }
     }
 
-    private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, int connectionID) throws IOException {
+    private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, byte connectionID) throws IOException {
         ByteBuf dest = initBuffer(tick, connectionID);
 
         dest.writeByte(numTypes);

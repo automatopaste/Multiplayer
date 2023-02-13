@@ -16,7 +16,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         VariantData data = variants.get(instanceID);
 
         if (data == null) {
@@ -32,7 +32,7 @@ public class VariantDataMap implements InboundEntityManager {
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         VariantData data = variants.get(instanceID);
 
         if (data != null) {

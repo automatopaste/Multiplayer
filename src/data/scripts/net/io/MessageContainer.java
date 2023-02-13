@@ -10,10 +10,10 @@ public class MessageContainer {
     private final int tick;
     private final ByteBuf data;
     private final InetSocketAddress dest;
-    private final int connectionID;
+    private final byte connectionID;
     private int bufSize;
 
-    public MessageContainer(ByteBuf data, int tick, InetSocketAddress dest, int connectionID) throws IOException {
+    public MessageContainer(ByteBuf data, int tick, InetSocketAddress dest, byte connectionID) throws IOException {
         this.tick = tick;
         this.data = data;
         this.dest = dest;
@@ -32,7 +32,7 @@ public class MessageContainer {
         return dest;
     }
 
-    public int getConnectionID() {
+    public byte getConnectionID() {
         return connectionID;
     }
 }

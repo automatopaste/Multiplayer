@@ -10,31 +10,34 @@ import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
     private final Map<Short, ClientData> players;
-
     private final ClientData host;
+
     private final LobbyData lobby;
 
+    private final Map<Byte, String> usernames = new HashMap<>();
+
     public PlayerLobby(MPServerPlugin serverPlugin) {
-
         players = new HashMap<>();
-        host = new ClientData((short) 0, Global.getCombatEngine().getViewport(), serverPlugin);
-        players.put((short) 0, host);
 
-        lobby = new LobbyData((short) 0, this, serverPlugin.getPlayerShipMap());
+        String hostUsername = Global.getSettings().getString("MP_UsernameString");
+        host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, Global.getCombatEngine().getViewport(), serverPlugin, hostUsername);
+        players.put(DEFAULT_HOST_INSTANCE, host);
+
+        usernames.put(DEFAULT_HOST_ID, hostUsername);
+
+        lobby = new LobbyData(DEFAULT_HOST_INSTANCE, this, serverPlugin.getPlayerShipMap());
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         ClientData data = players.get(instanceID);
 
         if (data == null) {
-            data = new ClientData(instanceID, null, null);
+            data = new ClientData(instanceID, connectionID, null, null, null);
             players.put(instanceID, data);
 
             data.destExecute(toProcess, tick);
@@ -46,7 +49,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         ClientData data = players.get(instanceID);
 
         if (data != null) {
@@ -57,19 +60,19 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
         InstanceData instanceData = lobby.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put((short) -1, instanceData);
+            out.put(DEFAULT_HOST_INSTANCE, instanceData);
         }
 
         return out;
     }
 
     @Override
-    public Set<Short> getDeleted(byte typeID) {
+    public Set<Short> getDeleted(byte typeID, byte connectionID) {
         return null;
     }
 
@@ -79,6 +82,10 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
         lobby.update(amount, this);
         for (ClientData clientData : players.values()) {
             clientData.update(amount, this);
+
+            if (clientData.getUsername() != null) {
+                usernames.put(clientData.getConnectionID(), clientData.getUsername());
+            }
         }
     }
 
@@ -95,5 +102,9 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     @Override
     public PacketType getOutboundPacketType() {
         return PacketType.SOCKET;
+    }
+
+    public Map<Byte, String> getUsernames() {
+        return usernames;
     }
 }

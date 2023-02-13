@@ -13,28 +13,29 @@ import java.util.Set;
 
 public class Player implements OutboundEntityManager {
     private final ClientData player;
-    private final short instanceID;
+    private final short connectionID;
 
-    public Player(short instanceID, MPPlugin plugin) {
-        this.instanceID = instanceID;
+    public Player(byte connectionID, MPPlugin plugin) {
+        this.connectionID = connectionID;
 
-        player = new ClientData(instanceID, Global.getCombatEngine().getViewport(), plugin);
+        String username = Global.getSettings().getString("MP_UsernameString");
+        player = new ClientData(connectionID, connectionID, Global.getCombatEngine().getViewport(), plugin, username);
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
         InstanceData instanceData = player.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put(instanceID, instanceData);
+            out.put(this.connectionID, instanceData);
         }
 
         return out;
     }
 
     @Override
-    public Set<Short> getDeleted(byte typeID) {
+    public Set<Short> getDeleted(byte typeID, byte connectionID) {
         return null;
     }
 

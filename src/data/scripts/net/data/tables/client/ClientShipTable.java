@@ -25,7 +25,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         if (typeID == ShipData.TYPE_ID) {
             ShipData data = table[instanceID];
 
@@ -59,7 +59,7 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         ShipData data = table[instanceID];
 
         if (data != null) {

@@ -19,15 +19,16 @@ import java.util.Map;
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
     private final InetSocketAddress remoteAddress;
+    private final byte connectionID;
 
-    public ServerConnectionWrapper(ServerConnectionManager connectionManager, short connectionId, InetSocketAddress remoteAddress, MPPlugin plugin) {
+    public ServerConnectionWrapper(ServerConnectionManager connectionManager, byte connectionID, InetSocketAddress remoteAddress, MPPlugin plugin) {
         super(plugin);
 
         this.connectionManager = connectionManager;
         this.remoteAddress = remoteAddress;
-        this.connectionID = connectionId;
+        this.connectionID = connectionID;
 
-        connectionData = new ConnectionData(connectionId, this);
+        connectionData = new ConnectionData(connectionID, connectionID, this);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
         clientPort = connectionData.getClientPort();
 
-        OutboundData outbound = connectionManager.getDuplex().getOutboundSocket();
+        OutboundData outbound = connectionManager.getDuplex().getOutboundSocket().get(connectionID);
 
         switch (connectionState) {
             //case INITIALISATION_READY:
@@ -82,7 +83,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         Map<Short, InstanceData> instance = new HashMap<>();
-        instance.put(connectionID, connectionData.sourceExecute(0f));
+        instance.put((short) -1, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 
         return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
@@ -92,7 +93,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public List<MessageContainer> getDatagrams() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
-        OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram();
+        OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram().get(connectionID);
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -124,14 +125,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public void updateInbound(InboundData entities) {
         Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
         if (instance != null) {
-            Map<Byte, Object> data = instance.get(connectionID);
+            Map<Byte, Object> data = instance.get((short) -1);
             if (data != null) {
                 connectionData.destExecute(data, connectionManager.getTick());
             }
         }
         entities.in.remove(ConnectionData.TYPE_ID);
 
-        connectionManager.getDuplex().updateInbound(entities);
+        connectionManager.getDuplex().updateInbound(entities, connectionID);
     }
 
     public InetSocketAddress getRemoteAddress() {

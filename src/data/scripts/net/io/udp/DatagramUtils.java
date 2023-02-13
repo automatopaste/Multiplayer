@@ -11,7 +11,7 @@ import java.util.zip.DataFormatException;
 
 public class DatagramUtils {
 
-    public static SizeData write(Channel channel, MessageContainer message, InetSocketAddress dest, int connectionID) throws InterruptedException {
+    public static SizeData write(Channel channel, MessageContainer message, InetSocketAddress dest, byte connectionID) throws InterruptedException {
         ByteBuf buf = message.getData();
         if (buf.readableBytes() <= 4) {
             channel.flush();

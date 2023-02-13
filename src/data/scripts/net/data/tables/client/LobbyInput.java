@@ -9,13 +9,11 @@ import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
 
-    private final short instanceID;
     private LobbyData lobby;
 
     private String clientPilotedShipID = null;
 
-    public LobbyInput(short instanceID) {
-        this.instanceID = instanceID;
+    public LobbyInput() {
         lobby = null;
     }
 
@@ -23,28 +21,6 @@ public class LobbyInput implements InboundEntityManager {
     public void update(float amount, MPPlugin plugin) {
         if (lobby != null) {
             lobby.update(amount, this);
-//
-//            List<Short> players = lobby.getPlayers();
-//            List<String> playerShipIDs = lobby.getPlayerShipIDs();
-//
-//            for (int i = 0; i < players.size(); i++) {
-//                Short playerID = players.get(i);
-//
-//                if (i + 1 > playerShipIDs.size()) {
-//                    break;
-//                }
-//
-//                if (playerID != null && playerID == instanceID) {
-//                    String playerShipID = playerShipIDs.get(i);
-//
-//                    if (!playerShipID.equals(clientPilotedShipID)) {
-//                        clientPilotedShipID = playerShipID;
-//
-//                        plugin.removeEntityManager(PlayerShipOutput.class);
-//                        plugin.initEntityManager(new PlayerShipOutput(instanceID, clientPilotedShipID));
-//                    }
-//                }
-//            }
         }
     }
 
@@ -54,7 +30,7 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick) {
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         if (lobby == null) {
             lobby = new LobbyData(instanceID, null, null);
 
@@ -67,7 +43,7 @@ public class LobbyInput implements InboundEntityManager {
     }
 
     @Override
-    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick) {
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
         LobbyData data = lobby;
 
         if (data != null) {

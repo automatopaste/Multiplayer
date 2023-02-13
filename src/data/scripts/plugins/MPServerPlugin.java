@@ -3,6 +3,7 @@ package data.scripts.plugins;
 import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
@@ -11,10 +12,12 @@ import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.pregen.VariantDataGenerator;
 import data.scripts.net.data.tables.server.*;
 import data.scripts.net.io.ServerConnectionManager;
+import data.scripts.plugins.gui.MPChatboxPlugin;
 import org.lazywizard.console.Console;
-import org.lwjgl.input.Keyboard;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MPServerPlugin extends MPPlugin {
 
@@ -31,7 +34,14 @@ public class MPServerPlugin extends MPPlugin {
     private final VariantDataGenerator variantDatastore;
     private final ProjectileSpecDatastore projectileSpecDatastore;
 
+    private final TextChatHost textChatHost;
+
     public MPServerPlugin(int port) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
+        engine.addPlugin(chatboxPlugin);
+
         variantDatastore = new VariantDataGenerator();
         initDatastore(variantDatastore);
 
@@ -54,6 +64,9 @@ public class MPServerPlugin extends MPPlugin {
         projectileTable = new ProjectileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
         initEntityManager(projectileTable);
 
+        textChatHost = new TextChatHost(chatboxPlugin, playerLobby);
+        initEntityManager(textChatHost);
+
 //        missileTable = new MissileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
 //        initEntityManager(missileTable);
 
@@ -63,26 +76,33 @@ public class MPServerPlugin extends MPPlugin {
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
-        if (Keyboard.isKeyDown(Keyboard.KEY_K)) {
-            serverConnectionManager.stop();
-            Global.getCombatEngine().removePlugin(this);
-            Console.showMessage("Closed server");
-        }
-
         // inbound data update
-        InboundData inbound = serverConnectionManager.getDuplex().getDeltas();
-        DataGenManager.distributeInboundDeltas(inbound, this, serverConnectionManager.getTick());
+        Map<Byte, InboundData> inbound = serverConnectionManager.getDuplex().getDeltas();
+        for (byte connectionID : inbound.keySet()) {
+            InboundData data = inbound.get(connectionID);
+            DataGenManager.distributeInboundDeltas(data, this, serverConnectionManager.getTick(), connectionID);
+        }
 
         // simulation update
         updateEntityManagers(amount);
 
         // outbound data update
-        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket(amount);
-        serverConnectionManager.getDuplex().updateOutboundSocket(outboundSocket);
-        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram(amount);
-        serverConnectionManager.getDuplex().updateOutboundDatagram(outboundDatagram);
+        Set<Byte> connections = serverConnectionManager.getServerConnectionWrappers().keySet();
+        for (byte connectionID : connections) {
+            OutboundData socketData = DataGenManager.collectOutboundDeltasSocket(amount, connectionID);
+            serverConnectionManager.getDuplex().updateOutboundSocket(connectionID, socketData);
+            OutboundData datagramData = DataGenManager.collectOutboundDeltasSocket(amount, connectionID);
+            serverConnectionManager.getDuplex().updateOutboundDatagram(connectionID, datagramData);
+        }
 
         debug();
+    }
+
+    @Override
+    public void stop() {
+        serverConnectionManager.stop();
+        Global.getCombatEngine().removePlugin(this);
+        Console.showMessage("Closed server");
     }
 
     private void debug() {

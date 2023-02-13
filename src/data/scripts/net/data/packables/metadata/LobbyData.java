@@ -1,7 +1,7 @@
 package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ShortRecord;
@@ -30,7 +30,7 @@ public class LobbyData extends EntityData {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                new SyncingListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID).setDebugText("player ship instances"),
                 new SourceExecute<List<Short>>() {
                     @Override
                     public List<Short> get() {
@@ -42,6 +42,7 @@ public class LobbyData extends EntityData {
                         out.addAll(playerLobby.getPlayers().keySet());
 
                         return out;
+
                     }
                 },
                 new DestExecute<List<Short>>() {
@@ -53,7 +54,7 @@ public class LobbyData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("player piloted ship ids"),
                 new SourceExecute<List<String>>() {
                     @Override
                     public List<String> get() {

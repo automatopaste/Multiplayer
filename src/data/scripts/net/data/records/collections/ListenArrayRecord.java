@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sends a one-way list of values
+ * Sends a one-way array of values. Useful for lists of data that don't need feedback.
  * @param <E> Value type
  */
 public class ListenArrayRecord<E> extends DataRecord<List<E>> {

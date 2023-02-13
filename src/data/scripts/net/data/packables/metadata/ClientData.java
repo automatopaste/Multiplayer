@@ -1,8 +1,8 @@
 package data.scripts.net.data.packables.metadata;
 
 import com.fs.starfarer.api.combat.ViewportAPI;
-import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.pregen.ProjectileSpecDatastore;
@@ -23,8 +23,10 @@ public class ClientData extends EntityData {
     private float viewMult;
     private int connectionType;
     private short numSpecs;
+    private String username;
+    private byte connectionID;
 
-    public ClientData(short instanceID, final ViewportAPI viewport, final MPPlugin plugin) {
+    public ClientData(short instanceID, final byte connectionID, final ViewportAPI viewport, final MPPlugin plugin, final String username) {
         super(instanceID);
 
         try {
@@ -101,6 +103,36 @@ public class ClientData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault(),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        return connectionID;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        setConnectionID(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                StringRecord.getDefault().setDebugText("username"),
+                new SourceExecute<String>() {
+                    @Override
+                    public String get() {
+                        return username;
+                    }
+                },
+                new DestExecute<String>() {
+                    @Override
+                    public void execute(String value, EntityData packable) {
+                        setUsername(value);
+                    }
+                }
+        ));
     }
 
     @Override
@@ -149,5 +181,21 @@ public class ClientData extends EntityData {
 
     public short getNumSpecs() {
         return numSpecs;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public byte getConnectionID() {
+        return connectionID;
+    }
+
+    public void setConnectionID(byte connectionID) {
+        this.connectionID = connectionID;
     }
 }

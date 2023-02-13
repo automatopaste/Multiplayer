@@ -76,7 +76,7 @@ public class MissileTable extends EntityTable<MissileData> implements OutboundEn
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, float amount) {
+    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
         if (typeID == ProjectileData.TYPE_ID) {
@@ -96,7 +96,7 @@ public class MissileTable extends EntityTable<MissileData> implements OutboundEn
     }
 
     @Override
-    public Set<Short> getDeleted(byte typeID) {
+    public Set<Short> getDeleted(byte typeID, byte connectionID) {
         return null;
     }
 
