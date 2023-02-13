@@ -91,12 +91,16 @@ public class ServerDuplex {
 
     public synchronized OutboundData getOutboundSocket(byte connectionID) {
         OutboundData out = outboundSocket.get(connectionID);
+        if (out == null) out = new OutboundData(connectionID);
+
         outboundSocket.put(connectionID, new OutboundData(connectionID));
         return out;
     }
 
     public synchronized OutboundData getOutboundDatagram(byte connectionID) {
         OutboundData out = outboundDatagram.get(connectionID);
+        if (out == null) out = new OutboundData(connectionID);
+
         outboundDatagram.put(connectionID, new OutboundData(connectionID));
         return out;
     }
