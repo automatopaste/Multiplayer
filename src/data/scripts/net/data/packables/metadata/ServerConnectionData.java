@@ -5,21 +5,19 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPPlugin;
 
-public class ConnectionData extends EntityData {
+public class ServerConnectionData extends EntityData {
 
     public static byte TYPE_ID;
 
     private byte connectionState;
-    private int clientPort;
     private byte connectionID;
 
-    public ConnectionData(short instanceID, final byte connectionID, final BaseConnectionWrapper connection) {
+    public ServerConnectionData(short instanceID, final byte connectionID, final BaseConnectionWrapper connection) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -33,24 +31,8 @@ public class ConnectionData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        ConnectionData connectionData = (ConnectionData) packable;
-                        connectionData.setConnectionState(value);
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                IntRecord.getDefault().setDebugText("client port"),
-                new SourceExecute<Integer>() {
-                    @Override
-                    public Integer get() {
-                        return connection.getClientPort();
-                    }
-                },
-                new DestExecute<Integer>() {
-                    @Override
-                    public void execute(Integer value, EntityData packable) {
-                        ConnectionData connectionData = (ConnectionData) packable;
-                        connectionData.setClientPort(value);
+                        ServerConnectionData serverConnectionData = (ServerConnectionData) packable;
+                        serverConnectionData.setConnectionState(value);
                     }
                 }
         ));
@@ -65,8 +47,8 @@ public class ConnectionData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        ConnectionData connectionData = (ConnectionData) packable;
-                        connectionData.setConnectionID(value);
+                        ServerConnectionData serverConnectionData = (ServerConnectionData) packable;
+                        serverConnectionData.setConnectionID(value);
                     }
                 }
         ));
@@ -98,14 +80,6 @@ public class ConnectionData extends EntityData {
 
     public void setConnectionState(byte connectionState) {
         this.connectionState = connectionState;
-    }
-
-    public int getClientPort() {
-        return clientPort;
-    }
-
-    public void setClientPort(int clientPort) {
-        this.clientPort = clientPort;
     }
 
     public void setConnectionID(byte connectionID) {

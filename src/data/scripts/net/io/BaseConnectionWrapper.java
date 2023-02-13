@@ -5,7 +5,6 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.packables.metadata.ConnectionData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
@@ -31,8 +30,6 @@ public abstract class BaseConnectionWrapper {
         CLOSED
     }
     protected ConnectionState connectionState = ConnectionState.INITIALISATION_READY;
-
-    protected ConnectionData connectionData;
 
     protected int clientPort;
 

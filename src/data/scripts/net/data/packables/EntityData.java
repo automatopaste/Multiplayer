@@ -19,7 +19,7 @@ public abstract class EntityData {
     protected final short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final List<InterpRecordLambda<?>> interpolate;
-    private boolean init = true;
+    private boolean flush = true;
 
     public EntityData(short instanceID) {
         this.instanceID = instanceID;
@@ -62,13 +62,13 @@ public abstract class EntityData {
         for (byte i = 0; i < records.size(); i++) {
             RecordLambda<?> recordLambda = records.get(i);
 
-            if (recordLambda.sourceExecute(amount) || init) {
+            if (recordLambda.sourceExecute(amount) || flush) {
                 deltas.put(i, recordLambda.record);
                 size += recordLambda.record.size();
             }
         }
 
-        init = false;
+        flush = false;
 
         return new InstanceData(size, deltas);
     }
@@ -110,4 +110,8 @@ public abstract class EntityData {
      * Called when entity is deleted
      */
     public abstract void delete();
+
+    public void flush() {
+        flush = true;
+    }
 }

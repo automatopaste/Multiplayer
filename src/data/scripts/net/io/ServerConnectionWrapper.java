@@ -7,7 +7,8 @@ import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
-import data.scripts.net.data.packables.metadata.ConnectionData;
+import data.scripts.net.data.packables.metadata.ClientConnectionData;
+import data.scripts.net.data.packables.metadata.ServerConnectionData;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -21,6 +22,9 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final InetSocketAddress remoteAddress;
     private final byte connectionID;
 
+    private final ServerConnectionData send;
+    private final ClientConnectionData receive;
+
     public ServerConnectionWrapper(ServerConnectionManager connectionManager, byte connectionID, InetSocketAddress remoteAddress, MPPlugin plugin) {
         super(plugin);
 
@@ -28,15 +32,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         this.remoteAddress = remoteAddress;
         this.connectionID = connectionID;
 
-        connectionData = new ConnectionData(connectionID, connectionID, this);
+        send = new ServerConnectionData(connectionID, connectionID, this);
+        receive = new ClientConnectionData(connectionID, this);
     }
 
     @Override
     public List<MessageContainer> getSocketMessages() throws IOException {
-        if (connectionData == null) return null;
-
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
-        clientPort = connectionData.getClientPort();
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(receive.getConnectionState());
+        clientPort = receive.getClientPort();
 
         OutboundData outbound = connectionManager.getDuplex().getOutboundSocket(connectionID);
 
@@ -83,15 +86,16 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         Map<Short, InstanceData> instance = new HashMap<>();
-        instance.put((short) connectionID, connectionData.sourceExecute(0f));
-        outbound.out.put(ConnectionData.TYPE_ID, instance);
+        send.flush();
+        instance.put((short) connectionID, send.sourceExecute(0f));
+        outbound.out.put(ServerConnectionData.TYPE_ID, instance);
 
         return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
     }
 
     @Override
     public List<MessageContainer> getDatagrams() throws IOException {
-        if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
+        if (connectionState != ConnectionState.SIMULATING) return null;
 
         OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram(connectionID);
 
@@ -123,14 +127,14 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateInbound(InboundData entities) {
-        Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
+        Map<Short, Map<Byte, Object>> instance = entities.in.get(ServerConnectionData.TYPE_ID);
         if (instance != null) {
             Map<Byte, Object> data = instance.get((short) connectionID);
             if (data != null) {
-                connectionData.destExecute(data, connectionManager.getTick());
+                receive.destExecute(data, connectionManager.getTick());
             }
         }
-        entities.in.remove(ConnectionData.TYPE_ID);
+        entities.in.remove(ClientConnectionData.TYPE_ID);
 
         connectionManager.getDuplex().updateInbound(entities, connectionID);
     }

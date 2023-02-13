@@ -5,7 +5,8 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.packables.metadata.ConnectionData;
+import data.scripts.net.data.packables.metadata.ClientConnectionData;
+import data.scripts.net.data.packables.metadata.ServerConnectionData;
 import data.scripts.net.io.tcp.client.SocketClient;
 import data.scripts.net.io.udp.client.DatagramClient;
 import data.scripts.plugins.MPClientPlugin;
@@ -32,6 +33,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
     private int tick;
     private byte connectionID;
+    private ClientConnectionData send;
+    private ServerConnectionData receive;
 
     public ClientConnectionWrapper(String host, int port, MPPlugin plugin) {
         super(plugin);
@@ -49,13 +52,13 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
     @Override
     public List<MessageContainer> getSocketMessages() throws IOException {
-        if (connectionData == null) {
+        if (receive == null || send == null) {
             return null;
         }
 
         clientPort = socketClient.getLocalPort();
 
-        connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
+        connectionState = BaseConnectionWrapper.ordinalToConnectionState(receive.getConnectionState());
 
         OutboundData outbound = duplex.getOutboundSocket();
 
@@ -92,7 +95,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
                 break;
             case SIMULATING:
-                if (datagramClient == null && connectionData.getClientPort() != 0) {
+                if (datagramClient == null && send.getClientPort() != 0) {
                     datagramClient = new DatagramClient(host, port, clientPort, this);
                     datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
                     datagram.start();
@@ -104,15 +107,16 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         }
 
         Map<Short, InstanceData> instance = new HashMap<>();
-        instance.put((short) connectionID, connectionData.sourceExecute(0f));
-        outbound.out.put(ConnectionData.TYPE_ID, instance);
+        send.flush();
+        instance.put((short) connectionID, send.sourceExecute(0f));
+        outbound.out.put(ServerConnectionData.TYPE_ID, instance);
 
         return writeBuffer(outbound, tick, null, connectionID);
     }
 
     @Override
     public List<MessageContainer> getDatagrams() throws IOException {
-        if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
+        if (send == null || connectionState != ConnectionState.SIMULATING) return null;
 
         OutboundData outbound = duplex.getOutboundDatagram();
 
@@ -134,25 +138,30 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateInbound(InboundData entities, int tick) {
-        Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
+        Map<Short, Map<Byte, Object>> instance = entities.in.get(ServerConnectionData.TYPE_ID);
         if (instance != null && !instance.values().isEmpty()) {
             if (instance.values().size() > 1) throw new RuntimeException("wtf");
 
             for (short id : instance.keySet()) {
                 Map<Byte, Object> records = instance.get(id);
 
-                if (connectionData == null) {
-                    connectionData = new ConnectionData((short) -10, (byte) -5, this);
+                if (receive == null) {
+                    receive = new ServerConnectionData((short) -10, (byte) -5, this);
                     ((MPClientPlugin) localPlugin).init();
-                }
-                connectionData.destExecute(records, tick);
+                    receive.destExecute(records, tick);
 
-                connectionID = connectionData.getConnectionID();
+                    send = new ClientConnectionData(receive.getConnectionID(), this);
+                    send.sourceExecute(0f);
+                } else {
+                    receive.destExecute(records, tick);
+                }
+
+                connectionID = receive.getConnectionID();
 
                 break;
             }
         }
-        entities.in.remove(ConnectionData.TYPE_ID);
+        entities.in.remove(ServerConnectionData.TYPE_ID);
 
         if (tick != -1) this.tick = tick;
         duplex.updateInbound(entities);

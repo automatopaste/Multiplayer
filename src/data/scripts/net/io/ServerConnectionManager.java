@@ -30,7 +30,7 @@ public class ServerConnectionManager implements Runnable {
     private final Thread socket;
 
     private final Map<Byte, ServerConnectionWrapper> serverConnectionWrappers;
-    private byte inc = 0;
+    private byte inc = 1;
 
     private int tick;
     private final Clock clock;
@@ -128,7 +128,7 @@ public class ServerConnectionManager implements Runnable {
         return serverConnectionWrapper;
     }
 
-    public void removeConnection(short id) {
+    public void removeConnection(byte id) {
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.remove(id);
         }

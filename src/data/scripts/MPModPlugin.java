@@ -11,10 +11,7 @@ import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
-import data.scripts.net.data.packables.metadata.ClientData;
-import data.scripts.net.data.packables.metadata.ConnectionData;
-import data.scripts.net.data.packables.metadata.LobbyData;
-import data.scripts.net.data.packables.metadata.PlayerShipData;
+import data.scripts.net.data.packables.metadata.*;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
@@ -40,9 +37,11 @@ public class MPModPlugin extends BaseModPlugin {
         VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
         ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
         PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
-        ConnectionData.TYPE_ID = DataGenManager.registerEntityType(ConnectionData.class);
+        ServerConnectionData.TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
+        ClientConnectionData.TYPE_ID = DataGenManager.registerEntityType(ClientConnectionData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
         ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
+        ChatListenData.TYPE_ID = DataGenManager.registerEntityType(ChatListenData.class);
 
         Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault()));
         IntRecord.setTypeId(DataGenManager.registerRecordType(IntRecord.class.getSimpleName(), IntRecord.getDefault()));
