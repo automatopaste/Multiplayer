@@ -38,7 +38,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(connectionData.getConnectionState());
         clientPort = connectionData.getClientPort();
 
-        OutboundData outbound = connectionManager.getDuplex().getOutboundSocket().get(connectionID);
+        OutboundData outbound = connectionManager.getDuplex().getOutboundSocket(connectionID);
 
         switch (connectionState) {
             //case INITIALISATION_READY:
@@ -83,7 +83,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         Map<Short, InstanceData> instance = new HashMap<>();
-        instance.put((short) -1, connectionData.sourceExecute(0f));
+        instance.put((short) connectionID, connectionData.sourceExecute(0f));
         outbound.out.put(ConnectionData.TYPE_ID, instance);
 
         return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
@@ -93,7 +93,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public List<MessageContainer> getDatagrams() throws IOException {
         if (connectionData == null || connectionState != ConnectionState.SIMULATING) return null;
 
-        OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram().get(connectionID);
+        OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram(connectionID);
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -125,7 +125,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     public void updateInbound(InboundData entities) {
         Map<Short, Map<Byte, Object>> instance = entities.in.get(ConnectionData.TYPE_ID);
         if (instance != null) {
-            Map<Byte, Object> data = instance.get((short) -1);
+            Map<Byte, Object> data = instance.get((short) connectionID);
             if (data != null) {
                 connectionData.destExecute(data, connectionManager.getTick());
             }

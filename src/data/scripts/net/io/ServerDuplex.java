@@ -89,15 +89,15 @@ public class ServerDuplex {
         updateDeleted(data.deleted, outboundData.deleted);
     }
 
-    public synchronized Map<Byte, OutboundData> getOutboundSocket() {
-        Map<Byte, OutboundData> out = new HashMap<>(outboundSocket);
-        outboundSocket.clear();
+    public synchronized OutboundData getOutboundSocket(byte connectionID) {
+        OutboundData out = outboundSocket.get(connectionID);
+        outboundSocket.put(connectionID, new OutboundData(connectionID));
         return out;
     }
 
-    public synchronized Map<Byte, OutboundData> getOutboundDatagram() {
-        Map<Byte, OutboundData> out = new HashMap<>(outboundDatagram);
-        outboundDatagram.clear();
+    public synchronized OutboundData getOutboundDatagram(byte connectionID) {
+        OutboundData out = outboundDatagram.get(connectionID);
+        outboundDatagram.put(connectionID, new OutboundData(connectionID));
         return out;
     }
 
