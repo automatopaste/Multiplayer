@@ -82,7 +82,7 @@ public abstract class BaseConnectionWrapper {
     public static ByteBuf initBuffer(int tick, int connectionID) {
         ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
         buf.writeInt(tick);
-        buf.writeInt(connectionID);
+        buf.writeByte(connectionID);
         return buf;
     }
 
