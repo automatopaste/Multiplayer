@@ -108,6 +108,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
         Map<Short, InstanceData> instance = new HashMap<>();
         send.flush();
+        send.setState(connectionState);
         instance.put((short) connectionID, send.sourceExecute(0f));
         outbound.out.put(ServerConnectionData.TYPE_ID, instance);
 
