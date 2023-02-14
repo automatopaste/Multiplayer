@@ -91,7 +91,7 @@ public class MPServerPlugin extends MPPlugin {
         for (byte connectionID : connections) {
             OutboundData socketData = DataGenManager.collectOutboundDeltasSocket(amount, connectionID);
             serverConnectionManager.getDuplex().updateOutboundSocket(connectionID, socketData);
-            OutboundData datagramData = DataGenManager.collectOutboundDeltasSocket(amount, connectionID);
+            OutboundData datagramData = DataGenManager.collectOutboundDeltasDatagram(amount, connectionID);
             serverConnectionManager.getDuplex().updateOutboundDatagram(connectionID, datagramData);
         }
 

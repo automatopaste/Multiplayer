@@ -181,6 +181,7 @@ public abstract class BaseConnectionWrapper {
             out.add(container(outboundData.out.size(), entities, outboundData.deleted.size(), deleted, tick, address, connectionID));
 
             entities.release();
+            deleted.release();
         }
 
         return out;
