@@ -38,10 +38,7 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
             ChatListenData listener = listeners.get(id);
 
             List<MPChatboxPlugin.ChatEntry> entries = listener.getReceived();
-            for (MPChatboxPlugin.ChatEntry entry : entries) {
-                fresh.add(entry);
-                chatbox.addEntry(entry);
-            }
+            fresh.addAll(entries);
         }
 
         for (MPChatboxPlugin.ChatEntry chatEntry : fresh) {
