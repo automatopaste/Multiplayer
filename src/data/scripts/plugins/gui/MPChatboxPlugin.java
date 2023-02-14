@@ -98,7 +98,6 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
                     @Override
                     public void onClick() {
                         if (active == ActivePanel.NONE) {
-                            Global.getCombatEngine().setPaused(true);
                             active = ActivePanel.CHAT;
                         } else {
                             active = ActivePanel.NONE;
