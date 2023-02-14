@@ -74,6 +74,12 @@ public class MPClientPlugin extends MPPlugin {
         playerShip = new PlayerShip(connection.getConnectionID());
         initEntityManager(playerShip);
 
+        lobbyInput = new LobbyInput();
+        initEntityManager(lobbyInput);
+
+        player = new Player(connection.getConnectionID(), this);
+        initEntityManager(player);
+
         textChatClient = new TextChatClient(connection.getConnectionID(), connection.getConnectionID(), chatboxPlugin, lobbyInput);
         initEntityManager(textChatClient);
 
@@ -93,15 +99,6 @@ public class MPClientPlugin extends MPPlugin {
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Connection interrupted");
             return;
-        }
-
-        if (lobbyInput == null) {
-            lobbyInput = new LobbyInput();
-            initEntityManager(lobbyInput);
-        }
-        if (player == null) {
-            player = new Player(connection.getConnectionID(), this);
-            initEntityManager(player);
         }
 
         // get inbound
