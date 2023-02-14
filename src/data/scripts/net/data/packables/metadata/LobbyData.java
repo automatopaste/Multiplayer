@@ -42,7 +42,9 @@ public class LobbyData extends EntityData {
                         // server ship
                         out.add((byte) -1);
 
-                        out.addAll(playerLobby.getPlayers().keySet());
+                        for (short id : playerLobby.getPlayers().keySet()) {
+                            out.add((byte) (id & 0xFF));
+                        }
 
                         return out;
 
