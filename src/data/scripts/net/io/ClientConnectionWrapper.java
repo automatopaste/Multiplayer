@@ -93,14 +93,14 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
                 connectionState = ConnectionState.SIMULATING;
 
-                break;
-            case SIMULATING:
-                if (datagramClient == null && send.getClientPort() != 0) {
+                if (datagramClient == null) {
                     datagramClient = new DatagramClient(host, port, clientPort, this);
                     datagram = new Thread(datagramClient, "DATAGRAM_CLIENT_THREAD");
                     datagram.start();
                 }
 
+                break;
+            case SIMULATING:
                 break;
             default:
                 break;
