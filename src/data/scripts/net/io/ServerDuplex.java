@@ -28,7 +28,10 @@ public class ServerDuplex {
 
     public synchronized void updateInbound(InboundData data, byte connectionID) {
         InboundData inbound = this.inbound.get(connectionID);
-        if (inbound == null) inbound = new InboundData();
+        if (inbound == null) {
+            inbound = new InboundData();
+            this.inbound.put(connectionID, inbound);
+        }
 
         for (Byte type : data.in.keySet()) {
             Map<Short, Map<Byte, Object>> inboundEntities = inbound.in.get(type);
