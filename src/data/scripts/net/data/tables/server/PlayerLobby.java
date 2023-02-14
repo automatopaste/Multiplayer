@@ -13,7 +13,7 @@ import data.scripts.plugins.MPServerPlugin;
 import java.util.*;
 
 public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
-    private final Map<Byte, ClientData> players;
+    private final Map<Short, ClientData> players;
     private final ClientData host;
 
     private final LobbyData lobby;
@@ -25,7 +25,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
         String hostUsername = Global.getSettings().getString("MP_UsernameString");
         host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, Global.getCombatEngine().getViewport(), serverPlugin, hostUsername);
-        players.put(DEFAULT_HOST_ID, host);
+        players.put(DEFAULT_HOST_INSTANCE, host);
 
         usernames.put(DEFAULT_HOST_ID, hostUsername);
 
@@ -34,11 +34,11 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
-        ClientData data = players.get(connectionID);
+        ClientData data = players.get(instanceID);
 
         if (data == null) {
             data = new ClientData(instanceID, connectionID, null, null, null);
-            players.put(connectionID, data);
+            players.put(instanceID, data);
 
             data.destExecute(toProcess, tick);
 
@@ -89,7 +89,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
         }
     }
 
-    public Map<Byte, ClientData> getPlayers() {
+    public Map<Short, ClientData> getPlayers() {
         return players;
     }
 
