@@ -76,14 +76,8 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
     public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
-        for (short id : listeners.keySet()) {
-            ChatListenData chatListenData = listeners.get(id);
-            InstanceData instanceData = chatListenData.sourceExecute(amount);
-
-            if (instanceData != null && instanceData.size > 0) {
-                out.put(id, instanceData);
-            }
-        }
+        InstanceData instanceData = send.sourceExecute(amount);
+        if (!instanceData.records.isEmpty()) out.put(DEFAULT_HOST_INSTANCE, instanceData);
 
         return out;
     }
