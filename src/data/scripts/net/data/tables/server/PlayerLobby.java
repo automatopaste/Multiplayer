@@ -24,7 +24,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
         players = new HashMap<>();
 
         String hostUsername = Global.getSettings().getString("MP_UsernameString");
-        host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, Global.getCombatEngine().getViewport(), serverPlugin, hostUsername);
+        host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, serverPlugin, hostUsername);
         players.put(DEFAULT_HOST_INSTANCE, host);
 
         usernames.put(DEFAULT_HOST_ID, hostUsername);
@@ -37,7 +37,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
         ClientData data = players.get(instanceID);
 
         if (data == null) {
-            data = new ClientData(instanceID, connectionID, null, null, null);
+            data = new ClientData(instanceID, connectionID, null, null);
             players.put(instanceID, data);
 
             data.destExecute(toProcess, tick);

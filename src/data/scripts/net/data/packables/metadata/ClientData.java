@@ -1,6 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
-import com.fs.starfarer.api.combat.ViewportAPI;
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -26,7 +26,7 @@ public class ClientData extends EntityData {
     private String username;
     private byte connectionID;
 
-    public ClientData(short instanceID, final byte connectionID, final ViewportAPI viewport, final MPPlugin plugin, final String username) {
+    public ClientData(short instanceID, final byte connectionID, final MPPlugin plugin, final String username) {
         super(instanceID);
 
         try {
@@ -39,7 +39,7 @@ public class ClientData extends EntityData {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        return viewport.getCenter();
+                        return Global.getCombatEngine().getViewport().getCenter();
                     }
                 },
                 new DestExecute<Vector2f>() {
@@ -55,7 +55,7 @@ public class ClientData extends EntityData {
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
-                        return viewport.getViewMult();
+                        return Global.getCombatEngine().getViewport().getViewMult();
                     }
                 },
                 new DestExecute<Float>() {

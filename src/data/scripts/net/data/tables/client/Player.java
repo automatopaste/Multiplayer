@@ -19,7 +19,7 @@ public class Player implements OutboundEntityManager {
         this.connectionID = connectionID;
 
         String username = Global.getSettings().getString("MP_UsernameString");
-        player = new ClientData(connectionID, connectionID, Global.getCombatEngine().getViewport(), plugin, username);
+        player = new ClientData(connectionID, connectionID, plugin, username);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class Player implements OutboundEntityManager {
 
     @Override
     public PacketType getOutboundPacketType() {
-        return PacketType.DATAGRAM;
+        return PacketType.SOCKET;
     }
 }
