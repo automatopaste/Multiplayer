@@ -25,15 +25,15 @@ public class MPClientPlugin extends MPPlugin {
 
     private boolean init = false;
 
-    //inbound
+    private final MPChatboxPlugin chatboxPlugin;
+
     private ClientConnectionWrapper connection;
     private ClientShipTable shipTable;
     private ClientProjectileTable projectileTable;
     private VariantDataMap variantDataMap;
     private LobbyInput lobbyInput;
     private PlayerShip playerShip;
-
-    //outbound
+    private TextChatClient textChatClient;
     private Player player;
 
     private ProjectileSpecDatastore projectileSpecDatastore;
@@ -48,7 +48,7 @@ public class MPClientPlugin extends MPPlugin {
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
+        chatboxPlugin = new MPChatboxPlugin();
         engine.addPlugin(chatboxPlugin);
 
         connection = new ClientConnectionWrapper(host, port, this);
@@ -62,7 +62,6 @@ public class MPClientPlugin extends MPPlugin {
         projectileSpecDatastore = new ProjectileSpecDatastore();
         initDatastore(projectileSpecDatastore);
 
-        // inbound init
         shipTable = new ClientShipTable();
         initEntityManager(shipTable);
 
@@ -72,9 +71,11 @@ public class MPClientPlugin extends MPPlugin {
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
 
-        // outbound init
         playerShip = new PlayerShip(connection.getConnectionID());
         initEntityManager(playerShip);
+
+        textChatClient = new TextChatClient(connection.getConnectionID(), connection.getConnectionID(), chatboxPlugin, lobbyInput);
+        initEntityManager(textChatClient);
 
         dataGraph = new DebugGraphContainer("Inbound Packet Size", 120, 60f);
         dataGraph2 = new DebugGraphContainer("Inbound Packet Count", 120, 60f);
