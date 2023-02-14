@@ -214,8 +214,8 @@ public abstract class BaseConnectionWrapper {
 
         dest.writeByte(numTypes);
         dest.writeBytes(entities);
-//        dest.writeByte(numDeletedTypes);
-//        dest.writeBytes(deleted);
+        dest.writeByte(numDeletedTypes);
+        dest.writeBytes(deleted);
 
         return new MessageContainer(dest, tick, address, connectionID);
     }
@@ -263,21 +263,21 @@ public abstract class BaseConnectionWrapper {
             }
         }
 
-//        byte numDeletedTypes = data.readByte();
-//
-//        for (byte i = 0; i < numDeletedTypes; i++) {
-//            byte typeID = data.readByte();
-//
-//            Set<Short> instances = new HashSet<>();
-//            deleted.put(typeID, instances);
-//
-//            short numDeleted = data.readShort();
-//
-//            for (int j = 0; j < numDeleted; j++) {
-//                short instance = data.readShort();
-//                instances.add(instance);
-//            }
-//        }
+        byte numDeletedTypes = data.readByte();
+
+        for (byte i = 0; i < numDeletedTypes; i++) {
+            byte typeID = data.readByte();
+
+            Set<Short> instances = new HashSet<>();
+            deleted.put(typeID, instances);
+
+            short numDeleted = data.readShort();
+
+            for (int j = 0; j < numDeleted; j++) {
+                short instance = data.readShort();
+                instances.add(instance);
+            }
+        }
 
         return new InboundData(inbound, deleted);
     }

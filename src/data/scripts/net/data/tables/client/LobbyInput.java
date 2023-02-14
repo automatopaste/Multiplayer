@@ -5,6 +5,7 @@ import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
@@ -12,6 +13,8 @@ public class LobbyInput implements InboundEntityManager {
     private LobbyData lobby;
 
     private String clientPilotedShipID = null;
+
+    private final Map<Byte, String> usernames = new HashMap<>();
 
     public LobbyInput() {
         lobby = null;
@@ -21,6 +24,8 @@ public class LobbyInput implements InboundEntityManager {
     public void update(float amount, MPPlugin plugin) {
         if (lobby != null) {
             lobby.update(amount, this);
+
+            usernames.putAll(lobby.getPlayerUsernames());
         }
     }
 
@@ -54,5 +59,9 @@ public class LobbyInput implements InboundEntityManager {
 
     public LobbyData getLobby() {
         return lobby;
+    }
+
+    public Map<Byte, String> getUsernames() {
+        return usernames;
     }
 }
