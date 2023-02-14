@@ -110,7 +110,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         send.flush();
         send.setState(connectionState);
         instance.put((short) connectionID, send.sourceExecute(0f));
-        outbound.out.put(ServerConnectionData.TYPE_ID, instance);
+        outbound.out.put(ClientConnectionData.TYPE_ID, instance);
 
         return writeBuffer(outbound, tick, null, connectionID);
     }

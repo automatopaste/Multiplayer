@@ -127,7 +127,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void updateInbound(InboundData entities) {
-        Map<Short, Map<Byte, Object>> instance = entities.in.get(ServerConnectionData.TYPE_ID);
+        Map<Short, Map<Byte, Object>> instance = entities.in.get(ClientConnectionData.TYPE_ID);
         if (instance != null) {
             Map<Byte, Object> data = instance.get((short) connectionID);
             if (data != null) {
