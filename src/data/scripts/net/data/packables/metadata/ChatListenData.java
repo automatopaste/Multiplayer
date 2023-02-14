@@ -93,6 +93,9 @@ public class ChatListenData extends EntityData {
     }
 
     public List<MPChatboxPlugin.ChatEntry> getReceived() {
+        if (received.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<MPChatboxPlugin.ChatEntry> out = new ArrayList<>(received);
         received.clear();
         return out;
