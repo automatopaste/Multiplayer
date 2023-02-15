@@ -140,16 +140,17 @@ public class ServerDuplex {
                     outboundEntities.put(instance, outboundInstanceData);
                 } else {
                     for (byte id : deltaInstanceData.records.keySet()) {
-                        DataRecord<?> outboundRecord = outboundInstanceData.records.get(id);
+                        DataRecord<?> record = outboundInstanceData.records.get(id);
                         DataRecord<?> delta = deltaInstanceData.records.get(id);
 
-                        if (outboundRecord == null) {
-                            outboundRecord = delta;
-                            outboundInstanceData.records.put(id, outboundRecord);
+                        if (record == null) {
+                            outboundInstanceData.records.put(id, delta);
+                        } else {
+                            outboundInstanceData.size -= record.size();
                             outboundInstanceData.size += delta.size();
-                        }
 
-                        outboundRecord.overwrite(delta.getValue());
+                            record.overwrite(delta.getValue());
+                        }
                     }
                 }
             }

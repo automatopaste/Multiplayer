@@ -5,7 +5,6 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.packables.metadata.ChatListenData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
@@ -181,10 +180,6 @@ public abstract class BaseConnectionWrapper {
 
                         // write record data bytes
                         record.write(entities);
-
-                        if (type == ChatListenData.TYPE_ID) {
-                            float f = 0f;
-                        }
                     }
                 }
             }
