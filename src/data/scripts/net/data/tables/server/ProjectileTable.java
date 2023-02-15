@@ -12,7 +12,6 @@ import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
-import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.RayProjectileData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -124,7 +123,9 @@ public class ProjectileTable implements OutboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerOutboundEntityManager(ProjectileData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(RayProjectileData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(BallisticProjectileData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(MissileData.TYPE_ID, this);
     }
 
     @Override

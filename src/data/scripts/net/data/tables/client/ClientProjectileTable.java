@@ -5,7 +5,6 @@ import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
-import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.RayProjectileData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -122,6 +121,8 @@ public class ClientProjectileTable implements InboundEntityManager {
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ProjectileData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(RayProjectileData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(BallisticProjectileData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(MissileData.TYPE_ID, this);
     }
 }
