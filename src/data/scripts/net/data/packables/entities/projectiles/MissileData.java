@@ -106,8 +106,7 @@ public class MissileData extends EntityData {
                     public void execute(Vector2f value, EntityData packable) {
                         setLocation(new Vector2f(value));
 
-                        ProjectileData projectileData = (ProjectileData) packable;
-                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) {
                             projectile.getLocation().set(value);
                         }
@@ -144,8 +143,7 @@ public class MissileData extends EntityData {
                     public void execute(Float value, EntityData packable) {
                         setFacing(value);
 
-                        ProjectileData projectileData = (ProjectileData) packable;
-                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) {
                             projectile.setFacing(value);
                         }
@@ -163,8 +161,7 @@ public class MissileData extends EntityData {
                 new DestExecute<Float>() {
                     @Override
                     public void execute(Float value, EntityData packable) {
-                        ProjectileData projectileData = (ProjectileData) packable;
-                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) projectile.setAngularVelocity(value);
                     }
                 }
@@ -180,8 +177,7 @@ public class MissileData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        ProjectileData projectileData = (ProjectileData) packable;
-                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) projectile.setHitpoints(projectile.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
                     }
                 }
