@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class ChatListenData extends EntityData {
 
-    public static byte TYPE_ID;
+    public static byte TYPE_ID = DataGenManager.registerEntityType(ChatListenData.class);
 
     private final List<MPChatboxPlugin.ChatEntry> toWrite = new ArrayList<>();
     private final List<MPChatboxPlugin.ChatEntry> received = new ArrayList<>();

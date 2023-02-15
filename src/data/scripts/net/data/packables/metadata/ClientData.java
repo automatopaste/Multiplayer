@@ -1,6 +1,7 @@
 package data.scripts.net.data.packables.metadata;
 
 import com.fs.starfarer.api.Global;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -17,7 +18,7 @@ import org.lwjgl.util.vector.Vector2f;
  */
 public class ClientData extends EntityData {
 
-    public static byte TYPE_ID;
+    public static byte TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
 
     private Vector2f viewportCenter;
     private float viewMult;

@@ -4,7 +4,6 @@ import cmu.CMUtils;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
@@ -72,8 +71,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 Map<Short, InstanceData> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
                 outbound.out.put(ShipData.TYPE_ID, ships);
 
-                Map<Short, InstanceData> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
-                outbound.out.put(ProjectileData.TYPE_ID, projectiles);
+                Map<Byte, Map<Short, InstanceData>> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
+                outbound.out.putAll(projectiles);
 
                 connectionState = ConnectionState.SIMULATION_READY;
 

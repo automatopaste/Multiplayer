@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -23,7 +24,7 @@ public class LobbyData extends EntityData {
 
     public static final int MAX_USERNAME_CHARS = 12;
 
-    public static byte TYPE_ID;
+    public static byte TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
 
     private List<Byte> players;
     private List<String> playerShipIDs;

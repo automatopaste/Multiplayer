@@ -4,6 +4,7 @@ import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.api.loading.WeaponGroupType;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
@@ -21,7 +22,7 @@ import java.util.*;
 
 public class VariantData extends EntityData {
 
-    public static byte TYPE_ID;
+    public static byte TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
 
     private int numFluxCapacitors;
     private int numFluxVents;

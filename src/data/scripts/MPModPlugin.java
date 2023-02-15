@@ -7,15 +7,10 @@ import com.fs.starfarer.api.campaign.CampaignPlugin;
 import com.fs.starfarer.api.combat.AutofireAIPlugin;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
-import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
-import data.scripts.net.data.packables.entities.ships.ShieldData;
-import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.entities.ships.VariantData;
-import data.scripts.net.data.packables.metadata.*;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
@@ -32,17 +27,6 @@ public class MPModPlugin extends BaseModPlugin {
 
     @Override
     public void onApplicationLoad() {
-        ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
-        ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
-        VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);
-        ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
-        PlayerShipData.TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
-        ServerConnectionData.TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
-        ClientConnectionData.TYPE_ID = DataGenManager.registerEntityType(ClientConnectionData.class);
-        LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
-        ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
-        ChatListenData.TYPE_ID = DataGenManager.registerEntityType(ChatListenData.class);
-
         Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault()));
         IntRecord.setTypeId(DataGenManager.registerRecordType(IntRecord.class.getSimpleName(), IntRecord.getDefault()));
         StringRecord.setTypeId(DataGenManager.registerRecordType(StringRecord.class.getSimpleName(), StringRecord.getDefault()));

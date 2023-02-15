@@ -4,7 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
-import com.fs.starfarer.combat.entities.Missile;
+import com.fs.starfarer.combat.entities.BallisticProjectile;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
@@ -19,9 +19,9 @@ import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
-public class MissileData extends EntityData {
+public class BallisticProjectileData extends EntityData {
 
-    public static byte TYPE_ID = DataGenManager.registerEntityType(MissileData.class);
+    public static byte TYPE_ID = DataGenManager.registerEntityType(BallisticProjectileData.class);
 
     private DamagingProjectileAPI projectile;
     private short specID;
@@ -32,11 +32,11 @@ public class MissileData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public MissileData(short instanceID, final Missile projectile, final short specID, final ShipTable shipTable) {
+    public BallisticProjectileData(short instanceID, final BallisticProjectile projectile, final short specID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                ShortRecord.getDefault().setDebugText("missile spec id"),
+                ShortRecord.getDefault().setDebugText("projectile spec id"),
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
@@ -114,7 +114,7 @@ public class MissileData extends EntityData {
                         }
                     }
                 }
-        ));
+        ).setRate(9999f));
         addRecord(new RecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
@@ -131,7 +131,7 @@ public class MissileData extends EntityData {
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
-        ));
+        ).setRate(9999f));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("facing"),
                 new SourceExecute<Float>() {
@@ -152,7 +152,7 @@ public class MissileData extends EntityData {
                         }
                     }
                 }
-        ));
+        ).setRate(9999f));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
@@ -169,7 +169,7 @@ public class MissileData extends EntityData {
                         if (projectile != null) projectile.setAngularVelocity(value);
                     }
                 }
-        ));
+        ).setRate(9999f));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("hitpoints"),
                 new SourceExecute<Byte>() {
@@ -214,13 +214,14 @@ public class MissileData extends EntityData {
             }
         }
 
+        String w = weapon == null ? null : weapon.getId();
+        Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
+
         try {
-            String w = weapon == null ? null : weapon.getId();
-            Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
                     ship, weapon, w, new Vector2f(location), facing, vel
             );
-        } catch (NullPointerException n) {
+        } catch (Throwable n) {
             n.printStackTrace();
         }
     }
@@ -228,10 +229,6 @@ public class MissileData extends EntityData {
     @Override
     public void delete() {
 
-    }
-
-    public static void setTypeId(byte typeId) {
-        TYPE_ID = typeId;
     }
 
     public void setSpecID(short specID) {

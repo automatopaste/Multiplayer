@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.RecordLambda;
@@ -30,9 +31,7 @@ import java.util.List;
  */
 public class PlayerShipData extends EntityData {
 
-    public static final String NULL_SHIP = "NONE";
-
-    public static byte TYPE_ID;
+    public static byte TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
 
     private int controlBitmask;
     private String playerShipID;
@@ -70,7 +69,7 @@ public class PlayerShipData extends EntityData {
                     @Override
                     public String get() {
                         String s = playerShip.getPlayerShipID();
-                        if (s == null) return NULL_SHIP;
+                        if (s == null) return StringRecord.NULL;
                         return s;
                     }
                 },
@@ -78,7 +77,7 @@ public class PlayerShipData extends EntityData {
                     @Override
                     public void execute(String value, EntityData packable) {
                         PlayerShipData playerShipData = (PlayerShipData) packable;
-                        if (value == null || value.equals(NULL_SHIP)) {
+                        if (value == null || value.equals(StringRecord.NULL)) {
                             playerShipData.setPlayerShipID(null);
                         } else {
                             playerShipData.setPlayerShipID(value);
