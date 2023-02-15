@@ -25,7 +25,10 @@ public abstract class DataRecord<T> {
             throw new NullPointerException("Null value in record delta check: " + debug);
         }
 
-        value = t;
+        if (isUpdated) {
+            value = t;
+        }
+
         return isUpdated;
     }
 

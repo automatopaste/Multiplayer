@@ -31,6 +31,15 @@ public class ListenArrayRecord<E> extends DataRecord<List<E>> {
     }
 
     @Override
+    public void overwrite(Object delta) {
+        super.overwrite(delta);
+
+        if (getDebugText().equals("chat strings")) {
+            float f = 0f;
+        }
+    }
+
+    @Override
     public void write(ByteBuf dest) {
         if (value.size() > 0b11111111) {
             throw new RuntimeException("List size exceeded " + 0b11111111 + " elements");
@@ -42,6 +51,10 @@ public class ListenArrayRecord<E> extends DataRecord<List<E>> {
         for (E e : value) {
             writer.overwrite(e);
             writer.write(dest);
+        }
+
+        if (getDebugText().equals("chat strings")) {
+            float f = 0f;
         }
     }
 
@@ -68,6 +81,10 @@ public class ListenArrayRecord<E> extends DataRecord<List<E>> {
 
     @Override
     protected boolean checkUpdate(List<E> delta) {
+        if (getDebugText().equals("chat strings") && !value.isEmpty()) {
+            float f = 0f;
+        }
+
         return !delta.isEmpty();
     }
 
