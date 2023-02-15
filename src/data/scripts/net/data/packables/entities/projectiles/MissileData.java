@@ -124,8 +124,7 @@ public class MissileData extends EntityData {
                 new DestExecute<Vector2f>() {
                     @Override
                     public void execute(Vector2f value, EntityData packable) {
-                        ProjectileData projectileData = (ProjectileData) packable;
-                        DamagingProjectileAPI projectile = projectileData.getProjectile();
+                        DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
