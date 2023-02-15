@@ -42,7 +42,7 @@ public class ClientDuplex {
                 } else {
                     for (Byte k : p.keySet()) {
                         Object delta = d.get(k);
-                        if (delta != null) p.put(k, delta);
+                        p.put(k, delta);
                     }
                 }
             }

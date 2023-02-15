@@ -70,42 +70,50 @@ public class ServerDuplex {
         }
     }
 
-    public synchronized void updateOutboundSocket(byte connectionID, OutboundData outboundData) {
-        OutboundData data = outboundSocket.get(connectionID);
-        if (data == null) {
-            data = new OutboundData(connectionID);
-            outboundSocket.put(connectionID, data);
-        }
+    public void updateOutboundSocket(byte connectionID, OutboundData outboundData) {
+        synchronized (outboundSocket) {
+            OutboundData data = outboundSocket.get(connectionID);
+            if (data == null) {
+                data = new OutboundData(connectionID);
+                outboundSocket.put(connectionID, data);
+            }
 
-        updateEntities(data.out, outboundData.out);
-        updateDeleted(data.deleted, outboundData.deleted);
+            updateEntities(data.out, outboundData.out);
+            updateDeleted(data.deleted, outboundData.deleted);
+        }
     }
 
     public synchronized void updateOutboundDatagram(byte connectionID, OutboundData outboundData) {
-        OutboundData data = outboundDatagram.get(connectionID);
-        if (data == null) {
-            data = new OutboundData(connectionID);
-            outboundDatagram.put(connectionID, data);
-        }
+        synchronized (outboundDatagram) {
+            OutboundData data = outboundDatagram.get(connectionID);
+            if (data == null) {
+                data = new OutboundData(connectionID);
+                outboundDatagram.put(connectionID, data);
+            }
 
-        updateEntities(data.out, outboundData.out);
-        updateDeleted(data.deleted, outboundData.deleted);
+            updateEntities(data.out, outboundData.out);
+            updateDeleted(data.deleted, outboundData.deleted);
+        }
     }
 
     public synchronized OutboundData getOutboundSocket(byte connectionID) {
-        OutboundData out = outboundSocket.get(connectionID);
-        if (out == null) out = new OutboundData(connectionID);
+        synchronized (outboundSocket) {
+            OutboundData out = outboundSocket.get(connectionID);
+            if (out == null) out = new OutboundData(connectionID);
 
-        outboundSocket.put(connectionID, new OutboundData(connectionID));
-        return out;
+            outboundSocket.put(connectionID, new OutboundData(connectionID));
+            return out;
+        }
     }
 
     public synchronized OutboundData getOutboundDatagram(byte connectionID) {
-        OutboundData out = outboundDatagram.get(connectionID);
-        if (out == null) out = new OutboundData(connectionID);
+        synchronized (outboundDatagram) {
+            OutboundData out = outboundDatagram.get(connectionID);
+            if (out == null) out = new OutboundData(connectionID);
 
-        outboundDatagram.put(connectionID, new OutboundData(connectionID));
-        return out;
+            outboundDatagram.put(connectionID, new OutboundData(connectionID));
+            return out;
+        }
     }
 
     public static void updateEntities(Map<Byte, Map<Short, InstanceData>> dest, Map<Byte, Map<Short, InstanceData>> deltaMap) {

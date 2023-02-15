@@ -5,6 +5,7 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.packables.metadata.ChatListenData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
@@ -160,7 +161,31 @@ public abstract class BaseConnectionWrapper {
                 entities.writeShort(instances.size());
 
                 for (short instance : instances.keySet()) {
-                    writeInstance(entities, instances.get(instance), instance);
+                    InstanceData instanceData = instances.get(instance);
+
+                    // write instance short
+                    entities.writeShort(instance);
+
+                    // write num records byte
+                    entities.writeByte(instanceData.records.size());
+
+                    for (byte id : instanceData.records.keySet()) {
+                        DataRecord<?> record = instanceData.records.get(id);
+
+                        // write record id byte
+                        entities.writeByte(id);
+
+                        //write record type byte
+                        byte typeID = record.getTypeId();
+                        entities.writeByte(typeID);
+
+                        // write record data bytes
+                        record.write(entities);
+
+                        if (type == ChatListenData.TYPE_ID) {
+                            float f = 0f;
+                        }
+                    }
                 }
             }
 
@@ -185,28 +210,6 @@ public abstract class BaseConnectionWrapper {
         }
 
         return out;
-    }
-
-    private static void writeInstance(ByteBuf dest, InstanceData instanceData, short instanceID) {
-        // write instance short
-        dest.writeShort(instanceID);
-
-        // write num records byte
-        dest.writeByte(instanceData.records.size());
-
-        for (byte id : instanceData.records.keySet()) {
-            DataRecord<?> record = instanceData.records.get(id);
-
-            // write record id byte
-            dest.writeByte(id);
-
-            //write record type byte
-            byte typeID = record.getTypeId();
-            dest.writeByte(typeID);
-
-            // write record data bytes
-            record.write(dest);
-        }
     }
 
     private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, byte connectionID) throws IOException {

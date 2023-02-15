@@ -50,6 +50,10 @@ public class ChatListenData extends EntityData {
 
                         toWrite.clear();
 
+                        if (out.size() > 0) {
+                            float f = 0f;
+                        }
+
                         return out;
                     }
                 },
