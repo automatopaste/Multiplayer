@@ -26,20 +26,23 @@ public class ServerDuplex {
         return in;
     }
 
-    public synchronized void updateInbound(InboundData data, byte connectionID) {
-        InboundData inbound = this.inbound.get(connectionID);
-        if (inbound == null) {
-            inbound = new InboundData();
-            this.inbound.put(connectionID, inbound);
+    public void updateInbound(InboundData data, byte connectionID) {
+        InboundData inboundData;
+        synchronized (inbound) {
+            inboundData = this.inbound.get(connectionID);
+            if (inboundData == null) {
+                inboundData = new InboundData();
+                this.inbound.put(connectionID, inboundData);
+            }
         }
 
         for (Byte type : data.in.keySet()) {
-            Map<Short, Map<Byte, Object>> inboundEntities = inbound.in.get(type);
+            Map<Short, Map<Byte, Object>> inboundEntities = inboundData.in.get(type);
             Map<Short, Map<Byte, Object>> deltas = data.in.get(type);
 
             if (inboundEntities == null) {
                 inboundEntities = new HashMap<>();
-                inbound.in.put(type, inboundEntities);
+                inboundData.in.put(type, inboundEntities);
             }
 
             for (Short instance : deltas.keySet()) {
@@ -58,12 +61,12 @@ public class ServerDuplex {
         }
 
         for (Byte type : data.deleted.keySet()) {
-            Set<Short> deleted = inbound.deleted.get(type);
+            Set<Short> deleted = inboundData.deleted.get(type);
             Set<Short> deltas = data.deleted.get(type);
 
             if (deleted == null) {
                 deleted = new HashSet<>();
-                inbound.deleted.put(type, deleted);
+                inboundData.deleted.put(type, deleted);
             }
 
             deleted.addAll(deltas);
@@ -71,32 +74,34 @@ public class ServerDuplex {
     }
 
     public void updateOutboundSocket(byte connectionID, OutboundData outboundData) {
+        OutboundData data;
         synchronized (outboundSocket) {
-            OutboundData data = outboundSocket.get(connectionID);
+            data = outboundSocket.get(connectionID);
             if (data == null) {
                 data = new OutboundData(connectionID);
                 outboundSocket.put(connectionID, data);
             }
-
-            updateEntities(data.out, outboundData.out);
-            updateDeleted(data.deleted, outboundData.deleted);
         }
+
+        updateEntities(data.out, outboundData.out);
+        updateDeleted(data.deleted, outboundData.deleted);
     }
 
-    public synchronized void updateOutboundDatagram(byte connectionID, OutboundData outboundData) {
+    public void updateOutboundDatagram(byte connectionID, OutboundData outboundData) {
+        OutboundData data;
         synchronized (outboundDatagram) {
-            OutboundData data = outboundDatagram.get(connectionID);
+            data = outboundDatagram.get(connectionID);
             if (data == null) {
                 data = new OutboundData(connectionID);
                 outboundDatagram.put(connectionID, data);
             }
-
-            updateEntities(data.out, outboundData.out);
-            updateDeleted(data.deleted, outboundData.deleted);
         }
+
+        updateEntities(data.out, outboundData.out);
+        updateDeleted(data.deleted, outboundData.deleted);
     }
 
-    public synchronized OutboundData getOutboundSocket(byte connectionID) {
+    public OutboundData getOutboundSocket(byte connectionID) {
         synchronized (outboundSocket) {
             OutboundData out = outboundSocket.get(connectionID);
             if (out == null) out = new OutboundData(connectionID);
@@ -106,7 +111,7 @@ public class ServerDuplex {
         }
     }
 
-    public synchronized OutboundData getOutboundDatagram(byte connectionID) {
+    public OutboundData getOutboundDatagram(byte connectionID) {
         synchronized (outboundDatagram) {
             OutboundData out = outboundDatagram.get(connectionID);
             if (out == null) out = new OutboundData(connectionID);
@@ -144,7 +149,7 @@ public class ServerDuplex {
                             outboundInstanceData.size += delta.size();
                         }
 
-                        outboundRecord.overwrite(outboundRecord.getValue());
+                        outboundRecord.overwrite(delta.getValue());
                     }
                 }
             }
