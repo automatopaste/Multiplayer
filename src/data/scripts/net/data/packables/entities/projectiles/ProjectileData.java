@@ -4,7 +4,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -20,7 +19,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class ProjectileData extends EntityData {
 
-    public static byte TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
+    public static byte TYPE_ID;
 
     private DamagingProjectileAPI projectile;
     private short specID;

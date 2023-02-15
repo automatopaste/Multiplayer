@@ -5,9 +5,8 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
-import data.scripts.net.data.DataGenManager;
-import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.DestExecute;
+import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.IntRecord;
@@ -31,7 +30,7 @@ import java.util.List;
  */
 public class PlayerShipData extends EntityData {
 
-    public static byte TYPE_ID = DataGenManager.registerEntityType(PlayerShipData.class);
+    public static byte TYPE_ID;
 
     private int controlBitmask;
     private String playerShipID;

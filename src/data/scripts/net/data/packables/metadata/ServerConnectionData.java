@@ -1,6 +1,5 @@
 package data.scripts.net.data.packables.metadata;
 
-import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -13,7 +12,7 @@ import data.scripts.plugins.MPPlugin;
 
 public class ServerConnectionData extends EntityData {
 
-    public static byte TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
+    public static byte TYPE_ID;
 
     private byte connectionState;
     private byte connectionID;

@@ -2,7 +2,6 @@ package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShieldAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.Float16Record;
@@ -14,7 +13,7 @@ import org.lazywizard.lazylib.MathUtils;
 
 public class ShieldData extends EntityData {
 
-    public static byte TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
+    public static byte TYPE_ID;
 
     private final short instanceID;
 

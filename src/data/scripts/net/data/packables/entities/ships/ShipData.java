@@ -6,7 +6,6 @@ import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.combat.entities.Ship;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.records.*;
@@ -25,7 +24,8 @@ import org.lwjgl.util.vector.Vector2f;
 import java.util.*;
 
 public class ShipData extends EntityData {
-    public static byte TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
+
+    public static byte TYPE_ID;
 
     private final Map<Integer, Boolean> prevStates = new HashMap<>();
     private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownDisabledEngines = new HashSet<>();
