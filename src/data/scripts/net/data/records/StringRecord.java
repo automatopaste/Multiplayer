@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 public class StringRecord extends DataRecord<String> {
     public static byte TYPE_ID;
 
+    public static final String NULL = "NULL";
+
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public StringRecord(String value) {
@@ -16,7 +18,7 @@ public class StringRecord extends DataRecord<String> {
 
     @Override
     public void write(ByteBuf dest) {
-        byte[] bytes = value == null ? "NONE".getBytes(CHARSET) : value.getBytes(CHARSET);
+        byte[] bytes = value == null ? NULL.getBytes(CHARSET) : value.getBytes(CHARSET);
 
         if (bytes.length > Byte.MAX_VALUE) {
             byte[] b = new byte[Byte.MAX_VALUE];
@@ -64,7 +66,7 @@ public class StringRecord extends DataRecord<String> {
 
     @Override
     public int size() {
-        if (value == null) return 1 + "NONE".getBytes(CHARSET).length;
+        if (value == null) return 1 + NULL.getBytes(CHARSET).length;
         return 1 + value.getBytes(CHARSET).length;
     }
 }
