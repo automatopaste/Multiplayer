@@ -214,6 +214,7 @@ public class MissileData extends EntityData {
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
                     ship, weapon, w, new Vector2f(location), facing, vel
             );
+            if (ship != null) projectile.setOwner(ship.getOwner());
         } catch (NullPointerException n) {
             n.printStackTrace();
         }
