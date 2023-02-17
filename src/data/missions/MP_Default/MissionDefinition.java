@@ -19,7 +19,7 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         enemyVariants.add("medusa_Attack");
         enemyVariants.add("medusa_Attack");
 
-        enemyVariants.add("tempest_Attack");
+//        enemyVariants.add("tempest_Attack");
         enemyVariants.add("omen_PD");
     }
 
@@ -31,7 +31,7 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         playerVariants.add("medusa_Attack");
         playerVariants.add("medusa_Attack");
 
-        playerVariants.add("tempest_Attack");
+//        playerVariants.add("tempest_Attack");
         playerVariants.add("omen_PD");
     }
 
@@ -53,8 +53,10 @@ public class MissionDefinition implements MissionDefinitionPlugin {
             f = false;
         }
 
+        f = true;
         for (String variant : playerVariants) {
-            api.addToFleet(FleetSide.PLAYER, variant, FleetMemberType.SHIP, false);
+            api.addToFleet(FleetSide.PLAYER, variant, FleetMemberType.SHIP, f);
+            f = false;
         }
 
         // Set up the map.
