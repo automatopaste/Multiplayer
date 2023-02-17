@@ -260,21 +260,6 @@ public class PlayerShipData extends EntityData {
         if (controls[5]) {
             float target = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
 
-            float acc = ship.getTurnAcceleration() * amount;
-//            float rotate = MathUtils.getShortestRotation(ship.getFacing(), target);
-//            float vel = ship.getAngularVelocity();
-//
-//            if (rotate > 0f) vel += acc;
-//            else if (rotate < 0f) vel -= acc;
-//
-//            vel = MathUtils.clamp(vel, -ship.getMaxTurnRate(), ship.getMaxTurnRate());
-//
-//            if (Math.abs(rotate) < 20f) {
-//                ship.setFacing(ship.getFacing() + (rotate * amount));
-//            } else {
-//                ship.setAngularVelocity(vel);
-//            }
-
             DroneAIUtils.rotate(target, ship, control);
         }
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
