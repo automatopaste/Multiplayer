@@ -106,8 +106,8 @@ public class ShieldData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
-        if (pluginType == MPPlugin.PluginType.CLIENT) {
+    public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
+        if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
             if (shield == null) {
                 ClientShipTable clientShipTable = (ClientShipTable) manager;
 

@@ -41,7 +41,7 @@ public class Player implements OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        player.update(amount, this, plugin.getType());
+        player.update(amount, this, plugin);
     }
 
     @Override

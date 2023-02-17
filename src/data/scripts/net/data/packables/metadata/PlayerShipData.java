@@ -1,7 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
@@ -9,12 +8,14 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.PlayerShip;
+import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
@@ -100,9 +101,6 @@ public class PlayerShipData extends EntityData {
                     @Override
                     public void execute(Vector2f value, EntityData packable) {
                         setMouseTarget(value);
-
-                        ShipAPI ship = getPlayerShip();
-                        if (ship != null) ship.getMouseTarget().set(value);
                     }
                 }
         ));
@@ -114,14 +112,14 @@ public class PlayerShipData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
-        if (playerShip == null) {
-            check();
+    public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
+        if (playerShip == null && plugin.getType() == MPPlugin.PluginType.SERVER) {
+            check((ShipTable) plugin.getEntityManagers().get(ShipTable.class));
         }
 
         if (playerShip != null) {
-            if (pluginType == MPPlugin.PluginType.SERVER) {
-                unmask(playerShip, controlBitmask);
+            if (plugin.getType() == MPPlugin.PluginType.SERVER) {
+                unmask(playerShip, controlBitmask, amount);
             } else {
                 playerShip.blockCommandForOneFrame(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK);
             }
@@ -132,13 +130,21 @@ public class PlayerShipData extends EntityData {
         prev = check;
     }
 
-    private void check() {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        for (ShipAPI ship : engine.getShips()) {
-            if (ship.getFleetMemberId().equals(playerShipID)) {
-                ship.setShipAI(new MPDefaultShipAIPlugin());
+    private void check(ShipTable shipTable) {
+        for (ShipData data : shipTable.getTable()) {
+            if (data != null && data.getShip() != null) {
+                ShipAPI ship = data.getShip();
 
-                playerShip = ship;
+                if (ship.getFleetMemberId().equals(playerShipID)) {
+                    ship.setShipAI(new MPDefaultShipAIPlugin());
+                    data.setControlOverride(new ShipControlOverride(this) {
+                        @Override
+                        public void control(ShipAPI ship) {
+                            ship.getMouseTarget().set(mouseTarget);
+                        }
+                    });
+                    playerShip = ship;
+                }
             }
         }
     }
@@ -217,7 +223,7 @@ public class PlayerShipData extends EntityData {
         return bits;
     }
 
-    public void unmask(ShipAPI ship, int bitmask) {
+    public void unmask(ShipAPI ship, int bitmask, float amount) {
 
         boolean[] controls = new boolean[Integer.SIZE];
         for (int i = 0; i < controls.length; i++) {
@@ -231,9 +237,21 @@ public class PlayerShipData extends EntityData {
         if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
         if (controls[5]) {
             float target = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
+
+            float acc = ship.getTurnAcceleration() * amount;
             float rotate = MathUtils.getShortestRotation(ship.getFacing(), target);
-            rotate = MathUtils.clamp(rotate, -ship.getMaxTurnRate(), ship.getMaxTurnRate());
-            ship.setFacing(ship.getFacing() + (Global.getCombatEngine().getElapsedInLastFrame() * rotate));
+            float vel = ship.getAngularVelocity();
+
+            if (rotate > 0f) vel += acc;
+            else if (rotate < 0f) vel -= acc;
+
+            vel = MathUtils.clamp(vel, -ship.getMaxTurnRate(), ship.getMaxTurnRate());
+
+            float d = (ship.getMaxTurnRate() * ship.getMaxTurnRate()) / (2f * ship.getTurnAcceleration());
+            float m = Math.abs(rotate) / d;
+            vel *= m;
+
+            ship.setAngularVelocity(vel);
         }
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
         if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
@@ -278,5 +296,15 @@ public class PlayerShipData extends EntityData {
 
     public Vector2f getMouseTarget() {
         return mouseTarget;
+    }
+
+    public abstract static class ShipControlOverride {
+        public final PlayerShipData data;
+
+        public ShipControlOverride(PlayerShipData data) {
+            this.data = data;
+        }
+
+        public abstract void control(ShipAPI ship);
     }
 }

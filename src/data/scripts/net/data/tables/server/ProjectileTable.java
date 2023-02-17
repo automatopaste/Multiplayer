@@ -68,13 +68,13 @@ public class ProjectileTable implements OutboundEntityManager {
         }
 
         for (MovingRayData r : movingRays.registered.values()) {
-            r.update(amount, this, plugin.getType());
+            r.update(amount, this, plugin);
         }
         for (BallisticProjectileData r : ballisticProjectiles.registered.values()) {
-            r.update(amount, this, plugin.getType());
+            r.update(amount, this, plugin);
         }
         for (MissileData r : missiles.registered.values()) {
-            r.update(amount, this, plugin.getType());
+            r.update(amount, this, plugin);
         }
     }
 

@@ -46,6 +46,8 @@ public class ShipData extends EntityData {
     private final Map<WeaponAPI, Byte> weaponSlotIDs = new HashMap<>();
     private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
+    private PlayerShipData.ShipControlOverride controlOverride;
+
     public ShipData(short instanceID, final ShipAPI ship, final PlayerShips playerShips) {
         super(instanceID);
         this.ship = ship;
@@ -739,8 +741,10 @@ public class ShipData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
-
+    public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
+        if (controlOverride != null) {
+            controlOverride.control(ship);
+        }
     }
 
     @Override
@@ -787,6 +791,14 @@ public class ShipData extends EntityData {
 
     public Map<Byte, WeaponAPI> getWeaponSlots() {
         return weaponSlots;
+    }
+
+    public void setControlOverride(PlayerShipData.ShipControlOverride controlOverride) {
+        this.controlOverride = controlOverride;
+    }
+
+    public void removeControlOverride() {
+        controlOverride = null;
     }
 
     public static class ArmourSyncData {

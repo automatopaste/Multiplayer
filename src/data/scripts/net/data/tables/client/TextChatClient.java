@@ -37,8 +37,8 @@ public class TextChatClient implements InboundEntityManager, OutboundEntityManag
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        send.update(amount, this, plugin.getType());
-        receive.update(amount, this, plugin.getType());
+        send.update(amount, this, plugin);
+        receive.update(amount, this, plugin);
 
         String input = chatbox.getInput();
         if (input != null) {

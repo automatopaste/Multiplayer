@@ -26,7 +26,7 @@ public class PlayerShips implements InboundEntityManager {
     @Override
     public void update(float amount, MPPlugin plugin) {
         for (PlayerShipData playerShipData : playerShips.values()) {
-            playerShipData.update(amount, this, plugin.getType());
+            playerShipData.update(amount, this, plugin);
         }
 
         for (PlayerShipData playerShipData : playerShips.values()) {
@@ -59,10 +59,6 @@ public class PlayerShips implements InboundEntityManager {
                             break;
                         }
                     }
-                }
-
-                if (activeShip != null) {
-                    playerShipData.unmask(activeShip, playerShipData.getControlBitmask());
                 }
             } else {
                 String s = IDTrackerMap.get(playerShipData);

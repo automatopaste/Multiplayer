@@ -78,10 +78,10 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        host.update(amount, this, plugin.getType());
-        lobby.update(amount, this, plugin.getType());
+        host.update(amount, this, plugin);
+        lobby.update(amount, this, plugin);
         for (ClientData clientData : players.values()) {
-            clientData.update(amount, this, plugin.getType());
+            clientData.update(amount, this, plugin);
 
             if (clientData.getUsername() != null) {
                 usernames.put(clientData.getConnectionID(), clientData.getUsername());

@@ -264,7 +264,7 @@ public class VariantData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
+    public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
 
     }
 

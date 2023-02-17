@@ -95,7 +95,7 @@ public abstract class EntityData {
     /**
      * Called every time an entity plugin updates on the game thread. May be called by either client or server
      */
-    public abstract void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType);
+    public abstract void update(float amount, BaseEntityManager manager, MPPlugin plugin);
 
     /**
      * Called when entity is initialised
