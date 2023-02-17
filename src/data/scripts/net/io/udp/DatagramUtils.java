@@ -44,26 +44,21 @@ public class DatagramUtils {
     }
 
     public static Decompressed read(DatagramPacket in) throws DataFormatException {
-        try {
-            ByteBuf content = in.content();
+        ByteBuf content = in.content();
 
-            long timestamp = content.readLong();
-            int size = content.readInt();
+        long timestamp = content.readLong();
+        int size = content.readInt();
 
-            if (size == 0) return new Decompressed();
+        if (size == 0) return new Decompressed();
 
-            byte[] bytes = new byte[size];
-            content.readBytes(bytes);
+        byte[] bytes = new byte[size];
+        content.readBytes(bytes);
 
-            Decompressed out = new Decompressed();
-            out.data = bytes;
-            out.timestamp = timestamp;
+        Decompressed out = new Decompressed();
+        out.data = bytes;
+        out.timestamp = timestamp;
 
-            return out;
-        } finally {
-            in.release();
-        }
-
+        return out;
     }
 
     public static class SizeData {
