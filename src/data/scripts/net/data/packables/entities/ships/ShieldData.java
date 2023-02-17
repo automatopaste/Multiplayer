@@ -20,8 +20,6 @@ public class ShieldData extends EntityData {
 
     private ShieldAPI shield;
 
-    private boolean active = false;
-
     /**
      * Shield must be passed in constructor
      */
@@ -46,7 +44,8 @@ public class ShieldData extends EntityData {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            active = value == (byte) 1;
+                            if (value == (byte) 1) shield.toggleOn();
+                            else shield.toggleOff();
                         }
                     }
                 }
@@ -64,7 +63,7 @@ public class ShieldData extends EntityData {
                     public void execute(Float value, EntityData packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
-                        if (shield != null) {
+                        if (shield != null && shield.isOn()) {
                             shield.forceFacing(value);
                         }
                     }
@@ -88,7 +87,7 @@ public class ShieldData extends EntityData {
                     public void execute(Float value, EntityData packable) {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
-                        if (shield != null) {
+                        if (shield != null && shield.isOn()) {
                             shield.setActiveArc(value);
                         }
                     }
@@ -113,11 +112,6 @@ public class ShieldData extends EntityData {
                 ClientShipTable clientShipTable = (ClientShipTable) manager;
 
                 setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
-            }
-
-            if (shield != null) {
-                if (active) shield.toggleOn();
-                else shield.toggleOff();
             }
         }
     }
