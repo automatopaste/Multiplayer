@@ -7,7 +7,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.net.InetSocketAddress;
-import java.util.Date;
 import java.util.List;
 
 public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUtils.Decompressed> {
@@ -16,15 +15,14 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUtils.Deco
         ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.data.length);
         data.writeBytes(in.data);
 
-        Date date = new Date();
-        int latency = (int) (date.getTime() - in.timestamp);
+        long latency = System.currentTimeMillis() - in.timestamp;
 
         try {
             Unpacked result = new Unpacked(
                     data,
                     (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
                     (InetSocketAddress) channelHandlerContext.channel().localAddress(),
-                    latency
+                    (int) latency
             );
 
             out.add(result);

@@ -7,7 +7,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
-import java.util.Date;
 import java.util.zip.DataFormatException;
 
 public class DatagramUtils {
@@ -28,8 +27,7 @@ public class DatagramUtils {
 
             ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 5);
 
-            Date now = new Date();
-            out.writeLong(now.getTime());
+            out.writeLong(System.currentTimeMillis());
 
             out.writeInt(sizeData.size);
 
