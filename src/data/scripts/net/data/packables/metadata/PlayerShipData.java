@@ -38,6 +38,8 @@ public class PlayerShipData extends EntityData {
     private ShipAPI playerShip;
     private Vector2f mouseTarget = new Vector2f(0f, 0f);
 
+    private boolean shieldToggleCheck = false;
+
     /**
      * Source constructor
      *
@@ -160,7 +162,7 @@ public class PlayerShipData extends EntityData {
         this.playerShipID = playerShipID;
     }
 
-    public static int mask() {
+    public int mask() {
         boolean[] controls = new boolean[Integer.SIZE];
 
         if (!Keyboard.isCreated()) return 0x00000000;
@@ -178,7 +180,8 @@ public class PlayerShipData extends EntityData {
         controls[8] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_USE_SYSTEM")));
 
 //        controls[9] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SHIELDS")));
-        controls[9] = Mouse.isButtonDown(1);
+        controls[9] = Mouse.isButtonDown(1) && !shieldToggleCheck;
+        shieldToggleCheck = Mouse.isButtonDown(1);
 
 //        controls[10] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_FIRE")));
         controls[10] = Mouse.isButtonDown(0);
