@@ -215,7 +215,7 @@ public class MissileData extends EntityData {
                     ship, weapon, w, new Vector2f(location), facing, vel
             );
             if (ship != null) projectile.setOwner(ship.getOwner());
-        } catch (NullPointerException n) {
+        } catch (Throwable n) {
             n.printStackTrace();
         }
     }
