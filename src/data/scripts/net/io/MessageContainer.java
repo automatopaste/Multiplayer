@@ -11,7 +11,6 @@ public class MessageContainer {
     private final ByteBuf data;
     private final InetSocketAddress dest;
     private final byte connectionID;
-    private int bufSize;
 
     public MessageContainer(ByteBuf data, int tick, InetSocketAddress dest, byte connectionID) throws IOException {
         this.tick = tick;
@@ -34,5 +33,9 @@ public class MessageContainer {
 
     public byte getConnectionID() {
         return connectionID;
+    }
+
+    public int getTick() {
+        return tick;
     }
 }
