@@ -123,8 +123,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 "server latency " + send.getLatency()
         );
         dataGraph.increment(send.getLatency());
-        CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph", dataGraph);
-
+        CMUtils.getGuiDebug().putContainer(ClientConnectionWrapper.class, "dataGraph", dataGraph);
 
         return writeBuffer(outbound, tick, null, connectionID);
     }
