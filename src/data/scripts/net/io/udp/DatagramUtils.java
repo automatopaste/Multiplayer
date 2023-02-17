@@ -13,33 +13,35 @@ public class DatagramUtils {
 
     public static SizeData write(Channel channel, MessageContainer message, InetSocketAddress dest, byte connectionID) throws InterruptedException {
         ByteBuf buf = message.getData();
-        if (buf.readableBytes() <= 4) {
-            channel.flush();
-            return null;
+        try {
+            if (buf.readableBytes() <= 4) {
+                channel.flush();
+                return null;
+            }
+
+            SizeData sizeData = new SizeData();
+
+            byte[] bytes = new byte[buf.readableBytes()];
+            //if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
+            sizeData.size = bytes.length;
+            buf.readBytes(bytes);
+//          byte[] compressed = CompressionUtils.deflate(bytes);
+//          sizeData.sizeCompressed = (short) compressed.length;
+
+            ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 8);
+
+            out.writeInt(sizeData.size);
+//          out.writeInt(sizeData.sizeCompressed);
+//          out.writeBytes(compressed);
+
+            out.writeBytes(bytes);
+
+            channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
+
+            return sizeData;
+        } finally {
+            buf.release();
         }
-
-        SizeData sizeData = new SizeData();
-
-        byte[] bytes = new byte[buf.readableBytes()];
-        //if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
-        sizeData.size = bytes.length;
-        buf.readBytes(bytes);
-//        byte[] compressed = CompressionUtils.deflate(bytes);
-//        sizeData.sizeCompressed = (short) compressed.length;
-
-        ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 8);
-
-        out.writeInt(sizeData.size);
-//        out.writeInt(sizeData.sizeCompressed);
-//        out.writeBytes(compressed);
-
-        out.writeBytes(bytes);
-
-        channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
-
-        buf.release();
-
-        return sizeData;
     }
 
     public static byte[] read(DatagramPacket in) throws DataFormatException {

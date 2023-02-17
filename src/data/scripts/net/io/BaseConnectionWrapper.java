@@ -215,6 +215,8 @@ public abstract class BaseConnectionWrapper {
         dest.writeByte(numDeletedTypes);
         dest.writeBytes(deleted);
 
+        dest.writeInt(0x00000000);
+
         return new MessageContainer(dest, tick, address, connectionID);
     }
 

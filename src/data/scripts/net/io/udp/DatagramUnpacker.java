@@ -15,14 +15,19 @@ public class DatagramUnpacker extends MessageToMessageDecoder<byte[]> {
         ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.length);
         data.writeBytes(in);
 
-        Unpacked result = new Unpacked(
-                data,
-                (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                (InetSocketAddress) channelHandlerContext.channel().localAddress()
-        );
+        try {
+            Unpacked result = new Unpacked(
+                    data,
+                    (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+            );
 
-        out.add(result);
-
-        data.release();
+            out.add(result);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            channelHandlerContext.flush();
+        } finally {
+            data.release();
+        }
     }
 }
