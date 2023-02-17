@@ -9,7 +9,6 @@ import data.scripts.net.data.records.DataRecord;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.buffer.UnpooledByteBufAllocator;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -147,75 +146,64 @@ public abstract class BaseConnectionWrapper {
         }
 
         for (OutboundData outboundData : toWrite) {
-            ByteBuf entities = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
-            ByteBuf deleted = UnpooledByteBufAllocator.DEFAULT.buffer(MAX_PACKET_SIZE);
+            ByteBuf dest = initBuffer(tick, connectionID);
+
+            dest.writeByte(outboundData.out.size());
 
             for (byte type : outboundData.out.keySet()) {
                 // write type byte
-                entities.writeByte(type);
+                dest.writeByte(type);
 
                 Map<Short, InstanceData> instances = outboundData.out.get(type);
 
                 // write num instances short
-                entities.writeShort(instances.size());
+                dest.writeShort(instances.size());
 
                 for (short instance : instances.keySet()) {
                     InstanceData instanceData = instances.get(instance);
 
                     // write instance short
-                    entities.writeShort(instance);
+                    dest.writeShort(instance);
 
                     // write num records byte
-                    entities.writeByte(instanceData.records.size());
+                    dest.writeByte(instanceData.records.size());
 
                     for (byte id : instanceData.records.keySet()) {
                         DataRecord<?> record = instanceData.records.get(id);
 
                         // write record id byte
-                        entities.writeByte(id);
+                        dest.writeByte(id);
 
                         //write record type byte
                         byte typeID = record.getTypeId();
-                        entities.writeByte(typeID);
+                        dest.writeByte(typeID);
 
                         // write record data bytes
-                        record.write(entities);
+                        record.write(dest);
                     }
                 }
             }
 
+            dest.writeByte(outboundData.deleted.size());
+
             for (byte type : outboundData.deleted.keySet()) {
                 // write type byte
-                deleted.writeByte(type);
+                dest.writeByte(type);
 
                 Set<Short> instances = outboundData.deleted.get(type);
 
                 // write num instances short
-                entities.writeShort(instances.size());
+                dest.writeShort(instances.size());
 
                 for (short instance : instances) {
-                    deleted.writeShort(instance);
+                    dest.writeShort(instance);
                 }
             }
 
-            out.add(container(outboundData.out.size(), entities, outboundData.deleted.size(), deleted, tick, address, connectionID));
-
-            entities.release();
-            deleted.release();
+            out.add(new MessageContainer(dest, tick, address, connectionID));
         }
 
         return out;
-    }
-
-    private static MessageContainer container(int numTypes, ByteBuf entities, int numDeletedTypes, ByteBuf deleted, int tick, InetSocketAddress address, byte connectionID) throws IOException {
-        ByteBuf dest = initBuffer(tick, connectionID);
-
-        dest.writeByte(numTypes);
-        dest.writeBytes(entities);
-        dest.writeByte(numDeletedTypes);
-        dest.writeBytes(deleted);
-
-        return new MessageContainer(dest, tick, address, connectionID);
     }
 
     public static InboundData readBuffer(ByteBuf data) throws IOException {
