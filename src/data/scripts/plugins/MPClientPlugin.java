@@ -107,6 +107,7 @@ public class MPClientPlugin extends MPPlugin {
         InboundData entities = connection.getDuplex().getDeltas();
         dataGraph.increment(entities.size);
         dataGraph2.increment(connection.getDuplex().getNumSinceTick());
+        dataGraph3.increment(connection.getDuplex().getLatency());
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph", dataGraph);
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph2", dataGraph2);
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph3", dataGraph3);
