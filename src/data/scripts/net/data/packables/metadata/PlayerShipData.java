@@ -116,8 +116,14 @@ public class PlayerShipData extends EntityData {
     public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
         if (playerShip == null) {
             check();
-        } else {
-            unmask(playerShip, controlBitmask);
+        }
+
+        if (playerShip != null) {
+            if (pluginType == MPPlugin.PluginType.SERVER) {
+                unmask(playerShip, controlBitmask);
+            } else {
+                playerShip.blockCommandForOneFrame(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK);
+            }
         }
     }
 

@@ -2,7 +2,6 @@ package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShieldAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
 import data.scripts.net.data.packables.*;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.Float16Record;
@@ -117,8 +116,6 @@ public class ShieldData extends EntityData {
             }
 
             if (shield != null) {
-                ship.blockCommandForOneFrame(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK);
-
                 if (active) shield.toggleOn();
                 else shield.toggleOff();
             }
