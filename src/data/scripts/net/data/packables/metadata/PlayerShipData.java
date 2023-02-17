@@ -113,7 +113,7 @@ public class PlayerShipData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager) {
+    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
         if (playerShip == null) {
             check();
         } else {

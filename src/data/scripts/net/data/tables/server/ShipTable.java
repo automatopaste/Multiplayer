@@ -97,10 +97,10 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         }
 
         for (ShipData shipData : table) {
-            if (shipData != null) shipData.update(amount, this);
+            if (shipData != null) shipData.update(amount, this, plugin.getType());
         }
         for (ShieldData shieldData : shields.registered.values()) {
-            shieldData.update(amount, this);
+            shieldData.update(amount, this, plugin.getType());
         }
     }
 

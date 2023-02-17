@@ -29,7 +29,7 @@ public class ClientProjectileTable implements InboundEntityManager {
 
         for (MovingRayData data : movingRays.values()) {
             if (data != null) {
-                data.update(amount, this);
+                data.update(amount, this, plugin.getType());
                 data.interp(amount);
 
                 p.remove(data.getProjectile());
@@ -37,7 +37,7 @@ public class ClientProjectileTable implements InboundEntityManager {
         }
         for (BallisticProjectileData data : ballisticProjectiles.values()) {
             if (data != null) {
-                data.update(amount, this);
+                data.update(amount, this, plugin.getType());
                 data.interp(amount);
 
                 p.remove(data.getProjectile());
@@ -45,7 +45,7 @@ public class ClientProjectileTable implements InboundEntityManager {
         }
         for (MissileData data : missiles.values()) {
             if (data != null) {
-                data.update(amount, this);
+                data.update(amount, this, plugin.getType());
                 data.interp(amount);
 
                 p.remove(data.getProjectile());

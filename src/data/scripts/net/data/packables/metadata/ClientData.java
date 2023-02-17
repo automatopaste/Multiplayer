@@ -141,7 +141,7 @@ public class ClientData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager) {
+    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
 
     }
 

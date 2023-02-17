@@ -26,7 +26,7 @@ public class PlayerShips implements InboundEntityManager {
     @Override
     public void update(float amount, MPPlugin plugin) {
         for (PlayerShipData playerShipData : playerShips.values()) {
-            playerShipData.update(amount, this);
+            playerShipData.update(amount, this, plugin.getType());
         }
 
         for (PlayerShipData playerShipData : playerShips.values()) {

@@ -74,12 +74,13 @@ public class ClientShipTable extends EntityTable<ShipData> implements InboundEnt
     public void update(float amount, MPPlugin plugin) {
         for (ShipData ship : table) {
             if (ship != null) {
-                ship.update(amount, this);
+                ship.update(amount, this, plugin.getType());
                 ship.interp(amount);
             }
         }
         for (ShieldData shieldData : shields.values()) {
-            shieldData.update(amount, this);
+            shieldData.update(amount, this, plugin.getType());
+            shieldData.interp(amount);
         }
     }
 

@@ -29,7 +29,7 @@ public class PlayerShip implements OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        playerShipData.update(amount, this);
+        playerShipData.update(amount, this, plugin.getType());
 
         if (playerShipID != null && playerShipIDPrev == null || playerShipID != null && !playerShipIDPrev.equals(playerShipID)) {
             for (ShipAPI ship : Global.getCombatEngine().getShips()) {

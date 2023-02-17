@@ -105,16 +105,18 @@ public class ShieldData extends EntityData {
     }
 
     @Override
-    public void update(float amount, BaseEntityManager manager) {
-        if (shield == null && manager instanceof ClientShipTable) {
-            ClientShipTable clientShipTable = (ClientShipTable) manager;
+    public void update(float amount, BaseEntityManager manager, MPPlugin.PluginType pluginType) {
+        if (pluginType == MPPlugin.PluginType.CLIENT) {
+            if (shield == null) {
+                ClientShipTable clientShipTable = (ClientShipTable) manager;
 
-            setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
-        }
+                setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
+            }
 
-        if (shield != null) {
-            if (active) shield.toggleOn();
-            else shield.toggleOff();
+            if (shield != null) {
+                if (active) shield.toggleOn();
+                else shield.toggleOff();
+            }
         }
     }
 
