@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.metadata;
 
+import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
@@ -18,7 +19,6 @@ import data.scripts.net.data.tables.client.PlayerShip;
 import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
-import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -41,6 +41,28 @@ public class PlayerShipData extends EntityData {
 
     private boolean shieldEnable = false;
     private boolean prev = false;
+
+    private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
+        @Override
+        public float getKp() {
+            return 0;
+        }
+
+        @Override
+        public float getKd() {
+            return 0;
+        }
+
+        @Override
+        public float getRp() {
+            return 0.1f;
+        }
+
+        @Override
+        public float getRd() {
+            return 0.05f;
+        }
+    };
 
     /**
      * Source constructor
@@ -239,19 +261,21 @@ public class PlayerShipData extends EntityData {
             float target = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
 
             float acc = ship.getTurnAcceleration() * amount;
-            float rotate = MathUtils.getShortestRotation(ship.getFacing(), target);
-            float vel = ship.getAngularVelocity();
+//            float rotate = MathUtils.getShortestRotation(ship.getFacing(), target);
+//            float vel = ship.getAngularVelocity();
+//
+//            if (rotate > 0f) vel += acc;
+//            else if (rotate < 0f) vel -= acc;
+//
+//            vel = MathUtils.clamp(vel, -ship.getMaxTurnRate(), ship.getMaxTurnRate());
+//
+//            if (Math.abs(rotate) < 20f) {
+//                ship.setFacing(ship.getFacing() + (rotate * amount));
+//            } else {
+//                ship.setAngularVelocity(vel);
+//            }
 
-            if (rotate > 0f) vel += acc;
-            else if (rotate < 0f) vel -= acc;
-
-            vel = MathUtils.clamp(vel, -ship.getMaxTurnRate(), ship.getMaxTurnRate());
-
-            float d = (ship.getMaxTurnRate() * ship.getMaxTurnRate()) / (2f * ship.getTurnAcceleration());
-            float m = Math.abs(rotate) / d;
-            vel *= m;
-
-            ship.setAngularVelocity(vel);
+            DroneAIUtils.rotate(target, ship, control);
         }
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
         if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
