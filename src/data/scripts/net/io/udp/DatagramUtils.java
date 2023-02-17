@@ -28,13 +28,15 @@ public class DatagramUtils {
 //          byte[] compressed = CompressionUtils.deflate(bytes);
 //          sizeData.sizeCompressed = (short) compressed.length;
 
-            ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 8);
+            ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 9);
 
             out.writeInt(sizeData.size);
 //          out.writeInt(sizeData.sizeCompressed);
 //          out.writeBytes(compressed);
 
             out.writeBytes(bytes);
+
+            out.writeInt(0x00000000);
 
             channel.writeAndFlush(new DatagramPacket(out, dest)).sync();
 
