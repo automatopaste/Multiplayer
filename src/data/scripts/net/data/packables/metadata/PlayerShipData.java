@@ -41,7 +41,9 @@ public class PlayerShipData extends EntityData {
     private Vector2f mouseTarget = new Vector2f(0f, 0f);
 
     private boolean shieldEnable = false;
-    private boolean prev = false;
+    private boolean prevShields = false;
+    private boolean fighterEnable = false;
+    private boolean prevFighters = false;
 
     private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
         @Override
@@ -151,9 +153,13 @@ public class PlayerShipData extends EntityData {
             }
         }
 
-        boolean check = Mouse.isButtonDown(1);
-        if (check && !prev) shieldEnable = !shieldEnable;
-        prev = check;
+        boolean shieldCheck = Mouse.isButtonDown(1);
+        if (shieldCheck && !prevShields) shieldEnable = !shieldEnable;
+        prevShields = shieldCheck;
+
+        boolean fighterCheck = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_PULL_BACK_FIGHTERS")));
+        if (fighterCheck && !prevFighters) fighterEnable = !fighterEnable;
+        prevFighters = fighterCheck;
     }
 
     private void check(ShipTable shipTable) {
@@ -226,12 +232,13 @@ public class PlayerShipData extends EntityData {
 
         controls[9] = shieldEnable;
 
-//        controls[10] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_FIRE")));
         controls[10] = Mouse.isButtonDown(0);
 
         controls[11] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_VENT_FLUX")));
         controls[12] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_HOLD_FIRE")));
-        controls[13] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_PULL_BACK_FIGHTERS")));
+
+        controls[13] = fighterEnable;
+
         controls[14] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_1")));
         controls[15] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_2")));
         controls[16] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_3")));
@@ -239,6 +246,16 @@ public class PlayerShipData extends EntityData {
         controls[18] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_5")));
         controls[19] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_6")));
         controls[20] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_7")));
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+            controls[21] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_1")));
+            controls[22] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_2")));
+            controls[23] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_3")));
+            controls[24] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_4")));
+            controls[25] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_5")));
+            controls[26] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_6")));
+            controls[27] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_7")));
+        }
 
         // max length 32
         int bits = 0;
@@ -298,7 +315,15 @@ public class PlayerShipData extends EntityData {
         if (controls[10]) ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), selected);
         if (controls[11]) ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
         if (controls[12]) ship.giveCommand(ShipCommand.HOLD_FIRE, null, 0);
-        if (controls[13]) ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
+        if (controls[13]) {
+            if (ship.isPullBackFighters()) {
+                ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
+            }
+        } else {
+            if (!ship.isPullBackFighters()) {
+                ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
+            }
+        }
         if (controls[14]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 0);
         if (controls[15]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 1);
         if (controls[16]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 2);
@@ -306,6 +331,14 @@ public class PlayerShipData extends EntityData {
         if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 4);
         if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 5);
         if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 6);
+
+        if (controls[21]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 0);
+        if (controls[22]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 1);
+        if (controls[23]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 2);
+        if (controls[24]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 3);
+        if (controls[25]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 4);
+        if (controls[26]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 5);
+        if (controls[27]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 6);
     }
 
     public void setMouseTarget(Vector2f mouseTarget) {
