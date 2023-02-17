@@ -610,8 +610,6 @@ public class ShipData extends EntityData {
                                     ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
                                 }
 
-
-
                                 List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
                                 for (int j = 0; j < weaponGroupsCopy.size(); j++) {
                                     WeaponGroupAPI group = weaponGroupsCopy.get(j);

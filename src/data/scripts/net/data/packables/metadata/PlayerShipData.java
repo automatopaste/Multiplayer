@@ -4,6 +4,7 @@ import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
+import com.fs.starfarer.api.combat.ViewportAPI;
 import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
@@ -115,8 +116,11 @@ public class PlayerShipData extends EntityData {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        if (playerShip.getPlayerShip() != null) return playerShip.getPlayerShip().getMouseTarget();
-                        return new Vector2f(0f, 0f);
+                        Vector2f m = new Vector2f(Mouse.getX(), Mouse.getY());
+                        ViewportAPI v = Global.getCombatEngine().getViewport();
+                        m.x = v.convertScreenXToWorldX(m.x);
+                        m.y = v.convertWorldYtoScreenY(m.y);
+                        return m;
                     }
                 },
                 new DestExecute<Vector2f>() {
@@ -258,7 +262,7 @@ public class PlayerShipData extends EntityData {
         if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
         if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
         if (controls[5]) {
-            float target = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
+            float target = VectorUtils.getAngle(ship.getLocation(), mouseTarget);
 
             DroneAIUtils.rotate(target, ship, control);
         }
@@ -300,7 +304,7 @@ public class PlayerShipData extends EntityData {
     }
 
     public void setMouseTarget(Vector2f mouseTarget) {
-        this.mouseTarget = mouseTarget;
+        this.mouseTarget.set(mouseTarget);
     }
 
     public Vector2f getMouseTarget() {
