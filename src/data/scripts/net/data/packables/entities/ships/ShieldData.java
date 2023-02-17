@@ -19,7 +19,7 @@ public class ShieldData extends EntityData {
 
     private ShieldAPI shield;
 
-    private boolean active;
+    private boolean active = false;
 
     /**
      * Shield must be passed in constructor
@@ -111,10 +111,11 @@ public class ShieldData extends EntityData {
 
             setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
         }
-        assert shield != null;
 
-        if (active) shield.toggleOn();
-        else shield.toggleOff();
+        if (shield != null) {
+            if (active) shield.toggleOn();
+            else shield.toggleOff();
+        }
     }
 
     @Override
