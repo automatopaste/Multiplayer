@@ -20,7 +20,6 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
 
         InboundData entities = in.getUnpacked();
         entities.setSize(in.getSize());
-        entities.setLatency(in.getLatency());
 
         connection.updateInbound(entities, serverTick);
     }
