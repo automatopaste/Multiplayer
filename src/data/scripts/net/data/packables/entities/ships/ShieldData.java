@@ -54,7 +54,7 @@ public class ShieldData extends EntityData {
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
-                        return shield.getFacing() - ship.getFacing();
+                        return shield.getFacing();
                     }
                 },
                 new DestExecute<Float>() {
