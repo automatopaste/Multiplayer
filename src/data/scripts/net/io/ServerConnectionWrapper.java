@@ -92,7 +92,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         CMUtils.getGuiDebug().putText(
                 ServerConnectionWrapper.class,
                 "latency" + connectionID,
-                "client " + connectionID + " latency " + send.getLatency()
+                "client " + connectionID + " effective round trip latency " + send.getLatency()
         );
 
         return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);

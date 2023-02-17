@@ -1,7 +1,6 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
-import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
@@ -37,7 +36,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     private ClientConnectionData send;
     private ServerConnectionData receive;
 
-    private DebugGraphContainer dataGraph;
+//    private DebugGraphContainer dataGraph;
 
     public ClientConnectionWrapper(String host, int port, MPPlugin plugin) {
         super(plugin);
@@ -48,7 +47,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
         tick = -1;
 
-        dataGraph = new DebugGraphContainer("Latency", 120, 30f);
+//        dataGraph = new DebugGraphContainer("Latency", 120, 30f);
 
         socketClient = new SocketClient(host, port, this);
         socket = new Thread(socketClient, "SOCKET_CLIENT_THREAD");
@@ -120,10 +119,10 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         CMUtils.getGuiDebug().putText(
                 ServerConnectionWrapper.class,
                 "latency",
-                "server latency " + send.getLatency()
+                "effective round trip latency " + send.getLatency()
         );
-        dataGraph.increment(send.getLatency());
-        CMUtils.getGuiDebug().putContainer(ClientConnectionWrapper.class, "dataGraph", dataGraph);
+//        dataGraph.increment(send.getLatency());
+//        CMUtils.getGuiDebug().putContainer(ClientConnectionWrapper.class, "dataGraph", dataGraph);
 
         return writeBuffer(outbound, tick, null, connectionID);
     }
