@@ -22,6 +22,9 @@ public class ServerInboundHandler extends SimpleChannelInboundHandler<Unpacked> 
         }
 
         InboundData entities = in.getUnpacked();
+        entities.setLatency(in.getLatency());
+        entities.setSize(in.getSize());
+
         connectionWrapper.updateInbound(entities);
     }
 
