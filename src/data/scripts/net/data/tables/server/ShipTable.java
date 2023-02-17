@@ -8,6 +8,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.DataRecord;
+import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.DataGenManager;
@@ -21,7 +22,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
     private final Map<ShipAPI, Short> registered;
     private final Set<Short> deleted;
-    private final Map<Short, ShieldData> shields;
+    private final EntityInstanceMap<ShieldData> shields;
     private final PlayerShips playerShips;
 
     public ShipTable(PlayerShips playerShips) {
@@ -30,7 +31,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
         registered = new HashMap<>();
         deleted = new HashSet<>();
-        shields = new HashMap<>();
+        shields = new EntityInstanceMap<>();
     }
 
     @Override
@@ -49,8 +50,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
                 }
             }
         } else if (typeID == ShieldData.TYPE_ID) {
-            for (Short id : shields.keySet()) {
-                ShieldData shieldData = shields.get(id);
+            for (Short id : shields.registered.keySet()) {
+                ShieldData shieldData = shields.registered.get(id);
 
                 InstanceData instanceData = shieldData.sourceExecute(amount);
 
@@ -65,9 +66,14 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
     @Override
     public Set<Short> getDeleted(byte typeID, byte connectionID) {
-        Set<Short> out = new HashSet<>(deleted);
-        deleted.clear();
-        return out;
+        if (typeID == ShipData.TYPE_ID) {
+            Set<Short> out = new HashSet<>(deleted);
+            deleted.clear();
+            return out;
+        } else if (typeID == ShieldData.TYPE_ID) {
+            return shields.getDeleted();
+        }
+        return null;
     }
 
     @Override
@@ -93,7 +99,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         for (ShipData shipData : table) {
             if (shipData != null) shipData.update(amount, this);
         }
-        for (ShieldData shieldData : shields.values()) {
+        for (ShieldData shieldData : shields.registered.values()) {
             shieldData.update(amount, this);
         }
     }
@@ -104,7 +110,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         registered.put(ship, id);
         table[id] = new ShipData(id, ship, playerShips);
         if (ship.getShield() != null) {
-            shields.put(id, new ShieldData(id, ship.getShield(), ship));
+            shields.registered.put(id, new ShieldData(id, ship.getShield(), ship));
         }
     }
 
@@ -114,7 +120,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         table[index] = null;
 
         registered.remove(ship);
-        shields.remove(index);
+        if (ship.getShield() != null) shields.delete(index);
         markVacant(index);
 
         deleted.add(index);

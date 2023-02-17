@@ -19,6 +19,8 @@ public class ShieldData extends EntityData {
 
     private ShieldAPI shield;
 
+    private boolean active;
+
     /**
      * Shield must be passed in constructor
      */
@@ -29,7 +31,7 @@ public class ShieldData extends EntityData {
         if (shield == null) throw new NullPointerException("Null shield object");
 
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("shield_active"),
+                ByteRecord.getDefault().setDebugText("shield active"),
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
@@ -42,10 +44,7 @@ public class ShieldData extends EntityData {
                         ShieldData shieldData = (ShieldData) packable;
                         ShieldAPI shield = shieldData.getShield();
                         if (shield != null) {
-                            boolean active = value == (byte) 1;
-
-                            if (active) shield.toggleOn();
-                            else shield.toggleOff();
+                            active = value == (byte) 1;
                         }
                     }
                 }
@@ -112,6 +111,10 @@ public class ShieldData extends EntityData {
 
             setShield(clientShipTable.getTable()[instanceID].getShip().getShield());
         }
+        assert shield != null;
+
+        if (active) shield.toggleOn();
+        else shield.toggleOff();
     }
 
     @Override
