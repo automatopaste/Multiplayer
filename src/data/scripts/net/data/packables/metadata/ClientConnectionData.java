@@ -76,9 +76,9 @@ public class ClientConnectionData extends EntityData {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
-                        if (connection.cReceive == 1) {
+                        if (connection.cReceive == 0) {
                             latency = System.currentTimeMillis() - timestamp;
-                            connection.cReceive = 0;
+                            connection.cReceive = 1;
 
                             timestamp = System.currentTimeMillis();
                             return (byte) 1;
