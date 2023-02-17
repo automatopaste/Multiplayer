@@ -258,16 +258,21 @@ public class PlayerShipData extends EntityData {
 
         if (controls[0]) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
         if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
-        if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
-        if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
-        if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
-        if (controls[5]) {
-            float target = VectorUtils.getAngle(ship.getLocation(), mouseTarget);
 
+        if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
+        if (controls[5]) { // strafe mode
+            float target = VectorUtils.getAngle(ship.getLocation(), mouseTarget);
             DroneAIUtils.rotate(target, ship, control);
+
+            if (controls[2]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
+            if (controls[3]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
+        } else {
+            if (controls[2]) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+            if (controls[3]) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
+            if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
+            if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
         }
-        if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
-        if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
+
         if (controls[8]) ship.giveCommand(ShipCommand.USE_SYSTEM, null, 0);
         if (ship.getShield() != null) {
             if (controls[9]) {
