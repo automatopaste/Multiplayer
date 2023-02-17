@@ -15,14 +15,11 @@ public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUtils.Deco
         ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.data.length);
         data.writeBytes(in.data);
 
-        long latency = System.currentTimeMillis() - in.timestamp;
-
         try {
             Unpacked result = new Unpacked(
                     data,
                     (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                    (InetSocketAddress) channelHandlerContext.channel().localAddress(),
-                    (int) latency
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
             );
 
             out.add(result);

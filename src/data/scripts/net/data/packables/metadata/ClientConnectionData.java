@@ -18,6 +18,8 @@ public class ClientConnectionData extends EntityData {
     private byte connectionState;
     private int clientPort;
     private byte connectionID;
+    private long timestamp;
+    private long latency;
 
     private BaseConnectionWrapper.ConnectionState state = BaseConnectionWrapper.ConnectionState.INITIALISATION_READY;
 
@@ -66,6 +68,44 @@ public class ClientConnectionData extends EntityData {
                     @Override
                     public void execute(Byte value, EntityData packable) {
                         setConnectionID(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("client flag"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        if (connection.cReceive == 1) {
+                            latency = System.currentTimeMillis() - timestamp;
+                            connection.cReceive = 0;
+
+                            timestamp = System.currentTimeMillis();
+                            return (byte) 1;
+                        }
+
+                        return (byte) 0;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        connection.cListen = value;
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("server listen"),
+                new SourceExecute<java.lang.Byte>() {
+                    @Override
+                    public java.lang.Byte get() {
+                        return connection.sListen;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        connection.sReceive = value;
                     }
                 }
         ));
@@ -121,5 +161,9 @@ public class ClientConnectionData extends EntityData {
 
     public byte getConnectionID() {
         return connectionID;
+    }
+
+    public long getLatency() {
+        return latency;
     }
 }

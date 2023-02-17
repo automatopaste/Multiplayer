@@ -41,7 +41,6 @@ public class MPClientPlugin extends MPPlugin {
     //debug
     private DebugGraphContainer dataGraph;
     private DebugGraphContainer dataGraph2;
-    private DebugGraphContainer dataGraph3;
 
     public MPClientPlugin(String host, int port) {
         this.host = host;
@@ -86,7 +85,6 @@ public class MPClientPlugin extends MPPlugin {
 
         dataGraph = new DebugGraphContainer("Inbound Packet Size", 120, 30f);
         dataGraph2 = new DebugGraphContainer("Inbound Packet Count", 120, 30f);
-        dataGraph3 = new DebugGraphContainer("Latency", 120, 30f);
 
         init = true;
     }
@@ -107,10 +105,8 @@ public class MPClientPlugin extends MPPlugin {
         InboundData entities = connection.getDuplex().getDeltas();
         dataGraph.increment(entities.size);
         dataGraph2.increment(connection.getDuplex().getNumSinceTick());
-        dataGraph3.increment(connection.getDuplex().getLatency());
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph", dataGraph);
         CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph2", dataGraph2);
-        CMUtils.getGuiDebug().putContainer(MPClientPlugin.class, "dataGraph3", dataGraph3);
 
         DataGenManager.distributeInboundDeltas(entities, this, connection.getTick(), connection.getConnectionID());
 

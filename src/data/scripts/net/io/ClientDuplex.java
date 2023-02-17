@@ -14,7 +14,6 @@ public class ClientDuplex {
     private InboundData inbound = new InboundData();
     private OutboundData outboundSocket = new OutboundData((byte) -1);
     private OutboundData outboundDatagram = new OutboundData((byte) -1);
-    private volatile int latency;
 
     public synchronized InboundData getDeltas() {
         InboundData in = inbound;
@@ -59,11 +58,6 @@ public class ClientDuplex {
             deleted.addAll(deltas);
         }
 
-        if (data.latency != -1) latency = data.latency;
-    }
-
-    public int getLatency() {
-        return latency;
     }
 
     public synchronized void updateOutboundSocket(OutboundData bufferData) {

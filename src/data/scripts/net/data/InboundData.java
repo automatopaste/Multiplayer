@@ -8,7 +8,6 @@ public class InboundData {
     public final Map<Byte, Map<Short, Map<Byte, Object>>> in;
     public final Map<Byte, Set<Short>> deleted;
     public int size = -1;
-    public int latency = -1;
 
     public InboundData() {
         this(new HashMap<Byte, Map<Short, Map<Byte, Object>>>(), new HashMap<Byte, Set<Short>>());
@@ -21,9 +20,5 @@ public class InboundData {
 
     public void setSize(int size) {
         this.size = size;
-    }
-
-    public void setLatency(int latency) {
-        this.latency = latency;
     }
 }

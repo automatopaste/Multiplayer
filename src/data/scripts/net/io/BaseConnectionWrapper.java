@@ -17,6 +17,12 @@ import java.util.*;
 public abstract class BaseConnectionWrapper {
     public static final int MAX_PACKET_SIZE = Math.min(2012, Global.getSettings().getInt("MP_PacketSize"));
 
+    public byte sListen;
+    public byte sReceive;
+    public byte cListen;
+    public byte cReceive;
+//    public byte cListen;
+
     public enum ConnectionState {
         INITIALISATION_READY,
         INITIALISING,

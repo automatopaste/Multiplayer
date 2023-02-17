@@ -89,6 +89,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         instance.put((short) connectionID, send.sourceExecute(0f));
         outbound.out.put(ServerConnectionData.TYPE_ID, instance);
 
+        CMUtils.getGuiDebug().putText(
+                ServerConnectionWrapper.class,
+                "latency" + connectionID,
+                "client " + connectionID + " latency " + send.getLatency()
+        );
+
         return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
     }
 

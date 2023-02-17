@@ -25,9 +25,7 @@ public class DatagramUtils {
             sizeData.size = bytes.length;
             buf.readBytes(bytes);
 
-            ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 5);
-
-            out.writeLong(System.currentTimeMillis());
+            ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 4);
 
             out.writeInt(sizeData.size);
 
@@ -44,7 +42,6 @@ public class DatagramUtils {
     public static Decompressed read(DatagramPacket in) throws DataFormatException {
         ByteBuf content = in.content();
 
-        long timestamp = content.readLong();
         int size = content.readInt();
 
         if (size == 0) return new Decompressed();
@@ -54,7 +51,6 @@ public class DatagramUtils {
 
         Decompressed out = new Decompressed();
         out.data = bytes;
-        out.timestamp = timestamp;
 
         return out;
     }
@@ -66,6 +62,5 @@ public class DatagramUtils {
 
     public static class Decompressed {
         public byte[] data;
-        public long timestamp;
     }
 }

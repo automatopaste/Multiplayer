@@ -16,15 +16,17 @@ public class ServerConnectionData extends EntityData {
 
     private byte connectionState;
     private byte connectionID;
+    private long timestamp;
+    private long latency;
 
     public ServerConnectionData(short instanceID, final byte connectionID, final BaseConnectionWrapper connection) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("connection state"),
-                new SourceExecute<java.lang.Byte>() {
+                new SourceExecute<Byte>() {
                     @Override
-                    public java.lang.Byte get() {
+                    public Byte get() {
                         return (byte) connection.getConnectionState().ordinal();
                     }
                 },
@@ -38,9 +40,9 @@ public class ServerConnectionData extends EntityData {
         ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("connection id"),
-                new SourceExecute<java.lang.Byte>() {
+                new SourceExecute<Byte>() {
                     @Override
-                    public java.lang.Byte get() {
+                    public Byte get() {
                         return connectionID;
                     }
                 },
@@ -52,6 +54,59 @@ public class ServerConnectionData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("server flag"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        if (connection.sReceive == 1) {
+                            latency = System.currentTimeMillis() - timestamp;
+                            connection.sReceive = 0;
+
+                            timestamp = System.currentTimeMillis();
+                            return (byte) 1;
+                        }
+
+                        return (byte) 0;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        connection.sListen = value;
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("client listen"),
+                new SourceExecute<java.lang.Byte>() {
+                    @Override
+                    public java.lang.Byte get() {
+                        return connection.cListen;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        connection.cReceive = value;
+                    }
+                }
+        ));
+//        addRecord(new RecordLambda<>(
+//                ByteRecord.getDefault().setDebugText("client listen"),
+//                new SourceExecute<Byte>() {
+//                    @Override
+//                    public Byte get() {
+//                        return connection.cListen;
+//                    }
+//                },
+//                new DestExecute<Byte>() {
+//                    @Override
+//                    public void execute(Byte value, EntityData packable) {
+//                        receive = value;
+//                    }
+//                }
+//        ));
     }
 
     @Override
@@ -88,5 +143,9 @@ public class ServerConnectionData extends EntityData {
 
     public byte getConnectionID() {
         return connectionID;
+    }
+
+    public long getLatency() {
+        return latency;
     }
 }
