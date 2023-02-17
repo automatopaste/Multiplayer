@@ -132,6 +132,7 @@ public class ServerConnectionManager implements Runnable {
         synchronized (serverConnectionWrappers) {
             serverConnectionWrappers.remove(id);
         }
+        duplex.removeConnection(id);
     }
 
     public void stop() {
@@ -139,8 +140,6 @@ public class ServerConnectionManager implements Runnable {
 
         socketServer.stop();
         datagramServer.stop();
-        socket.interrupt();
-        datagram.interrupt();
 
         System.out.println("STOPPING PRIMARY SERVER THREAD");
     }

@@ -111,6 +111,9 @@ public class MPServerPlugin extends MPPlugin {
         guiDebug.putText(MPServerPlugin.class, "clients", serverConnectionManager.getServerConnectionWrappers().size() + " remote clients connected");
         guiDebug.putText(MPServerPlugin.class, "shipCount", "tracking " + shipTable.getRegistered().size() + " ships in local table");
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
+        for (byte c : serverConnectionManager.getDuplex().getLatencies().keySet()) {
+            guiDebug.putText(MPServerPlugin.class, "latency" + c, "client " + c + " latency " + serverConnectionManager.getDuplex().getLatencies().get(c));
+        }
     }
 
     public VariantDataGenerator getVariantStore() {

@@ -184,8 +184,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     public void stop() {
         socketClient.stop();
         if (datagramClient != null) datagramClient.stop();
-        socket.interrupt();
-        if (datagram != null) datagram.interrupt();
 
         setConnectionState(BaseConnectionWrapper.ConnectionState.CLOSED);
     }

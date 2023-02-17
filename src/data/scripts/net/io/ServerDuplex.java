@@ -183,4 +183,19 @@ public class ServerDuplex {
             return latencies;
         }
     }
+
+    public void removeConnection(byte connectionID) {
+        synchronized (inbound) {
+            inbound.remove(connectionID);
+        }
+        synchronized (outboundSocket) {
+            outboundSocket.remove(connectionID);
+        }
+        synchronized (outboundDatagram) {
+            outboundDatagram.remove(connectionID);
+        }
+        synchronized (latencies) {
+            latencies.remove(connectionID);
+        }
+    }
 }

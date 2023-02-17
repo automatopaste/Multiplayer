@@ -45,8 +45,8 @@ public class DatagramServer implements Runnable {
 
         clock = new Clock(ServerConnectionManager.TICK_RATE);
 
-        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE, 40f);
-        dataGraph2 = new DebugGraphContainer("Packet Count", ServerConnectionManager.TICK_RATE, 40f);
+        dataGraph = new DebugGraphContainer("Packet Size", ServerConnectionManager.TICK_RATE * 4, 40f);
+        dataGraph2 = new DebugGraphContainer("Packet Count", ServerConnectionManager.TICK_RATE * 4, 40f);
 //        dataGraphCompressed = new DebugGraphContainer("Compressed Bytes Out", ServerConnectionManager.TICK_RATE, 50f);
 //        dataGraphRatio = new DebugGraphContainer("Compression Ratio", ServerConnectionManager.TICK_RATE, 50f);
 
