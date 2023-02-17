@@ -12,9 +12,10 @@ public class Unpacked {
     private final InetSocketAddress sender;
     private final InetSocketAddress recipient;
     private final byte connectionID;
+    private final int latency;
     private final int size;
 
-    public Unpacked(ByteBuf data, InetSocketAddress sender, InetSocketAddress recipient) {
+    public Unpacked(ByteBuf data, InetSocketAddress sender, InetSocketAddress recipient, int latency) {
         this.sender = sender;
         this.recipient = recipient;
 
@@ -22,6 +23,7 @@ public class Unpacked {
 
         tick = data.readInt();
         connectionID = data.readByte();
+        this.latency = latency;
 
         InboundData m;
         try {
@@ -57,5 +59,9 @@ public class Unpacked {
 
     public int getSize() {
         return size;
+    }
+
+    public int getLatency() {
+        return latency;
     }
 }

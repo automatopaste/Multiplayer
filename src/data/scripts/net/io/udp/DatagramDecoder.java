@@ -10,9 +10,9 @@ public class DatagramDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext context, DatagramPacket in, List<Object> out) throws Exception {
-        byte[] decompressed = DatagramUtils.read(in);
+        DatagramUtils.Decompressed decompressed = DatagramUtils.read(in);
 
-        if (decompressed.length == 0) {
+        if (decompressed.data.length == 0) {
             context.flush();
             return;
         }

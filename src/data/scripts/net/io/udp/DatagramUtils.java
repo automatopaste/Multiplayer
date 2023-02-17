@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.zip.DataFormatException;
 
 public class DatagramUtils {
@@ -22,17 +23,15 @@ public class DatagramUtils {
             SizeData sizeData = new SizeData();
 
             byte[] bytes = new byte[buf.readableBytes()];
-            //if (bytes.length > Short.MAX_VALUE) throw new IndexOutOfBoundsException();
             sizeData.size = bytes.length;
             buf.readBytes(bytes);
-//          byte[] compressed = CompressionUtils.deflate(bytes);
-//          sizeData.sizeCompressed = (short) compressed.length;
 
             ByteBuf out = PooledByteBufAllocator.DEFAULT.buffer(bytes.length + 5);
 
+            Date now = new Date();
+            out.writeLong(now.getTime());
+
             out.writeInt(sizeData.size);
-//          out.writeInt(sizeData.sizeCompressed);
-//          out.writeBytes(compressed);
 
             out.writeBytes(bytes);
 
@@ -44,25 +43,36 @@ public class DatagramUtils {
         }
     }
 
-    public static byte[] read(DatagramPacket in) throws DataFormatException {
-        ByteBuf content = in.content();
-        int size = content.readInt();
-//        int sizeCompressed = content.readInt();
+    public static Decompressed read(DatagramPacket in) throws DataFormatException {
+        try {
+            ByteBuf content = in.content();
 
-        if (size == 0) return new byte[0];
+            long timestamp = content.readLong();
+            int size = content.readInt();
 
-//        byte[] bytes = new byte[sizeCompressed];
-//        content.readBytes(bytes);
+            if (size == 0) return new Decompressed();
 
-        byte[] bytes = new byte[size];
-        content.readBytes(bytes);
+            byte[] bytes = new byte[size];
+            content.readBytes(bytes);
 
-//        return CompressionUtils.inflate(bytes, size, sizeCompressed);
-        return bytes;
+            Decompressed out = new Decompressed();
+            out.data = bytes;
+            out.timestamp = timestamp;
+
+            return out;
+        } finally {
+            in.release();
+        }
+
     }
 
     public static class SizeData {
         public int size;
         public int sizeCompressed;
+    }
+
+    public static class Decompressed {
+        public byte[] data;
+        public long timestamp;
     }
 }

@@ -18,7 +18,7 @@ import data.scripts.net.data.tables.server.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
 
-public class RayProjectileData extends EntityData {
+public class MovingRayData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -31,7 +31,7 @@ public class RayProjectileData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public RayProjectileData(short instanceID, final MovingRay projectile, final short specID, final ShipTable shipTable) {
+    public MovingRayData(short instanceID, final MovingRay projectile, final short specID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(

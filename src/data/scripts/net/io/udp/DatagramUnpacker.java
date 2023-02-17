@@ -7,19 +7,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.List;
 
-public class DatagramUnpacker extends MessageToMessageDecoder<byte[]> {
+public class DatagramUnpacker extends MessageToMessageDecoder<DatagramUtils.Decompressed> {
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, byte[] in, List<Object> out) throws Exception {
-        ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.length);
-        data.writeBytes(in);
+    protected void decode(ChannelHandlerContext channelHandlerContext, DatagramUtils.Decompressed in, List<Object> out) throws Exception {
+        ByteBuf data = PooledByteBufAllocator.DEFAULT.buffer(in.data.length);
+        data.writeBytes(in.data);
+
+        Date date = new Date();
+        int latency = (int) (date.getTime() - in.timestamp);
 
         try {
             Unpacked result = new Unpacked(
                     data,
                     (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                    (InetSocketAddress) channelHandlerContext.channel().localAddress()
+                    (InetSocketAddress) channelHandlerContext.channel().localAddress(),
+                    latency
             );
 
             out.add(result);

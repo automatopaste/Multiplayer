@@ -14,7 +14,8 @@ public class BufferUnpacker extends ByteToMessageDecoder {
         Unpacked result = new Unpacked(
                 in,
                 (InetSocketAddress) channelHandlerContext.channel().remoteAddress(),
-                (InetSocketAddress) channelHandlerContext.channel().localAddress()
+                (InetSocketAddress) channelHandlerContext.channel().localAddress(),
+                -1
         );
 
         out.add(result);

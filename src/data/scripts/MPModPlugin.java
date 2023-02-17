@@ -11,7 +11,7 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
 import data.scripts.net.data.packables.entities.projectiles.ProjectileData;
-import data.scripts.net.data.packables.entities.projectiles.RayProjectileData;
+import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
@@ -38,7 +38,7 @@ public class MPModPlugin extends BaseModPlugin {
         BallisticProjectileData.TYPE_ID = DataGenManager.registerEntityType(BallisticProjectileData.class);
         MissileData.TYPE_ID = DataGenManager.registerEntityType(MissileData.class);
         ProjectileData.TYPE_ID = DataGenManager.registerEntityType(ProjectileData.class);
-        RayProjectileData.TYPE_ID = DataGenManager.registerEntityType(RayProjectileData.class);
+        MovingRayData.TYPE_ID = DataGenManager.registerEntityType(MovingRayData.class);
         ShieldData.TYPE_ID = DataGenManager.registerEntityType(ShieldData.class);
         ShipData.TYPE_ID = DataGenManager.registerEntityType(ShipData.class);
         VariantData.TYPE_ID = DataGenManager.registerEntityType(VariantData.class);

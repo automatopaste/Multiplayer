@@ -15,6 +15,7 @@ public class ServerDuplex {
     private final Map<Byte, InboundData> inbound = new HashMap<>();
     private final Map<Byte, OutboundData> outboundSocket = new HashMap<>();
     private final Map<Byte, OutboundData> outboundDatagram = new HashMap<>();
+    private final Map<Byte, Integer> latencies = new HashMap<>();
 
     /**
      * Get a map of delta compressed instance ids and their entity
@@ -33,6 +34,12 @@ public class ServerDuplex {
             if (inboundData == null) {
                 inboundData = new InboundData();
                 this.inbound.put(connectionID, inboundData);
+            }
+        }
+
+        synchronized (latencies) {
+            if (data.latency != -1) {
+                latencies.put(connectionID, data.latency);
             }
         }
 
@@ -168,6 +175,12 @@ public class ServerDuplex {
             }
 
             dest.addAll(deltas);
+        }
+    }
+
+    public Map<Byte, Integer> getLatencies() {
+        synchronized (latencies) {
+            return latencies;
         }
     }
 }
