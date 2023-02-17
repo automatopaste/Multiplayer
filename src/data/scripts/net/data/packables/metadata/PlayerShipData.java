@@ -119,7 +119,7 @@ public class PlayerShipData extends EntityData {
                         Vector2f m = new Vector2f(Mouse.getX(), Mouse.getY());
                         ViewportAPI v = Global.getCombatEngine().getViewport();
                         m.x = v.convertScreenXToWorldX(m.x);
-                        m.y = v.convertWorldYtoScreenY(m.y);
+                        m.y = v.convertScreenYToWorldY(m.y);
                         return m;
                     }
                 },
