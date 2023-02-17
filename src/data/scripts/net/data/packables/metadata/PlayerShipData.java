@@ -38,7 +38,8 @@ public class PlayerShipData extends EntityData {
     private ShipAPI playerShip;
     private Vector2f mouseTarget = new Vector2f(0f, 0f);
 
-    private boolean shieldToggleCheck = false;
+    private boolean shieldEnable = false;
+    private boolean prev = false;
 
     /**
      * Source constructor
@@ -125,6 +126,10 @@ public class PlayerShipData extends EntityData {
                 playerShip.blockCommandForOneFrame(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK);
             }
         }
+
+        boolean check = Mouse.isButtonDown(1);
+        if (check && !prev) shieldEnable = !shieldEnable;
+        prev = check;
     }
 
     private void check() {
@@ -186,8 +191,8 @@ public class PlayerShipData extends EntityData {
         controls[8] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_USE_SYSTEM")));
 
 //        controls[9] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SHIELDS")));
-        controls[9] = Mouse.isButtonDown(1) && !shieldToggleCheck;
-        shieldToggleCheck = Mouse.isButtonDown(1);
+
+        controls[9] = shieldEnable;
 
 //        controls[10] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_FIRE")));
         controls[10] = Mouse.isButtonDown(0);
@@ -233,7 +238,17 @@ public class PlayerShipData extends EntityData {
         if (controls[6]) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
         if (controls[7]) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
         if (controls[8]) ship.giveCommand(ShipCommand.USE_SYSTEM, null, 0);
-        if (controls[9]) ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
+        if (ship.getShield() != null) {
+            if (controls[9]) {
+                if (ship.getShield().isOff()) {
+                    ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
+                }
+            } else {
+                if (ship.getShield().isOn()) {
+                    ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
+                }
+            }
+        }
 
         int selected = 0;
         List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
