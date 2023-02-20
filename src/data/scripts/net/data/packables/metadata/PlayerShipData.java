@@ -267,7 +267,6 @@ public class PlayerShipData extends EntityData {
     }
 
     public void unmask(ShipAPI ship, int bitmask, float amount) {
-
         boolean[] controls = new boolean[Integer.SIZE];
         for (int i = 0; i < controls.length; i++) {
             if ((bitmask & 1 << i) != 0) controls[i] = true;

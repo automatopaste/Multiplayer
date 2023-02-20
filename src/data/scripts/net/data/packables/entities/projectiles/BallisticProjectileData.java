@@ -10,6 +10,7 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -208,15 +209,25 @@ public class BallisticProjectileData extends EntityData {
             }
         }
 
-        String w = weapon == null ? null : weapon.getId();
+        String weaponID = weapon == null ? null : weapon.getId();
         Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
+
+        String projID;
+        ProjectileSpecDatastore datastore;
+        try {
+            datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
+            projID = datastore.getProjectileIDKeys().get(specID);
+        } catch (Exception e) {
+            Global.getLogger(BallisticProjectileData.class).error("Unable to recover projectile ID from datastore");
+            return;
+        }
 
         try {
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
-                    ship, weapon, w, new Vector2f(location), facing, vel
+                    ship, weapon, weaponID, projID, new Vector2f(location), facing, vel
             );
         } catch (Throwable n) {
-            n.printStackTrace();
+            Global.getLogger(BallisticProjectileData.class).error(String.format("Error spawning projectile with ID [%s] and weapon ID [%s]", projID, weaponID));
         }
     }
 

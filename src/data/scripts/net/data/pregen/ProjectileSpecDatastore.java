@@ -18,7 +18,9 @@ public class ProjectileSpecDatastore implements PregenDatastore {
     private final Map<String, MissileSpecAPI> missiles = new HashMap<>();
     private final Map<String, ProjectileSpecAPI> projectiles = new HashMap<>();
     private final Map<String, Short> weaponIDs = new HashMap<>();
+    private final Map<Short, String> weaponIDKeys = new HashMap<>();
     private final Map<String, Short> projectileIDs = new HashMap<>();
+    private final Map<Short, String> projectileIDKeys = new HashMap<>();
 
     /**
      * Collate weapon and projectile specs
@@ -29,6 +31,7 @@ public class ProjectileSpecDatastore implements PregenDatastore {
         short index = 0;
         for (String id : weaponIDs) {
             this.weaponIDs.put(id, index);
+            this.weaponIDKeys.put(index, id);
             index++;
         }
 
@@ -37,6 +40,7 @@ public class ProjectileSpecDatastore implements PregenDatastore {
         index = 0;
         for (String id : projectileIDs) {
             this.projectileIDs.put(id, index);
+            this.projectileIDKeys.put(index, id);
             index++;
         }
 
@@ -67,8 +71,16 @@ public class ProjectileSpecDatastore implements PregenDatastore {
         return weaponIDs;
     }
 
+    public Map<Short, String> getWeaponIDKeys() {
+        return weaponIDKeys;
+    }
+
     public Map<String, Short> getProjectileIDs() {
         return projectileIDs;
+    }
+
+    public Map<Short, String> getProjectileIDKeys() {
+        return projectileIDKeys;
     }
 
     public Map<String, MissileSpecAPI> getMissiles() {
