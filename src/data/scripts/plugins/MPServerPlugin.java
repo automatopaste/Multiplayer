@@ -61,7 +61,7 @@ public class MPServerPlugin extends MPPlugin {
         shipTable = new ShipTable(playerShips);
         initEntityManager(shipTable);
 
-        projectileTable = new ProjectileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
+        projectileTable = new ProjectileTable(projectileSpecDatastore, shipTable);
         initEntityManager(projectileTable);
 
         textChatHost = new TextChatHost(chatboxPlugin, playerLobby);
