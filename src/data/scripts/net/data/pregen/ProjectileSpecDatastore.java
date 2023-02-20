@@ -1,12 +1,17 @@
 package data.scripts.net.data.pregen;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.SettingsAPI;
 import com.fs.starfarer.api.loading.MissileSpecAPI;
 import com.fs.starfarer.api.loading.ProjectileSpecAPI;
 import com.fs.starfarer.api.loading.WeaponSpecAPI;
 import com.fs.starfarer.loading.o00O;
 import data.scripts.plugins.MPPlugin;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +26,7 @@ public class ProjectileSpecDatastore implements PregenDatastore {
     private final Map<Short, String> weaponIDKeys = new HashMap<>();
     private final Map<String, Short> projectileIDs = new HashMap<>();
     private final Map<Short, String> projectileIDKeys = new HashMap<>();
+    private final Map<String, String> weaponSpawnIDs = new HashMap<>();
 
     /**
      * Collate weapon and projectile specs
@@ -65,6 +71,21 @@ public class ProjectileSpecDatastore implements PregenDatastore {
             } else if (o == null) { // beam
             }
         }
+
+        SettingsAPI settings = Global.getSettings();
+        try {
+            JSONArray data = settings.getMergedSpreadsheetDataForMod("projectileID","data/config/mp/proj_spawns.csv", "multiplayer");
+
+            for (int i = 0; i < data.length(); i++) {
+                JSONObject row = data.getJSONObject(i);
+                String projectileID = row.getString("projectileID");
+                String weaponID = row.getString("weaponID");
+
+                weaponSpawnIDs.put(projectileID, weaponID);
+            }
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Map<String, Short> getWeaponIDs() {
@@ -89,5 +110,9 @@ public class ProjectileSpecDatastore implements PregenDatastore {
 
     public Map<String, ProjectileSpecAPI> getProjectiles() {
         return projectiles;
+    }
+
+    public Map<String, String> getWeaponSpawnIDs() {
+        return weaponSpawnIDs;
     }
 }

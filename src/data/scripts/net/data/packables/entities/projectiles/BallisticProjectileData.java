@@ -24,7 +24,7 @@ public class BallisticProjectileData extends EntityData {
     public static byte TYPE_ID;
 
     private DamagingProjectileAPI projectile;
-    private short specID;
+    private short weaponSpecID;
     private short shipID;
     private byte weaponID;
     private ShipAPI ship;
@@ -32,21 +32,21 @@ public class BallisticProjectileData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public BallisticProjectileData(short instanceID, final BallisticProjectile projectile, final short specID, final ShipTable shipTable) {
+    public BallisticProjectileData(short instanceID, final BallisticProjectile projectile, final short weaponSpecID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                ShortRecord.getDefault().setDebugText("projectile spec id"),
+                ShortRecord.getDefault().setDebugText("weapon spec id"),
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
-                        return specID;
+                        return weaponSpecID;
                     }
                 },
                 new DestExecute<Short>() {
                     @Override
                     public void execute(Short value, EntityData packable) {
-                        setSpecID(value);
+                        setWeaponSpecID(value);
                     }
                 }
         ));
@@ -113,7 +113,7 @@ public class BallisticProjectileData extends EntityData {
                         }
                     }
                 }
-        ).setRate(9999f));
+        ).setRate(0.5f));
         addRecord(new RecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
@@ -129,7 +129,7 @@ public class BallisticProjectileData extends EntityData {
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
-        ).setRate(9999f));
+        ).setRate(0.5f));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("facing"),
                 new SourceExecute<Float>() {
@@ -149,7 +149,7 @@ public class BallisticProjectileData extends EntityData {
                         }
                     }
                 }
-        ).setRate(9999f));
+        ).setRate(0.5f));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
@@ -165,7 +165,7 @@ public class BallisticProjectileData extends EntityData {
                         if (projectile != null) projectile.setAngularVelocity(value);
                     }
                 }
-        ).setRate(9999f));
+        ).setRate(0.5f));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("hitpoints"),
                 new SourceExecute<Byte>() {
@@ -209,14 +209,16 @@ public class BallisticProjectileData extends EntityData {
             }
         }
 
-        String weaponID = weapon == null ? null : weapon.getId();
+
         Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
 
-        String projID;
+//        String projID;
+        String weaponID;
         ProjectileSpecDatastore datastore;
         try {
             datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
-            projID = datastore.getProjectileIDKeys().get(specID);
+//            projID = datastore.getProjectileIDKeys().get(specID);
+            weaponID = datastore.getWeaponIDKeys().get(weaponSpecID);
         } catch (Exception e) {
             Global.getLogger(BallisticProjectileData.class).error("Unable to recover projectile ID from datastore");
             return;
@@ -224,10 +226,10 @@ public class BallisticProjectileData extends EntityData {
 
         try {
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
-                    ship, weapon, weaponID, projID, new Vector2f(location), facing, vel
+                    ship, weapon, weaponID, new Vector2f(location), facing, vel
             );
         } catch (Throwable n) {
-            Global.getLogger(BallisticProjectileData.class).error(String.format("Error spawning projectile with ID [%s] and weapon ID [%s]", projID, weaponID));
+            Global.getLogger(BallisticProjectileData.class).error(String.format("Error spawning projectile with weapon ID [%s]", weaponID));
         }
     }
 
@@ -236,12 +238,12 @@ public class BallisticProjectileData extends EntityData {
 
     }
 
-    public void setSpecID(short specID) {
-        this.specID = specID;
+    public void setWeaponSpecID(short weaponSpecID) {
+        this.weaponSpecID = weaponSpecID;
     }
 
-    public short getSpecID() {
-        return specID;
+    public short getWeaponSpecID() {
+        return weaponSpecID;
     }
 
     public ShipAPI getShip() {

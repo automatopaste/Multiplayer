@@ -13,6 +13,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
 import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -29,14 +30,14 @@ public class ProjectileTable implements OutboundEntityManager {
     private final EntityInstanceMap<MissileData> missiles = new EntityInstanceMap<>();
 
     private final Map<DamagingProjectileAPI, Short> registered = new HashMap<>();
-    private final Map<String, Short> specIDs;
     private final Set<Short> deleted;
+    private final ProjectileSpecDatastore datastore;
     private final ShipTable shipTable;
 
     private final Queue<Short> vacant;
 
-    public ProjectileTable(Map<String, Short> specIDs, ShipTable shipTable) {
-        this.specIDs = specIDs;
+    public ProjectileTable(ProjectileSpecDatastore datastore, ShipTable shipTable) {
+        this.datastore = datastore;
         this.shipTable = shipTable;
 
         deleted = new HashSet<>();
@@ -84,18 +85,24 @@ public class ProjectileTable implements OutboundEntityManager {
 
         registered.put(projectile, id);
         String projectileID = projectile.getProjectileSpecId();
-        short s = specIDs.get(projectileID);
+        short weaponSpecID;
+        if (projectile.isFromMissile()) {
+            String w = datastore.getWeaponSpawnIDs().get(projectileID);
+            weaponSpecID = datastore.getWeaponIDs().get(w);
+        } else {
+            weaponSpecID = datastore.getWeaponIDs().get(projectile.getWeapon().getSpec().getWeaponId());
+        }
 
         if (projectile instanceof MovingRay) {
-            movingRays.registered.put(id, new MovingRayData(id, (MovingRay) projectile, s, shipTable));
+            movingRays.registered.put(id, new MovingRayData(id, (MovingRay) projectile, weaponSpecID, shipTable));
             return;
         }
         if (projectile instanceof BallisticProjectile) {
-            ballisticProjectiles.registered.put(id, new BallisticProjectileData(id, (BallisticProjectile) projectile, s, shipTable));
+            ballisticProjectiles.registered.put(id, new BallisticProjectileData(id, (BallisticProjectile) projectile, weaponSpecID, shipTable));
             return;
         }
         if (projectile instanceof Missile) {
-            missiles.registered.put(id, new MissileData(id, (Missile) projectile, s, shipTable));
+            missiles.registered.put(id, new MissileData(id, (Missile) projectile, weaponSpecID, shipTable));
             return;
         }
     }
