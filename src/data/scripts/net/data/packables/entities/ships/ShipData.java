@@ -48,6 +48,8 @@ public class ShipData extends EntityData {
 
     private PlayerShipData.ShipControlOverride controlOverride;
 
+    private short engineControllerBitmask = 0x0000;
+
     public ShipData(short instanceID, final ShipAPI ship, final PlayerShips playerShips) {
         super(instanceID);
         this.ship = ship;
@@ -210,35 +212,45 @@ public class ShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("flux vent, overload, engine boost flags"),
-                new SourceExecute<Byte>() {
+                ShortRecord.getDefault().setDebugText("flux vent, overload, engine boost flags"),
+                new SourceExecute<Short>() {
                     @Override
-                    public Byte get() {
-                        byte b = 0x00;
-//                        if (ship.getFluxTracker().isEngineBoostActive()) b |= 0b10000000;
-                        if (ship.getFluxTracker().isOverloaded()) b |= 0b01000000;
-                        if (ship.getFluxTracker().isVenting()) b |= 0b00100000;
-                        return b;
+                    public Short get() {
+                        short s = 0x0000;
+                        if (ship.getFluxTracker().isOverloaded()) s |= 0b01000000;
+                        if (ship.getFluxTracker().isVenting()) s |= 0b00100000;
+
+                        ShipEngineControllerAPI controller = ship.getEngineController();
+                        if (controller.isAccelerating()) s |= 0b0000000010000000;
+                        if (controller.isAcceleratingBackwards()) s |= 0b0000000001000000;
+                        if (controller.isStrafingLeft()) s |= 0b0000000000100000;
+                        if (controller.isStrafingRight()) s |= 0b0000000000010000;
+                        if (controller.isTurningLeft()) s |= 0b0000000000001000;
+                        if (controller.isTurningRight()) s |= 0b0000000000000100;
+                        if (controller.isDecelerating()) s |= 0b0000000000000010;
+                        return s;
                     }
                 },
-                new DestExecute<Byte>() {
+                new DestExecute<Short>() {
                     @Override
-                    public void execute(Byte value, EntityData packable) {
+                    public void execute(Short value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
-                            byte b = value;
+                            short s = value;
                             //if ((b & 0b10000000) >>> 7 != 0) // engine boost
 
-                            if ((b & 0b01000000) >>> 6 != 0) {
-                                ship.getFluxTracker().forceOverload(999f);
+                            if ((s & 0b0100000000000000) >>> 14 == 0x0001) {
+                                ship.getFluxTracker().forceOverload(0f);
                             } else if (ship.getFluxTracker().isOverloaded()) {
                                 ship.getFluxTracker().stopOverload();
                             }
 
-                            if ((b & 0b00100000) >>> 5 != 0 && !ship.getFluxTracker().isVenting()) {
+                            if ((s & 0b0010000000000000) >>> 13 == 0x0001 && !ship.getFluxTracker().isVenting()) {
                                 ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
                             }
+
+                            setEngineControllerBitmask(s);
                         }
                     }
                 }
@@ -752,6 +764,17 @@ public class ShipData extends EntityData {
         if (ship == null && manager instanceof InboundEntityManager) {
             init(plugin, (InboundEntityManager) manager);
         }
+
+        if (ship != null) {
+            short s = engineControllerBitmask;
+            if ((s & 0b0000000010000000) >>> 7 == 0x0001) ship.giveCommand(ShipCommand.ACCELERATE, null, 0);
+            if ((s & 0b0000000001000000) >>> 6 == 0x0001) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
+            if ((s & 0b0000000000100000) >>> 5 == 0x0001) ship.giveCommand(ShipCommand.STRAFE_LEFT, null, 0);
+            if ((s & 0b0000000000010000) >>> 4 == 0x0001) ship.giveCommand(ShipCommand.STRAFE_RIGHT, null, 0);
+            if ((s & 0b0000000000001000) >>> 3 == 0x0001) ship.giveCommand(ShipCommand.TURN_LEFT, null, 0);
+            if ((s & 0b0000000000000100) >>> 2 == 0x0001) ship.giveCommand(ShipCommand.TURN_RIGHT, null, 0);
+            if ((s & 0b0000000000000010) >>> 1 == 0x0001) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
+        }
     }
 
     @Override
@@ -806,6 +829,10 @@ public class ShipData extends EntityData {
 
     public void removeControlOverride() {
         controlOverride = null;
+    }
+
+    public void setEngineControllerBitmask(short engineControllerBitmask) {
+        this.engineControllerBitmask = engineControllerBitmask;
     }
 
     public static class ArmourSyncData {
