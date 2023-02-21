@@ -65,7 +65,7 @@ public class StringRecord extends DataRecord<String> {
     }
 
     @Override
-    public int size() {
+    public synchronized int size() {
         if (value == null) return 1 + NULL.getBytes(CHARSET).length;
         return 1 + value.getBytes(CHARSET).length;
     }
