@@ -34,8 +34,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     private ClientConnectionData send;
     private ServerConnectionData receive;
 
-    private final Set<String> requested = new HashSet<>();
-
 //    private DebugGraphContainer dataGraph;
 
     public ClientConnectionWrapper(String host, int port, MPPlugin plugin) {
@@ -210,6 +208,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     }
 
     public void queueVariantDownloadForID(String fleetmemberID) {
-        requested.add(fleetmemberID);
+        send.addRequested(fleetmemberID);
     }
 }

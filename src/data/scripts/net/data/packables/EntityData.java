@@ -107,6 +107,9 @@ public abstract class EntityData {
      */
     public abstract void delete();
 
+    /**
+     * Forces the next sourceExecute() call to return all records
+     */
     public void flush() {
         flush = true;
     }

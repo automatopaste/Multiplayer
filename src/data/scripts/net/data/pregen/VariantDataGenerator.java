@@ -7,7 +7,9 @@ import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Collect and package all data that needs to be transferred before remote combat simulation can begin on client
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public class VariantDataGenerator implements PregenDatastore {
 
-    private List<VariantData> generated;
+    private final Map<String, VariantData> generated = new HashMap<>();
 
     /**
      * Collects data that needs to be loaded on client side before combat entities can be updated or spawned
@@ -31,15 +33,14 @@ public class VariantDataGenerator implements PregenDatastore {
         members.addAll(manager1.getDeployedCopy());
         members.addAll(manager1.getReservesCopy());
 
-        generated = new ArrayList<>();
         short index = 0;
         for (FleetMemberAPI member : members) {
-            generated.add(new VariantData(index, member.getVariant(), member.getId()));
+            generated.put(member.getId(), new VariantData(index, member.getVariant(), member.getId()));
             index++;
         }
     }
 
-    public List<VariantData> getGenerated() {
+    public Map<String, VariantData> getGenerated() {
         return generated;
     }
 }

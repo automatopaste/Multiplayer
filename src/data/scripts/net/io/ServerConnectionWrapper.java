@@ -1,6 +1,7 @@
 package data.scripts.net.io;
 
 import cmu.CMUtils;
+import com.fs.starfarer.api.Global;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
@@ -8,6 +9,7 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
+import data.scripts.net.data.pregen.VariantDataGenerator;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ServerConnectionWrapper extends BaseConnectionWrapper {
     private final ServerConnectionManager connectionManager;
@@ -55,7 +58,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": sending client data over socket...");
 
                 Map<Short, InstanceData> variants = new HashMap<>();
-                for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated()) {
+                for (VariantData variantData : connectionManager.getServerPlugin().getVariantStore().getGenerated().values()) {
                     variants.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
                 }
 
@@ -79,6 +82,25 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case SIMULATION_READY:
             case SIMULATING:
+                Set<String> requested = receive.getRequested();
+
+                if (!requested.isEmpty()) {
+                    Map<Short, InstanceData> v = new HashMap<>();
+                    VariantDataGenerator datastore = connectionManager.getServerPlugin().getVariantStore();
+                    for (String id : requested) {
+                        VariantData variantData = datastore.getGenerated().get(id);
+                        if (variantData != null) {
+                            variantData.flush();
+                            v.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
+                        } else {
+                            Global.getLogger(ServerConnectionWrapper.class).error("Unable to find variant for requested fleetmember id " + id);
+                        }
+                    }
+
+                    outbound.out.put(VariantData.TYPE_ID, v);
+                }
+
+                break;
             case CLOSED:
             default:
                 break;
