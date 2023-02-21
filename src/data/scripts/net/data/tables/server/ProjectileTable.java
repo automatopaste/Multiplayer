@@ -13,7 +13,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
 import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
-import data.scripts.net.data.pregen.ProjectileSpecDatastore;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.OutboundEntityManager;

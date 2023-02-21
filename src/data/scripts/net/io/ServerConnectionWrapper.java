@@ -9,7 +9,7 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
-import data.scripts.net.data.pregen.ShipVariantDatastore;
+import data.scripts.net.data.datagen.ShipVariantDatastore;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;

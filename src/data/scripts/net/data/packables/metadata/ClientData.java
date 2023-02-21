@@ -5,7 +5,7 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.pregen.ProjectileSpecDatastore;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;

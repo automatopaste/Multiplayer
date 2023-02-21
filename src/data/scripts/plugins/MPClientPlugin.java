@@ -9,7 +9,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
-import data.scripts.net.data.pregen.ProjectileSpecDatastore;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.tables.client.*;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.net.io.ClientConnectionWrapper;

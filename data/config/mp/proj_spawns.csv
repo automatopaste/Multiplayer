@@ -1,3 +1,4 @@
 projectileID,weaponID
 sabot_warhead2,mp_sabot_proj_spawn
 mirv_warhead,mp_hurricane_proj_spawn
+pilum_second_stage,mp_pilum_proj_spawn

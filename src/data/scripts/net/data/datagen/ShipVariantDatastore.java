@@ -1,4 +1,4 @@
-package data.scripts.net.data.pregen;
+package data.scripts.net.data.datagen;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatFleetManagerAPI;
@@ -12,7 +12,7 @@ import java.util.*;
  * Collect and package all data that needs to be transferred before remote combat simulation can begin on client
  * e.g. variants
  */
-public class ShipVariantDatastore implements PregenDatastore {
+public class ShipVariantDatastore implements BaseDatagen {
 
     private final Map<String, VariantData> generated = new HashMap<>();
     private short index = 0;

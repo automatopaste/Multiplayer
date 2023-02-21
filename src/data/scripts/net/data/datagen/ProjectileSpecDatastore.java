@@ -1,4 +1,4 @@
-package data.scripts.net.data.pregen;
+package data.scripts.net.data.datagen;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.SettingsAPI;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectileSpecDatastore implements PregenDatastore {
+public class ProjectileSpecDatastore implements BaseDatagen {
 
 //    private final Map<Short, WeaponSpecAPI> weapons = new HashMap<>();
     private final Map<String, MissileSpecAPI> missiles = new HashMap<>();

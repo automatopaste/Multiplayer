@@ -1,8 +1,8 @@
-package data.scripts.net.data.pregen;
+package data.scripts.net.data.datagen;
 
 import data.scripts.plugins.MPPlugin;
 
-public interface PregenDatastore {
+public interface BaseDatagen {
 
     void generate(MPPlugin plugin);
 }

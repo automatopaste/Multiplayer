@@ -3,7 +3,7 @@ package data.scripts.plugins;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import data.scripts.net.data.tables.BaseEntityManager;
-import data.scripts.net.data.pregen.PregenDatastore;
+import data.scripts.net.data.datagen.BaseDatagen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
     }
 
     protected final Map<Class<? extends BaseEntityManager>, BaseEntityManager> entityManagers = new HashMap<>();
-    protected final Map<Class<? extends PregenDatastore>, PregenDatastore> datastores = new HashMap<>();
+    protected final Map<Class<? extends BaseDatagen>, BaseDatagen> datastores = new HashMap<>();
 
     public MPPlugin() {
 
@@ -50,20 +50,20 @@ public abstract class MPPlugin extends BaseEveryFrameCombatPlugin {
         for (BaseEntityManager manager : entityManagers.values()) manager.update(amount, this);
     }
 
-    public void initDatastore(PregenDatastore datastore) {
+    public void initDatastore(BaseDatagen datastore) {
         datastores.put(datastore.getClass(), datastore);
         datastore.generate(this);
     }
 
     public void genData() {
-        for (PregenDatastore datastore : datastores.values()) datastore.generate(this);
+        for (BaseDatagen datastore : datastores.values()) datastore.generate(this);
     }
 
-    public PregenDatastore getDatastore(Class<? extends PregenDatastore> clazz) {
+    public BaseDatagen getDatastore(Class<? extends BaseDatagen> clazz) {
         return datastores.get(clazz);
     }
 
-    public void removeDatastore(Class<? extends PregenDatastore> clazz) {
+    public void removeDatastore(Class<? extends BaseDatagen> clazz) {
         datastores.remove(clazz);
     }
 }
