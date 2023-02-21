@@ -4,9 +4,7 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.PluginPick;
 import com.fs.starfarer.api.campaign.CampaignPlugin;
-import com.fs.starfarer.api.combat.AutofireAIPlugin;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
@@ -21,6 +19,7 @@ import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
+import data.scripts.plugins.ai.MPDefaultMissileAIPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,6 +72,16 @@ public class MPModPlugin extends BaseModPlugin {
             clientPlugin.getShipTable().getTempAutofirePlugins().put(ship.getId(), plugins);
 
             return new PluginPick<>((AutofireAIPlugin) plugin, CampaignPlugin.PickPriority.HIGHEST);
+        }
+        return null;
+    }
+
+    @Override
+    public PluginPick<MissileAIPlugin> pickMissileAI(MissileAPI missile, ShipAPI launchingShip) {
+        if (getPlugin() != null && getPlugin().getType() == MPPlugin.PluginType.CLIENT) {
+            MPDefaultMissileAIPlugin plugin = new MPDefaultMissileAIPlugin();
+
+            return new PluginPick<>((MissileAIPlugin) plugin, CampaignPlugin.PickPriority.HIGHEST);
         }
         return null;
     }
