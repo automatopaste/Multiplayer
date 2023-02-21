@@ -13,9 +13,7 @@ import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Manages switching logic for inputting/sending data
@@ -35,6 +33,8 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
     private byte connectionID;
     private ClientConnectionData send;
     private ServerConnectionData receive;
+
+    private final Set<String> requested = new HashSet<>();
 
 //    private DebugGraphContainer dataGraph;
 
@@ -113,6 +113,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         Map<Short, InstanceData> instance = new HashMap<>();
         send.flush();
         send.setState(connectionState);
+
         instance.put((short) connectionID, send.sourceExecute(0f));
         outbound.out.put(ClientConnectionData.TYPE_ID, instance);
 
@@ -206,5 +207,9 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
     public byte getConnectionID() {
         return connectionID;
+    }
+
+    public void queueVariantDownloadForID(String fleetmemberID) {
+        requested.add(fleetmemberID);
     }
 }

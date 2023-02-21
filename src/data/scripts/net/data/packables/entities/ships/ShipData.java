@@ -641,7 +641,12 @@ public class ShipData extends EntityData {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         VariantData variantData = clientPlugin.getVariantDataMap().find(fleetMemberID);
-        if (variantData == null) return;
+        if (variantData == null) {
+            // variant data missing, request download
+            ((MPClientPlugin) plugin).getConnection().queueVariantDownloadForID(fleetMemberID);
+
+            return;
+        }
 
         // update variant
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullID);

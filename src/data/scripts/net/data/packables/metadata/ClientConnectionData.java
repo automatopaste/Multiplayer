@@ -6,10 +6,17 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.io.BaseConnectionWrapper;
 import data.scripts.plugins.MPPlugin;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ClientConnectionData extends EntityData {
 
@@ -20,6 +27,8 @@ public class ClientConnectionData extends EntityData {
     private byte connectionID;
     private long timestamp;
     private long latency;
+
+    private final Set<String> requested = new HashSet<>();
 
     private BaseConnectionWrapper.ConnectionState state = BaseConnectionWrapper.ConnectionState.INITIALISATION_READY;
 
@@ -109,6 +118,23 @@ public class ClientConnectionData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
+                new SourceExecute<List<String>>() {
+                    @Override
+                    public List<String> get() {
+                        List<String> out = new ArrayList<>(requested);
+                        requested.clear();
+                        return out;
+                    }
+                },
+                new DestExecute<List<String>>() {
+                    @Override
+                    public void execute(List<String> value, EntityData packable) {
+                        requested.addAll(value);
+                    }
+                }
+        ));
     }
 
     @Override
@@ -165,5 +191,15 @@ public class ClientConnectionData extends EntityData {
 
     public long getLatency() {
         return latency;
+    }
+
+    public void addRequested(String fleetmemberID) {
+        requested.add(fleetmemberID);
+    }
+
+    public Set<String> getRequested() {
+        Set<String> out = new HashSet<>(requested);
+        requested.clear();
+        return out;
     }
 }
