@@ -212,12 +212,10 @@ public class BallisticProjectileData extends EntityData {
 
         Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
 
-//        String projID;
         String weaponID;
         ProjectileSpecDatastore datastore;
         try {
             datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
-//            projID = datastore.getProjectileIDKeys().get(specID);
             weaponID = datastore.getWeaponIDKeys().get(weaponSpecID);
         } catch (Exception e) {
             Global.getLogger(BallisticProjectileData.class).error("Unable to recover projectile ID from datastore");

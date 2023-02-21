@@ -92,21 +92,6 @@ public class ServerConnectionData extends EntityData {
                     }
                 }
         ));
-//        addRecord(new RecordLambda<>(
-//                ByteRecord.getDefault().setDebugText("client listen"),
-//                new SourceExecute<Byte>() {
-//                    @Override
-//                    public Byte get() {
-//                        return connection.cListen;
-//                    }
-//                },
-//                new DestExecute<Byte>() {
-//                    @Override
-//                    public void execute(Byte value, EntityData packable) {
-//                        receive = value;
-//                    }
-//                }
-//        ));
     }
 
     @Override

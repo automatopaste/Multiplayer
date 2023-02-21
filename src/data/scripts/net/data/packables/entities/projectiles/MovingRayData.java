@@ -10,6 +10,7 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.pregen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -23,7 +24,7 @@ public class MovingRayData extends EntityData {
     public static byte TYPE_ID;
 
     private DamagingProjectileAPI projectile;
-    private short specID;
+    private short weaponSpecID;
     private short shipID;
     private byte weaponID;
     private ShipAPI ship;
@@ -31,21 +32,21 @@ public class MovingRayData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public MovingRayData(short instanceID, final MovingRay projectile, final short specID, final ShipTable shipTable) {
+    public MovingRayData(short instanceID, final MovingRay projectile, final short weaponSpecID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
-                ShortRecord.getDefault().setDebugText("projectile spec id"),
+                ShortRecord.getDefault().setDebugText("weapon spec id"),
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
-                        return specID;
+                        return weaponSpecID;
                     }
                 },
                 new DestExecute<Short>() {
                     @Override
                     public void execute(Short value, EntityData packable) {
-                        setSpecID(value);
+                        setWeaponSpecID(value);
                     }
                 }
         ));
@@ -208,15 +209,24 @@ public class MovingRayData extends EntityData {
             }
         }
 
-        String w = weapon == null ? null : weapon.getId();
         Vector2f vel = ship == null ? new Vector2f(0f, 0f) : new Vector2f(ship.getVelocity());
+
+        String weaponID;
+        ProjectileSpecDatastore datastore;
+        try {
+            datastore = (ProjectileSpecDatastore) plugin.getDatastore(ProjectileSpecDatastore.class);
+            weaponID = datastore.getWeaponIDKeys().get(weaponSpecID);
+        } catch (Exception e) {
+            Global.getLogger(BallisticProjectileData.class).error("Unable to recover projectile ID from datastore");
+            return;
+        }
 
         try {
             projectile = (DamagingProjectileAPI) Global.getCombatEngine().spawnProjectile(
-                    ship, weapon, w, new Vector2f(location), facing, vel
+                    ship, weapon, weaponID, new Vector2f(location), facing, vel
             );
         } catch (Throwable n) {
-            n.printStackTrace();
+            Global.getLogger(BallisticProjectileData.class).error(String.format("Error spawning projectile with weapon ID [%s]", weaponID));
         }
     }
 
@@ -225,12 +235,12 @@ public class MovingRayData extends EntityData {
 
     }
 
-    public void setSpecID(short specID) {
-        this.specID = specID;
+    public void setWeaponSpecID(short weaponSpecID) {
+        this.weaponSpecID = weaponSpecID;
     }
 
-    public short getSpecID() {
-        return specID;
+    public short getWeaponSpecID() {
+        return weaponSpecID;
     }
 
     public ShipAPI getShip() {
