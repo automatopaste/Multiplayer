@@ -9,7 +9,7 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
-import data.scripts.net.data.pregen.VariantDataGenerator;
+import data.scripts.net.data.pregen.ShipVariantDatastore;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -86,7 +86,10 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
                 if (!requested.isEmpty()) {
                     Map<Short, InstanceData> v = new HashMap<>();
-                    VariantDataGenerator datastore = connectionManager.getServerPlugin().getVariantStore();
+
+                    ShipVariantDatastore datastore = connectionManager.getServerPlugin().getVariantStore();
+                    datastore.checkVariantUpdate();
+
                     for (String id : requested) {
                         VariantData variantData = datastore.getGenerated().get(id);
                         if (variantData != null) {

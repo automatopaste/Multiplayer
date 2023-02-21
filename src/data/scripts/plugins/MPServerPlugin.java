@@ -9,7 +9,7 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.pregen.ProjectileSpecDatastore;
-import data.scripts.net.data.pregen.VariantDataGenerator;
+import data.scripts.net.data.pregen.ShipVariantDatastore;
 import data.scripts.net.data.tables.server.*;
 import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.plugins.gui.MPChatboxPlugin;
@@ -31,7 +31,7 @@ public class MPServerPlugin extends MPPlugin {
     private final ProjectileTable projectileTable;
 //    private final MissileTable missileTable;
 
-    private final VariantDataGenerator variantDatastore;
+    private final ShipVariantDatastore variantDatastore;
     private final ProjectileSpecDatastore projectileSpecDatastore;
 
     private final TextChatHost textChatHost;
@@ -42,7 +42,7 @@ public class MPServerPlugin extends MPPlugin {
         MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
         engine.addPlugin(chatboxPlugin);
 
-        variantDatastore = new VariantDataGenerator();
+        variantDatastore = new ShipVariantDatastore();
         initDatastore(variantDatastore);
 
         projectileSpecDatastore = new ProjectileSpecDatastore();
@@ -113,7 +113,7 @@ public class MPServerPlugin extends MPPlugin {
         guiDebug.putText(MPServerPlugin.class, "tick", "current server tick " + serverConnectionManager.getTick() + " @ " + ServerConnectionManager.TICK_RATE + "Hz");
     }
 
-    public VariantDataGenerator getVariantStore() {
+    public ShipVariantDatastore getVariantStore() {
         return variantDatastore;
     }
 
