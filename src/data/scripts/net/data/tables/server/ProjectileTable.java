@@ -86,6 +86,7 @@ public class ProjectileTable implements OutboundEntityManager {
         registered.put(projectile, id);
         String projectileID = projectile.getProjectileSpecId();
         short weaponSpecID;
+
         if (projectile.isFromMissile()) {
             String w = datastore.getWeaponSpawnIDs().get(projectileID);
             weaponSpecID = datastore.getWeaponIDs().get(w);
