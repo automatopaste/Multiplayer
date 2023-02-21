@@ -743,6 +743,10 @@ public class ShipData extends EntityData {
         if (controlOverride != null) {
             controlOverride.control(ship);
         }
+
+        if (ship == null && manager instanceof InboundEntityManager) {
+            init(plugin, (InboundEntityManager) manager);
+        }
     }
 
     @Override

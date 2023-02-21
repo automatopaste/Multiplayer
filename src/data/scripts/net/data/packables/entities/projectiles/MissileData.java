@@ -1,9 +1,7 @@
 package data.scripts.net.data.packables.entities.projectiles;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.DamagingProjectileAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.combat.entities.Missile;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
@@ -32,7 +30,7 @@ public class MissileData extends EntityData {
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
 
-    public MissileData(short instanceID, final Missile projectile, final short weaponSpecID, final ShipTable shipTable) {
+    public MissileData(short instanceID, final MissileAPI missile, final short weaponSpecID, final ShipTable shipTable) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -56,7 +54,7 @@ public class MissileData extends EntityData {
                     @Override
                     public Short get() {
                         try {
-                            Short s = shipTable.getRegistered().get(projectile.getWeapon().getShip());
+                            Short s = shipTable.getRegistered().get(missile.getWeapon().getShip());
                             if (s == null) return -1;
                             else return s;
                         } catch (NullPointerException ignored) {
@@ -77,9 +75,9 @@ public class MissileData extends EntityData {
                     @Override
                     public Byte get() {
                         try {
-                            short id = shipTable.getRegistered().get(projectile.getWeapon().getShip());
+                            short id = shipTable.getRegistered().get(missile.getWeapon().getShip());
                             ShipData data = shipTable.getTable()[id];
-                            Byte b = data.getWeaponSlotIDs().get(projectile.getWeapon());
+                            Byte b = data.getWeaponSlotIDs().get(missile.getWeapon());
                             if (b == null) return -1;
                             else return b;
                         } catch (NullPointerException ignored) {
@@ -99,7 +97,7 @@ public class MissileData extends EntityData {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        return new Vector2f(projectile.getLocation());
+                        return new Vector2f(missile.getLocation());
                     }
                 },
                 new DestExecute<Vector2f>() {
@@ -119,7 +117,7 @@ public class MissileData extends EntityData {
                 new SourceExecute<Vector2f>() {
                     @Override
                     public Vector2f get() {
-                        return new Vector2f(projectile.getVelocity());
+                        return new Vector2f(missile.getVelocity());
                     }
                 },
                 new DestExecute<Vector2f>() {
@@ -135,7 +133,7 @@ public class MissileData extends EntityData {
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
-                        return projectile.getFacing();
+                        return missile.getFacing();
                     }
                 },
                 new DestExecute<Float>() {
@@ -155,7 +153,7 @@ public class MissileData extends EntityData {
                 new SourceExecute<Float>() {
                     @Override
                     public Float get() {
-                        return projectile.getAngularVelocity();
+                        return missile.getAngularVelocity();
                     }
                 },
                 new DestExecute<Float>() {
@@ -171,7 +169,7 @@ public class MissileData extends EntityData {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
-                        return ConversionUtils.floatToByte(projectile.getHitpoints(), 1f);
+                        return ConversionUtils.floatToByte(missile.getHitpoints(), 1f);
                     }
                 },
                 new DestExecute<Byte>() {
@@ -179,6 +177,45 @@ public class MissileData extends EntityData {
                     public void execute(Byte value, EntityData packable) {
                         DamagingProjectileAPI projectile = getProjectile();
                         if (projectile != null) projectile.setHitpoints(projectile.getMaxHitpoints() * ConversionUtils.byteToFloat(value, 1f));
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("engine controller"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        byte b = 0x00;
+                        Missile m = (Missile) missile;
+                        ShipEngineControllerAPI controller = m.getEngineController();
+                        if (controller.isAccelerating()) b |= 0b10000000;
+                        if (controller.isAcceleratingBackwards()) b |= 0b01000000;
+                        if (controller.isDecelerating()) b |= 0b00100000;
+                        if (controller.isFlamingOut() || controller.isFlamedOut()) b |= 0b00010000;
+                        if (controller.isStrafingLeft()) b |= 0b00001000;
+                        if (controller.isStrafingRight()) b |= 0b00000100;
+                        if (controller.isTurningLeft()) b |= 0b00000010;
+                        if (controller.isTurningRight()) b |= 0b00000001;
+                        return b;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        DamagingProjectileAPI p = getProjectile();
+                        if (!(p instanceof MissileAPI)) return;
+
+                        MissileAPI m = (MissileAPI) p;
+
+                        byte b = value;
+                        if ((b & 0b10000000) >>> 7 == 0x01) m.giveCommand(ShipCommand.ACCELERATE);
+                        if ((b & 0b01000000) >>> 6 == 0x01) m.giveCommand(ShipCommand.ACCELERATE_BACKWARDS);
+                        if ((b & 0b00100000) >>> 5 == 0x01) m.giveCommand(ShipCommand.DECELERATE);
+                        if ((b & 0b00010000) >>> 4 == 0x01) m.getEngineController().forceFlameout();
+                        if ((b & 0b00001000) >>> 3 == 0x01) m.giveCommand(ShipCommand.STRAFE_LEFT);
+                        if ((b & 0b00000100) >>> 2 == 0x01) m.giveCommand(ShipCommand.STRAFE_RIGHT);
+                        if ((b & 0b00000010) >>> 1 == 0x01) m.giveCommand(ShipCommand.TURN_LEFT);
+                        if ((b & 0b00000001) == 0x01) m.giveCommand(ShipCommand.TURN_RIGHT);
                     }
                 }
         ));
