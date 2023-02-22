@@ -4,6 +4,7 @@ import cmu.CMUtils;
 import cmu.plugins.debug.DebugGraphContainer;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
@@ -16,6 +17,7 @@ import data.scripts.net.io.ClientConnectionWrapper;
 import data.scripts.plugins.gui.MPChatboxPlugin;
 import org.lazywizard.console.Console;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MPClientPlugin extends MPPlugin {
@@ -55,8 +57,16 @@ public class MPClientPlugin extends MPPlugin {
     }
 
     public void init() {
-        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        for (ShipAPI ship : engine.getShips()) {
             Global.getCombatEngine().removeEntity(ship);
+        }
+
+        // sorry
+        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
+        for (CombatEntityAPI asteroid : asteroids) {
+            engine.removeEntity(asteroid);
         }
 
         projectileSpecDatastore = new ProjectileSpecDatastore();

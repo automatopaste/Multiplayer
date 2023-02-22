@@ -2,7 +2,7 @@
 	"id":"multiplayer",
 	"name":"Multiplayer",
 	"author":"hehe",
-	"version":"1.0.0",
+	"version":"0.1.1",
 	"description":"Combat multiplayer mod.",
 	"gameVersion":"0.95.1a-RC6",
 	"jars":[

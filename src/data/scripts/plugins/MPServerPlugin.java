@@ -4,6 +4,7 @@ import cmu.CMUtils;
 import cmu.plugins.GUIDebug;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
@@ -15,6 +16,7 @@ import data.scripts.net.io.ServerConnectionManager;
 import data.scripts.plugins.gui.MPChatboxPlugin;
 import org.lazywizard.console.Console;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,12 @@ public class MPServerPlugin extends MPPlugin {
 
     public MPServerPlugin(int port) {
         CombatEngineAPI engine = Global.getCombatEngine();
+
+        // sorry
+        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
+        for (CombatEntityAPI asteroid : asteroids) {
+            engine.removeEntity(asteroid);
+        }
 
         MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
         engine.addPlugin(chatboxPlugin);
