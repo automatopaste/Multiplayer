@@ -52,6 +52,7 @@ public class PlayerShips implements InboundEntityManager {
 //                            activeShip.getShipAI()
 
                             activeShip.setShipAI(new MPDefaultShipAIPlugin());
+                            playerShipData.setPlayerShip(activeShip);
 
                             activeShips.put(id, activeShip);
                             IDTrackerMap.put(playerShipData, id);

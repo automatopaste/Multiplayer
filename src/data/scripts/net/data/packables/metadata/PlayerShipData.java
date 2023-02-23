@@ -195,6 +195,10 @@ public class PlayerShipData extends EntityData {
         return playerShip;
     }
 
+    public void setPlayerShip(ShipAPI playerShip) {
+        this.playerShip = playerShip;
+    }
+
     public int getControlBitmask() {
         return controlBitmask;
     }
@@ -276,6 +280,7 @@ public class PlayerShipData extends EntityData {
         if (controls[1]) ship.giveCommand(ShipCommand.ACCELERATE_BACKWARDS, null, 0);
 
         if (controls[4]) ship.giveCommand(ShipCommand.DECELERATE, null, 0);
+
         if (controls[5]) { // strafe mode
             float target = VectorUtils.getAngle(ship.getLocation(), mouseTarget);
             DroneAIUtils.rotate(target, ship, control);
