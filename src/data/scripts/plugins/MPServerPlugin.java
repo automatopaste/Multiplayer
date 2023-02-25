@@ -41,12 +41,6 @@ public class MPServerPlugin extends MPPlugin {
     public MPServerPlugin(int port) {
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        // sorry
-        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
-        for (CombatEntityAPI asteroid : asteroids) {
-            engine.removeEntity(asteroid);
-        }
-
         MPChatboxPlugin chatboxPlugin = new MPChatboxPlugin();
         engine.addPlugin(chatboxPlugin);
 
@@ -89,6 +83,14 @@ public class MPServerPlugin extends MPPlugin {
         for (byte connectionID : inbound.keySet()) {
             InboundData data = inbound.get(connectionID);
             DataGenManager.distributeInboundDeltas(data, this, serverConnectionManager.getTick(), connectionID);
+        }
+
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        // sorry
+        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
+        for (CombatEntityAPI asteroid : asteroids) {
+            engine.removeEntity(asteroid);
         }
 
         // simulation update

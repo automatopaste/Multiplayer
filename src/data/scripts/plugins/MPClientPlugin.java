@@ -63,12 +63,6 @@ public class MPClientPlugin extends MPPlugin {
             Global.getCombatEngine().removeEntity(ship);
         }
 
-        // sorry
-        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
-        for (CombatEntityAPI asteroid : asteroids) {
-            engine.removeEntity(asteroid);
-        }
-
         projectileSpecDatastore = new ProjectileSpecDatastore();
         initDatastore(projectileSpecDatastore);
 
@@ -109,6 +103,14 @@ public class MPClientPlugin extends MPPlugin {
             Global.getCombatEngine().removePlugin(this);
             Console.showMessage("Connection interrupted");
             return;
+        }
+
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        // sorry
+        List<CombatEntityAPI> asteroids = new ArrayList<>(engine.getAsteroids());
+        for (CombatEntityAPI asteroid : asteroids) {
+            engine.removeEntity(asteroid);
         }
 
         // get inbound
