@@ -2,16 +2,14 @@ package data.scripts.net.data.packables.metadata;
 
 import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
-import com.fs.starfarer.api.combat.ViewportAPI;
-import com.fs.starfarer.api.combat.WeaponGroupAPI;
+import com.fs.starfarer.api.combat.*;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.IntRecord;
+import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -38,6 +36,8 @@ public class PlayerShipData extends EntityData {
     private String playerShipID;
 
     private ShipAPI playerShip;
+    private ShipAIPlugin aiPlugin;
+
     private Vector2f mouseTarget = new Vector2f(0f, 0f);
 
     private boolean shieldEnable = false;
@@ -92,7 +92,7 @@ public class PlayerShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                StringRecord.getDefault().setDebugText("player ship id"),
+                StringRecord.getDefault().setDebugText("player ship id string"),
                 new SourceExecute<String>() {
                     @Override
                     public String get() {
@@ -110,6 +110,21 @@ public class PlayerShipData extends EntityData {
                         } else {
                             playerShipData.setPlayerShipID(value);
                         }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ShortRecord.getDefault().setDebugText("player ship id"),
+                new SourceExecute<Short>() {
+                    @Override
+                    public Short get() {
+                        return playerShip.getActiveShipID();
+                    }
+                },
+                new DestExecute<Short>() {
+                    @Override
+                    public void execute(Short value, EntityData packable) {
+
                     }
                 }
         ));
@@ -162,6 +177,17 @@ public class PlayerShipData extends EntityData {
         prevFighters = fighterCheck;
     }
 
+    public void transferPlayerShip(ShipAPI dest) {
+        if (this.playerShip != null && aiPlugin != null) {
+            playerShip.setShipAI(aiPlugin);
+            aiPlugin.forceCircumstanceEvaluation();
+        }
+
+        playerShip = dest;
+        aiPlugin = playerShip.getShipAI();
+        playerShip.setShipAI(new MPDefaultShipAIPlugin());
+    }
+
     private void check(ShipTable shipTable) {
         for (ShipData data : shipTable.getTable()) {
             if (data != null && data.getShip() != null) {
@@ -193,10 +219,6 @@ public class PlayerShipData extends EntityData {
 
     public ShipAPI getPlayerShip() {
         return playerShip;
-    }
-
-    public void setPlayerShip(ShipAPI playerShip) {
-        this.playerShip = playerShip;
     }
 
     public int getControlBitmask() {

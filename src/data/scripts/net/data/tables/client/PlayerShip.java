@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
@@ -20,6 +21,7 @@ public class PlayerShip implements OutboundEntityManager {
     private String playerShipID;
     private String playerShipIDPrev;
     private ShipAPI playerShip;
+    private short activeShipID;
 
     public PlayerShip(short instanceID) {
         this.instanceID = instanceID;
@@ -36,16 +38,20 @@ public class PlayerShip implements OutboundEntityManager {
                 if (ship.getFleetMemberId().equals(playerShipID)) {
                     Global.getCombatEngine().setPlayerShipExternal(ship);
                     playerShip = ship;
+
+                    ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
+                    for (ShipData shipData : clientShipTable.getShips().values()) {
+                        if (shipData.getShip().equals(playerShip)) {
+                            activeShipID = shipData.getInstanceID();
+                        }
+                    }
+
                     break;
                 }
             }
         }
 
         playerShipIDPrev = playerShipID;
-
-        if (playerShip != null) {
-//            playerShip.blockCommandForOneFrame(ShipCommand.FIRE);
-        }
     }
 
     @Override
@@ -77,6 +83,10 @@ public class PlayerShip implements OutboundEntityManager {
 
     public String getPlayerShipID() {
         return playerShipID;
+    }
+
+    public short getActiveShipID() {
+        return activeShipID;
     }
 
     public ShipAPI getPlayerShip() {

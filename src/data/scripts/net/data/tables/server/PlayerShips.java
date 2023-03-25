@@ -17,8 +17,6 @@ public class PlayerShips implements InboundEntityManager {
     private final Map<Short, PlayerShipData> playerShips = new HashMap<>();
 
     private final Map<PlayerShipData, String> IDTrackerMap = new HashMap<>();
-    private final Map<String, ShipAPI> activeShips = new HashMap<>();
-    private final Map<String, ShipAIPlugin> aiPlugins = new HashMap<>();
 
     public PlayerShips() {
     }
@@ -47,6 +45,8 @@ public class PlayerShips implements InboundEntityManager {
                 if (find) {
                     for (ShipAPI ship : Global.getCombatEngine().getShips()) {
                         if (ship.getFleetMemberId().equals(id)) {
+                            playerShipData.transferPlayerShip(ship);
+
                             activeShip = ship;
 
 //                            activeShip.getShipAI()

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * No real difference in speed vs using lists
+ * No real difference in speed vs using hashmaps, doesnt solve any problems and probably should be removed
  */
 public abstract class EntityTable<T extends EntityData> {
     protected final T[] table;
