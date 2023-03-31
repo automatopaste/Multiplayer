@@ -235,7 +235,7 @@ public class MissileData extends EntityData {
     public void init(MPPlugin plugin, InboundEntityManager manager) {
         if (shipID != -1) {
             ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
-            ShipData shipData = clientShipTable.getTable()[shipID];
+            ShipData shipData = clientShipTable.getShips().get(shipID);
 
             if (shipData != null && shipData.getShip() != null) {
                 setShip(shipData.getShip());

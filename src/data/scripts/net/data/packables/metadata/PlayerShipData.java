@@ -10,7 +10,6 @@ import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ShortRecord;
-import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -33,7 +32,9 @@ public class PlayerShipData extends EntityData {
     public static byte TYPE_ID;
 
     private int controlBitmask;
-    private String playerShipID;
+    private short playerShipID;
+    private short requestedShipID = -1;
+    private short requestedShipIDPrev = -1;
 
     private ShipAPI playerShip;
     private ShipAIPlugin aiPlugin;
@@ -92,28 +93,6 @@ public class PlayerShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                StringRecord.getDefault().setDebugText("player ship id string"),
-                new SourceExecute<String>() {
-                    @Override
-                    public String get() {
-                        String s = playerShip.getPlayerShipID();
-                        if (s == null) return StringRecord.NULL;
-                        return s;
-                    }
-                },
-                new DestExecute<String>() {
-                    @Override
-                    public void execute(String value, EntityData packable) {
-                        PlayerShipData playerShipData = (PlayerShipData) packable;
-                        if (value == null || value.equals(StringRecord.NULL)) {
-                            playerShipData.setPlayerShipID(null);
-                        } else {
-                            playerShipData.setPlayerShipID(value);
-                        }
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
                 ShortRecord.getDefault().setDebugText("player ship id"),
                 new SourceExecute<Short>() {
                     @Override
@@ -124,7 +103,22 @@ public class PlayerShipData extends EntityData {
                 new DestExecute<Short>() {
                     @Override
                     public void execute(Short value, EntityData packable) {
-
+                        setPlayerShipID(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ShortRecord.getDefault().setDebugText("requested switch ship id"),
+                new SourceExecute<Short>() {
+                    @Override
+                    public Short get() {
+                        return playerShip.getRequestedShipID();
+                    }
+                },
+                new DestExecute<Short>() {
+                    @Override
+                    public void execute(Short value, EntityData packable) {
+                        setRequestedShipID(value);
                     }
                 }
         ));
@@ -229,12 +223,26 @@ public class PlayerShipData extends EntityData {
         this.controlBitmask = controlBitmask;
     }
 
-    public String getPlayerShipID() {
+    public short getPlayerShipID() {
         return playerShipID;
     }
 
-    public void setPlayerShipID(String playerShipID) {
+    public void setPlayerShipID(short playerShipID) {
         this.playerShipID = playerShipID;
+    }
+
+    public short getRequestedShipID() {
+        return requestedShipID;
+    }
+
+    public void setRequestedShipID(short requestedShipID) {
+        if (requestedShipIDPrev == requestedShipID) {
+            this.requestedShipID = -1;
+        } else {
+            this.requestedShipID = requestedShipID;
+        }
+
+        requestedShipIDPrev = requestedShipID;
     }
 
     public int mask() {

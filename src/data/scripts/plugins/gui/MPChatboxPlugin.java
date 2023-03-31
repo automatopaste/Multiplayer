@@ -1,7 +1,6 @@
 package data.scripts.plugins.gui;
 
 import cmu.gui.Button;
-import cmu.gui.Panel;
 import cmu.gui.*;
 import com.fs.starfarer.api.GameState;
 import com.fs.starfarer.api.Global;
@@ -29,8 +28,8 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
     }
     private ActivePanel active = ActivePanel.NONE;
 
-    private Panel widget;
-    private Panel chatbox;
+    private ListPanel widget;
+    private ListPanel chatbox;
 
     public MPChatboxPlugin() {
 
@@ -62,7 +61,7 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         float h = Global.getSettings().getScreenHeightPixels();
 
         Vector2f root1 = new Vector2f(w - 92f, h - 148f);
-        Vector2f root2 = new Vector2f(w - 264f, 500f);
+        Vector2f root2 = new Vector2f(w - 364f, 500f);
 
         CMUKitUI.render(widget, root1, events);
 
@@ -75,14 +74,14 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         }
     }
 
-    private Panel initWidget() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initWidget() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 60f;
         panelParams.y = 26f;
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
                 buttonParams.width = 58f;
                 buttonParams.height = 24f;
@@ -109,22 +108,22 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-    private Panel initChatbox() {
-        final Panel.PanelParams panelParams = new Panel.PanelParams();
-        panelParams.x = 260f;
-        panelParams.y = 180f;
+    private ListPanel initChatbox() {
+        final ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
+        panelParams.x = 360f;
+        panelParams.y = 380f;
         panelParams.update = false;
 
-        final Panel.PanelParams chatPanelParams = new Panel.PanelParams();
-        chatPanelParams.x = 250f;
-        chatPanelParams.y = 160f;
+        final ListPanel.ListPanelParams chatPanelParams = new ListPanel.ListPanelParams();
+        chatPanelParams.x = 350f;
+        chatPanelParams.y = 360f;
         chatPanelParams.noDeco = true;
         chatPanelParams.conformToListSize = true;
         chatPanelParams.update = true;
 
-        final Panel chatPanel = new Panel(chatPanelParams, new Panel.PanelMaker() {
+        final ListPanel chatPanel = new ListPanel(chatPanelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel) {
+            public void make(ListPanel panel) {
                 List<Text> toAdd = new ArrayList<>();
 
                 float height = 0f;
@@ -156,13 +155,13 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
             }
         });
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 panel1.addChild(chatPanel);
 
                 TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
-                textEntryBoxParams.width = 250f;
+                textEntryBoxParams.width = 350f;
                 textEntryBoxParams.height = 24f;
                 Text.TextParams textParams1 = new Text.TextParams();
                 final TextEntryBox textEntryBox = new TextEntryBox(textEntryBoxParams, TODRAW14, textParams1);

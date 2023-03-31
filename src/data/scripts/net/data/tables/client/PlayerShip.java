@@ -22,6 +22,7 @@ public class PlayerShip implements OutboundEntityManager {
     private String playerShipIDPrev;
     private ShipAPI playerShip;
     private short activeShipID;
+    private short requestedShipID;
 
     public PlayerShip(short instanceID) {
         this.instanceID = instanceID;
@@ -87,6 +88,10 @@ public class PlayerShip implements OutboundEntityManager {
 
     public short getActiveShipID() {
         return activeShipID;
+    }
+
+    public short getRequestedShipID() {
+        return requestedShipID;
     }
 
     public ShipAPI getPlayerShip() {

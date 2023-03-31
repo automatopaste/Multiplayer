@@ -1,72 +1,67 @@
 package data.scripts.net.data.tables.server;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAIPlugin;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPPlugin;
-import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerShips implements InboundEntityManager {
 
+    // map client connection id to data object
     private final Map<Short, PlayerShipData> playerShips = new HashMap<>();
 
-    private final Map<PlayerShipData, String> IDTrackerMap = new HashMap<>();
+    // map ship id to client connection id
+    private final Map<Short, Short> activeShips = new HashMap<>();
 
-    public PlayerShips() {
+    private final ShipTable shipTable;
+    private short hostActiveShipID;
+
+    public PlayerShips(ShipTable shipTable) {
+        this.shipTable = shipTable;
     }
 
     @Override
     public void update(float amount, MPPlugin plugin) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        if (engine.getPlayerShip() == null || engine.getPlayerShip().isShuttlePod()) {
+            hostActiveShipID = -1;
+        } else {
+            try {
+                hostActiveShipID = shipTable.getRegistered().get(engine.getPlayerShip());
+            } catch (NullPointerException n) {
+                Global.getLogger(PlayerShips.class).error("unable to find id for host ship in local table");
+            }
+        }
+
+        activeShips.clear();
+
+        activeShips.put(hostActiveShipID, DEFAULT_HOST_INSTANCE);
+
         for (PlayerShipData playerShipData : playerShips.values()) {
             playerShipData.update(amount, this, plugin);
+
+            activeShips.put(playerShipData.getPlayerShipID(), playerShipData.getInstanceID());
         }
 
         for (PlayerShipData playerShipData : playerShips.values()) {
-            String id = playerShipData.getPlayerShipID();
+            short current = playerShipData.getPlayerShipID();
+            short requested = playerShipData.getRequestedShipID();
+            if (requested != -1) { // remote client is submitting an id to switch to
+                boolean transfer = activeShips.containsValue(requested);
+                if (transfer) {
+                    ShipAPI dest = shipTable.getTable()[requested].getShip();
 
-            if (id != null) {
-                ShipAPI activeShip = activeShips.get(id);
+                    playerShipData.transferPlayerShip(dest);
 
-                boolean find = false;
-
-                if (activeShip == null) { // no ship yet selected
-                    find = true;
-                } else if (!activeShip.getFleetMemberId().equals(id)) { // switched ships
-                    activeShip.resetDefaultAI();
-                    find = true;
-                }
-
-                if (find) {
-                    for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-                        if (ship.getFleetMemberId().equals(id)) {
-                            playerShipData.transferPlayerShip(ship);
-
-                            activeShip = ship;
-
-//                            activeShip.getShipAI()
-
-                            activeShip.setShipAI(new MPDefaultShipAIPlugin());
-                            playerShipData.setPlayerShip(activeShip);
-
-                            activeShips.put(id, activeShip);
-                            IDTrackerMap.put(playerShipData, id);
-
-                            break;
-                        }
-                    }
-                }
-            } else {
-                String s = IDTrackerMap.get(playerShipData);
-
-                if (s != null) {
-                    activeShips.remove(s);
-                    IDTrackerMap.remove(playerShipData);
+                    activeShips.remove(current);
+                    activeShips.put(requested, playerShipData.getInstanceID());
                 }
             }
         }
@@ -108,7 +103,7 @@ public class PlayerShips implements InboundEntityManager {
         }
     }
 
-    public String getHostShipID() {
-        return Global.getCombatEngine().getPlayerShip().getFleetMemberId();
+    public Short getHostShipID() {
+        return hostActiveShipID;
     }
 }

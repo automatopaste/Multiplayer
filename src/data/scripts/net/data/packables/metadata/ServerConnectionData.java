@@ -59,7 +59,7 @@ public class ServerConnectionData extends EntityData {
                 new SourceExecute<Byte>() {
                     @Override
                     public Byte get() {
-                        if (connection.sReceive == 0) {
+                        if (connection.sReceive == 0) { // this is very much a hack but it works
                             latency = System.currentTimeMillis() - timestamp;
                             connection.sReceive = 1;
 

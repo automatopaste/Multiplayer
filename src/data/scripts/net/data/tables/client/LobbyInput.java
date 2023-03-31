@@ -1,8 +1,11 @@
 package data.scripts.net.data.tables.client;
 
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -10,13 +13,17 @@ import java.util.Map;
 
 public class LobbyInput implements InboundEntityManager {
 
+    private final byte clientID;
     private LobbyData lobby;
 
     private String clientPilotedShipID = null;
 
     private final Map<Byte, String> usernames = new HashMap<>();
+    private final Map<Byte, Short> pilotedShipIDs = new HashMap<>();
+    private short localPilotedShipID;
 
-    public LobbyInput() {
+    public LobbyInput(byte clientID) {
+        this.clientID = clientID;
         lobby = null;
     }
 
@@ -26,6 +33,17 @@ public class LobbyInput implements InboundEntityManager {
             lobby.update(amount, this, plugin);
 
             usernames.putAll(lobby.getPlayerUsernames());
+            pilotedShipIDs.putAll(lobby.getPlayerShipIDs());
+
+            short pilotedShipID = pilotedShipIDs.get(clientID);
+            if (pilotedShipID != localPilotedShipID) {
+                ShipAPI ship = ((MPClientPlugin) plugin).getShipTable().getShips().get(pilotedShipID).getShip();
+                if (ship != null) {
+                    Global.getCombatEngine().setPlayerShipExternal(ship);
+                }
+            }
+
+            localPilotedShipID = pilotedShipID;
         }
     }
 
@@ -63,5 +81,9 @@ public class LobbyInput implements InboundEntityManager {
 
     public Map<Byte, String> getUsernames() {
         return usernames;
+    }
+
+    public Map<Byte, Short> getPilotedShipIDs() {
+        return pilotedShipIDs;
     }
 }

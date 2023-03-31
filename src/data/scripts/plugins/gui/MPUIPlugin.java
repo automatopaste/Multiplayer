@@ -1,7 +1,6 @@
 package data.scripts.plugins.gui;
 
 import cmu.gui.Button;
-import cmu.gui.Panel;
 import cmu.gui.*;
 import com.fs.starfarer.api.GameState;
 import com.fs.starfarer.api.Global;
@@ -26,11 +25,11 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
     private static LazyFont.DrawableString TODRAW14;
     private static LazyFont.DrawableString TODRAW24;
 
-    private Panel hostPanel;
-    private Panel joinPanel;
-    private Panel widgetPanel;
-    private Panel selectPanel;
-    private Panel shipSelectionPanel;
+    private ListPanel hostPanel;
+    private ListPanel joinPanel;
+    private ListPanel widgetPanel;
+    private ListPanel selectPanel;
+    private ListPanel shipSelectionPanel;
     private enum ActivePanel {
         NONE,
         SELECT,
@@ -105,14 +104,14 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         }
     }
 
-    private Panel initWidget() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initWidget() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 26f;
         panelParams.y = 26f;
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
                 buttonParams.width = 24f;
                 buttonParams.height = 24f;
@@ -142,16 +141,16 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-    private Panel initSelect() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initSelect() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 300f;
         panelParams.y = 120f;
         panelParams.update = true;
         panelParams.conformToListSize = true;
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 Text.TextParams textParams = new Text.TextParams();
                 Text text = new Text(new Execute<String>() {
                     @Override
@@ -271,15 +270,15 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-    private Panel initHostUI() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initHostUI() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 300f;
         panelParams.y = 120f;
         panelParams.conformToListSize = true;
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 Text.TextParams textParams = new Text.TextParams();
                 Text text = new Text(new Execute<String>() {
                     @Override
@@ -366,15 +365,15 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-    private Panel initConnectionUI() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initConnectionUI() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 300f;
         panelParams.y = 150f;
         panelParams.conformToListSize = true;
 
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel1) {
+            public void make(ListPanel panel1) {
                 Text.TextParams textParams = new Text.TextParams();
                 Text text = new Text(new Execute<String>() {
                     @Override
@@ -461,15 +460,15 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-    private Panel initShipSelectionUI() {
-        Panel.PanelParams panelParams = new Panel.PanelParams();
+    private ListPanel initShipSelectionUI() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
         panelParams.x = 300f;
         panelParams.y = 150f;
         panelParams.conformToListSize = true;
         panelParams.update = true;
-        return new Panel(panelParams, new Panel.PanelMaker() {
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
-            public void make(Panel panel) {
+            public void make(ListPanel panel) {
                 Text.TextParams textParams = new Text.TextParams();
                 Text text = new Text(new Execute<String>() {
                     @Override

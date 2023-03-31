@@ -78,7 +78,7 @@ public class MPClientPlugin extends MPPlugin {
         playerShip = new PlayerShip(connection.getConnectionID());
         initEntityManager(playerShip);
 
-        lobbyInput = new LobbyInput();
+        lobbyInput = new LobbyInput(connection.getConnectionID());
         initEntityManager(lobbyInput);
 
         player = new Player(connection.getConnectionID(), this);

@@ -13,6 +13,7 @@ import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.plugins.MPPlugin;
+import data.scripts.plugins.MPServerPlugin;
 
 import java.util.*;
 
@@ -23,11 +24,11 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     private final Map<ShipAPI, Short> registered;
     private final Set<Short> deleted;
     private final EntityInstanceMap<ShieldData> shields;
-    private final PlayerShips playerShips;
+    private final MPServerPlugin serverPlugin;
 
-    public ShipTable(PlayerShips playerShips) {
+    public ShipTable(MPServerPlugin serverPlugin) {
         super(new ShipData[MAX_SHIPS]);
-        this.playerShips = playerShips;
+        this.serverPlugin = serverPlugin;
 
         registered = new HashMap<>();
         deleted = new HashSet<>();
@@ -108,7 +109,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         short id = (short) getVacant();
 
         registered.put(ship, id);
-        table[id] = new ShipData(id, ship, playerShips);
+        table[id] = new ShipData(id, ship, serverPlugin.getPlayerShipMap());
         if (ship.getShield() != null) {
             shields.registered.put(id, new ShieldData(id, ship.getShield(), ship));
         }

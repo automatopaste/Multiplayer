@@ -5,7 +5,6 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.StringRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -26,8 +25,8 @@ public class LobbyData extends EntityData {
     public static byte TYPE_ID;
 
     private List<Byte> players;
-    private List<String> playerShipIDs;
-    private Map<Byte, String> playerUsernames = new HashMap<>();
+    private Map<Byte, Short> playerShipIDs;
+    private final Map<Byte, String> playerUsernames = new HashMap<>();
 
     public LobbyData(short instanceID, final PlayerLobby playerLobby, final PlayerShips playerShips) {
         super(instanceID);
@@ -47,7 +46,6 @@ public class LobbyData extends EntityData {
                         }
 
                         return out;
-
                     }
                 },
                 new DestExecute<List<Byte>>() {
@@ -59,27 +57,44 @@ public class LobbyData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new SyncingListRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID).setDebugText("player piloted ship ids"),
-                new SourceExecute<List<String>>() {
+                new SyncingListRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("player piloted ship ids"),
+                new SourceExecute<List<Byte>>() {
                     @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>();
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
 
-                        // server ship
-                        out.add(playerShips.getHostShipID());
+                        out.add(BaseEntityManager.DEFAULT_HOST_ID);
+                        short id = playerShips.getHostShipID();
+                        out.add((byte) ((id >>> 8) & 0xFF));
+                        out.add((byte) (id & 0xFF));
 
                         for (PlayerShipData playerShipData : playerShips.getPlayerShips().values()) {
-                            out.add(playerShipData.getPlayerShipID());
+                            out.add((byte) (playerShipData.getInstanceID())); // hack where instance id is player id
+
+                            id = playerShipData.getPlayerShipID();
+                            out.add((byte) ((id >>> 8) & 0xFF));
+                            out.add((byte) (id & 0xFF));
                         }
 
                         return out;
                     }
                 },
-                new DestExecute<List<String>>() {
+                new DestExecute<List<Byte>>() {
                     @Override
-                    public void execute(List<String> value, EntityData packable) {
-                        LobbyData lobbyData = (LobbyData) packable;
-                        lobbyData.setPlayerShipIDs(value);
+                    public void execute(List<Byte> value, EntityData packable) {
+                        Map<Byte, Short> in = new HashMap<>();
+
+                        for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
+                            byte id = iterator.next();
+
+                            byte b1 = iterator.next();
+                            byte b2 = iterator.next();
+                            short s = (short) ((b1 << 8) | b2);
+
+                            in.put(id, s);
+                        }
+
+                        setPlayerShipIDs(in);
                     }
                 }
         ));
@@ -158,11 +173,11 @@ public class LobbyData extends EntityData {
         this.players = players;
     }
 
-    public List<String> getPlayerShipIDs() {
+    public Map<Byte, Short> getPlayerShipIDs() {
         return playerShipIDs;
     }
 
-    public void setPlayerShipIDs(List<String> playerShipIDs) {
+    public void setPlayerShipIDs(Map<Byte, Short> playerShipIDs) {
         this.playerShipIDs = playerShipIDs;
     }
 
