@@ -35,7 +35,7 @@ public class LobbyInput implements InboundEntityManager {
             usernames.putAll(lobby.getPlayerUsernames());
             pilotedShipIDs.putAll(lobby.getPlayerShipIDs());
 
-            short pilotedShipID = pilotedShipIDs.get(clientID);
+            Short pilotedShipID = pilotedShipIDs.get(clientID);
             if (pilotedShipID != localPilotedShipID) {
                 ShipAPI ship = ((MPClientPlugin) plugin).getShipTable().getShips().get(pilotedShipID).getShip();
                 if (ship != null) {
