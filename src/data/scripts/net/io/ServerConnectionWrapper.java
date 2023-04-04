@@ -77,7 +77,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 Map<Short, InstanceData> ships = shipTable.getShipsRegistered();
                 outbound.out.put(ShipData.TYPE_ID, ships);
 
-                ProjectileTable projectileTable = (ProjectileTable) connectionManager.getServerPlugin().getEntityManagers().get(ShipTable.class);
+                ProjectileTable projectileTable = (ProjectileTable) connectionManager.getServerPlugin().getEntityManagers().get(ProjectileTable.class);
                 Map<Byte, Map<Short, InstanceData>> projectiles = projectileTable.getProjectilesRegistered();
                 outbound.out.putAll(projectiles);
 
