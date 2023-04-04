@@ -99,7 +99,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 CMUKitUI.render(joinPanel, root2, events);
                 break;
             case SHIP_SELECT:
-                CMUKitUI.render(shipSelectionPanel, root2, events);
+                Vector2f s = new Vector2f((w - shipSelectionPanel.getWidth()) * 0.5f, (h - shipSelectionPanel.getWidth()) * 0.5f);
+                CMUKitUI.render(shipSelectionPanel, s, events);
                 break;
         }
     }
