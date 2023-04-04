@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.server;
+package data.scripts.net.data.tables.server.combat.players;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.DataGenManager;

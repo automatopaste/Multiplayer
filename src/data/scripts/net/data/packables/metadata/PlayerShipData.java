@@ -8,13 +8,14 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.client.PlayerShip;
-import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.client.combat.player.PlayerShip;
+import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.VectorUtils;
@@ -33,19 +34,23 @@ public class PlayerShipData extends EntityData {
 
     private int controlBitmask;
     private short playerShipID;
+    private byte playerShipFlags;
     private short requestedShipID = -1;
     private short requestedShipIDPrev = -1;
 
     private ShipAPI playerShip;
     private ShipAIPlugin aiPlugin;
+    private boolean isAccepted;
+    private boolean isRejected;
 
-    private Vector2f mouseTarget = new Vector2f(0f, 0f);
+    private final Vector2f mouseTarget = new Vector2f(0f, 0f);
 
     private boolean shieldEnable = false;
     private boolean prevShields = false;
     private boolean fighterEnable = false;
     private boolean prevFighters = false;
 
+    // make use of the CMUtils pd controller functionality to imitate the point-at-cursor pilot mode
     private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
         @Override
         public float getKp() {
@@ -123,6 +128,25 @@ public class PlayerShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("ship switch request flags"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        byte b = 0x00;
+
+
+
+                        return b;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        setPlayerShipFlags(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
                 Vector2f32Record.getDefault().setDebugText("player mouse target"),
                 new SourceExecute<Vector2f>() {
                     @Override
@@ -187,7 +211,7 @@ public class PlayerShipData extends EntityData {
             if (data != null && data.getShip() != null) {
                 ShipAPI ship = data.getShip();
 
-                if (ship.getFleetMemberId().equals(playerShipID)) {
+                if (data.getInstanceID() == playerShipID) {
                     ship.setShipAI(new MPDefaultShipAIPlugin());
                     data.setControlOverride(new ShipControlOverride(this) {
                         @Override
@@ -233,6 +257,14 @@ public class PlayerShipData extends EntityData {
 
     public short getRequestedShipID() {
         return requestedShipID;
+    }
+
+    public byte getPlayerShipFlags() {
+        return playerShipFlags;
+    }
+
+    public void setPlayerShipFlags(byte playerShipFlags) {
+        this.playerShipFlags = playerShipFlags;
     }
 
     public void setRequestedShipID(short requestedShipID) {

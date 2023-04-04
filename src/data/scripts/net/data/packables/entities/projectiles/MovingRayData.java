@@ -14,8 +14,8 @@ import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.client.ClientShipTable;
-import data.scripts.net.data.tables.server.ShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
 

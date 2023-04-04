@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.client;
+package data.scripts.net.data.tables.client.combat.entities;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.DamagingProjectileAPI;

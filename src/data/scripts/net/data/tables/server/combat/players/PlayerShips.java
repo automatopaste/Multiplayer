@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.server;
+package data.scripts.net.data.tables.server.combat.players;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.PlayerShipData;
 import data.scripts.net.data.tables.InboundEntityManager;
+import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;

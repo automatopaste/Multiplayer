@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.client;
+package data.scripts.net.data.tables.client.combat.connection;
 
 import com.fs.starfarer.api.Global;
 import data.scripts.net.data.DataGenManager;
@@ -6,6 +6,7 @@ import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.metadata.ChatListenData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
+import data.scripts.net.data.tables.client.combat.connection.LobbyInput;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.gui.MPChatboxPlugin;
 

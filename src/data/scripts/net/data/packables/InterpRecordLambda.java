@@ -22,7 +22,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
     public InterpRecordLambda(final DataRecord<T> record, SourceExecute<T> sourceExecute, final DestExecute<T> destExecute) {
         super(record, sourceExecute, destExecute);
 
-        this.interpExecute = new Default();
+        this.interpExecute = new DefaultLinterp();
 
         v1 = record.getValue();
         v2 = record.getValue();
@@ -75,7 +75,7 @@ public class InterpRecordLambda<T> extends RecordLambda<T> {
         }
     }
 
-    public class Default implements InterpExecute<T> {
+    public class DefaultLinterp implements InterpExecute<T> {
         @Override
         public T interpExecute(float progressive, T v1, T v2) {
             return record.linterp(progressive, v1, v2);

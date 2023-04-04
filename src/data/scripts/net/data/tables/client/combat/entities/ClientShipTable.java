@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.client;
+package data.scripts.net.data.tables.client.combat.entities;
 
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.ShieldData;

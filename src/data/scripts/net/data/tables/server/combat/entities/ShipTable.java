@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.server;
+package data.scripts.net.data.tables.server.combat.entities;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;

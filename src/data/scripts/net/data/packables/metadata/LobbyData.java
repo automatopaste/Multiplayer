@@ -8,8 +8,8 @@ import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.server.PlayerLobby;
-import data.scripts.net.data.tables.server.PlayerShips;
+import data.scripts.net.data.tables.server.combat.players.PlayerLobby;
+import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 
 import java.nio.charset.StandardCharsets;
