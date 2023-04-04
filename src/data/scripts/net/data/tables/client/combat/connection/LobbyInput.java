@@ -20,7 +20,7 @@ public class LobbyInput implements InboundEntityManager {
 
     private final Map<Byte, String> usernames = new HashMap<>();
     private final Map<Byte, Short> pilotedShipIDs = new HashMap<>();
-    private short localPilotedShipID;
+    private Short localPilotedShipID;
 
     public LobbyInput(byte clientID) {
         this.clientID = clientID;
