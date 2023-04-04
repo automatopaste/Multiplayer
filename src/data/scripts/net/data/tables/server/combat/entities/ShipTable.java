@@ -12,6 +12,7 @@ import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.DataGenManager;
+import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
 
@@ -109,7 +110,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         short id = (short) getVacant();
 
         registered.put(ship, id);
-        table[id] = new ShipData(id, ship, serverPlugin.getPlayerShipMap());
+        PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
+        table[id] = new ShipData(id, ship, playerShips);
         if (ship.getShield() != null) {
             shields.registered.put(id, new ShieldData(id, ship.getShield(), ship));
         }

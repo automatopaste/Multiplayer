@@ -10,6 +10,8 @@ import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
 import data.scripts.net.data.datagen.ShipVariantDatastore;
+import data.scripts.net.data.tables.server.combat.entities.ProjectileTable;
+import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;
@@ -71,10 +73,12 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning entities on client...");
 
-                Map<Short, InstanceData> ships = connectionManager.getServerPlugin().getServerShipTable().getShipsRegistered();
+                ShipTable shipTable = (ShipTable) connectionManager.getServerPlugin().getEntityManagers().get(ShipTable.class);
+                Map<Short, InstanceData> ships = shipTable.getShipsRegistered();
                 outbound.out.put(ShipData.TYPE_ID, ships);
 
-                Map<Byte, Map<Short, InstanceData>> projectiles = connectionManager.getServerPlugin().getProjectileTable().getProjectilesRegistered();
+                ProjectileTable projectileTable = (ProjectileTable) connectionManager.getServerPlugin().getEntityManagers().get(ShipTable.class);
+                Map<Byte, Map<Short, InstanceData>> projectiles = projectileTable.getProjectilesRegistered();
                 outbound.out.putAll(projectiles);
 
                 connectionState = ConnectionState.SIMULATION_READY;

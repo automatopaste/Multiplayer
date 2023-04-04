@@ -56,14 +56,14 @@ public class MPServerPlugin extends MPPlugin {
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
-        playerLobby = new PlayerLobby(this);
-        initEntityManager(playerLobby);
-
         shipTable = new ShipTable(this);
         initEntityManager(shipTable);
 
         playerShips = new PlayerShips(shipTable);
         initEntityManager(playerShips);
+
+        playerLobby = new PlayerLobby(this, playerShips);
+        initEntityManager(playerLobby);
 
         projectileTable = new ProjectileTable(projectileSpecDatastore, shipTable);
         initEntityManager(projectileTable);
@@ -132,21 +132,5 @@ public class MPServerPlugin extends MPPlugin {
     @Override
     public PluginType getType() {
         return PluginType.SERVER;
-    }
-
-    public ShipTable getServerShipTable() {
-        return shipTable;
-    }
-
-    public ProjectileTable getProjectileTable() {
-        return projectileTable;
-    }
-
-    public PlayerLobby getLobby() {
-        return playerLobby;
-    }
-
-    public PlayerShips getPlayerShipMap() {
-        return playerShips;
     }
 }

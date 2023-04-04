@@ -21,7 +21,7 @@ public class PlayerShips implements InboundEntityManager {
     private final Map<Short, Short> activeShips = new HashMap<>();
 
     private final ShipTable shipTable;
-    private short hostActiveShipID;
+    private short hostActiveShipID = DEFAULT_HOST_INSTANCE;
 
     public PlayerShips(ShipTable shipTable) {
         this.shipTable = shipTable;
@@ -32,7 +32,7 @@ public class PlayerShips implements InboundEntityManager {
         CombatEngineAPI engine = Global.getCombatEngine();
 
         if (engine.getPlayerShip() == null || engine.getPlayerShip().isShuttlePod()) {
-            hostActiveShipID = -1;
+            hostActiveShipID = DEFAULT_HOST_INSTANCE;
         } else {
             try {
                 hostActiveShipID = shipTable.getRegistered().get(engine.getPlayerShip());

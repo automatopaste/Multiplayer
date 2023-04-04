@@ -20,7 +20,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
     private final Map<Byte, String> usernames = new HashMap<>();
 
-    public PlayerLobby(MPServerPlugin serverPlugin) {
+    public PlayerLobby(MPServerPlugin serverPlugin, PlayerShips playerShips) {
         players = new HashMap<>();
 
         String hostUsername = Global.getSettings().getString("MP_UsernameString");
@@ -29,7 +29,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
         usernames.put(DEFAULT_HOST_ID, hostUsername);
 
-        lobby = new LobbyData(DEFAULT_HOST_INSTANCE, this, serverPlugin.getPlayerShipMap());
+        lobby = new LobbyData(DEFAULT_HOST_INSTANCE, this, playerShips);
     }
 
     @Override
