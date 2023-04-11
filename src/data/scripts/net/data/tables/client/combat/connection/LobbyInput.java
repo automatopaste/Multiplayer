@@ -1,27 +1,20 @@
 package data.scripts.net.data.tables.client.combat.connection;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class LobbyInput implements InboundEntityManager {
 
     private final byte clientID;
     private LobbyData lobby;
 
-    private String clientPilotedShipID = null;
-
     private final Map<Byte, String> usernames = new HashMap<>();
     private final Map<Byte, Short> pilotedShipIDs = new HashMap<>();
-    private Short localPilotedShipID;
 
     public LobbyInput(byte clientID) {
         this.clientID = clientID;
@@ -36,15 +29,15 @@ public class LobbyInput implements InboundEntityManager {
             usernames.putAll(lobby.getPlayerUsernames());
             pilotedShipIDs.putAll(lobby.getPlayerShipIDs());
 
-            Short pilotedShipID = pilotedShipIDs.get(clientID);
-            if (!Objects.equals(pilotedShipID, localPilotedShipID)) {
-                ShipAPI ship = ((MPClientPlugin) plugin).getShipTable().getShips().get(pilotedShipID).getShip();
-                if (ship != null) {
-                    Global.getCombatEngine().setPlayerShipExternal(ship);
-                }
-            }
+//            Short pilotedShipID = pilotedShipIDs.get(clientID);
+//            if (!Objects.equals(pilotedShipID, localPilotedShipID)) {
+//                ShipAPI ship = ((MPClientPlugin) plugin).getShipTable().getShips().get(pilotedShipID).getShip();
+//                if (ship != null) {
+//                    Global.getCombatEngine().setPlayerShipExternal(ship);
+//                }
+//            }
 
-            localPilotedShipID = pilotedShipID;
+//            localPilotedShipID = pilotedShipID;
         }
     }
 
