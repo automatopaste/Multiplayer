@@ -113,7 +113,7 @@ public class ClientPlayerData extends EntityData {
                 new SourceExecute<Short>() {
                     @Override
                     public Short get() {
-                        return playerShip.getRequestedShipID();
+                        return requestedShipID;
                     }
                 },
                 new DestExecute<Short>() {
