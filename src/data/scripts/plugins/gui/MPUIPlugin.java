@@ -10,6 +10,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
@@ -623,6 +624,19 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                 @Override
                                 public String get() {
                                     if (plugin instanceof MPClientPlugin) {
+                                        MPClientPlugin client = (MPClientPlugin) plugin;
+
+                                        ShipAPI h = client.getPlayerShip().getHostShip();
+                                        if (h == ship) return "HOST CONTROL";
+
+                                        for (short id : client.getLobbyInput().getPilotedShipIDs().values()) {
+                                            ShipData shipData = client.getShipTable().getShips().get(id);
+                                            if (shipData.getShip() == ship) return "PLAYER CONTROL";
+                                        }
+
+                                        ShipAPI s = client.getPlayerShip().getActiveShip();
+                                        if (s == null) return "ACTIVE";
+
                                         return "TRANSFER";
                                     } else {
                                         MPServerPlugin server = (MPServerPlugin) plugin;

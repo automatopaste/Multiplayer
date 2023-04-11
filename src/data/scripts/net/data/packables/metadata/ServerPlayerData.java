@@ -79,6 +79,10 @@ public class ServerPlayerData extends EntityData {
         this.activeID = activeID;
     }
 
+    public short getHostID() {
+        return hostID;
+    }
+
     public void setHostID(short hostID) {
         this.hostID = hostID;
     }

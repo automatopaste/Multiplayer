@@ -88,6 +88,16 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
         return serverPlayerData.getActiveID();
     }
 
+    public ShipAPI getActiveShip() {
+        if (serverPlayerData.getActiveID() == -1) return null;
+        return clientShipTable.getShips().get(serverPlayerData.getActiveID()).getShip();
+    }
+
+    public ShipAPI getHostShip() {
+        if (serverPlayerData.getHostID() == -1) return null;
+        return clientShipTable.getShips().get(serverPlayerData.getHostID()).getShip();
+    }
+
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
         serverPlayerData.destExecute(toProcess, tick);
