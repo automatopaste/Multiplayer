@@ -14,6 +14,7 @@ public class ServerPlayerData extends EntityData {
     public static byte TYPE_ID;
 
     private short activeID;
+    private short hostID;
 
     public ServerPlayerData(short instanceID) {
         super(instanceID);
@@ -24,6 +25,21 @@ public class ServerPlayerData extends EntityData {
                     @Override
                     public Short get() {
                         return activeID;
+                    }
+                },
+                new DestExecute<Short>() {
+                    @Override
+                    public void execute(Short value, EntityData packable) {
+                        setActiveID(value);
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ShortRecord.getDefault().setDebugText("host ship id"),
+                new SourceExecute<Short>() {
+                    @Override
+                    public Short get() {
+                        return hostID;
                     }
                 },
                 new DestExecute<Short>() {
@@ -61,5 +77,9 @@ public class ServerPlayerData extends EntityData {
 
     public void setActiveID(short activeID) {
         this.activeID = activeID;
+    }
+
+    public void setHostID(short hostID) {
+        this.hostID = hostID;
     }
 }

@@ -62,18 +62,21 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             if (requested != -1) { // remote client is submitting an id to switch to
                 ShipAPI dest = shipTable.getTable()[requested].getShip();
 
-                transferControl(dest, false);
+                transferControl(dest, false, c);
             }
+        }
+
+        for (short id : serverPlayerData.keySet()) {
+            ServerPlayerData s = serverPlayerData.get(id);
+            s.setHostID(hostActiveShipID);
         }
     }
 
-    public void transferControl(ShipAPI dest, boolean host) {
+    public void transferControl(ShipAPI dest, boolean host, ClientPlayerData playerData) {
         Short destID = shipTable.getRegistered().get(dest);
         if (destID == null) {
             return;
         }
-
-        ClientPlayerData clientPlayerData = this.clientPlayerData.get(destID);
 
         CombatEngineAPI engine = Global.getCombatEngine();
         if (host) {
@@ -81,7 +84,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
                 return;
             }
 
-            if (clientPlayerData == null) { // ship control is vacant
+            if (playerData == null) { // ship control is vacant
                 engine.setPlayerShipExternal(dest);
             } else { // ship is controlled by a player
                 // todo add config option to let host override player control
@@ -90,7 +93,8 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             if (destID == hostActiveShipID) {
 
             } else {
-                clientPlayerData.transferPlayerShip(dest);
+                playerData.transferPlayerShip(dest);
+                serverPlayerData.get(playerData.getInstanceID()).setActiveID(destID);
             }
         }
     }
