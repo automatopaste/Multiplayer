@@ -11,7 +11,9 @@ import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.packables.metadata.ClientPlayerData;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
+import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
@@ -627,35 +629,47 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                         MPClientPlugin client = (MPClientPlugin) plugin;
 
                                         ShipAPI h = client.getPlayerShip().getHostShip();
-                                        if (h == ship) return "HOST CONTROL";
+                                        if (h == ship) {
+                                            buttonTextParams.color = Color.YELLOW;
+                                            return "HOST CONTROL";
+                                        }
 
                                         for (short id : client.getLobbyInput().getPilotedShipIDs().values()) {
                                             ShipData shipData = client.getShipTable().getShips().get(id);
-                                            if (shipData.getShip() == ship) return "PLAYER CONTROL";
+                                            if (shipData.getShip() == ship) {
+                                                buttonTextParams.color = Color.BLUE;
+                                                return "PLAYER CONTROL";
+                                            }
                                         }
 
                                         ShipAPI s = client.getPlayerShip().getActiveShip();
                                         if (s == null) return "ACTIVE";
-
-                                        return "TRANSFER";
                                     } else {
                                         MPServerPlugin server = (MPServerPlugin) plugin;
                                         if (server == null) return "NULL";
 
-                                        PlayerShips ships = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
-                                        switch (ships.getController(ship)) {
-                                            case HOST:
-                                                buttonTextParams.color = Color.YELLOW;
-                                                return "HOST CONTROL";
-                                            case CLIENT:
+                                        PlayerShips playerShips = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
+                                        ShipTable shipTable = (ShipTable) server.getEntityManagers().get(ShipTable.class);
+
+                                        short id = shipTable.getRegistered().get(ship);
+
+                                        if (id == playerShips.getHostShipID()) {
+                                            buttonTextParams.color = Color.YELLOW;
+                                            return "HOST CONTROL";
+                                        }
+
+                                        for (short sid : playerShips.getClientPlayerData().keySet()) {
+                                            ClientPlayerData clientPlayerData = playerShips.getClientPlayerData().get(sid);
+
+                                            if (clientPlayerData.getPlayerShip() == ship) {
                                                 buttonTextParams.color = Color.BLUE;
                                                 return "PLAYER CONTROL";
-                                            case AI_CONTROL:
-                                                return "TRANSFER";
-                                            default:
-                                                return "NULL";
+                                            }
                                         }
+
                                     }
+
+                                    return "TRANSFER";
                                 }
                             }, TODRAW14, buttonTextParams);
                             Button button = new Button(buttonParams, buttonText, new Button.ButtonCallback() {

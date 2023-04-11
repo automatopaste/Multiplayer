@@ -169,12 +169,4 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
     public Short getHostShipID() {
         return hostActiveShipID;
     }
-
-    public Controller getController(ShipAPI ship) {
-        Short id = shipTable.getRegistered().get(ship);
-        if (id == null) return Controller.NULL;
-        else if (id == hostActiveShipID) return Controller.HOST;
-        else if (clientPlayerData.get(id) != null) return Controller.CLIENT;
-        return Controller.AI_CONTROL;
-    }
 }
