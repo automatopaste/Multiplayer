@@ -80,7 +80,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public PacketType getOutboundPacketType() {
-        return PacketType.DATAGRAM;
+        return PacketType.SOCKET;
     }
 
     public short getActiveShipID() {
