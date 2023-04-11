@@ -44,6 +44,7 @@ public class MPModPlugin extends BaseModPlugin {
         ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
         ClientPlayerData.TYPE_ID = DataGenManager.registerEntityType(ClientPlayerData.class);
+        ServerPlayerData.TYPE_ID = DataGenManager.registerEntityType(ServerPlayerData.class);
         ServerConnectionData.TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
 
         Float32Record.setTypeId(DataGenManager.registerRecordType(Float32Record.class.getSimpleName(), Float32Record.getDefault()));

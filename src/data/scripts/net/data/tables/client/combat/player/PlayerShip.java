@@ -57,6 +57,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void register() {
+        DataGenManager.registerInboundEntityManager(ServerPlayerData.TYPE_ID, this);
         DataGenManager.registerOutboundEntityManager(ClientPlayerData.TYPE_ID, this);
     }
 
