@@ -117,6 +117,10 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             data = new ClientPlayerData(instanceID, null);
 
             clientPlayerData.put(instanceID, data);
+            ServerPlayerData s = new ServerPlayerData(instanceID);
+            serverPlayerData.put(instanceID, s);
+            s.destExecute(new HashMap<Byte, Object>(), tick);
+            s.init(plugin, this);
 
             data.destExecute(toProcess, tick);
             data.init(plugin, this);

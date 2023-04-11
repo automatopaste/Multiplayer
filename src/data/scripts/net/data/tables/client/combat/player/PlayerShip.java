@@ -6,6 +6,8 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.metadata.ClientPlayerData;
+import data.scripts.net.data.packables.metadata.ServerPlayerData;
+import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
 import data.scripts.plugins.MPPlugin;
@@ -14,48 +16,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerShip implements OutboundEntityManager {
+public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     private final ClientPlayerData clientPlayerData;
+    private final ServerPlayerData serverPlayerData;
+    private short prevActiveID;
     private final ClientShipTable clientShipTable;
     private final short instanceID;
-
-    private String playerShipID;
-    private String playerShipIDPrev;
-    private ShipAPI playerShip;
-    private short activeShipID;
-    private short requestedShipID;
 
     public PlayerShip(short instanceID, ClientShipTable clientShipTable) {
         this.instanceID = instanceID;
 
         clientPlayerData = new ClientPlayerData(instanceID, this);
+        serverPlayerData = new ServerPlayerData(instanceID);
+
         this.clientShipTable = clientShipTable;
     }
 
     @Override
     public void update(float amount, MPPlugin plugin) {
         clientPlayerData.update(amount, this, plugin);
+        serverPlayerData.update(amount, this, plugin);
 
-        if (playerShipID != null && playerShipIDPrev == null || playerShipID != null && !playerShipIDPrev.equals(playerShipID)) {
-            for (ShipAPI ship : Global.getCombatEngine().getShips()) {
-                if (ship.getFleetMemberId().equals(playerShipID)) {
-                    Global.getCombatEngine().setPlayerShipExternal(ship);
-                    playerShip = ship;
-
-                    ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
-                    for (ShipData shipData : clientShipTable.getShips().values()) {
-                        if (shipData.getShip().equals(playerShip)) {
-                            activeShipID = shipData.getInstanceID();
-                        }
-                    }
-
-                    break;
-                }
+        if (serverPlayerData.getActiveID() != prevActiveID) {
+            ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
+            if (data != null) {
+                Global.getCombatEngine().setPlayerShipExternal(data.getShip());
             }
         }
 
-        playerShipIDPrev = playerShipID;
+        prevActiveID = serverPlayerData.getActiveID();
     }
 
     public void requestTransfer(ShipAPI dest) {
@@ -92,31 +82,17 @@ public class PlayerShip implements OutboundEntityManager {
         return PacketType.DATAGRAM;
     }
 
-//    public PlayerShips.Controller getController(ShipAPI ship) {
-//        Short id = .getRegistered().get(ship);
-//        if (id == null) return PlayerShips.Controller.NULL;
-//        else if (id == hostActiveShipID) return PlayerShips.Controller.HOST;
-//        else if (playerShips.get(id) != null) return PlayerShips.Controller.CLIENT;
-//        return PlayerShips.Controller.AI_CONTROL;
-//    }
-
-    public String getPlayerShipID() {
-        return playerShipID;
-    }
-
     public short getActiveShipID() {
-        return activeShipID;
+        return serverPlayerData.getActiveID();
     }
 
-    public short getRequestedShipID() {
-        return requestedShipID;
+    @Override
+    public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
+        serverPlayerData.destExecute(toProcess, tick);
     }
 
-    public ShipAPI getPlayerShip() {
-        return playerShip;
-    }
+    @Override
+    public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
 
-    public void setPlayerShipID(String playerShipID) {
-        this.playerShipID = playerShipID;
     }
 }
