@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.metadata.ClientData;
+import data.scripts.net.data.packables.metadata.LobbyData;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
@@ -19,6 +20,8 @@ public class Player implements OutboundEntityManager {
         this.connectionID = connectionID;
 
         String username = Global.getSettings().getString("MP_UsernameString");
+        if (username.length() > LobbyData.MAX_USERNAME_CHARS) username = username.substring(0, LobbyData.MAX_USERNAME_CHARS);
+
         player = new ClientData(connectionID, connectionID, plugin, username);
     }
 

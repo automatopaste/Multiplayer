@@ -107,10 +107,11 @@ public class LobbyData extends EntityData {
 
                         for (byte id : playerLobby.getUsernames().keySet()) {
                             String name = playerLobby.getUsernames().get(id);
+
                             out.add(id);
 
                             byte[] b = name.getBytes(StandardCharsets.UTF_8);
-                            int length = Math.min(b.length, MAX_USERNAME_CHARS);
+                            int length = name.length();
                             out.add((byte) length);
                             for (int i = 0; i < length; i++) {
                                 out.add(b[i]);

@@ -24,6 +24,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
         players = new HashMap<>();
 
         String hostUsername = Global.getSettings().getString("MP_UsernameString");
+        if (hostUsername.length() > LobbyData.MAX_USERNAME_CHARS) hostUsername = hostUsername.substring(0, LobbyData.MAX_USERNAME_CHARS);
         host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, serverPlugin, hostUsername);
         players.put(DEFAULT_HOST_INSTANCE, host);
 
