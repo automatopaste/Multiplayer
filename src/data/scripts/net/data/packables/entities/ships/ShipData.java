@@ -7,7 +7,7 @@ import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.net.data.packables.*;
-import data.scripts.net.data.packables.metadata.PlayerShipData;
+import data.scripts.net.data.packables.metadata.ClientPlayerData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -46,7 +46,7 @@ public class ShipData extends EntityData {
     private final Map<WeaponAPI, Byte> weaponSlotIDs = new HashMap<>();
     private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
-    private PlayerShipData.ShipControlOverride controlOverride;
+    private ClientPlayerData.ShipControlOverride controlOverride;
 
     private short engineControllerBitmask = 0x0000;
 
@@ -287,7 +287,7 @@ public class ShipData extends EntityData {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             if (playerShips != null) {
-                                for (PlayerShipData d : playerShips.getPlayerShips().values()) {
+                                for (ClientPlayerData d : playerShips.getClientPlayerData().values()) {
                                     if (d.getPlayerShip().equals(ship)) {
                                         ship.getMouseTarget().set(d.getMouseTarget());
                                         return;
@@ -823,7 +823,7 @@ public class ShipData extends EntityData {
         return weaponSlots;
     }
 
-    public void setControlOverride(PlayerShipData.ShipControlOverride controlOverride) {
+    public void setControlOverride(ClientPlayerData.ShipControlOverride controlOverride) {
         this.controlOverride = controlOverride;
     }
 

@@ -68,10 +68,10 @@ public class LobbyData extends EntityData {
                         out.add((byte) ((id >>> 8) & 0xFF));
                         out.add((byte) (id & 0xFF));
 
-                        for (PlayerShipData playerShipData : playerShips.getPlayerShips().values()) {
-                            out.add((byte) (playerShipData.getInstanceID())); // hack where instance id is player id
+                        for (ClientPlayerData clientPlayerData : playerShips.getClientPlayerData().values()) {
+                            out.add((byte) (clientPlayerData.getInstanceID())); // hack where instance id is player id
 
-                            id = playerShipData.getPlayerShipID();
+                            id = clientPlayerData.getPlayerShipID();
                             out.add((byte) ((id >>> 8) & 0xFF));
                             out.add((byte) (id & 0xFF));
                         }

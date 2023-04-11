@@ -81,7 +81,7 @@ public class MPClientPlugin extends MPPlugin {
         variantDataMap = new VariantDataMap();
         initEntityManager(variantDataMap);
 
-        playerShip = new PlayerShip(connection.getConnectionID());
+        playerShip = new PlayerShip(connection.getConnectionID(), shipTable);
         initEntityManager(playerShip);
 
         lobbyInput = new LobbyInput(connection.getConnectionID());

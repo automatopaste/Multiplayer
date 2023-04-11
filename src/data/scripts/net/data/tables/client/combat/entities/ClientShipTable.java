@@ -1,5 +1,6 @@
 package data.scripts.net.data.tables.client.combat.entities;
 
+import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
@@ -13,6 +14,7 @@ import java.util.Map;
 public class ClientShipTable implements InboundEntityManager {
 
     private final Map<Short, ShipData> registered = new HashMap<>();
+    private final Map<ShipAPI, Short> shipIDs = new HashMap<>();
 
     private final Map<Short, ShieldData> shields;
     private final Map<String, Map<String, MPDefaultAutofireAIPlugin>> tempAutofirePlugins;
@@ -62,6 +64,11 @@ public class ClientShipTable implements InboundEntityManager {
 
         if (data != null) {
             data.delete();
+
+            ShipAPI ship = data.getShip();
+            if (ship != null) {
+                shipIDs.remove(ship);
+            }
         }
 
         registered.remove(instanceID);
@@ -72,6 +79,11 @@ public class ClientShipTable implements InboundEntityManager {
         for (ShipData ship : registered.values()) {
             ship.update(amount, this, plugin);
             ship.interp(amount);
+
+            ShipAPI s = ship.getShip();
+            if (s != null) {
+                shipIDs.put(s, ship.getInstanceID());
+            }
         }
         for (ShieldData shieldData : shields.values()) {
             shieldData.update(amount, this, plugin);
@@ -83,6 +95,10 @@ public class ClientShipTable implements InboundEntityManager {
     public void register() {
         DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
         DataGenManager.registerInboundEntityManager(ShieldData.TYPE_ID, this);
+    }
+
+    public Map<ShipAPI, Short> getShipIDs() {
+        return shipIDs;
     }
 
     public Map<Short, ShipData> getShips() {

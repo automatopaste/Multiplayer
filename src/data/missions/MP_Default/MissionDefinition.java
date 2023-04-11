@@ -6,7 +6,6 @@ import com.fs.starfarer.api.mission.FleetSide;
 import com.fs.starfarer.api.mission.MissionDefinitionAPI;
 import com.fs.starfarer.api.mission.MissionDefinitionPlugin;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +43,6 @@ public class MissionDefinition implements MissionDefinitionPlugin {
 
         api.setFleetTagline(FleetSide.PLAYER, "Cydonian Defence Fleet");
         api.setFleetTagline(FleetSide.ENEMY, "Tri-Tachyon Planet-Killer Escort Force");
-
-        api.setBackgroundGlowColor(new Color(255, 156, 20, 59));
 
         boolean f = true;
         for (String variant : enemyVariants) {

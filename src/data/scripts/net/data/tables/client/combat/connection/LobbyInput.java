@@ -10,6 +10,7 @@ import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LobbyInput implements InboundEntityManager {
 
@@ -36,7 +37,7 @@ public class LobbyInput implements InboundEntityManager {
             pilotedShipIDs.putAll(lobby.getPlayerShipIDs());
 
             Short pilotedShipID = pilotedShipIDs.get(clientID);
-            if (pilotedShipID != localPilotedShipID) {
+            if (!Objects.equals(pilotedShipID, localPilotedShipID)) {
                 ShipAPI ship = ((MPClientPlugin) plugin).getShipTable().getShips().get(pilotedShipID).getShip();
                 if (ship != null) {
                     Global.getCombatEngine().setPlayerShipExternal(ship);

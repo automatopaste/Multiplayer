@@ -7,8 +7,11 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
+import data.scripts.net.data.tables.client.combat.player.PlayerShip;
+import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
@@ -73,7 +76,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
         MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
         if (plugin instanceof MPClientPlugin) {
-            if (shipSelectionPanel == null) shipSelectionPanel = initShipSelectionUI();
+            if (shipSelectionPanel == null) shipSelectionPanel = initShipSelectionUI(plugin);
         } else {
             shipSelectionPanel = null;
         }
@@ -85,6 +88,14 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         CMUKitUI.render(widgetPanel, root1, events);
 
         Vector2f root2 = new Vector2f(w - 306f, h - 175f);
+
+        shipSelectionPanel = initShipSelectionUI(plugin);
+
+        if (active != ActivePanel.NONE) {
+            Global.getCombatEngine().getPlayerShip().blockCommandForOneFrame(ShipCommand.FIRE);
+            TODRAW24.setText("! // FIRE COMMANDS BLOCKED \\\\ !");
+            TODRAW24.draw(w * 0.5f, h * 0.5f);
+        }
 
         switch (active) {
             case NONE:
@@ -99,7 +110,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 CMUKitUI.render(joinPanel, root2, events);
                 break;
             case SHIP_SELECT:
-                Vector2f s = new Vector2f((w - shipSelectionPanel.getWidth()) * 0.5f, (h - shipSelectionPanel.getWidth()) * 0.5f);
+                Vector2f s = new Vector2f((w - shipSelectionPanel.getWidth()) * 0.5f, (h + shipSelectionPanel.getHeight()) * 0.5f);
                 CMUKitUI.render(shipSelectionPanel, s, events);
                 break;
         }
@@ -201,28 +212,28 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 Button button2 = new Button(buttonParams2, buttonText2, buttonCallback2);
                 panel1.addChild(button2);
 
+                Text.TextParams buttonTextParams3 = new Text.TextParams();
+                buttonTextParams3.align = LazyFont.TextAlignment.CENTER;
+                Text buttonText3 = new Text(new Execute<String>() {
+                    @Override
+                    public String get() {
+                        return "SELECT SHIP";
+                    }
+                }, TODRAW14, buttonTextParams3);
+                Button.ButtonParams buttonParams3 = new Button.ButtonParams();
+                buttonParams3.width = 120f;
+                buttonParams3.height = 24f;
+                Button.ButtonCallback buttonCallback3 = new Button.ButtonCallback() {
+                    @Override
+                    public void onClick() {
+                        active = ActivePanel.SHIP_SELECT;
+                    }
+                };
+                Button button3 = new Button(buttonParams3, buttonText3, buttonCallback3);
+                panel1.addChild(button3);
+
                 final MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
                 if (plugin instanceof MPClientPlugin) {
-                    Text.TextParams buttonTextParams3 = new Text.TextParams();
-                    buttonTextParams3.align = LazyFont.TextAlignment.CENTER;
-                    Text buttonText3 = new Text(new Execute<String>() {
-                        @Override
-                        public String get() {
-                            return "SELECT SHIP";
-                        }
-                    }, TODRAW14, buttonTextParams3);
-                    Button.ButtonParams buttonParams3 = new Button.ButtonParams();
-                    buttonParams3.width = 120f;
-                    buttonParams3.height = 24f;
-                    Button.ButtonCallback buttonCallback3 = new Button.ButtonCallback() {
-                        @Override
-                        public void onClick() {
-                            active = ActivePanel.SHIP_SELECT;
-                        }
-                    };
-                    Button button3 = new Button(buttonParams3, buttonText3, buttonCallback3);
-                    panel1.addChild(button3);
-
                     Text.TextParams buttonTextParams4 = new Text.TextParams();
                     buttonTextParams4.align = LazyFont.TextAlignment.CENTER;
                     buttonTextParams4.color = Color.ORANGE;
@@ -515,53 +526,155 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 //        });
 //    }
 
-    private GridPanel initShipSelectionUI() {
+    private GridPanel initShipSelectionUI(final MPPlugin plugin) {
         final GridPanel.GridParams params = new GridPanel.GridParams();
-        params.x = 800;
-        params.y = 400f;
+        params.x = 1000f;
+        params.y = 600f;
         params.edgePad = 0f;
+        params.update = true;
 
         return new GridPanel(params, new GridPanel.PanelMaker() {
             @Override
             public void make(GridPanel gridPanel) {
-                CombatEngineAPI engine = Global.getCombatEngine();
-                List<ShipAPI> ships = engine.getShips();
+                final CombatEngineAPI engine = Global.getCombatEngine();
+                final List<ShipAPI> ships = engine.getShips();
 
-                final int x = 4, y = 2;
+                final int x = 5, y = 4, max = x * y;
                 int xi = 0, yi = 0;
                 final float dx = params.x / x, dy = params.y / y;
 
-                Element[][] elements = new Element[x][y];
+                Element[][] elements = new Element[y][x];
 
+                int i = 0;
                 for (final ShipAPI ship : ships) {
+                    if (i > max) break;
+
                     ListPanel.ListPanelParams listPanelParams = new ListPanel.ListPanelParams();
                     listPanelParams.x = dx;
                     listPanelParams.y = dy;
-                    listPanelParams.conformToListSize = false;
+                    listPanelParams.mode = ListPanel.ListMode.VERTICAL;
                     listPanelParams.update = true;
+                    listPanelParams.conformToListSize = false;
 
-                    elements[xi][yi] = new ListPanel(listPanelParams, new ListPanel.PanelMaker() {
+                    elements[yi][xi] = new ListPanel(listPanelParams, new ListPanel.PanelMaker() {
                         @Override
                         public void make(ListPanel listPanel) {
-                            Text.TextParams textParams = new Text.TextParams();
-                            textParams.align = LazyFont.TextAlignment.LEFT;
-                            textParams.maxWidth = dx;
-                            textParams.maxHeight = dy;
+                            Color c;
+                            switch (ship.getOwner()) {
+                                case 0:
+                                    c = Color.GREEN;
+                                    break;
+                                case 1:
+                                    c = Color.RED;
+                                    break;
+                                case 100:
+                                    c = Color.BLUE;
+                                    break;
+                                default:
+                                    c = Color.YELLOW;
+                                    break;
+                            }
 
-                            Text text = new Text(new Execute<String>() {
+                            Text.TextParams textParams1 = new Text.TextParams();
+                            textParams1.align = LazyFont.TextAlignment.LEFT;
+                            textParams1.maxWidth = dx;
+                            textParams1.maxHeight = dy;
+                            textParams1.color = c;
+                            Text text1 = new Text(new Execute<String>() {
                                 @Override
                                 public String get() {
-                                    return ship.getName();
+                                    String n = ship.getName();
+                                    if (n == null) return "NULL";
+                                    return n;
                                 }
-                            }, TODRAW24, textParams);
+                            }, TODRAW14, textParams1);
 
-                            listPanel.addChild(text);
+                            Text.TextParams textParams2 = new Text.TextParams();
+                            textParams2.align = LazyFont.TextAlignment.LEFT;
+                            textParams2.maxWidth = dx;
+                            textParams2.maxHeight = dy;
+                            textParams2.color = Color.WHITE;
+                            Text text2 = new Text(new Execute<String>() {
+                                @Override
+                                public String get() {
+                                    String sf = String.format("%s"
+                                            + "\nLOC: [%s, %s]"
+                                            + "\nVEL: [%s, %s]",
+                                            ship.getHullSpec().getNameWithDesignationWithDashClass(),
+                                            (int) ship.getLocation().x,
+                                            (int) ship.getLocation().y,
+                                            (int) ship.getVelocity().x,
+                                            (int) ship.getVelocity().y
+                                    );
+
+                                    return sf;
+                                }
+                            }, TODRAW14, textParams2);
+
+                            Button.ButtonParams buttonParams = new Button.ButtonParams();
+                            buttonParams.height = 24f;
+                            buttonParams.width = 140f;
+                            final Text.TextParams buttonTextParams = new Text.TextParams();
+                            buttonTextParams.color = Color.WHITE;
+                            buttonTextParams.maxHeight = 16f;
+                            buttonTextParams.maxWidth = 40f;
+                            buttonTextParams.align = LazyFont.TextAlignment.CENTER;
+                            Text buttonText = new Text(new Execute<String>() {
+                                @Override
+                                public String get() {
+                                    if (plugin instanceof MPClientPlugin) {
+                                        return "TRANSFER";
+                                    } else {
+                                        MPServerPlugin server = (MPServerPlugin) plugin;
+                                        if (server == null) return "NULL";
+
+                                        PlayerShips ships = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
+                                        switch (ships.getController(ship)) {
+                                            case HOST:
+                                                buttonTextParams.color = Color.YELLOW;
+                                                return "HOST CONTROL";
+                                            case CLIENT:
+                                                buttonTextParams.color = Color.BLUE;
+                                                return "PLAYER CONTROL";
+                                            case AI_CONTROL:
+                                                return "TRANSFER";
+                                            default:
+                                                return "NULL";
+                                        }
+                                    }
+                                }
+                            }, TODRAW14, buttonTextParams);
+                            Button button = new Button(buttonParams, buttonText, new Button.ButtonCallback() {
+                                @Override
+                                public void onClick() {
+                                    switch (plugin.getType()) {
+                                        case CLIENT:
+                                            MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+                                            PlayerShip playerShip = (PlayerShip) clientPlugin.getEntityManagers().get(PlayerShip.class);
+
+                                            playerShip.requestTransfer(ship);
+                                            break;
+                                        case SERVER:
+                                            MPServerPlugin serverPlugin = (MPServerPlugin) plugin;
+                                            PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
+
+                                            playerShips.transferControl(ship, true);
+                                            break;
+                                    }
+                                }
+                            });
+
+                            listPanel.addChild(text1);
+                            listPanel.addChild(text2);
+                            listPanel.addChild(button);
                         }
                     });
 
                     xi++;
                     yi += Math.max(0, xi - x + 1);
                     xi %= x;
+
+                    i++;
                 }
 
                 gridPanel.setChildren(elements);
