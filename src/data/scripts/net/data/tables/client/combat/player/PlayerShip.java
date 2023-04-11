@@ -40,6 +40,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
         if (serverPlayerData.getActiveID() != prevActiveID) {
             ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
+
             if (data != null) {
                 Global.getCombatEngine().setPlayerShipExternal(data.getShip());
             }

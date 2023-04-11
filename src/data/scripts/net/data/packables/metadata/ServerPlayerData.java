@@ -45,7 +45,7 @@ public class ServerPlayerData extends EntityData {
                 new DestExecute<Short>() {
                     @Override
                     public void execute(Short value, EntityData packable) {
-                        setActiveID(value);
+                        setHostID(value);
                     }
                 }
         ));
