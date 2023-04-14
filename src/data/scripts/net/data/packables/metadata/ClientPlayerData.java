@@ -37,7 +37,6 @@ public class ClientPlayerData extends EntityData {
     private short requestedShipID = -1;
 
     private ShipAPI playerShip;
-    private ShipAIPlugin aiPlugin;
 
     private final Vector2f mouseTarget = new Vector2f(0f, 0f);
 
@@ -173,14 +172,13 @@ public class ClientPlayerData extends EntityData {
     }
 
     public void transferPlayerShip(ShipAPI dest) {
-        if (this.playerShip != null && aiPlugin != null) {
-            playerShip.setShipAI(aiPlugin);
-            aiPlugin.forceCircumstanceEvaluation();
+        if (playerShip != null) {
+            playerShip.resetDefaultAI();
+            playerShip.getShipAI().forceCircumstanceEvaluation();
         }
 
+        dest.setShipAI(new MPDefaultShipAIPlugin());
         playerShip = dest;
-        aiPlugin = playerShip.getShipAI();
-        playerShip.setShipAI(new MPDefaultShipAIPlugin());
     }
 
     private void check(ShipTable shipTable) {
