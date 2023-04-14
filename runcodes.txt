@@ -1,0 +1,3 @@
+-disable all ai
+runcode for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+ship.setShipAI(new data.scripts.plugins.ai.MPDefaultShipAIPlugin());}

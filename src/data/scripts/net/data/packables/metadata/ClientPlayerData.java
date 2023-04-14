@@ -157,14 +157,15 @@ public class ClientPlayerData extends EntityData {
         if (playerShip != null) {
             if (plugin.getType() == MPPlugin.PluginType.SERVER) {
                 unmask(playerShip, controlBitmask, amount);
-            } else {
-                playerShip.blockCommandForOneFrame(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK);
+            }
+
+            if (playerShip.getShield() != null) {
+                if (Mouse.isButtonDown(1) && !prevShields) {
+                    shieldEnable = !playerShip.getShield().isOn();
+                    prevShields = true;
+                }
             }
         }
-
-        boolean shieldCheck = Mouse.isButtonDown(1);
-        if (shieldCheck && !prevShields) shieldEnable = !shieldEnable;
-        prevShields = shieldCheck;
 
         boolean fighterCheck = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_PULL_BACK_FIGHTERS")));
         if (fighterCheck && !prevFighters) fighterEnable = !fighterEnable;
