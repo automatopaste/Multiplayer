@@ -9,11 +9,11 @@ import com.fs.starfarer.combat.entities.Missile;
 import com.fs.starfarer.combat.entities.MovingRay;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
 import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
-import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -223,6 +223,10 @@ public class ProjectileTable implements OutboundEntityManager {
 
             b.put(id, new InstanceData(size, records));
         }
+
+//        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+//           ship.setShipAI(new data.scripts.plugins.ai.MPDefaultShipAIPlugin());
+//        }
 
         Map<Short, InstanceData> m = new HashMap<>();
         out.put(MissileData.TYPE_ID, m);

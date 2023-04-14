@@ -7,7 +7,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ShipData;
@@ -94,10 +93,14 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
         shipSelectionPanel = initShipSelectionUI(plugin);
 
-        if (active != ActivePanel.NONE) {
-            Global.getCombatEngine().getPlayerShip().blockCommandForOneFrame(ShipCommand.FIRE);
-            TODRAW24.setText("! // FIRE COMMANDS BLOCKED \\\\ !");
-            TODRAW24.draw(w * 0.5f, h * 0.5f);
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine.isPaused() && plugin != null) {
+            CMUKitUI.openGL11ForText();
+            TODRAW24.setText("! // PAUSED \\\\ !");
+            float w1 = TODRAW24.getWidth();
+            float h1 = TODRAW24.getHeight();
+            TODRAW24.draw((w - w1) * 0.5f, (h - h1) * 0.5f);
+            CMUKitUI.closeGL11ForText();
         }
 
         switch (active) {

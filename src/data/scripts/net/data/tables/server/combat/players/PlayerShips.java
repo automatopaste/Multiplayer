@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.metadata.ClientPlayerData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -60,9 +61,12 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             short requested = c.getRequestedShipID();
 
             if (requested != -1) { // remote client is submitting an id to switch to
-                ShipAPI dest = shipTable.getTable()[requested].getShip();
+                ShipData shipData = shipTable.getTable()[requested];
 
-                transferControl(dest, false, c);
+                if (shipData != null) {
+                    ShipAPI dest = shipData.getShip();
+                    transferControl(dest, false, c);
+                }
             }
         }
 
