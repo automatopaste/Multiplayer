@@ -639,6 +639,12 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
                                         for (short id : client.getLobbyInput().getPilotedShipIDs().values()) {
                                             ShipData shipData = client.getShipTable().getShips().get(id);
+
+                                            if (shipData == null) {
+                                                buttonTextParams.color = Color.GRAY;
+                                                return "DATA NULL";
+                                            }
+
                                             if (shipData.getShip() == ship) {
                                                 buttonTextParams.color = Color.BLUE;
                                                 return "PLAYER CONTROL";
