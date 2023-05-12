@@ -4,7 +4,7 @@
 	"author":"hehe",
 	"version":"0.1.1",
 	"description":"Combat multiplayer mod.",
-	"gameVersion":"0.95.1a-RC6",
+	"gameVersion":"0.96a-RC7",
 	"jars":[
 		"jars/Multiplayer.jar",
 		"jars/netty/netty-all-4.1.69.Final.jar",
