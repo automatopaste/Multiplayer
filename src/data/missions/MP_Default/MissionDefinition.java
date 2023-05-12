@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Random;
 
 public class MissionDefinition implements MissionDefinitionPlugin {
+
+    private static final int NUM_PLAYER = 6;
+    private static final int NUM_ENEMY = 6;
+
     private static final List<String> enemyVariants = new ArrayList<String>();
     static {
         enemyVariants.add("aurora_Balanced");
@@ -81,6 +85,9 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         api.addObjective(minX + width * 0.5f, minY + height * 0.25f, "sensor_array");
 
         api.addPlugin(new EveryFrameCombatPlugin() {
+
+            private float cooldown = 1f;
+
             @Override
             public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
 
@@ -90,26 +97,55 @@ public class MissionDefinition implements MissionDefinitionPlugin {
             public void advance(float amount, List<InputEventAPI> events) {
                 CombatEngineAPI engine = Global.getCombatEngine();
 
+                if (engine.isPaused()) return;
+
+                if (cooldown > 0f) {
+                    cooldown -= engine.getElapsedInLastFrame();
+                    return;
+                }
+
                 Random r = new Random(6969);
 
-                int n = engine.getShips().size();
-                if (n < 6 && n > 0) {
-                    int index = (int) (Math.random() * playerVariants.size());
-                    FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, playerVariants.get(index));
-                    Vector2f loc = new Vector2f((r.nextFloat() * 10000f) - 5000f, (r.nextFloat() * 10000f) - 5000f);
-                    ShipAPI s1 = engine.getFleetManager(FleetSide.PLAYER).spawnFleetMember(member, loc, 90f, 1f);
-                    s1.setCRAtDeployment(0.7f);
-                    s1.setCurrentCR(0.7f);
-                    Console.showMessage("spawning " + s1.getHullSpec().getNameWithDesignationWithDashClass());
-
-                    int index2 = (int) (Math.random() * enemyVariants.size());
-                    FleetMemberAPI member2 = Global.getFactory().createFleetMember(FleetMemberType.SHIP, enemyVariants.get(index2));
-                    Vector2f loc2 = new Vector2f((r.nextFloat() * 10000f) - 5000f, (r.nextFloat() * 10000f) - 5000f);
-                    ShipAPI s2 = engine.getFleetManager(FleetSide.ENEMY).spawnFleetMember(member2, loc2, 270f, 1f);
-                    s2.setCRAtDeployment(0.7f);
-                    s2.setCurrentCR(0.7f);
-                    Console.showMessage("spawning " + s2.getHullSpec().getNameWithDesignationWithDashClass());
+                int p = 0, e = 0;
+                for (ShipAPI ship : engine.getShips()) {
+                    if (ship.isAlive()) {
+                        if (ship.getOwner() == 0) p++;
+                        else if (ship.getOwner() == 1) e++;
+                    }
                 }
+
+                int n1 = NUM_PLAYER - p;
+                if (n1 > 0 && n1 <= NUM_PLAYER) {
+                    for (int i = 0; i < n1; i++) {
+                        int index = (int) (Math.random() * playerVariants.size());
+                        FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, playerVariants.get(index));
+                        member.getCrewComposition().setCrew(member.getNeededCrew());
+                        member.getRepairTracker().setCR(0.7f);
+                        member.setOwner(0);
+                        Vector2f loc = new Vector2f((r.nextFloat() * 10000f) - 5000f, (r.nextFloat() * 10000f) - 5000f);
+                        ShipAPI s = engine.getFleetManager(FleetSide.PLAYER).spawnFleetMember(member, loc, 90f, 1f);
+                        s.setCRAtDeployment(0.7f);
+                        s.setCurrentCR(0.7f);
+                        Console.showMessage("spawning " + s.getHullSpec().getNameWithDesignationWithDashClass());
+                    }
+                }
+
+                int n2 = NUM_ENEMY - e;
+                if (n2 > 0 && n2 <= NUM_ENEMY) {
+                    for (int i = 0; i < n2; i++) {
+                        int index2 = (int) (Math.random() * enemyVariants.size());
+                        FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, enemyVariants.get(index2));
+                        member.getCrewComposition().setCrew(member.getNeededCrew());
+                        member.getRepairTracker().setCR(0.7f);
+                        member.setOwner(1);
+                        Vector2f loc2 = new Vector2f((r.nextFloat() * 10000f) - 5000f, (r.nextFloat() * 10000f) - 5000f);
+                        ShipAPI s = engine.getFleetManager(FleetSide.ENEMY).spawnFleetMember(member, loc2, 270f, 1f);
+                        s.setCRAtDeployment(0.7f);
+                        s.setCurrentCR(0.7f);
+                        Console.showMessage("spawning " + s.getHullSpec().getNameWithDesignationWithDashClass());
+                    }
+                }
+                cooldown = 10f;
             }
 
             @Override
