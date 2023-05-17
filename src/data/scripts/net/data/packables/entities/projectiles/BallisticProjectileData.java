@@ -182,6 +182,21 @@ public class BallisticProjectileData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("owner"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        return (byte) (projectile.getOwner() & 0xFF);
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        getProjectile().setOwner(value);
+                    }
+                }
+        ));
     }
 
     @Override

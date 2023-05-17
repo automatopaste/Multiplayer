@@ -29,6 +29,8 @@ public class ShipData extends EntityData {
 
     private final Map<Integer, Boolean> prevStates = new HashMap<>();
     private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownDisabledEngines = new HashSet<>();
+    private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownEnabledEngines = new HashSet<>();
+    private final Map<Byte, Boolean> weaponFireStates = new HashMap<>();
 
     private float[][] prevArmourGrid = null;
     private boolean prevFlameout = false;
@@ -57,12 +59,27 @@ public class ShipData extends EntityData {
         slotIDs = new HashMap<>();
         try {
             Map<String, Integer> m = VariantData.getSlotIDs(ship.getVariant());
+
+            byte b = Byte.MIN_VALUE;
             for (String s : m.keySet()) {
-                slotIDs.put(s, (byte) (int) m.get(s));
+                byte id = (byte) (int) m.get(s);
+
+                b = (byte) Math.max(b, id);
+
+                slotIDs.put(s, id);
+            }
+
+            final int lim = 0b01111111;
+            if ((b & 0xFF) > lim) {
+                throw new RuntimeException("Max number of supported weapon slots exceeded: " + lim);
             }
 
             genSlotIDs();
         } catch (NullPointerException ignored) {}
+
+        for (byte b : slotIDs.values()) {
+            weaponFireStates.put(b, false);
+        }
 
         addRecord(new RecordLambda<>(
                 StringRecord.getDefault().setDebugText("fleet member id"),
@@ -474,6 +491,47 @@ public class ShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("enabled engine ids"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+
+                        List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
+                        for (int i = 0; i < shipEngines.size(); i++) {
+                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+                            if (!engine.isDisabled() && !knownEnabledEngines.contains(engine)) {
+                                out.add((byte) i);
+                                knownEnabledEngines.add(engine);
+                            } else {
+                                knownEnabledEngines.remove(engine);
+                            }
+                        }
+
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, EntityData packable) {
+                        ShipAPI ship = getShip();
+                        if (ship != null) {
+                            for (byte b : value) {
+                                int id = b & 0xFF;
+
+                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
+                                for (int i = 0; i < shipEngines.size(); i++) {
+                                    if (i == id) {
+                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
+                                        engine.repair();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
                 new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("disabled engine ids"),
                 new SourceExecute<List<Byte>>() {
                     @Override
@@ -497,8 +555,7 @@ public class ShipData extends EntityData {
                 new DestExecute<List<Byte>>() {
                     @Override
                     public void execute(List<Byte> value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
+                        ShipAPI ship = getShip();
                         if (ship != null) {
                             for (byte b : value) {
                                 int id = b & 0xFF;
@@ -516,16 +573,21 @@ public class ShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("firing weapon ids"),
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon fire states"),
                 new SourceExecute<List<Byte>>() {
                     @Override
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
 
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            if (weapon.isFiring()) {
-                                int id = slotIDs.get(weapon.getSlot().getId());
-                                out.add((byte) id);
+                            byte id = (byte) (slotIDs.get(weapon.getSlot().getId()) & 0b011111111);
+                            boolean p = weaponFireStates.get(id);
+                            boolean f = weapon.isFiring();
+                            if (f != p) {
+                                if (f) {
+                                    id |= 0b10000000;
+                                }
+                                out.add(id);
                             }
                         }
                         return out;
@@ -534,13 +596,14 @@ public class ShipData extends EntityData {
                 new DestExecute<List<Byte>>() {
                     @Override
                     public void execute(List<Byte> value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
+                        ShipAPI ship = getShip();
                         if (ship != null) {
                             for (byte b : value) {
-                                int id = b & 0xFF;
-                                MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
-                                if (plugin != null) plugin.trigger();
+                                if ((b & 0b10000000) != 0) {
+                                    weaponSlots.get(b).setForceFireOneFrame(true);
+                                } else {
+                                    weaponSlots.get(b).setForceNoFireOneFrame(true);
+                                }
                             }
                         }
                     }
@@ -553,7 +616,7 @@ public class ShipData extends EntityData {
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
                         for (WeaponAPI weapon : ship.getAllWeapons()) {
-                            byte id = (byte) (int) slotIDs.get(weapon.getSlot().getId());
+                            byte id = slotIDs.get(weapon.getSlot().getId());
                             out.add(id);
 
                             int v = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
@@ -565,82 +628,113 @@ public class ShipData extends EntityData {
                 new DestExecute<List<Byte>>() {
                     @Override
                     public void execute(List<Byte> value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
+                        ShipAPI ship = getShip();
                         if (ship != null) {
                             for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
-                                int id = iterator.next() & 0xFF;
+                                byte id = iterator.next();
                                 float facing = ConversionUtils.byteToFloat(iterator.next(), 360f);
 
-                                MPDefaultAutofireAIPlugin plugin = autofirePluginSlots.get(id);
-                                if (plugin != null) plugin.setTargetFacing(facing);
+                                weaponSlots.get(id).setFacing(facing);
                             }
                         }
                     }
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("non autofiring weapon groups"),
-                new SourceExecute<List<Byte>>() {
+                ByteRecord.getDefault().setDebugText("group autofire status"),
+                new SourceExecute<Byte>() {
                     @Override
-                    public List<Byte> get() {
-                        List<Byte> out = new ArrayList<>();
-
+                    public Byte get() {
                         List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
-                        for (int i = 0; i < groups.size(); i++) {
-                            WeaponGroupAPI group = groups.get(i);
 
-                            byte g = (byte) (i & 0b00111111);
-                            if (group.isAutofiring()) g |= 0b10000000;
-                            if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
-
-                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), group.getActiveWeapon().getCooldown());
-
-                            out.add(g);
-                            out.add(cooldown);
+                        byte b = 0x00;
+                        byte f = 0b00000001;
+                        for (WeaponGroupAPI group : groups) {
+                            if (group.isAutofiring()) b |= f;
+                            f <<= 1;
                         }
 
-                        return out;
+                        return b;
                     }
                 },
-                new DestExecute<List<Byte>>() {
+                new DestExecute<Byte>() {
                     @Override
-                    public void execute(List<Byte> value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) {
-                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
-                                byte aByte = iterator.next();
-                                int g = aByte & 0xFF;
-
-                                int i = g & 0b00111111;
-                                boolean autofiring = (g & 0b10000000) != 0;
-                                boolean firing = (g & 0b01000000) != 0;
-
-                                if (firing) {
-                                    ship.giveCommand(ShipCommand.SELECT_GROUP, null, i);
-                                    ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
-                                }
-
-                                List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
-                                for (int j = 0; j < weaponGroupsCopy.size(); j++) {
-                                    WeaponGroupAPI group = weaponGroupsCopy.get(j);
-
-                                    if (j == i) {
-                                        float cooldown = ConversionUtils.byteToFloat(iterator.next(), group.getActiveWeapon().getCooldown());
-
-                                        group.getActiveWeapon().setRemainingCooldownTo(cooldown);
-
-                                        if (group.isAutofiring() != autofiring) {
-                                            ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
-                                        }
-                                    }
-                                }
+                    public void execute(Byte value, EntityData packable) {
+                        byte b = value;
+                        byte f = 0b00000001;
+                        for (WeaponGroupAPI group : getShip().getWeaponGroupsCopy()) {
+                            if ((b & f) == 0) {
+                                group.toggleOff();
+                            } else {
+                                group.toggleOn();
                             }
+                            f <<= 1;
                         }
                     }
                 }
         ));
+//        addRecord(new RecordLambda<>(
+//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("non autofiring weapon groups"),
+//                new SourceExecute<List<Byte>>() {
+//                    @Override
+//                    public List<Byte> get() {
+//                        List<Byte> out = new ArrayList<>();
+//
+//                        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
+//                        for (int i = 0; i < groups.size(); i++) {
+//                            WeaponGroupAPI group = groups.get(i);
+//
+//                            byte g = (byte) (i & 0b01111111);
+//                            if (group.isAutofiring()) g |= 0b10000000;
+////                            if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
+//
+//                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), group.getActiveWeapon().getCooldown());
+//
+//                            out.add(g);
+//                            out.add(cooldown);
+//                        }
+//
+//                        return out;
+//                    }
+//                },
+//                new DestExecute<List<Byte>>() {
+//                    @Override
+//                    public void execute(List<Byte> value, EntityData packable) {
+//                        ShipData shipData = (ShipData) packable;
+//                        ShipAPI ship = shipData.getShip();
+//                        if (ship != null) {
+//                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
+//                                byte aByte = iterator.next();
+//                                int g = aByte & 0xFF;
+//
+//                                int i = g & 0b01111111;
+//                                boolean autofiring = (g & 0b10000000) != 0;
+////                                boolean firing = (g & 0b01000000) != 0;
+//
+////                                if (firing) {
+////                                    ship.giveCommand(ShipCommand.SELECT_GROUP, null, i);
+////                                    ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
+////                                }
+//
+//                                List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
+//                                for (int j = 0; j < weaponGroupsCopy.size(); j++) {
+//                                    WeaponGroupAPI group = weaponGroupsCopy.get(j);
+//
+//                                    if (j == i) {
+//                                        float cooldown = ConversionUtils.byteToFloat(iterator.next(), group.getActiveWeapon().getCooldown());
+//
+//                                        group.getActiveWeapon().setRemainingCooldownTo(cooldown);
+//
+//                                        if (group.isAutofiring() != autofiring) {
+//                                            ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//        ));
     }
 
     @Override
