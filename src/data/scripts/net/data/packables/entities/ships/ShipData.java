@@ -599,10 +599,12 @@ public class ShipData extends EntityData {
                         ShipAPI ship = getShip();
                         if (ship != null) {
                             for (byte b : value) {
+                                byte k = (byte) (b & 0b01111111);
+
                                 if ((b & 0b10000000) != 0) {
-                                    weaponSlots.get(b).setForceFireOneFrame(true);
+                                    weaponSlots.get(k).setForceFireOneFrame(true);
                                 } else {
-                                    weaponSlots.get(b).setForceNoFireOneFrame(true);
+                                    weaponSlots.get(k).setForceNoFireOneFrame(true);
                                 }
                             }
                         }
