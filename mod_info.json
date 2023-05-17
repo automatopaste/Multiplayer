@@ -1,10 +1,10 @@
 {
 	"id":"multiplayer",
 	"name":"Multiplayer",
-	"author":"hehe",
-	"version":"0.1.1",
+	"author":"tomatopaste",
+	"version":"0.1.2",
 	"description":"Combat multiplayer mod.",
-	"gameVersion":"0.96a-RC7",
+	"gameVersion":"0.96a-RC8",
 	"jars":[
 		"jars/Multiplayer.jar",
 		"jars/netty/netty-all-4.1.69.Final.jar",

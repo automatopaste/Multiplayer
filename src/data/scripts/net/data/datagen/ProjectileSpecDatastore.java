@@ -5,7 +5,6 @@ import com.fs.starfarer.api.SettingsAPI;
 import com.fs.starfarer.api.loading.MissileSpecAPI;
 import com.fs.starfarer.api.loading.ProjectileSpecAPI;
 import com.fs.starfarer.api.loading.WeaponSpecAPI;
-import com.fs.starfarer.loading.o00O;
 import data.scripts.plugins.MPPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +31,20 @@ public class ProjectileSpecDatastore implements BaseDatagen {
      * Collate weapon and projectile specs
      */
     public void generate(MPPlugin plugin) {
-        List<String> weaponIDs = new ArrayList<>(o00O.Object()); // obf found in StarfarerSettings.getAllWeaponSpecs();
+        List<String> weaponIDs = new ArrayList<>(); // obf found in StarfarerSettings.getAllWeaponSpecs();
+        List<String> projectileIDs = new ArrayList<>();
+        for (WeaponSpecAPI spec : Global.getSettings().getAllWeaponSpecs()) {
+            weaponIDs.add(spec.getWeaponId());
+            Object projSpec = spec.getProjectileSpec();
+            if (projSpec instanceof ProjectileSpecAPI){
+                projectileIDs.add(((ProjectileSpecAPI) projSpec).getId());
+            } else if (projSpec instanceof MissileSpecAPI) {
+                projectileIDs.add(((MissileSpecAPI) projSpec).getHullSpec().getHullId());
+            }
+        }
+        for (WeaponSpecAPI spec : Global.getSettings().getSystemWeaponSpecs()) {
+            weaponIDs.add(spec.getWeaponId());
+        }
 
         short index = 0;
         for (String id : weaponIDs) {
@@ -41,7 +53,7 @@ public class ProjectileSpecDatastore implements BaseDatagen {
             index++;
         }
 
-        List<String> projectileIDs = new ArrayList<>(o00O.o00000()); // educated guess based on weaponIDs
+         // educated guess based on weaponIDs
 
         index = 0;
         for (String id : projectileIDs) {

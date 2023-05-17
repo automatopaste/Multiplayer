@@ -660,9 +660,10 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                         PlayerShips playerShips = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
                                         ShipTable shipTable = (ShipTable) server.getEntityManagers().get(ShipTable.class);
 
-                                        short id = shipTable.getRegistered().get(ship);
+                                        Short id = shipTable.getRegistered().get(ship);
+                                        if (id == null) return "NULL";
 
-                                        if (id == playerShips.getHostShipID()) {
+                                        if (id.equals(playerShips.getHostShipID())) {
                                             buttonTextParams.color = Color.YELLOW;
                                             return "HOST CONTROL";
                                         }
