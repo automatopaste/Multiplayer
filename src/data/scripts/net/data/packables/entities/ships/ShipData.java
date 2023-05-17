@@ -660,9 +660,12 @@ public class ShipData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
+                        ShipAPI ship = getShip();
+                        if (ship == null) return;
+
                         byte b = value;
                         byte f = 0b00000001;
-                        for (WeaponGroupAPI group : getShip().getWeaponGroupsCopy()) {
+                        for (WeaponGroupAPI group : ship.getWeaponGroupsCopy()) {
                             if ((b & f) == 0) {
                                 group.toggleOff();
                             } else {
