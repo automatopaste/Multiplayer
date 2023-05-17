@@ -182,6 +182,22 @@ public class MovingRayData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("owner"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        return (byte) projectile.getOwner();
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        DamagingProjectileAPI projectile = getProjectile();
+                        if (projectile != null) projectile.setOwner(value);
+                    }
+                }
+        ));
     }
 
     @Override
