@@ -193,7 +193,8 @@ public class BallisticProjectileData extends EntityData {
                 new DestExecute<Byte>() {
                     @Override
                     public void execute(Byte value, EntityData packable) {
-                        getProjectile().setOwner(value);
+                        DamagingProjectileAPI projectile = getProjectile();
+                        if (projectile != null) projectile.setOwner(value);
                     }
                 }
         ));
