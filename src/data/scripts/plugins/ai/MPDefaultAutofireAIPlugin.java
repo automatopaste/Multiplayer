@@ -4,15 +4,11 @@ import com.fs.starfarer.api.combat.AutofireAIPlugin;
 import com.fs.starfarer.api.combat.MissileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
-import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     private final WeaponAPI weapon;
-
-    private float targetFacing;
-    private boolean t1;
 
     public MPDefaultAutofireAIPlugin(WeaponAPI weapon) {
         this.weapon = weapon;
@@ -25,9 +21,7 @@ public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     @Override
     public boolean shouldFire() {
-        boolean fire = t1;
-        t1 = false;
-        return fire;
+        return false;
     }
 
     @Override
@@ -35,17 +29,9 @@ public class MPDefaultAutofireAIPlugin implements AutofireAIPlugin {
 
     }
 
-    public void trigger() {
-        t1 = true;
-    }
-
-    public void setTargetFacing(float facing) {
-        targetFacing = facing;
-    }
-
     @Override
     public Vector2f getTarget() {
-        return MathUtils.getPointOnCircumference(weapon.getLocation(), weapon.getRange(), targetFacing);
+        return null;
     }
 
     @Override
