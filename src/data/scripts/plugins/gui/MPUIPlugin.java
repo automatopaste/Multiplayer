@@ -24,6 +24,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Locale;
 
 public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
@@ -257,6 +258,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         public void onClick() {
                             active = ActivePanel.NONE;
                             plugin.stop();
+                            Global.getCombatEngine().getCustomData().put((MPPlugin.DATA_KEY), null);
                         }
                     };
                     Button button4 = new Button(buttonParams4, buttonText4, buttonCallback4);
@@ -279,6 +281,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         public void onClick() {
                             active = ActivePanel.NONE;
                             plugin.stop();
+                            Global.getCombatEngine().getCustomData().put((MPPlugin.DATA_KEY), null);
                         }
                     };
                     Button button4 = new Button(buttonParams4, buttonText4, buttonCallback4);
@@ -754,6 +757,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
     }
 
     private void initClient(String text, Text infoText) {
+        text = text.trim().toLowerCase(Locale.ROOT);
         if (text.trim().isEmpty()) {
             infoText.setExecute(new Execute<String>() {
                 @Override
@@ -762,6 +766,17 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 }
             });
             infoText.setColor(Color.RED);
+            return;
+        }
+
+        if (text.startsWith("localhost")) {
+            infoText.setExecute(new Execute<String>() {
+                @Override
+                public String get() {
+                    return "CLIENT STARTED";
+                }
+            });
+            MPModPlugin.setPlugin(new MPClientPlugin("localhost", 0));
             return;
         }
 

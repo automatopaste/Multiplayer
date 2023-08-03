@@ -457,39 +457,39 @@ public class ShipData extends EntityData {
                     }
                 }
         ));
-        addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("num flameouts"),
-                new SourceExecute<Byte>() {
-                    @Override
-                    public Byte get() {
-                        if (prevFlameout && !ship.getEngineController().isFlamedOut()) {
-                            prevFlameout = false;
-                            return (byte) 2;
-                        }
-                        if (ship.getEngineController().isFlamedOut() || ship.getEngineController().isFlamingOut()) {
-                            prevFlameout = true;
-                            return (byte) 1;
-                        }
-                        return (byte) 0;
-                    }
-                },
-                new DestExecute<Byte>() {
-                    @Override
-                    public void execute(Byte value, EntityData packable) {
-                        ShipData shipData = (ShipData) packable;
-                        ShipAPI ship = shipData.getShip();
-                        if (ship != null) {
-                            if (value == (byte) 2) {
-                                ship.getMutableStats().getCombatEngineRepairTimeMult().modifyMult("mp", 0f);
-                            } else if (value == (byte) 1) {
-                                if (!(ship.getEngineController().isFlamingOut() || ship.getEngineController().isFlamedOut())) ship.getEngineController().forceFlameout(false);
-                            } else if (value == (byte) 0) {
-                                ship.getMutableStats().getCombatEngineRepairTimeMult().unmodify("mp");
-                            }
-                        }
-                    }
-                }
-        ));
+//        addRecord(new RecordLambda<>(
+//                ByteRecord.getDefault().setDebugText("num flameouts"),
+//                new SourceExecute<Byte>() {
+//                    @Override
+//                    public Byte get() {
+//                        if (prevFlameout && !ship.getEngineController().isFlamedOut()) {
+//                            prevFlameout = false;
+//                            return (byte) 2;
+//                        }
+//                        if (ship.getEngineController().isFlamedOut() || ship.getEngineController().isFlamingOut()) {
+//                            prevFlameout = true;
+//                            return (byte) 1;
+//                        }
+//                        return (byte) 0;
+//                    }
+//                },
+//                new DestExecute<Byte>() {
+//                    @Override
+//                    public void execute(Byte value, EntityData packable) {
+//                        ShipData shipData = (ShipData) packable;
+//                        ShipAPI ship = shipData.getShip();
+//                        if (ship != null) {
+//                            if (value == (byte) 2) {
+//                                ship.getMutableStats().getCombatEngineRepairTimeMult().modifyMult("mp", 0f);
+//                            } else if (value == (byte) 1) {
+//                                if (!(ship.getEngineController().isFlamingOut() || ship.getEngineController().isFlamedOut())) ship.getEngineController().forceFlameout(false);
+//                            } else if (value == (byte) 0) {
+//                                ship.getMutableStats().getCombatEngineRepairTimeMult().unmodify("mp");
+//                            }
+//                        }
+//                    }
+//                }
+//        ));
         addRecord(new RecordLambda<>(
                 new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("enabled engine ids"),
                 new SourceExecute<List<Byte>>() {
@@ -573,7 +573,7 @@ public class ShipData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon states"), // probably inefficient
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon states"),
                 new SourceExecute<List<Byte>>() {
                     @Override
                     public List<Byte> get() {
@@ -594,14 +594,14 @@ public class ShipData extends EntityData {
 //                                out.add(id);
 //                            }
 
-                            float arcHalf = weapon.getSlot().getArc() * 0.5f;
-                            float arcMax = weapon.getSlot().getAngle() + arcHalf;
-                            float arcMin = weapon.getSlot().getAngle() - arcHalf;
-
-                            float d = (weapon.getCurrAngle() - arcMin) / (arcMax - arcMin);
-
-                            byte v = (byte) (d * 255f);
-                            out.add(v);
+//                            float arcHalf = weapon.getSlot().getArc() * 0.5f;
+//                            float arcMax = weapon.getSlot().getAngle() + arcHalf;
+//                            float arcMin = weapon.getSlot().getAngle() - arcHalf;
+//
+//                            float d = (weapon.getCurrAngle() - arcMin) / (arcMax - arcMin);
+//
+//                            byte v = (byte) (d * 255f);
+//                            out.add(v);
                         }
                         return out;
                     }
@@ -628,50 +628,71 @@ public class ShipData extends EntityData {
                                     weapon.repair();
                                 }
 
-                                byte a = iterator.next();
-                                float n = a / 255f;
-
-                                float arcHalf = weapon.getSlot().getArc() * 0.5f;
-                                float arcMax = weapon.getSlot().getAngle() + arcHalf;
-                                float arcMin = weapon.getSlot().getAngle() - arcHalf;
-
-                                weapon.setCurrAngle((n * (arcMax - arcMin)) + arcMin);
+//                                byte a = iterator.next();
+//                                float n = a / 255f;
+//
+//                                float arcHalf = weapon.getSlot().getArc() * 0.5f;
+//                                float arcMax = weapon.getSlot().getAngle() + arcHalf;
+//                                float arcMin = weapon.getSlot().getAngle() - arcHalf;
+//
+//                                weapon.setCurrAngle((n * (arcMax - arcMin)) + arcMin);
                             }
                         }
                     }
                 }
         ));
-//        addRecord(new RecordLambda<>(
-//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon facing"),
-//                new SourceExecute<List<Byte>>() {
-//                    @Override
-//                    public List<Byte> get() {
-//                        List<Byte> out = new ArrayList<>();
-//                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-//                            byte id = slotIDs.get(weapon.getSlot().getId());
-//                            out.add(id);
-//
-//                            int v = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
-//                            out.add((byte) v);
-//                        }
-//                        return out;
-//                    }
-//                },
-//                new DestExecute<List<Byte>>() {
-//                    @Override
-//                    public void execute(List<Byte> value, EntityData packable) {
-//                        ShipAPI ship = getShip();
-//                        if (ship != null) {
-//                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
-//                                byte id = iterator.next();
-//                                float facing = ConversionUtils.byteToFloat(iterator.next(), 360f);
-//
-//                                weaponSlots.get(id).setFacing(facing);
-//                            }
-//                        }
-//                    }
-//                }
-//        ));
+        addRecord(new RecordLambda<>(
+                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon facing"),
+                new SourceExecute<List<Byte>>() {
+                    @Override
+                    public List<Byte> get() {
+                        List<Byte> out = new ArrayList<>();
+                        for (WeaponAPI weapon : ship.getAllWeapons()) {
+                            byte id = slotIDs.get(weapon.getSlot().getId());
+                            out.add(id);
+
+                            float angle = weapon.getSlot().getAngle();
+                            float arc = weapon.getSlot().getArc();
+                            if (arc < 0.5f) {
+                                out.add((byte) 0x00);
+                                continue;
+                            }
+                            float arcHalf = arc * 0.5f;
+                            float arcMax = angle + arcHalf;
+                            float arcMin = angle - arcHalf;
+
+                            float d = (weapon.getCurrAngle() - arcMin) / (arcMax - arcMin);
+                            out.add(ConversionUtils.floatToByte(d, arc));
+                        }
+                        return out;
+                    }
+                },
+                new DestExecute<List<Byte>>() {
+                    @Override
+                    public void execute(List<Byte> value, EntityData packable) {
+                        ShipAPI ship = getShip();
+                        if (ship != null) {
+                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
+                                byte id = iterator.next();
+                                WeaponAPI weapon = weaponSlots.get(id);
+
+                                byte a = iterator.next();
+                                float n = a * (1f / 255);
+
+                                float angle = weapon.getSlot().getAngle();
+                                float arc = weapon.getSlot().getArc();
+                                float arcHalf = arc * 0.5f;
+                                float arcMax = angle + arcHalf;
+                                float arcMin = angle - arcHalf;
+
+                                float s = (n * (arcMax - arcMin)) + arcMin;
+
+                                weapon.setCurrAngle(s);
+                            }
+                        }
+                    }
+                }
+        ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("group autofire status"),
                 new SourceExecute<Byte>() {

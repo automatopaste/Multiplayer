@@ -58,6 +58,7 @@ public class ClientDuplex {
             deleted.addAll(deltas);
         }
 
+        inbound.size += data.size;;
     }
 
     public synchronized void updateOutboundSocket(OutboundData bufferData) {

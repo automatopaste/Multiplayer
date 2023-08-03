@@ -7,7 +7,7 @@ import java.util.Set;
 public class InboundData {
     public final Map<Byte, Map<Short, Map<Byte, Object>>> in;
     public final Map<Byte, Set<Short>> deleted;
-    public int size = -1;
+    public int size = 0;
 
     public InboundData() {
         this(new HashMap<Byte, Map<Short, Map<Byte, Object>>>(), new HashMap<Byte, Set<Short>>());

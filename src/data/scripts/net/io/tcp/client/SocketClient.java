@@ -101,7 +101,10 @@ public class SocketClient implements Runnable {
         });
 
         // Get channel after connected socket
-        ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+
+        String h = host.equals("localhost") ? "127.0.0.1" : host;
+        int p = host.equals("localhost") ? 8080 : port;
+        ChannelFuture channelFuture = bootstrap.connect(h, p).sync();
         channel = channelFuture.channel();
         local = (InetSocketAddress) channel.localAddress();
 
