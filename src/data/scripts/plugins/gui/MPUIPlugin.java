@@ -20,6 +20,7 @@ import data.scripts.plugins.MPServerPlugin;
 import org.lazywizard.lazylib.JSONUtils;
 import org.lazywizard.lazylib.ui.FontException;
 import org.lazywizard.lazylib.ui.LazyFont;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
@@ -44,6 +45,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         SHIP_SELECT
     }
     private ActivePanel active = ActivePanel.NONE;
+
+    private boolean cameraLockToShip = false;
+    private boolean prevCameraLockToShip = false;
 
     @Override
     public void init(CombatEngineAPI engine) {
@@ -102,6 +106,31 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             float h1 = TODRAW24.getHeight();
             TODRAW24.draw((w - w1) * 0.5f, (h - h1) * 0.5f);
             CMUKitUI.closeGL11ForText();
+        }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_L)) {
+                if (!prevCameraLockToShip) {
+                    cameraLockToShip = !cameraLockToShip;
+                    prevCameraLockToShip = true;
+                }
+            } else {
+                prevCameraLockToShip = false;
+            }
+        }
+
+        if (cameraLockToShip && engine.getPlayerShip() != null) {
+            CMUKitUI.openGL11ForText();
+            TODRAW24.setText("Camera locked ( toggle with L-CTRL + L )");
+            float w1 = TODRAW24.getWidth();
+            float h1 = TODRAW24.getHeight();
+            TODRAW24.draw((w - w1) * 0.5f, (h - 20f) - (h1 * 0.5f));
+            CMUKitUI.closeGL11ForText();
+
+            engine.getViewport().setExternalControl(true);
+            engine.getViewport().setCenter(engine.getPlayerShip().getLocation());
+        } else {
+            engine.getViewport().setExternalControl(false);
         }
 
         switch (active) {
@@ -411,19 +440,32 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, textParams2);
 
-                String s;
+                Text.TextParams textParams4 = new Text.TextParams();
+                Text text4 = new Text(new Execute<String>() {
+                    @Override
+                    public String get() {
+                        return "ENTER HOST PORT";
+                    }
+                }, TODRAW14, textParams4);
+
+                String s1;
+                int p;
                 try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
-                    s = data.getString("ip");
+                    s1 = data.getString("ip");
+                    p = data.getInt("port");
                 } catch (Exception e) {
-                    s = "";
+                    s1 = "";
+                    p = 0;
                 }
                 TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
                 textEntryBoxParams.height = 30f;
                 textEntryBoxParams.width = 200f;
                 Text.TextParams entryBoxTextParams = new Text.TextParams();
                 entryBoxTextParams.align = LazyFont.TextAlignment.LEFT;
-                final TextEntryBox textEntryBox = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
-                textEntryBox.setString(s);
+                final TextEntryBox textEntryBox1 = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
+                textEntryBox1.setString(s1);
+                final TextEntryBox textEntryBox2 = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
+                textEntryBox2.setString(p + "");
 
                 Text.TextParams buttonTextParams1 = new Text.TextParams();
                 buttonTextParams1.align = LazyFont.TextAlignment.CENTER;
@@ -439,7 +481,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
-                        textEntryBox.setString("");
+                        textEntryBox1.setString("");
+                        textEntryBox2.setString("0");
                     }
                 };
                 Button button1 = new Button(buttonParams1, buttonText1, buttonCallback1);
@@ -466,14 +509,22 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 Button.ButtonCallback buttonCallback = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
-                        initClient(textEntryBox.getString(), text3);
+                        int pt;
+                        try {
+                            pt = Integer.parseInt(textEntryBox2.getString());
+                        } catch (NumberFormatException n) {
+                            pt = 0;
+                        }
+                        initClient(textEntryBox1.getString(), pt, text3);
                     }
                 };
                 Button button = new Button(buttonParams, buttonText, buttonCallback);
 
                 panel1.addChild(text);
                 panel1.addChild(text2);
-                panel1.addChild(textEntryBox);
+                panel1.addChild(textEntryBox1);
+                panel1.addChild(text4);
+                panel1.addChild(textEntryBox2);
                 panel1.addChild(button1);
                 panel1.addChild(button);
                 panel1.addChild(text3);
@@ -756,9 +807,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         MPModPlugin.setPlugin(new MPServerPlugin(p));
     }
 
-    private void initClient(String text, Text infoText) {
-        text = text.trim().toLowerCase(Locale.ROOT);
-        if (text.trim().isEmpty()) {
+    private void initClient(String hostname, int port, Text infoText) {
+        hostname = hostname.trim().toLowerCase(Locale.ROOT);
+        if (hostname.trim().isEmpty()) {
             infoText.setExecute(new Execute<String>() {
                 @Override
                 public String get() {
@@ -769,7 +820,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        if (text.startsWith("localhost")) {
+        if (hostname.startsWith("localhost")) {
             infoText.setExecute(new Execute<String>() {
                 @Override
                 public String get() {
@@ -780,8 +831,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        String[] ids = text.split(" ");
-        if (ids.length != 1) {
+        String[] ids = hostname.split("\\.");
+        if (ids.length != 4) {
             infoText.setExecute(new Execute<String>() {
                 @Override
                 public String get() {
@@ -792,22 +843,22 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        String[] address = ids[0].split(":");
-        String host = address[0];
-        if (address.length < 2) {
-            infoText.setExecute(new Execute<String>() {
-                @Override
-                public String get() {
-                    return "PORT NOT SPECIFIED";
-                }
-            });
-            infoText.setColor(Color.RED);
-            return;
-        }
-        int port = Integer.parseInt(address[1]);
+//        String[] address = ids[0].split(":");
+//        String host = address[0];
+//        if (address.length < 2) {
+//            infoText.setExecute(new Execute<String>() {
+//                @Override
+//                public String get() {
+//                    return "PORT NOT SPECIFIED";
+//                }
+//            });
+//            infoText.setColor(Color.RED);
+//            return;
+//        }
 
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
-            data.put("ip", text);
+            data.put("ip", hostname);
+            data.put("port", port);
             data.save();
         } catch (Exception ignored) {
         }
@@ -819,6 +870,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             }
         });
         infoText.setColor(Color.GREEN);
-        MPModPlugin.setPlugin(new MPClientPlugin(host, port));
+        MPModPlugin.setPlugin(new MPClientPlugin(hostname, port));
     }
 }

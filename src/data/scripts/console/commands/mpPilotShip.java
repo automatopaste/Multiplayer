@@ -1,7 +1,7 @@
 package data.scripts.console.commands;
 
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.*;
 import org.jetbrains.annotations.NotNull;
 import org.lazywizard.console.BaseCommand;
 import org.lazywizard.console.Console;
@@ -14,35 +14,50 @@ public class mpPilotShip  implements BaseCommand {
     @Override
     public CommandResult runCommand(@NotNull String args, @NotNull CommandContext context) {
         Console.showMessage("deprecated");
-        return CommandResult.ERROR;
 
-//        if (!(context == CommandContext.COMBAT_CAMPAIGN || context == CommandContext.COMBAT_SIMULATION || context == CommandContext.COMBAT_MISSION)) {
-//            Console.showMessage("Command only usable in combat");
-//            return CommandResult.ERROR;
-//        }
-//
-//        Vector2f loc = new Vector2f(Global.getCombatEngine().getViewport().getCenter());
-//
-//        MPPlugin plugin = MPModPlugin.getPlugin();
-//        if (plugin == null || plugin.getType() != MPPlugin.PluginType.CLIENT) {
-//            Console.showMessage("Command only usable on client");
-//            return CommandResult.ERROR;
-//        }
-//        MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-//
-//        Set<Short> occupied = new HashSet<>(clientPlugin.getLobbyInput().getLobby().getPlayerShipIDs());
-//
-//        ShipAPI ship = getClosest(loc, Global.getCombatEngine(), occupied);
-//
-//        if (ship != null) {
-//            Global.getCombatEngine().setPlayerShipExternal(ship);
-//
-//            Console.showMessage("Piloting ship " + ship.getName());
-//            return CommandResult.SUCCESS;
-//        } else {
-//            Console.showMessage("Unable to find ship");
-//            return CommandResult.ERROR;
-//        }
+        for (final ShipAPI ship : Global.getCombatEngine().getShips()) {
+            ship.setShipAI(new ShipAIPlugin() {
+                @Override
+                public void setDoNotFireDelay(float amount) {
+
+                }
+
+                @Override
+                public void forceCircumstanceEvaluation() {
+
+                }
+
+                @Override
+                public void advance(float amount) {
+                    ship.giveCommand(ShipCommand.DECELERATE, null, 0);
+                    ship.setHoldFireOneFrame(true);
+                }
+
+                @Override
+                public boolean needsRefit() {
+                    return false;
+                }
+
+                @Override
+                public ShipwideAIFlags getAIFlags() {
+                    ShipwideAIFlags flags = new ShipwideAIFlags();
+                    flags.setFlag(ShipwideAIFlags.AIFlags.BACKING_OFF);
+                    return flags;
+                }
+
+                @Override
+                public void cancelCurrentManeuver() {
+
+                }
+
+                @Override
+                public ShipAIConfig getConfig() {
+                    return new ShipAIConfig();
+                }
+            });
+        }
+
+        return CommandResult.SUCCESS;
     }
 
     private static ShipAPI getClosest(Vector2f loc, CombatEngineAPI engine, Set<String> occupied) {

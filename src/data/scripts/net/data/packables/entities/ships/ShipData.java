@@ -48,8 +48,6 @@ public class ShipData extends EntityData {
     private final Map<WeaponAPI, Byte> weaponSlotIDs = new HashMap<>();
     private Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots;
 
-    private ClientPlayerData.ShipControlOverride controlOverride;
-
     private short engineControllerBitmask = 0x0000;
 
     public ShipData(short instanceID, final ShipAPI ship, final PlayerShips playerShips) {
@@ -457,39 +455,6 @@ public class ShipData extends EntityData {
                     }
                 }
         ));
-//        addRecord(new RecordLambda<>(
-//                ByteRecord.getDefault().setDebugText("num flameouts"),
-//                new SourceExecute<Byte>() {
-//                    @Override
-//                    public Byte get() {
-//                        if (prevFlameout && !ship.getEngineController().isFlamedOut()) {
-//                            prevFlameout = false;
-//                            return (byte) 2;
-//                        }
-//                        if (ship.getEngineController().isFlamedOut() || ship.getEngineController().isFlamingOut()) {
-//                            prevFlameout = true;
-//                            return (byte) 1;
-//                        }
-//                        return (byte) 0;
-//                    }
-//                },
-//                new DestExecute<Byte>() {
-//                    @Override
-//                    public void execute(Byte value, EntityData packable) {
-//                        ShipData shipData = (ShipData) packable;
-//                        ShipAPI ship = shipData.getShip();
-//                        if (ship != null) {
-//                            if (value == (byte) 2) {
-//                                ship.getMutableStats().getCombatEngineRepairTimeMult().modifyMult("mp", 0f);
-//                            } else if (value == (byte) 1) {
-//                                if (!(ship.getEngineController().isFlamingOut() || ship.getEngineController().isFlamedOut())) ship.getEngineController().forceFlameout(false);
-//                            } else if (value == (byte) 0) {
-//                                ship.getMutableStats().getCombatEngineRepairTimeMult().unmodify("mp");
-//                            }
-//                        }
-//                    }
-//                }
-//        ));
         addRecord(new RecordLambda<>(
                 new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("enabled engine ids"),
                 new SourceExecute<List<Byte>>() {
@@ -584,24 +549,6 @@ public class ShipData extends EntityData {
                             if (weapon.isFiring()) id |= 0b10000000;
                             if (weapon.isDisabled()) id |= 0b01000000;
                             out.add(id);
-
-//                            boolean p = weaponFireStates.get(id);
-//                            boolean f = weapon.isFiring();
-//                            if (f != p) {
-//                                if (f) {
-//                                    id |= 0b10000000;
-//                                }
-//                                out.add(id);
-//                            }
-
-//                            float arcHalf = weapon.getSlot().getArc() * 0.5f;
-//                            float arcMax = weapon.getSlot().getAngle() + arcHalf;
-//                            float arcMin = weapon.getSlot().getAngle() - arcHalf;
-//
-//                            float d = (weapon.getCurrAngle() - arcMin) / (arcMax - arcMin);
-//
-//                            byte v = (byte) (d * 255f);
-//                            out.add(v);
                         }
                         return out;
                     }
@@ -627,15 +574,6 @@ public class ShipData extends EntityData {
                                 } else {
                                     weapon.repair();
                                 }
-
-//                                byte a = iterator.next();
-//                                float n = a / 255f;
-//
-//                                float arcHalf = weapon.getSlot().getArc() * 0.5f;
-//                                float arcMax = weapon.getSlot().getAngle() + arcHalf;
-//                                float arcMin = weapon.getSlot().getAngle() - arcHalf;
-//
-//                                weapon.setCurrAngle((n * (arcMax - arcMin)) + arcMin);
                             }
                         }
                     }
@@ -651,18 +589,20 @@ public class ShipData extends EntityData {
                             byte id = slotIDs.get(weapon.getSlot().getId());
                             out.add(id);
 
-                            float angle = weapon.getSlot().getAngle();
-                            float arc = weapon.getSlot().getArc();
-                            if (arc < 0.5f) {
-                                out.add((byte) 0x00);
-                                continue;
-                            }
-                            float arcHalf = arc * 0.5f;
-                            float arcMax = angle + arcHalf;
-                            float arcMin = angle - arcHalf;
+//                            WeaponSlotAPI slot = weapon.getSlot();
+//
+//                            float angle = slot.getAngle();
+//                            float arc = slot.getArc();
+//                            if (arc < 0.5f) {
+//                                out.add((byte) 0x00);
+//                                continue;
+//                            }
+//
+//                            float left = angle + ship.getFacing() - (arc * 0.5f);
+//                            float norm = weapon.getCurrAngle() - left;
+//                            out.add(ConversionUtils.floatToByte(norm, arc));
 
-                            float d = (weapon.getCurrAngle() - arcMin) / (arcMax - arcMin);
-                            out.add(ConversionUtils.floatToByte(d, arc));
+                            out.add(ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f));
                         }
                         return out;
                     }
@@ -676,18 +616,17 @@ public class ShipData extends EntityData {
                                 byte id = iterator.next();
                                 WeaponAPI weapon = weaponSlots.get(id);
 
+//                                float angle = weapon.getSlot().getAngle();
+//                                float arc = weapon.getSlot().getArc();
+//
+//                                byte a = iterator.next();
+//                                float norm = ConversionUtils.byteToFloat(a, arc);
+//
+//                                float left = angle + ship.getFacing() - (arc * 0.5f);
+//                                weapon.setCurrAngle(left + (arc * norm));
+
                                 byte a = iterator.next();
-                                float n = a * (1f / 255);
-
-                                float angle = weapon.getSlot().getAngle();
-                                float arc = weapon.getSlot().getArc();
-                                float arcHalf = arc * 0.5f;
-                                float arcMax = angle + arcHalf;
-                                float arcMin = angle - arcHalf;
-
-                                float s = (n * (arcMax - arcMin)) + arcMin;
-
-                                weapon.setCurrAngle(s);
+                                weapon.setCurrAngle(ConversionUtils.byteToFloat(a, 360f));
                             }
                         }
                     }
@@ -907,10 +846,6 @@ public class ShipData extends EntityData {
 
     @Override
     public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
-        if (controlOverride != null) {
-            controlOverride.control(ship);
-        }
-
         if (ship == null && manager instanceof InboundEntityManager) {
             init(plugin, (InboundEntityManager) manager);
         }
@@ -971,14 +906,6 @@ public class ShipData extends EntityData {
 
     public Map<Byte, WeaponAPI> getWeaponSlots() {
         return weaponSlots;
-    }
-
-    public void setControlOverride(ClientPlayerData.ShipControlOverride controlOverride) {
-        this.controlOverride = controlOverride;
-    }
-
-    public void removeControlOverride() {
-        controlOverride = null;
     }
 
     public void setEngineControllerBitmask(short engineControllerBitmask) {

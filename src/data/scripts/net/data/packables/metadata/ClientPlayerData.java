@@ -2,7 +2,10 @@ package data.scripts.net.data.packables.metadata;
 
 import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipCommand;
+import com.fs.starfarer.api.combat.ViewportAPI;
+import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
@@ -44,6 +47,10 @@ public class ClientPlayerData extends EntityData {
     private boolean prevShields = false;
     private boolean fighterEnable = false;
     private boolean prevFighters = false;
+
+    private byte autofireStates = 0x00;
+    private byte selected = 0x00;
+    private boolean prevSelectedGroupAutofire = false;
 
     // make use of the CMUtils pd controller functionality to imitate the point-at-cursor pilot mode
     private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
@@ -157,6 +164,7 @@ public class ClientPlayerData extends EntityData {
         if (playerShip != null) {
             if (plugin.getType() == MPPlugin.PluginType.SERVER) {
                 unmask(playerShip, controlBitmask, amount);
+                playerShip.getMouseTarget().set(getMouseTarget());
             }
 
             if (playerShip.getShield() != null) {
@@ -189,12 +197,6 @@ public class ClientPlayerData extends EntityData {
 
                 if (data.getInstanceID() == playerShipID) {
                     ship.setShipAI(new MPDefaultShipAIPlugin());
-                    data.setControlOverride(new ShipControlOverride(this) {
-                        @Override
-                        public void control(ShipAPI ship) {
-                            ship.getMouseTarget().set(mouseTarget);
-                        }
-                    });
                     playerShip = ship;
                 }
             }
@@ -275,22 +277,19 @@ public class ClientPlayerData extends EntityData {
 
         controls[13] = fighterEnable;
 
-        controls[14] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_1")));
-        controls[15] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_2")));
-        controls[16] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_3")));
-        controls[17] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_4")));
-        controls[18] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_5")));
-        controls[19] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_6")));
-        controls[20] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_7")));
-
-        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-            controls[21] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_1")));
-            controls[22] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_2")));
-            controls[23] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_3")));
-            controls[24] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_4")));
-            controls[25] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_5")));
-            controls[26] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_6")));
-            controls[27] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_7")));
+        final int numGroups = 7;
+        final int controls0 = 14;
+        final int toggle0 = 21;
+        for (int i = 0; i < numGroups; i++) {
+            if (Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SELECT_GROUP_" + (i + 1))))) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+                    controls[i + controls0] = true;
+                    autofireStates ^= 0b00000001 << i;
+                } else {
+                    controls[i + toggle0] = true;
+                    selected = (byte) i;
+                }
+            }
         }
 
         // max length 32
@@ -360,21 +359,41 @@ public class ClientPlayerData extends EntityData {
                 ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
             }
         }
-        if (controls[14]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 0);
-        if (controls[15]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 1);
-        if (controls[16]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 2);
-        if (controls[17]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 3);
-        if (controls[18]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 4);
-        if (controls[19]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 5);
-        if (controls[20]) ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), 6);
 
-        if (controls[21]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 0);
-        if (controls[22]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 1);
-        if (controls[23]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 2);
-        if (controls[24]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 3);
-        if (controls[25]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 4);
-        if (controls[26]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 5);
-        if (controls[27]) ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), 6);
+        final int select0 = 14;
+        final int numGroups = ship.getWeaponGroupsCopy().size();
+        for (int i = 0; i < numGroups; i++) {
+            if (controls[i + select0]) {
+                if (prevSelectedGroupAutofire) {
+                    ship.getSelectedGroupAPI().toggleOn();
+                }
+
+                ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), i);
+                // autofire on manual group must be disabled for weapons to follow mouse on client controlled ship
+                WeaponGroupAPI newGroup = ship.getWeaponGroupsCopy().get(i);
+                prevSelectedGroupAutofire = newGroup.isAutofiring();
+                newGroup.toggleOff();
+
+                break;
+            }
+        }
+
+        final int controls0 = 21;
+        for (int i = 0; i < numGroups; i++) {
+            if (controls[i + controls0]) {
+                WeaponGroupAPI s = ship.getSelectedGroupAPI();
+                for (int j = 0; j < numGroups; j++) {
+                    if (s.equals(ship.getWeaponGroupsCopy().get(j))) {
+                        if (j == i) {
+                            prevSelectedGroupAutofire = !prevSelectedGroupAutofire;
+                        }
+                    }
+                }
+
+                ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), i);
+                break;
+            }
+        }
     }
 
     public void setMouseTarget(Vector2f mouseTarget) {
