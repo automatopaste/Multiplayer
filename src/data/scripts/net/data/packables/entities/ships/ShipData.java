@@ -28,8 +28,8 @@ public class ShipData extends EntityData {
 
     public static byte TYPE_ID;
 
-    private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownDisabledEngines = new HashSet<>();
-    private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownEnabledEngines = new HashSet<>();
+//    private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownDisabledEngines = new HashSet<>();
+//    private final Set<ShipEngineControllerAPI.ShipEngineAPI> knownEnabledEngines = new HashSet<>();
 
     private float[][] prevArmourGrid = null;
     private boolean prevFlameout = false;
@@ -399,13 +399,13 @@ public class ShipData extends EntityData {
 
                         List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
                         for (int i = 0; i < shipEngines.size(); i++) {
-                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                            if (!engine.isDisabled() && !knownEnabledEngines.contains(engine)) {
-                                out.add((byte) i);
-                                knownEnabledEngines.add(engine);
-                            } else {
-                                knownEnabledEngines.remove(engine);
+                            byte b = (byte)(i & 0b01111111);
+
+                            if (shipEngines.get(i).isDisabled()) {
+                                b |= 0b10000000;
                             }
+
+                            out.add(b);
                         }
 
                         return out;
@@ -416,56 +416,17 @@ public class ShipData extends EntityData {
                     public void execute(List<Byte> value, EntityData packable) {
                         ShipAPI ship = getShip();
                         if (ship != null) {
+                            List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
+
                             for (byte b : value) {
-                                int id = b & 0xFF;
+                                int id = b & 0b01111111;
 
-                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
-                                for (int i = 0; i < shipEngines.size(); i++) {
-                                    if (i == id) {
-                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                                        engine.repair();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        ));
-        addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("disabled engine ids"),
-                new SourceExecute<List<Byte>>() {
-                    @Override
-                    public List<Byte> get() {
-                        List<Byte> out = new ArrayList<>();
+                                ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(id);
 
-                        List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = ship.getEngineController().getShipEngines();
-                        for (int i = 0; i < shipEngines.size(); i++) {
-                            ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                            if (engine.isDisabled() && !knownDisabledEngines.contains(engine)) {
-                                out.add((byte) i);
-                                knownDisabledEngines.add(engine);
-                            } else {
-                                knownDisabledEngines.remove(engine);
-                            }
-                        }
-
-                        return out;
-                    }
-                },
-                new DestExecute<List<Byte>>() {
-                    @Override
-                    public void execute(List<Byte> value, EntityData packable) {
-                        ShipAPI ship = getShip();
-                        if (ship != null) {
-                            for (byte b : value) {
-                                int id = b & 0xFF;
-
-                                List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
-                                for (int i = 0; i < shipEngines.size(); i++) {
-                                    if (i == id) {
-                                        ShipEngineControllerAPI.ShipEngineAPI engine = shipEngines.get(i);
-                                        engine.disable();
-                                    }
+                                if ((b & 0b10000000) != 0) {
+                                    engine.disable();
+                                } else {
+                                    engine.repair();
                                 }
                             }
                         }
