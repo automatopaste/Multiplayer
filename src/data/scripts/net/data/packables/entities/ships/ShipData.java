@@ -60,7 +60,7 @@ public class ShipData extends EntityData {
 
                 b = (byte) Math.max(b, id);
 
-                slotIDs.putA(s, id);
+                slotIDs.put(s, id);
             }
 
             final int lim = 0b00111111;
@@ -472,199 +472,6 @@ public class ShipData extends EntityData {
                     }
                 }
         ));
-//        addRecord(new RecordLambda<>(
-//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon states"),
-//                new SourceExecute<List<Byte>>() {
-//                    @Override
-//                    public List<Byte> get() {
-//                        List<Byte> out = new ArrayList<>();
-//
-//                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-//                            byte id = (byte) (slotIDs.getA(weapon.getSlot().getId()) & 0b001111111);
-//                            if (weapon.isFiring()) id |= 0b10000000;
-//                            if (weapon.isDisabled()) id |= 0b01000000;
-//                            out.add(id);
-//                        }
-//                        return out;
-//                    }
-//                },
-//                new DestExecute<List<Byte>>() {
-//                    @Override
-//                    public void execute(List<Byte> value, EntityData packable) {
-//                        ShipAPI ship = getShip();
-//                        if (ship != null) {
-//                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
-//                                byte b = iterator.next();
-//                                byte k = (byte) (b & 0b00111111);
-//
-//                                WeaponAPI weapon = weaponSlots.getA(k);
-//
-//                                if ((b & 0b10000000) != 0) {
-//                                    weapon.setForceFireOneFrame(true);
-//                                } else {
-//                                    weapon.setForceNoFireOneFrame(true);
-//                                }
-//                                if ((b & 0b01000000) != 0) {
-//                                    weapon.disable();
-//                                } else {
-//                                    weapon.repair();
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//        ));
-//        addRecord(new RecordLambda<>(
-//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon facing"),
-//                new SourceExecute<List<Byte>>() {
-//                    @Override
-//                    public List<Byte> get() {
-//                        List<Byte> out = new ArrayList<>();
-//                        for (WeaponAPI weapon : ship.getAllWeapons()) {
-//                            byte id = slotIDs.getA(weapon.getSlot().getId());
-//                            out.add(id);
-//
-////                            WeaponSlotAPI slot = weapon.getSlot();
-////
-////                            float angle = slot.getAngle();
-////                            float arc = slot.getArc();
-////                            if (arc < 0.5f) {
-////                                out.add((byte) 0x00);
-////                                continue;
-////                            }
-////
-////                            float left = angle + ship.getFacing() - (arc * 0.5f);
-////                            float norm = weapon.getCurrAngle() - left;
-////                            out.add(ConversionUtils.floatToByte(norm, arc));
-//
-//                            out.add(ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f));
-//                        }
-//                        return out;
-//                    }
-//                },
-//                new DestExecute<List<Byte>>() {
-//                    @Override
-//                    public void execute(List<Byte> value, EntityData packable) {
-//                        ShipAPI ship = getShip();
-//                        if (ship != null) {
-//                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
-//                                byte id = iterator.next();
-//                                WeaponAPI weapon = weaponSlots.getA(id);
-//
-////                                float angle = weapon.getSlot().getAngle();
-////                                float arc = weapon.getSlot().getArc();
-////
-////                                byte a = iterator.next();
-////                                float norm = ConversionUtils.byteToFloat(a, arc);
-////
-////                                float left = angle + ship.getFacing() - (arc * 0.5f);
-////                                weapon.setCurrAngle(left + (arc * norm));
-//
-//                                byte a = iterator.next();
-//                                weapon.setCurrAngle(ConversionUtils.byteToFloat(a, 360f));
-//                            }
-//                        }
-//                    }
-//                }
-//        ));
-        addRecord(new RecordLambda<>(
-                ByteRecord.getDefault().setDebugText("group autofire status"),
-                new SourceExecute<Byte>() {
-                    @Override
-                    public Byte get() {
-                        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
-
-                        byte b = 0x00;
-                        byte f = 0b00000001;
-                        for (WeaponGroupAPI group : groups) {
-                            if (group.isAutofiring()) b |= f;
-                            f <<= 1;
-                        }
-
-                        return b;
-                    }
-                },
-                new DestExecute<Byte>() {
-                    @Override
-                    public void execute(Byte value, EntityData packable) {
-                        ShipAPI ship = getShip();
-                        if (ship == null) return;
-
-                        byte b = value;
-                        byte f = 0b00000001;
-                        for (WeaponGroupAPI group : ship.getWeaponGroupsCopy()) {
-                            if ((b & f) == 0) {
-                                group.toggleOff();
-                            } else {
-                                group.toggleOn();
-                            }
-                            f <<= 1;
-                        }
-                    }
-                }
-        ));
-//        addRecord(new RecordLambda<>(
-//                new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("non autofiring weapon groups"),
-//                new SourceExecute<List<Byte>>() {
-//                    @Override
-//                    public List<Byte> get() {
-//                        List<Byte> out = new ArrayList<>();
-//
-//                        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
-//                        for (int i = 0; i < groups.size(); i++) {
-//                            WeaponGroupAPI group = groups.get(i);
-//
-//                            byte g = (byte) (i & 0b01111111);
-//                            if (group.isAutofiring()) g |= 0b10000000;
-////                            if (group.getActiveWeapon().isFiring()) g |= 0b01000000;
-//
-//                            byte cooldown = ConversionUtils.floatToByte(group.getActiveWeapon().getCooldownRemaining(), group.getActiveWeapon().getCooldown());
-//
-//                            out.add(g);
-//                            out.add(cooldown);
-//                        }
-//
-//                        return out;
-//                    }
-//                },
-//                new DestExecute<List<Byte>>() {
-//                    @Override
-//                    public void execute(List<Byte> value, EntityData packable) {
-//                        ShipData shipData = (ShipData) packable;
-//                        ShipAPI ship = shipData.getShip();
-//                        if (ship != null) {
-//                            for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext();) {
-//                                byte aByte = iterator.next();
-//                                int g = aByte & 0xFF;
-//
-//                                int i = g & 0b01111111;
-//                                boolean autofiring = (g & 0b10000000) != 0;
-////                                boolean firing = (g & 0b01000000) != 0;
-//
-////                                if (firing) {
-////                                    ship.giveCommand(ShipCommand.SELECT_GROUP, null, i);
-////                                    ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), i);
-////                                }
-//
-//                                List<WeaponGroupAPI> weaponGroupsCopy = ship.getWeaponGroupsCopy();
-//                                for (int j = 0; j < weaponGroupsCopy.size(); j++) {
-//                                    WeaponGroupAPI group = weaponGroupsCopy.get(j);
-//
-//                                    if (j == i) {
-//                                        float cooldown = ConversionUtils.byteToFloat(iterator.next(), group.getActiveWeapon().getCooldown());
-//
-//                                        group.getActiveWeapon().setRemainingCooldownTo(cooldown);
-//
-//                                        if (group.isAutofiring() != autofiring) {
-//                                            ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, i);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//        ));
     }
 
     @Override
@@ -767,7 +574,7 @@ public class ShipData extends EntityData {
             for (String id : slotIDs.setA()) {
                 if (id.equals(w.getSlot().getId())) {
                     byte i = (byte) (int) slotIDs.getA(id);
-                    weaponSlots.putA(i, w);
+                    weaponSlots.put(i, w);
 
                     continue outer;
                 }

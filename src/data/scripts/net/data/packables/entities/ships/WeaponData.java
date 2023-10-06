@@ -2,6 +2,7 @@ package data.scripts.net.data.packables.entities.ships;
 
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.WeaponGroupAPI;
 import data.scripts.misc.MapSet;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
@@ -62,13 +63,13 @@ public class WeaponData extends EntityData {
                             boolean firing = weapon.isFiring();
 
                             if (firing != prevFiring) {
-                                if (!disabled) slotID |= 0b01000000;
+                                if (!disabled) states |= 0b01000000;
                             }
+
+                            byte facing = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
 
                             out.add(slotID);
                             out.add(states);
-
-                            byte facing = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
                             out.add(facing);
                         }
 
@@ -84,11 +85,16 @@ public class WeaponData extends EntityData {
                             for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
                                 byte id = iterator.next();
                                 byte states = iterator.next();
+                                byte facing = iterator.next();
 
                                 boolean isActive = (states & 0b10000000) != 0x00;
                                 boolean isFiring = (states & 0b01000000) != 0x00;
 
                                 WeaponAPI weapon = weaponSlots.getA(id);
+                                if (weapon == null) {
+                                    continue;
+                                }
+
                                 if (isActive) {
                                     weapon.repair();
                                 } else {
@@ -97,10 +103,46 @@ public class WeaponData extends EntityData {
 
                                 weapon.setForceFireOneFrame(isFiring);
 
-                                byte facing = iterator.next();
                                 float angle = ConversionUtils.byteToFloat(facing, 360f);
                                 weapon.setCurrAngle(angle);
                             }
+                        }
+                    }
+                }
+        ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("group autofire status"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        List<WeaponGroupAPI> groups = ship.getWeaponGroupsCopy();
+
+                        byte b = 0x00;
+                        byte f = 0b00000001;
+                        for (WeaponGroupAPI group : groups) {
+                            if (group.isAutofiring()) b |= f;
+                            f <<= 1;
+                        }
+
+                        return b;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        WeaponData weaponData = (WeaponData) packable;
+                        ShipAPI ship = weaponData.ship;
+                        if (ship == null) return;
+
+                        byte b = value;
+                        byte f = 0b00000001;
+                        for (WeaponGroupAPI group : ship.getWeaponGroupsCopy()) {
+                            if ((b & f) == 0) {
+                                group.toggleOff();
+                            } else {
+                                group.toggleOn();
+                            }
+                            f <<= 1;
                         }
                     }
                 }

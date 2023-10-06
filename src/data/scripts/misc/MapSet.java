@@ -37,11 +37,8 @@ public class MapSet<T, U> {
         return b.get(u);
     }
 
-    public void putA(T t, U u) {
+    public void put(T t, U u) {
         a.put(t, u);
-    }
-
-    public void putB(U u, T t) {
         b.put(u, t);
     }
 
