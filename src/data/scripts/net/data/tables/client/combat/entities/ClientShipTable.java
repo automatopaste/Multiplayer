@@ -4,6 +4,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.packables.entities.ships.WeaponData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
@@ -17,10 +18,13 @@ public class ClientShipTable implements InboundEntityManager {
     private final Map<ShipAPI, Short> shipIDs = new HashMap<>();
 
     private final Map<Short, ShieldData> shields;
+    private final Map<Short, WeaponData> weapons;
+
     private final Map<String, Map<String, MPDefaultAutofireAIPlugin>> tempAutofirePlugins;
 
     public ClientShipTable() {
         shields = new HashMap<>();
+        weapons = new HashMap<>();
         tempAutofirePlugins = new HashMap<>();
     }
 
@@ -54,6 +58,22 @@ public class ClientShipTable implements InboundEntityManager {
                 }
             } else {
                 shieldData.destExecute(toProcess, tick);
+            }
+        } else if (typeID == WeaponData.TYPE_ID) {
+            WeaponData weaponData = weapons.get(instanceID);
+
+            if (weaponData == null) {
+                ShipData shipData = registered.get(instanceID);
+                if (shipData != null && shipData.getShip() != null) {
+                    weaponData = new WeaponData(instanceID, shipData.getShip(), shipData.getSlotIDs(), shipData.getWeaponSlots());
+                    weapons.put(instanceID, weaponData);
+
+                    weaponData.destExecute(toProcess, tick);
+
+                    weaponData.init(plugin, this);
+                }
+            } else {
+                weaponData.destExecute(toProcess, tick);
             }
         }
     }
@@ -89,12 +109,17 @@ public class ClientShipTable implements InboundEntityManager {
             shieldData.update(amount, this, plugin);
             shieldData.interp(amount);
         }
+        for (WeaponData weaponData : weapons.values()) {
+            weaponData.update(amount, this, plugin);
+            weaponData.interp(amount);
+        }
     }
 
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(ShipData.TYPE_ID, this);
         DataGenManager.registerInboundEntityManager(ShieldData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(WeaponData.TYPE_ID, this);
     }
 
     public Map<ShipAPI, Short> getShipIDs() {
@@ -107,6 +132,10 @@ public class ClientShipTable implements InboundEntityManager {
 
     public Map<Short, ShieldData> getShields() {
         return shields;
+    }
+
+    public Map<Short, WeaponData> getWeapons() {
+        return weapons;
     }
 
     public Map<String, Map<String, MPDefaultAutofireAIPlugin>> getTempAutofirePlugins() {

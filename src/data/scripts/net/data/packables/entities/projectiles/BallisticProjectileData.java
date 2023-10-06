@@ -5,12 +5,12 @@ import com.fs.starfarer.api.combat.DamagingProjectileAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.combat.entities.BallisticProjectile;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -79,7 +79,7 @@ public class BallisticProjectileData extends EntityData {
                         try {
                             short id = shipTable.getRegistered().get(projectile.getWeapon().getShip());
                             ShipData data = shipTable.getTable()[id];
-                            Byte b = data.getWeaponSlotIDs().get(projectile.getWeapon());
+                            Byte b = data.getWeaponSlots().getB(projectile.getWeapon());
                             if (b == null) return -1;
                             else return b;
                         } catch (NullPointerException ignored) {
@@ -220,7 +220,7 @@ public class BallisticProjectileData extends EntityData {
                 setShip(shipData.getShip());
 
                 if (weaponID != -1) {
-                    setWeapon(shipData.getWeaponSlots().get(weaponID));
+                    setWeapon(shipData.getWeaponSlots().getA(weaponID));
                 }
             }
         }

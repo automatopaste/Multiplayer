@@ -7,6 +7,7 @@ import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.packables.entities.ships.WeaponData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.EntityTable;
@@ -25,6 +26,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     private final Map<ShipAPI, Short> registered;
     private final Set<Short> deleted;
     private final EntityInstanceMap<ShieldData> shields;
+    private final EntityInstanceMap<WeaponData> weapons;
     private final MPServerPlugin serverPlugin;
 
     public ShipTable(MPServerPlugin serverPlugin) {
@@ -34,6 +36,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         registered = new HashMap<>();
         deleted = new HashSet<>();
         shields = new EntityInstanceMap<>();
+        weapons = new EntityInstanceMap<>();
     }
 
     @Override
@@ -61,6 +64,16 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
                     out.put(id, instanceData);
                 }
             }
+        } else if (typeID == WeaponData.TYPE_ID) {
+            for (short id : weapons.registered.keySet()) {
+                WeaponData weaponData = weapons.registered.get(id);
+
+                InstanceData instanceData = weaponData.sourceExecute(amount);
+
+                if (instanceData.records != null && !instanceData.records.isEmpty()) {
+                    out.put(id, instanceData);
+                }
+            }
         }
 
         return out;
@@ -74,6 +87,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
             return out;
         } else if (typeID == ShieldData.TYPE_ID) {
             return shields.getDeleted();
+        } else if (typeID == WeaponData.TYPE_ID) {
+            return weapons.getDeleted();
         }
         return null;
     }
@@ -104,6 +119,9 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         for (ShieldData shieldData : shields.registered.values()) {
             shieldData.update(amount, this, plugin);
         }
+        for (WeaponData weaponData : weapons.registered.values()) {
+            weaponData.update(amount, this, plugin);
+        }
     }
 
     private void createEntry(ShipAPI ship) {
@@ -111,10 +129,14 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
         registered.put(ship, id);
         PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
-        table[id] = new ShipData(id, ship, playerShips);
+        ShipData shipData = new ShipData(id, ship, playerShips);
+        table[id] = shipData;
+
         if (ship.getShield() != null) {
             shields.registered.put(id, new ShieldData(id, ship.getShield(), ship));
         }
+
+        weapons.registered.put(id, new WeaponData(id, ship, shipData.getSlotIDs(), shipData.getWeaponSlots()));
     }
 
     private void deleteEntry(ShipAPI ship) {
@@ -124,6 +146,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
 
         registered.remove(ship);
         if (ship.getShield() != null) shields.delete(index);
+        weapons.delete(index);
         markVacant(index);
 
         deleted.add(index);
@@ -160,6 +183,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     public void register() {
         DataGenManager.registerOutboundEntityManager(ShipData.TYPE_ID, this);
         DataGenManager.registerOutboundEntityManager(ShieldData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(WeaponData.TYPE_ID, this);
     }
 
     @Override

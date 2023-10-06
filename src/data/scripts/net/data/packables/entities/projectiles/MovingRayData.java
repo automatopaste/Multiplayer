@@ -79,7 +79,7 @@ public class MovingRayData extends EntityData {
                         try {
                             short id = shipTable.getRegistered().get(projectile.getWeapon().getShip());
                             ShipData data = shipTable.getTable()[id];
-                            Byte b = data.getWeaponSlotIDs().get(projectile.getWeapon());
+                            Byte b = data.getWeaponSlots().getB(projectile.getWeapon());
                             if (b == null) return -1;
                             else return b;
                         } catch (NullPointerException ignored) {
@@ -220,7 +220,7 @@ public class MovingRayData extends EntityData {
                 setShip(shipData.getShip());
 
                 if (weaponID != -1) {
-                    setWeapon(shipData.getWeaponSlots().get(weaponID));
+                    setWeapon(shipData.getWeaponSlots().getA(weaponID));
                 }
             }
         }
