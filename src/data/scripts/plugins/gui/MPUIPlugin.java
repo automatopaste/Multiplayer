@@ -10,7 +10,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.metadata.ClientPlayerData;
+import data.scripts.net.data.packables.entities.ships.PlayerControlData;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
 import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
@@ -723,9 +723,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                         }
 
                                         for (short sid : playerShips.getClientPlayerData().keySet()) {
-                                            ClientPlayerData clientPlayerData = playerShips.getClientPlayerData().get(sid);
+                                            PlayerControlData playerControlData = playerShips.getClientPlayerData().get(sid);
 
-                                            if (clientPlayerData.getPlayerShip() == ship) {
+                                            if (playerControlData.getShip() == ship) {
                                                 buttonTextParams.color = Color.BLUE;
                                                 return "PLAYER CONTROL";
                                             }

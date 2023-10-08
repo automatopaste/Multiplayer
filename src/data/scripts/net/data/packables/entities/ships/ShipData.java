@@ -8,7 +8,6 @@ import com.fs.starfarer.api.loading.WeaponGroupSpec;
 import com.fs.starfarer.combat.entities.Ship;
 import data.scripts.misc.MapSet;
 import data.scripts.net.data.packables.*;
-import data.scripts.net.data.packables.metadata.ClientPlayerData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -295,8 +294,8 @@ public class ShipData extends EntityData {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             if (playerShips != null) {
-                                for (ClientPlayerData d : playerShips.getClientPlayerData().values()) {
-                                    if (d.getPlayerShip().equals(ship)) {
+                                for (PlayerControlData d : playerShips.getClientPlayerData().values()) {
+                                    if (d.getShip().equals(ship)) {
                                         ship.getMouseTarget().set(d.getMouseTarget());
                                         return;
                                     }
@@ -374,6 +373,7 @@ public class ShipData extends EntityData {
                     public void execute(List<Byte> value, EntityData packable) {
                         ShipData shipData = (ShipData) packable;
                         ShipAPI ship = shipData.getShip();
+
                         if (ship != null) {
                             for (int i = 0; i < value.size(); i += 2) {
                                 byte b1 = value.get(i);
@@ -414,7 +414,9 @@ public class ShipData extends EntityData {
                 new DestExecute<List<Byte>>() {
                     @Override
                     public void execute(List<Byte> value, EntityData packable) {
-                        ShipAPI ship = getShip();
+                        ShipData shipData = (ShipData) packable;
+                        ShipAPI ship = shipData.getShip();
+
                         if (ship != null) {
                             List<ShipEngineControllerAPI.ShipEngineAPI> shipEngines = getShip().getEngineController().getShipEngines();
 

@@ -1,4 +1,4 @@
-package data.scripts.net.data.packables.metadata;
+package data.scripts.net.data.packables.entities.ships;
 
 import cmu.drones.ai.DroneAIUtils;
 import com.fs.starfarer.api.Global;
@@ -10,7 +10,7 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.packables.entities.ships.ShipData;
+import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
 import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.Vector2f32Record;
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Sends player ship commands to the server
  */
-public class ClientPlayerData extends EntityData {
+public class PlayerControlData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -39,7 +39,7 @@ public class ClientPlayerData extends EntityData {
     private byte playerShipFlags;
     private short requestedShipID = -1;
 
-    private ShipAPI playerShip;
+    private ShipAPI ship;
 
     private final Vector2f mouseTarget = new Vector2f(0f, 0f);
 
@@ -47,10 +47,13 @@ public class ClientPlayerData extends EntityData {
     private boolean prevShields = false;
     private boolean fighterEnable = false;
     private boolean prevFighters = false;
+    private byte activeGroup = 0;
 
     private byte autofireStates = 0x00;
     private byte selected = 0x00;
     private boolean prevSelectedGroupAutofire = false;
+
+    private final float[] autofireToggleCooldowns = new float[7];
 
     // make use of the CMUtils pd controller functionality to imitate the point-at-cursor pilot mode
     private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
@@ -80,7 +83,7 @@ public class ClientPlayerData extends EntityData {
      *
      * @param instanceID unique
      */
-    public ClientPlayerData(short instanceID, final PlayerShip playerShip) {
+    public PlayerControlData(short instanceID, final PlayerShip playerShip) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -94,8 +97,8 @@ public class ClientPlayerData extends EntityData {
                 new DestExecute<Integer>() {
                     @Override
                     public void execute(Integer value, EntityData packable) {
-                        ClientPlayerData clientPlayerData = (ClientPlayerData) packable;
-                        clientPlayerData.setControlBitmask(value);
+                        PlayerControlData playerControlData = (PlayerControlData) packable;
+                        playerControlData.setControlBitmask(value);
                     }
                 }
         ));
@@ -148,6 +151,45 @@ public class ClientPlayerData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(
+                ByteRecord.getDefault().setDebugText("group select commands"),
+                new SourceExecute<Byte>() {
+                    @Override
+                    public Byte get() {
+                        byte b = 0;
+                        if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
+                            b = 1;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_2)) {
+                            b = 2;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_3)) {
+                            b = 3;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_4)) {
+                            b = 4;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_5)) {
+                            b = 5;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_6)) {
+                            b = 6;
+                        } else if (Keyboard.isKeyDown(Keyboard.KEY_7)) {
+                            b = 7;
+                        }
+
+                        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && b != 0) {
+                            b |= 0b10000000;
+                        }
+
+                        return b;
+                    }
+                },
+                new DestExecute<Byte>() {
+                    @Override
+                    public void execute(Byte value, EntityData packable) {
+                        if (value == 0) return;
+
+                        PlayerControlData playerControlData = (PlayerControlData) packable;
+                        playerControlData.activeGroup = value;
+                    }
+                }
+        ));
     }
 
     @Override
@@ -157,19 +199,40 @@ public class ClientPlayerData extends EntityData {
 
     @Override
     public void update(float amount, BaseEntityManager manager, MPPlugin plugin) {
-        if (playerShip == null && plugin.getType() == MPPlugin.PluginType.SERVER) {
+        if (ship == null && plugin.getType() == MPPlugin.PluginType.SERVER) {
             check((ShipTable) plugin.getEntityManagers().get(ShipTable.class));
         }
 
-        if (playerShip != null) {
+        for (int i = 0; i < autofireToggleCooldowns.length; i++) {
+            autofireToggleCooldowns[i] -= amount;
+        }
+
+        if (ship != null) {
             if (plugin.getType() == MPPlugin.PluginType.SERVER) {
-                unmask(playerShip, controlBitmask, amount);
-                playerShip.getMouseTarget().set(getMouseTarget());
+                unmask(ship, controlBitmask, amount);
+                ship.getMouseTarget().set(getMouseTarget());
+
+                if (activeGroup != 0) {
+                    int group = (activeGroup & 0b01111111) - 1;
+
+                    if ((activeGroup & 0b10000000) != 0) {
+                        if (autofireToggleCooldowns[group] < 0f) {
+                            ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, null, group);
+
+                            autofireToggleCooldowns[group] = 0.5f;
+                        }
+                    } else {
+                        ship.giveCommand(ShipCommand.SELECT_GROUP, null, group);
+                    }
+
+                    activeGroup = 0;
+                }
+
             }
 
-            if (playerShip.getShield() != null) {
+            if (ship.getShield() != null) {
                 if (Mouse.isButtonDown(1) && !prevShields) {
-                    shieldEnable = !playerShip.getShield().isOn();
+                    shieldEnable = !ship.getShield().isOn();
                     prevShields = true;
                 }
             }
@@ -181,13 +244,13 @@ public class ClientPlayerData extends EntityData {
     }
 
     public void transferPlayerShip(ShipAPI dest) {
-        if (playerShip != null) {
-            playerShip.resetDefaultAI();
-            playerShip.getShipAI().forceCircumstanceEvaluation();
+        if (ship != null) {
+            ship.resetDefaultAI();
+            ship.getShipAI().forceCircumstanceEvaluation();
         }
 
         dest.setShipAI(new MPDefaultShipAIPlugin());
-        playerShip = dest;
+        ship = dest;
     }
 
     private void check(ShipTable shipTable) {
@@ -197,7 +260,7 @@ public class ClientPlayerData extends EntityData {
 
                 if (data.getInstanceID() == playerShipID) {
                     ship.setShipAI(new MPDefaultShipAIPlugin());
-                    playerShip = ship;
+                    this.ship = ship;
                 }
             }
         }
@@ -213,8 +276,8 @@ public class ClientPlayerData extends EntityData {
         return TYPE_ID;
     }
 
-    public ShipAPI getPlayerShip() {
-        return playerShip;
+    public ShipAPI getShip() {
+        return ship;
     }
 
     public int getControlBitmask() {
@@ -359,41 +422,6 @@ public class ClientPlayerData extends EntityData {
                 ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
             }
         }
-
-        final int select0 = 14;
-        final int numGroups = ship.getWeaponGroupsCopy().size();
-        for (int i = 0; i < numGroups; i++) {
-            if (controls[i + select0]) {
-                if (prevSelectedGroupAutofire) {
-                    ship.getSelectedGroupAPI().toggleOn();
-                }
-
-                ship.giveCommand(ShipCommand.SELECT_GROUP, ship.getMouseTarget(), i);
-                // autofire on manual group must be disabled for weapons to follow mouse on client controlled ship
-                WeaponGroupAPI newGroup = ship.getWeaponGroupsCopy().get(i);
-                prevSelectedGroupAutofire = newGroup.isAutofiring();
-                newGroup.toggleOff();
-
-                break;
-            }
-        }
-
-        final int controls0 = 21;
-        for (int i = 0; i < numGroups; i++) {
-            if (controls[i + controls0]) {
-                WeaponGroupAPI s = ship.getSelectedGroupAPI();
-                for (int j = 0; j < numGroups; j++) {
-                    if (s.equals(ship.getWeaponGroupsCopy().get(j))) {
-                        if (j == i) {
-                            prevSelectedGroupAutofire = !prevSelectedGroupAutofire;
-                        }
-                    }
-                }
-
-                ship.giveCommand(ShipCommand.TOGGLE_AUTOFIRE, ship.getMouseTarget(), i);
-                break;
-            }
-        }
     }
 
     public void setMouseTarget(Vector2f mouseTarget) {
@@ -405,9 +433,9 @@ public class ClientPlayerData extends EntityData {
     }
 
     public abstract static class ShipControlOverride {
-        public final ClientPlayerData data;
+        public final PlayerControlData data;
 
-        public ShipControlOverride(ClientPlayerData data) {
+        public ShipControlOverride(PlayerControlData data) {
             this.data = data;
         }
 

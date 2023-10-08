@@ -9,10 +9,7 @@ import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.projectiles.BallisticProjectileData;
 import data.scripts.net.data.packables.entities.projectiles.MissileData;
 import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
-import data.scripts.net.data.packables.entities.ships.ShieldData;
-import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.entities.ships.VariantData;
-import data.scripts.net.data.packables.entities.ships.WeaponData;
+import data.scripts.net.data.packables.entities.ships.*;
 import data.scripts.net.data.packables.metadata.*;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
@@ -45,7 +42,7 @@ public class MPModPlugin extends BaseModPlugin {
         ClientConnectionData.TYPE_ID = DataGenManager.registerEntityType(ClientConnectionData.class);
         ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
-        ClientPlayerData.TYPE_ID = DataGenManager.registerEntityType(ClientPlayerData.class);
+        PlayerControlData.TYPE_ID = DataGenManager.registerEntityType(PlayerControlData.class);
         ServerPlayerData.TYPE_ID = DataGenManager.registerEntityType(ServerPlayerData.class);
         ServerConnectionData.TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
 

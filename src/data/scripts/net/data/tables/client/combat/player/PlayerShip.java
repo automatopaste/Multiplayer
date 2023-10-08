@@ -5,7 +5,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.metadata.ClientPlayerData;
+import data.scripts.net.data.packables.entities.ships.PlayerControlData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
-    private final ClientPlayerData clientPlayerData;
+    private final PlayerControlData playerControlData;
     private final ServerPlayerData serverPlayerData;
     private short prevActiveID;
     private final ClientShipTable clientShipTable;
@@ -27,7 +27,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
     public PlayerShip(short instanceID, ClientShipTable clientShipTable) {
         this.instanceID = instanceID;
 
-        clientPlayerData = new ClientPlayerData(instanceID, this);
+        playerControlData = new PlayerControlData(instanceID, this);
         serverPlayerData = new ServerPlayerData(instanceID);
 
         this.clientShipTable = clientShipTable;
@@ -35,7 +35,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        clientPlayerData.update(amount, this, plugin);
+        playerControlData.update(amount, this, plugin);
         serverPlayerData.update(amount, this, plugin);
 
         if (serverPlayerData.getActiveID() != prevActiveID) {
@@ -52,21 +52,21 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
     public void requestTransfer(ShipAPI dest) {
         Short id = clientShipTable.getShipIDs().get(dest);
         if (id != null) {
-            clientPlayerData.setRequestedShipID(id);
+            playerControlData.setRequestedShipID(id);
         }
     }
 
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(ServerPlayerData.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(ClientPlayerData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(PlayerControlData.TYPE_ID, this);
     }
 
     @Override
     public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
-        InstanceData instanceData = clientPlayerData.sourceExecute(amount);
+        InstanceData instanceData = playerControlData.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
             out.put(instanceID, instanceData);
         }

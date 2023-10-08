@@ -6,7 +6,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.metadata.ClientPlayerData;
+import data.scripts.net.data.packables.entities.ships.PlayerControlData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -27,7 +27,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
     }
 
     // map client connection id to data object
-    private final Map<Short, ClientPlayerData> clientPlayerData = new HashMap<>();
+    private final Map<Short, PlayerControlData> clientPlayerData = new HashMap<>();
     private final Map<Short, ServerPlayerData> serverPlayerData = new HashMap<>();
 
     private final ShipTable shipTable;
@@ -52,12 +52,12 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         }
 
         for (short id : clientPlayerData.keySet()) {
-            ClientPlayerData c = clientPlayerData.get(id);
+            PlayerControlData c = clientPlayerData.get(id);
             c.update(amount, this, plugin);
         }
 
         for (short id : clientPlayerData.keySet()) {
-            ClientPlayerData c = clientPlayerData.get(id);
+            PlayerControlData c = clientPlayerData.get(id);
             short requested = c.getRequestedShipID();
 
             if (requested != -1) { // remote client is submitting an id to switch to
@@ -76,7 +76,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         }
     }
 
-    public void transferControl(ShipAPI dest, boolean host, ClientPlayerData playerData) {
+    public void transferControl(ShipAPI dest, boolean host, PlayerControlData playerData) {
         Short destID = shipTable.getRegistered().get(dest);
         if (destID == null) {
             return;
@@ -105,20 +105,20 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(ClientPlayerData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(PlayerControlData.TYPE_ID, this);
         DataGenManager.registerOutboundEntityManager(ServerPlayerData.TYPE_ID, this);
     }
 
-    public Map<Short, ClientPlayerData> getClientPlayerData() {
+    public Map<Short, PlayerControlData> getClientPlayerData() {
         return clientPlayerData;
     }
 
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
-        ClientPlayerData data = clientPlayerData.get(instanceID);
+        PlayerControlData data = clientPlayerData.get(instanceID);
 
         if (data == null) {
-            data = new ClientPlayerData(instanceID, null);
+            data = new PlayerControlData(instanceID, null);
 
             clientPlayerData.put(instanceID, data);
             ServerPlayerData s = new ServerPlayerData(instanceID);
@@ -135,7 +135,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
-        ClientPlayerData data = clientPlayerData.get(instanceID);
+        PlayerControlData data = clientPlayerData.get(instanceID);
 
         if (data != null) {
             data.delete();
