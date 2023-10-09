@@ -35,7 +35,6 @@ public class MPServerPlugin extends MPPlugin {
     //outbound
     private final ShipTable shipTable;
     private final ProjectileTable projectileTable;
-//    private final MissileTable missileTable;
 
     private final ShipVariantDatastore variantDatastore;
     private final ProjectileSpecDatastore projectileSpecDatastore;
@@ -70,9 +69,6 @@ public class MPServerPlugin extends MPPlugin {
 
         textChatHost = new TextChatHost(chatboxPlugin, playerLobby);
         initEntityManager(textChatHost);
-
-//        missileTable = new MissileTable(projectileSpecDatastore.getProjectileIDs(), shipTable);
-//        initEntityManager(missileTable);
 
         Thread serverThread = new Thread(serverConnectionManager, "MP_SERVER_THREAD");
         serverThread.start();

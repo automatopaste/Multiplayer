@@ -10,11 +10,11 @@ import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
-import data.scripts.net.data.records.ConversionUtils;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.plugins.MPPlugin;
+import org.lazywizard.lazylib.MathUtils;
 
 import java.util.*;
 
@@ -63,15 +63,34 @@ public class WeaponData extends EntityData {
                             boolean prevFiring = weaponFireStates.get(slotID);
                             boolean firing = weapon.isFiring();
 
-                            if (firing != prevFiring) {
-                                if (!firing) states |= 0b01000000;
+                            if (firing != prevFiring && !firing) {
+                                states |= 0b01000000;
                             }
 
-                            byte facing = ConversionUtils.floatToByte(weapon.getCurrAngle(), 360f);
+                            boolean usePreciseFormat = weapon.isBeam();
+
+                            if (usePreciseFormat) {
+                                states |= 0b00100000;
+                            }
+
+                            float angle = weapon.getCurrAngle(); // absolute 360 angle
+                            float arcLength = weapon.getArc();
+                            float arcFacing = weapon.getArcFacing() + ship.getFacing(); // absolute 360 angle
+
+                            float delta = MathUtils.getShortestRotation(angle, arcFacing);
+                            float ratio = delta / (arcLength * 0.5f); // map to -1.0 .. 1.0
+                            ratio = (ratio * 0.5f) + 0.5f; // map to 0.0 .. 1.0
 
                             out.add(slotID);
                             out.add(states);
-                            out.add(facing);
+
+                            if (usePreciseFormat) {
+                                int data = (int)(ratio * 65535f);
+                                out.add((byte)((data & 0x0000FF00) >>> 8));
+                                out.add((byte)(data & 0x000000FF));
+                            } else {
+                                out.add((byte)(ratio * 255));
+                            }
                         }
 
                         return out;
@@ -86,7 +105,6 @@ public class WeaponData extends EntityData {
                             for (Iterator<Byte> iterator = value.iterator(); iterator.hasNext(); ) {
                                 byte id = iterator.next();
                                 byte states = iterator.next();
-                                byte facing = iterator.next();
 
                                 boolean isDisabled = (states & 0b10000000) != 0x00;
                                 boolean isFiring = (states & 0b01000000) != 0x00;
@@ -104,7 +122,28 @@ public class WeaponData extends EntityData {
 
                                 weapon.setForceFireOneFrame(isFiring);
 
-                                float angle = ConversionUtils.byteToFloat(facing, 360f);
+                                float ratio; // maps 0.0 .. 1.0
+                                boolean usePreciseFormat = (states & 0b00100000) != 0;
+                                if (usePreciseFormat) {
+                                    byte p0 = iterator.next();
+                                    byte p1 = iterator.next();
+                                    int d = ((p0 & 0xFF) << 8) | (p1 & 0xFF);
+                                    ratio = d / 65535f;
+                                } else {
+                                    byte b = iterator.next();
+                                    ratio = (b & 0xFF) / 255f;
+                                }
+
+//                                float angle = ConversionUtils.byteToFloat(facing, 360f);
+
+                                float arcLength = weapon.getArc();
+                                float arcFacing = weapon.getArcFacing(); // absolute 360 angle
+
+                                ratio = (ratio * 2f) - 1.0f; // maps -1.0 .. 1.0
+                                float delta = ratio * arcLength * 0.5f;
+
+                                float angle = arcFacing + ship.getFacing() - delta;
+
                                 weapon.setCurrAngle(angle);
                             }
                         }
