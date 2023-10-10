@@ -4,7 +4,7 @@ import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
-import data.scripts.net.data.packables.entities.ships.PlayerControlData;
+import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.collections.SyncingListRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
@@ -69,10 +69,10 @@ public class LobbyData extends EntityData {
                         out.add((byte) ((id >>> 8) & 0xFF));
                         out.add((byte) (id & 0xFF));
 
-                        for (PlayerControlData playerControlData : playerShips.getClientPlayerData().values()) {
-                            out.add((byte) (playerControlData.getInstanceID())); // hack where instance id is player id
+                        for (ClientPlayerData clientPlayerData : playerShips.getControlData().values()) {
+                            out.add((byte) (clientPlayerData.getInstanceID())); // hack where instance id is player id
 
-                            id = playerControlData.getPlayerShipID();
+                            id = clientPlayerData.getPlayerShipID();
                             out.add((byte) ((id >>> 8) & 0xFF));
                             out.add((byte) (id & 0xFF));
                         }

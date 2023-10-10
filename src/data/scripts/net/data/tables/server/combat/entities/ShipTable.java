@@ -100,7 +100,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         Set<ShipAPI> diff = new HashSet<>(registered.keySet());
 
         for (ShipAPI ship : engine.getShips()) {
-            if (ship.isFighter()) continue;
+            if (ship.isFighter() || ship.isPiece() || ship.isHulk()) continue;
 
             if (registered.containsKey(ship)) {
                 diff.remove(ship);
@@ -124,7 +124,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         }
     }
 
-    private void createEntry(ShipAPI ship) {
+    public short createEntry(ShipAPI ship) {
         short id = (short) getVacant();
 
         registered.put(ship, id);
@@ -137,6 +137,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         }
 
         weapons.registered.put(id, new WeaponData(id, ship, shipData.getSlotIDs(), shipData.getWeaponSlots()));
+
+        return id;
     }
 
     private void deleteEntry(ShipAPI ship) {

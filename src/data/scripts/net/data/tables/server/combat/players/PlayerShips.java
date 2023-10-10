@@ -5,8 +5,8 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
+import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.entities.ships.PlayerControlData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -27,7 +27,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
     }
 
     // map client connection id to data object
-    private final Map<Short, PlayerControlData> clientPlayerData = new HashMap<>();
+    private final Map<Short, ClientPlayerData> controlData = new HashMap<>();
     private final Map<Short, ServerPlayerData> serverPlayerData = new HashMap<>();
 
     private final ShipTable shipTable;
@@ -51,13 +51,13 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             }
         }
 
-        for (short id : clientPlayerData.keySet()) {
-            PlayerControlData c = clientPlayerData.get(id);
+        for (short id : controlData.keySet()) {
+            ClientPlayerData c = controlData.get(id);
             c.update(amount, this, plugin);
         }
 
-        for (short id : clientPlayerData.keySet()) {
-            PlayerControlData c = clientPlayerData.get(id);
+        for (short id : controlData.keySet()) {
+            ClientPlayerData c = controlData.get(id);
             short requested = c.getRequestedShipID();
 
             if (requested != -1) { // remote client is submitting an id to switch to
@@ -76,10 +76,10 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         }
     }
 
-    public void transferControl(ShipAPI dest, boolean host, PlayerControlData playerData) {
+    public void transferControl(ShipAPI dest, boolean host, ClientPlayerData playerData) {
         Short destID = shipTable.getRegistered().get(dest);
         if (destID == null) {
-            return;
+            destID = shipTable.createEntry(dest);
         }
 
         CombatEngineAPI engine = Global.getCombatEngine();
@@ -95,32 +95,33 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             }
         } else {
             if (destID == hostActiveShipID) {
-
+                // do nothing
             } else {
                 playerData.transferPlayerShip(dest);
                 serverPlayerData.get(playerData.getInstanceID()).setActiveID(destID);
+                playerData.setRequestedShipID(destID);
             }
         }
     }
 
     @Override
     public void register() {
-        DataGenManager.registerInboundEntityManager(PlayerControlData.TYPE_ID, this);
+        DataGenManager.registerInboundEntityManager(ClientPlayerData.TYPE_ID, this);
         DataGenManager.registerOutboundEntityManager(ServerPlayerData.TYPE_ID, this);
     }
 
-    public Map<Short, PlayerControlData> getClientPlayerData() {
-        return clientPlayerData;
+    public Map<Short, ClientPlayerData> getControlData() {
+        return controlData;
     }
 
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
-        PlayerControlData data = clientPlayerData.get(instanceID);
+        ClientPlayerData data = controlData.get(instanceID);
 
         if (data == null) {
-            data = new PlayerControlData(instanceID, null);
+            data = new ClientPlayerData(instanceID, null);
 
-            clientPlayerData.put(instanceID, data);
+            controlData.put(instanceID, data);
             ServerPlayerData s = new ServerPlayerData(instanceID);
             serverPlayerData.put(instanceID, s);
             s.destExecute(new HashMap<Byte, Object>(), tick);
@@ -135,12 +136,12 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
-        PlayerControlData data = clientPlayerData.get(instanceID);
+        ClientPlayerData data = controlData.get(instanceID);
 
         if (data != null) {
             data.delete();
 
-            clientPlayerData.remove(instanceID);
+            controlData.remove(instanceID);
         }
     }
 
@@ -172,5 +173,13 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
     public Short getHostShipID() {
         return hostActiveShipID;
+    }
+
+    public Map<Short, ServerPlayerData> getServerPlayerData() {
+        return serverPlayerData;
+    }
+
+    public ShipTable getShipTable() {
+        return shipTable;
     }
 }

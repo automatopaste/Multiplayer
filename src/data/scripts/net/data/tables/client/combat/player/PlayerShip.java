@@ -1,11 +1,12 @@
 package data.scripts.net.data.tables.client.combat.player;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.packables.entities.ships.PlayerControlData;
+import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -18,16 +19,18 @@ import java.util.Set;
 
 public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
-    private final PlayerControlData playerControlData;
+    private final ClientPlayerData clientPlayerData;
     private final ServerPlayerData serverPlayerData;
-    private short prevActiveID;
     private final ClientShipTable clientShipTable;
     private final short instanceID;
+
+    private boolean requestingTransfer = false;
+    private short requestedID = -1;
 
     public PlayerShip(short instanceID, ClientShipTable clientShipTable) {
         this.instanceID = instanceID;
 
-        playerControlData = new PlayerControlData(instanceID, this);
+        clientPlayerData = new ClientPlayerData(instanceID, this);
         serverPlayerData = new ServerPlayerData(instanceID);
 
         this.clientShipTable = clientShipTable;
@@ -35,38 +38,57 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     @Override
     public void update(float amount, MPPlugin plugin) {
-        playerControlData.update(amount, this, plugin);
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        clientPlayerData.update(amount, this, plugin);
         serverPlayerData.update(amount, this, plugin);
 
-        if (serverPlayerData.getActiveID() != prevActiveID) {
-            ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
+        if (requestingTransfer) {
+            if (serverPlayerData.getActiveID() == requestedID) {
+                requestingTransfer = false;
+                requestedID = -1;
 
+                ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
+                if (data != null) {
+                    engine.setPlayerShipExternal(data.getShip());
+                }
+
+                clientPlayerData.setRequestedShipID((short)-1);
+            }
+        }
+
+        Short id = clientShipTable.getShipIDs().get(engine.getPlayerShip());
+        boolean update = engine.getPlayerShip() == null || (id != null && id != serverPlayerData.getActiveID());
+
+        if (update && serverPlayerData.getActiveID() != -1) {
+            ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
             if (data != null) {
                 Global.getCombatEngine().setPlayerShipExternal(data.getShip());
             }
         }
-
-        prevActiveID = serverPlayerData.getActiveID();
     }
 
     public void requestTransfer(ShipAPI dest) {
         Short id = clientShipTable.getShipIDs().get(dest);
         if (id != null) {
-            playerControlData.setRequestedShipID(id);
+            clientPlayerData.setRequestedShipID(id);
+
+            requestingTransfer = true;
+            requestedID = id;
         }
     }
 
     @Override
     public void register() {
         DataGenManager.registerInboundEntityManager(ServerPlayerData.TYPE_ID, this);
-        DataGenManager.registerOutboundEntityManager(PlayerControlData.TYPE_ID, this);
+        DataGenManager.registerOutboundEntityManager(ClientPlayerData.TYPE_ID, this);
     }
 
     @Override
     public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
         Map<Short, InstanceData> out = new HashMap<>();
 
-        InstanceData instanceData = playerControlData.sourceExecute(amount);
+        InstanceData instanceData = clientPlayerData.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
             out.put(instanceID, instanceData);
         }
@@ -95,7 +117,11 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     public ShipAPI getHostShip() {
         if (serverPlayerData.getHostID() == -1) return null;
-        return clientShipTable.getShips().get(serverPlayerData.getHostID()).getShip();
+        ShipData shipData = clientShipTable.getShips().get(serverPlayerData.getHostID());
+        if (shipData != null) {
+            return shipData.getShip();
+        }
+        return null;
     }
 
     @Override

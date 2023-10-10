@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Sends player ship commands to the server
  */
-public class PlayerControlData extends EntityData {
+public class ClientPlayerData extends EntityData {
 
     public static byte TYPE_ID;
 
@@ -83,7 +83,7 @@ public class PlayerControlData extends EntityData {
      *
      * @param instanceID unique
      */
-    public PlayerControlData(short instanceID, final PlayerShip playerShip) {
+    public ClientPlayerData(short instanceID, final PlayerShip playerShip) {
         super(instanceID);
 
         addRecord(new RecordLambda<>(
@@ -97,8 +97,8 @@ public class PlayerControlData extends EntityData {
                 new DestExecute<Integer>() {
                     @Override
                     public void execute(Integer value, EntityData packable) {
-                        PlayerControlData playerControlData = (PlayerControlData) packable;
-                        playerControlData.setControlBitmask(value);
+                        ClientPlayerData clientPlayerData = (ClientPlayerData) packable;
+                        clientPlayerData.setControlBitmask(value);
                     }
                 }
         ));
@@ -185,8 +185,8 @@ public class PlayerControlData extends EntityData {
                     public void execute(Byte value, EntityData packable) {
                         if (value == 0) return;
 
-                        PlayerControlData playerControlData = (PlayerControlData) packable;
-                        playerControlData.activeGroup = value;
+                        ClientPlayerData clientPlayerData = (ClientPlayerData) packable;
+                        clientPlayerData.activeGroup = value;
                     }
                 }
         ));
@@ -433,9 +433,9 @@ public class PlayerControlData extends EntityData {
     }
 
     public abstract static class ShipControlOverride {
-        public final PlayerControlData data;
+        public final ClientPlayerData data;
 
-        public ShipControlOverride(PlayerControlData data) {
+        public ShipControlOverride(ClientPlayerData data) {
             this.data = data;
         }
 

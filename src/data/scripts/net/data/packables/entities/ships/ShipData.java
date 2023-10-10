@@ -294,7 +294,7 @@ public class ShipData extends EntityData {
                         ShipAPI ship = shipData.getShip();
                         if (ship != null) {
                             if (playerShips != null) {
-                                for (PlayerControlData d : playerShips.getClientPlayerData().values()) {
+                                for (ClientPlayerData d : playerShips.getControlData().values()) {
                                     if (d.getShip().equals(ship)) {
                                         ship.getMouseTarget().set(d.getMouseTarget());
                                         return;

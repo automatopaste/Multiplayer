@@ -42,7 +42,7 @@ public class MPModPlugin extends BaseModPlugin {
         ClientConnectionData.TYPE_ID = DataGenManager.registerEntityType(ClientConnectionData.class);
         ClientData.TYPE_ID = DataGenManager.registerEntityType(ClientData.class);
         LobbyData.TYPE_ID = DataGenManager.registerEntityType(LobbyData.class);
-        PlayerControlData.TYPE_ID = DataGenManager.registerEntityType(PlayerControlData.class);
+        ClientPlayerData.TYPE_ID = DataGenManager.registerEntityType(ClientPlayerData.class);
         ServerPlayerData.TYPE_ID = DataGenManager.registerEntityType(ServerPlayerData.class);
         ServerConnectionData.TYPE_ID = DataGenManager.registerEntityType(ServerConnectionData.class);
 
