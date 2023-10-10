@@ -51,6 +51,8 @@ public class MPClientPlugin extends MPPlugin {
 //    private DebugGraphContainer dataGraph2;
 
     public MPClientPlugin(String host, int port) {
+        Console.showMessage("initialising client");
+
         this.host = host;
         this.port = port;
 

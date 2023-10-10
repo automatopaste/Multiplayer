@@ -843,19 +843,6 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-//        String[] address = ids[0].split(":");
-//        String host = address[0];
-//        if (address.length < 2) {
-//            infoText.setExecute(new Execute<String>() {
-//                @Override
-//                public String get() {
-//                    return "PORT NOT SPECIFIED";
-//                }
-//            });
-//            infoText.setColor(Color.RED);
-//            return;
-//        }
-
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
             data.put("ip", hostname);
             data.put("port", port);
