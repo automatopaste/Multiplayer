@@ -2,13 +2,12 @@ package data.scripts.net.data.packables.entities.projectiles;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.combat.entities.Missile;
+import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.packables.DestExecute;
 import data.scripts.net.data.packables.EntityData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -186,8 +185,7 @@ public class MissileData extends EntityData {
                     @Override
                     public Byte get() {
                         byte b = 0x00;
-                        Missile m = (Missile) missile;
-                        ShipEngineControllerAPI controller = m.getEngineController();
+                        ShipEngineControllerAPI controller = missile.getEngineController();
                         if (controller.isAccelerating()) b |= 0b10000000;
                         if (controller.isAcceleratingBackwards()) b |= 0b01000000;
                         if (controller.isDecelerating()) b |= 0b00100000;

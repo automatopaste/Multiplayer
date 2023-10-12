@@ -831,17 +831,17 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        String[] ids = hostname.split("\\.");
-        if (ids.length != 4) {
-            infoText.setExecute(new Execute<String>() {
-                @Override
-                public String get() {
-                    return "INVALID ADDRESS";
-                }
-            });
-            infoText.setColor(Color.RED);
-            return;
-        }
+//        String[] ids = hostname.split("\\.");
+//        if (ids.length != 4) {
+//            infoText.setExecute(new Execute<String>() {
+//                @Override
+//                public String get() {
+//                    return "INVALID ADDRESS";
+//                }
+//            });
+//            infoText.setColor(Color.RED);
+//            return;
+//        }
 
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
             data.put("ip", hostname);
