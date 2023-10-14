@@ -40,6 +40,7 @@ public class WeaponData extends EntityData {
             weaponDisableStates.put(b, false);
         }
 
+        // todo : heavily optimise this
         addRecord(new RecordLambda<>(
                 new ListenArrayRecord<>(new ArrayList<Byte>(), ByteRecord.TYPE_ID).setDebugText("weapon slot id status"),
                 new SourceExecute<List<Byte>>() {
@@ -63,9 +64,11 @@ public class WeaponData extends EntityData {
                             boolean prevFiring = weaponFireStates.get(slotID);
                             boolean firing = weapon.isFiring();
 
-                            if (firing != prevFiring && !firing) {
+                            if (firing != prevFiring && firing) {
                                 states |= 0b01000000;
                             }
+
+                            weaponFireStates.put(slotID, firing);
 
                             boolean usePreciseFormat = weapon.isBeam();
 

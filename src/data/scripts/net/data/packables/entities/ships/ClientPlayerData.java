@@ -43,9 +43,6 @@ public class ClientPlayerData extends EntityData {
 
     private final Vector2f mouseTarget = new Vector2f(0f, 0f);
 
-    private boolean shieldEnable = false;
-    private boolean prevShields = false;
-    private boolean fighterEnable = false;
     private boolean prevFighters = false;
     private byte activeGroup = 0;
 
@@ -54,6 +51,9 @@ public class ClientPlayerData extends EntityData {
     private boolean prevSelectedGroupAutofire = false;
 
     private final float[] autofireToggleCooldowns = new float[7];
+    private float shieldToggleCooldown = 0f;
+    private float fighterToggleCooldown = 0f;
+    private float holdFireToggleCooldown = 0;
 
     // make use of the CMUtils pd controller functionality to imitate the point-at-cursor pilot mode
     private final DroneAIUtils.PDControl control = new DroneAIUtils.PDControl() {
@@ -229,18 +229,7 @@ public class ClientPlayerData extends EntityData {
                 }
 
             }
-
-            if (ship.getShield() != null) {
-                if (Mouse.isButtonDown(1) && !prevShields) {
-                    shieldEnable = !ship.getShield().isOn();
-                    prevShields = true;
-                }
-            }
         }
-
-        boolean fighterCheck = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_PULL_BACK_FIGHTERS")));
-        if (fighterCheck && !prevFighters) fighterEnable = !fighterEnable;
-        prevFighters = fighterCheck;
     }
 
     public void transferPlayerShip(ShipAPI dest) {
@@ -329,16 +318,14 @@ public class ClientPlayerData extends EntityData {
         controls[7] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_STRAFE_RIGHT_NOTURN")));
         controls[8] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_USE_SYSTEM")));
 
-//        controls[9] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_SHIELDS")));
+        controls[9] = Mouse.isButtonDown(1); // shield toggle
 
-        controls[9] = shieldEnable;
-
-        controls[10] = Mouse.isButtonDown(0);
+        controls[10] = Mouse.isButtonDown(0); // shoot gun pew
 
         controls[11] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_VENT_FLUX")));
         controls[12] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_HOLD_FIRE")));
 
-        controls[13] = fighterEnable;
+        controls[13] = Keyboard.isKeyDown(Keyboard.getKeyIndex(Global.getSettings().getControlStringForEnumName("SHIP_PULL_BACK_FIGHTERS")));
 
         final int numGroups = 7;
         final int controls0 = 14;
@@ -389,16 +376,11 @@ public class ClientPlayerData extends EntityData {
         }
 
         if (controls[8]) ship.giveCommand(ShipCommand.USE_SYSTEM, null, 0);
-        if (ship.getShield() != null) {
-            if (controls[9]) {
-                if (ship.getShield().isOff()) {
-                    ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
-                }
-            } else {
-                if (ship.getShield().isOn()) {
-                    ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
-                }
-            }
+
+        shieldToggleCooldown -= amount;
+        if (shieldToggleCooldown <= 0f && ship.getShield() != null && controls[9]) {
+            ship.giveCommand(ShipCommand.TOGGLE_SHIELD_OR_PHASE_CLOAK, null, 0);
+            shieldToggleCooldown = 0.2f;
         }
 
         int selected = 0;
@@ -412,15 +394,17 @@ public class ClientPlayerData extends EntityData {
 
         if (controls[10]) ship.giveCommand(ShipCommand.FIRE, ship.getMouseTarget(), selected);
         if (controls[11]) ship.giveCommand(ShipCommand.VENT_FLUX, null, 0);
-        if (controls[12]) ship.giveCommand(ShipCommand.HOLD_FIRE, null, 0);
-        if (controls[13]) {
-            if (ship.isPullBackFighters()) {
-                ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
-            }
-        } else {
-            if (!ship.isPullBackFighters()) {
-                ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
-            }
+
+        fighterToggleCooldown -= amount;
+        if (fighterToggleCooldown <= 0f && controls[13]) {
+            ship.giveCommand(ShipCommand.PULL_BACK_FIGHTERS, null, 0);
+            fighterToggleCooldown = 0.2f;
+        }
+
+        holdFireToggleCooldown -= amount;
+        if (holdFireToggleCooldown <= 0f && controls[12]) {
+            ship.giveCommand(ShipCommand.HOLD_FIRE, null, 0);
+            holdFireToggleCooldown = 0.2f;
         }
     }
 
