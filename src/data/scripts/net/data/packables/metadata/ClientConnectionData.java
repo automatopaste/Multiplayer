@@ -6,7 +6,7 @@ import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.SourceExecute;
 import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.IntRecord;
-import data.scripts.net.data.records.StringRecord;
+import data.scripts.net.data.records.ShortRecord;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
@@ -28,7 +28,7 @@ public class ClientConnectionData extends EntityData {
     private long timestamp;
     private long latency;
 
-    private final Set<String> requested = new HashSet<>();
+    private final Set<Short> requested = new HashSet<>();
 
     private BaseConnectionWrapper.ConnectionState state = BaseConnectionWrapper.ConnectionState.INITIALISATION_READY;
 
@@ -119,18 +119,18 @@ public class ClientConnectionData extends EntityData {
                 }
         ));
         addRecord(new RecordLambda<>(
-                new ListenArrayRecord<>(new ArrayList<String>(), StringRecord.TYPE_ID),
-                new SourceExecute<List<String>>() {
+                new ListenArrayRecord<>(new ArrayList<Short>(), ShortRecord.TYPE_ID),
+                new SourceExecute<List<Short>>() {
                     @Override
-                    public List<String> get() {
-                        List<String> out = new ArrayList<>(requested);
+                    public List<Short> get() {
+                        List<Short> out = new ArrayList<>(requested);
                         requested.clear();
                         return out;
                     }
                 },
-                new DestExecute<List<String>>() {
+                new DestExecute<List<Short>>() {
                     @Override
-                    public void execute(List<String> value, EntityData packable) {
+                    public void execute(List<Short> value, EntityData packable) {
                         requested.addAll(value);
                     }
                 }
@@ -193,12 +193,12 @@ public class ClientConnectionData extends EntityData {
         return latency;
     }
 
-    public void addRequested(String fleetmemberID) {
+    public void addRequested(short fleetmemberID) {
         requested.add(fleetmemberID);
     }
 
-    public Set<String> getRequested() {
-        Set<String> out = new HashSet<>(requested);
+    public Set<Short> getRequested() {
+        Set<Short> out = new HashSet<>(requested);
         requested.clear();
         return out;
     }

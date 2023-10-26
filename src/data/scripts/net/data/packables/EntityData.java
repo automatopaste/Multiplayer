@@ -16,10 +16,14 @@ import java.util.Map;
  */
 public abstract class EntityData {
 
-    protected final short instanceID;
+    protected short instanceID;
     protected final List<RecordLambda<?>> records;
     protected final List<InterpRecordLambda<?>> interpolate;
     private boolean flush = true;
+
+    public EntityData() {
+        this((short) -1);
+    }
 
     public EntityData(short instanceID) {
         this.instanceID = instanceID;
@@ -112,5 +116,9 @@ public abstract class EntityData {
      */
     public void flush() {
         flush = true;
+    }
+
+    public void setInstanceID(short instanceID) {
+        this.instanceID = instanceID;
     }
 }

@@ -45,8 +45,7 @@ public class ShipData extends EntityData {
 
     private short engineControllerBitmask = 0x0000;
 
-    public ShipData(short instanceID, final ShipAPI ship, final PlayerShips playerShips) {
-        super(instanceID);
+    public ShipData(final ShipAPI ship, final PlayerShips playerShips) {
         this.ship = ship;
 
         slotIDs = new MapSet<>();
@@ -449,7 +448,7 @@ public class ShipData extends EntityData {
         VariantData variantData = clientPlugin.getVariantDataMap().find(fleetMemberID);
         if (variantData == null) {
             // variant data missing, request download
-            ((MPClientPlugin) plugin).getConnection().queueVariantDownloadForID(fleetMemberID);
+            ((MPClientPlugin) plugin).getConnection().queueVariantDownloadForID(instanceID);
 
             return;
         }

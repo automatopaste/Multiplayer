@@ -5,11 +5,11 @@ import com.fs.starfarer.api.Global;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.datagen.ShipVariantDatastore;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
-import data.scripts.net.data.datagen.ShipVariantDatastore;
 import data.scripts.net.data.tables.server.combat.entities.ProjectileTable;
 import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.plugins.MPPlugin;
@@ -47,6 +47,8 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
 
         OutboundData outbound = connectionManager.getDuplex().getOutboundSocket(connectionID);
 
+        ShipTable shipTable = (ShipTable) connectionManager.getServerPlugin().getEntityManagers().get(ShipTable.class);
+
         switch (connectionState) {
             //case INITIALISATION_READY:
             case INITIALISING:
@@ -73,7 +75,6 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
             case SPAWNING:
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning entities on client...");
 
-                ShipTable shipTable = (ShipTable) connectionManager.getServerPlugin().getEntityManagers().get(ShipTable.class);
                 Map<Short, InstanceData> ships = shipTable.getShipsRegistered();
                 outbound.out.put(ShipData.TYPE_ID, ships);
 
@@ -86,7 +87,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
             //case SIMULATION_READY:
             case SIMULATING:
-                Set<String> requested = receive.getRequested();
+                Set<Short> requested = receive.getRequested();
 
                 if (!requested.isEmpty()) {
                     Map<Short, InstanceData> v = new HashMap<>();
@@ -94,13 +95,22 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                     ShipVariantDatastore datastore = connectionManager.getServerPlugin().getVariantStore();
                     datastore.checkVariantUpdate();
 
-                    for (String id : requested) {
-                        VariantData variantData = datastore.getGenerated().get(id);
-                        if (variantData != null) {
-                            variantData.flush();
-                            v.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
+                    for (short id : requested) {
+                        ShipData data = shipTable.getShipTable().array()[id];
+                        if (data != null) {
+                            String fleetmemberID = data.getShip().getFleetMemberId();
+                            VariantData variantData = datastore.getGenerated().get(fleetmemberID);
+
+                            if (variantData != null) {
+                                variantData.flush();
+                                v.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
+                            } else {
+                                Global.getLogger(ServerConnectionWrapper.class).error("Unable to find variant for requested fleetmember id " + id);
+                            }
+
+                            data.flush();
                         } else {
-                            Global.getLogger(ServerConnectionWrapper.class).error("Unable to find variant for requested fleetmember id " + id);
+                            //Global.getLogger(ServerConnectionWrapper.class).error("No registered entry at requested id " + id);
                         }
                     }
 

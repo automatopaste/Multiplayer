@@ -207,7 +207,7 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         return connectionID;
     }
 
-    public void queueVariantDownloadForID(String fleetmemberID) {
-        send.addRequested(fleetmemberID);
+    public void queueVariantDownloadForID(short instanceID) {
+        send.addRequested(instanceID);
     }
 }

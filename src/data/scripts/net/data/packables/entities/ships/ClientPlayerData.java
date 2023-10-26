@@ -243,7 +243,9 @@ public class ClientPlayerData extends EntityData {
     }
 
     private void check(ShipTable shipTable) {
-        for (ShipData data : shipTable.getTable()) {
+        for (int i = 0; i < shipTable.getShipTable().limit; i++) {
+            ShipData data = shipTable.getShipTable().array()[i];
+
             if (data != null && data.getShip() != null) {
                 ShipAPI ship = data.getShip();
 

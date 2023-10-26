@@ -11,6 +11,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
+import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
 import data.scripts.net.data.tables.server.combat.entities.ShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
@@ -24,6 +25,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -597,7 +599,26 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             @Override
             public void make(GridPanel gridPanel) {
                 final CombatEngineAPI engine = Global.getCombatEngine();
-                final List<ShipAPI> ships = engine.getShips();
+
+                List<ShipAPI> ships = new ArrayList<>();
+
+                if (plugin == null) {
+                    return;
+                } else if (plugin.getType() == MPPlugin.PluginType.SERVER) {
+                    ShipTable shipTable = (ShipTable) plugin.getEntityManagers().get(ShipTable.class);
+                    for (ShipData data : shipTable.getShipTable().array()) {
+                        if (data == null || data.getShip() == null) continue;
+
+                        ships.add(data.getShip());
+                    }
+                } else if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
+                    ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
+                    for (ShipData data : clientShipTable.getShipTable().array()) {
+                        if (data == null || data.getShip() == null) continue;
+
+                        ships.add(data.getShip());
+                    }
+                }
 
                 final int x = 5, y = 4, max = x * y;
                 int xi = 0, yi = 0;
@@ -692,7 +713,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                         }
 
                                         for (short id : client.getLobbyInput().getPilotedShipIDs().values()) {
-                                            ShipData shipData = client.getShipTable().getShips().get(id);
+                                            ShipData shipData = client.getShipTable().getShipTable().array()[id];
 
                                             if (shipData == null) {
                                                 buttonTextParams.color = Color.GRAY;
@@ -827,36 +848,42 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     return "CLIENT STARTED";
                 }
             });
+
+            saveAddress(hostname, 8080);
+
             MPModPlugin.setPlugin(new MPClientPlugin("localhost", 0));
-            return;
+        } else {
+            String[] ids = hostname.split("\\.");
+            if (ids.length != 4) {
+                infoText.setExecute(new Execute<String>() {
+                    @Override
+                    public String get() {
+                        return "INVALID ADDRESS";
+                    }
+                });
+                infoText.setColor(Color.RED);
+                return;
+            }
+
+            saveAddress(hostname, 8080);
+
+            infoText.setExecute(new Execute<String>() {
+                @Override
+                public String get() {
+                    return "CLIENT STARTED";
+                }
+            });
+            infoText.setColor(Color.GREEN);
+            MPModPlugin.setPlugin(new MPClientPlugin(hostname, port));
         }
+    }
 
-//        String[] ids = hostname.split("\\.");
-//        if (ids.length != 4) {
-//            infoText.setExecute(new Execute<String>() {
-//                @Override
-//                public String get() {
-//                    return "INVALID ADDRESS";
-//                }
-//            });
-//            infoText.setColor(Color.RED);
-//            return;
-//        }
-
+    private void saveAddress(String hostname, int port) {
         try (JSONUtils.CommonDataJSONObject data = JSONUtils.loadCommonJSON("mp_cache")) {
             data.put("ip", hostname);
             data.put("port", port);
             data.save();
         } catch (Exception ignored) {
         }
-
-        infoText.setExecute(new Execute<String>() {
-            @Override
-            public String get() {
-                return "CLIENT STARTED";
-            }
-        });
-        infoText.setColor(Color.GREEN);
-        MPModPlugin.setPlugin(new MPClientPlugin(hostname, port));
     }
 }

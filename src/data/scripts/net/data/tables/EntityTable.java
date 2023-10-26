@@ -5,32 +5,51 @@ import data.scripts.net.data.packables.EntityData;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * No real difference in speed vs using hashmaps, doesnt solve any problems and probably should be removed
- */
-public abstract class EntityTable<T extends EntityData> {
-    protected final T[] table;
+public class EntityTable<T extends EntityData> {
+    private final T[] table;
+    public short limit = 0; // highest number of elements
+
     private final Queue<Short> vacant;
 
     public EntityTable(T[] array) {
         table = array;
         vacant = new LinkedList<>();
-        for (short i = 0; i < array.length; i++) {
-            vacant.add(i);
+    }
+
+    public short add(T t) {
+        short id;
+
+        if (vacant.isEmpty()) {
+            id = limit;
+            limit++;
+        } else {
+            id = vacant.poll();
         }
+
+        if (id < 0 || id > table.length - 1) {
+            throw new NullPointerException("No vacant entity index found");
+        }
+
+        table[id] = t;
+
+        return id;
     }
 
-    protected void markVacant(short i) {
-        vacant.add(i);
+    public void remove(short id) {
+        vacant.add(id);
+        table[id] = null;
     }
 
-    protected int getVacant() {
-        Short i = vacant.poll();
-        if (i == null) throw new NullPointerException("No vacant entity index found");
-        return i;
+    public void set(short id, T t) {
+        limit = (short) Math.max(id + 1, limit);
+        table[id] = t;
     }
 
-    public T[] getTable() {
+    public long hash() {
+        return 0;
+    }
+
+    public T[] array() {
         return table;
     }
 }

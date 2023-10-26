@@ -61,7 +61,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
             short requested = c.getRequestedShipID();
 
             if (requested != -1) { // remote client is submitting an id to switch to
-                ShipData shipData = shipTable.getTable()[requested];
+                ShipData shipData = shipTable.getShipTable().array()[requested];
 
                 if (shipData != null) {
                     ShipAPI dest = shipData.getShip();

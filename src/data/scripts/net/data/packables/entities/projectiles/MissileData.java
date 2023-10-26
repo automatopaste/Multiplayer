@@ -75,7 +75,7 @@ public class MissileData extends EntityData {
                     public Byte get() {
                         try {
                             short id = shipTable.getRegistered().get(missile.getWeapon().getShip());
-                            ShipData data = shipTable.getTable()[id];
+                            ShipData data = shipTable.getShipTable().array()[id];
                             Byte b = data.getWeaponSlots().getB(missile.getWeapon());
                             if (b == null) return -1;
                             else return b;
@@ -233,7 +233,7 @@ public class MissileData extends EntityData {
     public void init(MPPlugin plugin, InboundEntityManager manager) {
         if (shipID != -1) {
             ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
-            ShipData shipData = clientShipTable.getShips().get(shipID);
+            ShipData shipData = clientShipTable.getShipTable().array()[shipID];
 
             if (shipData != null && shipData.getShip() != null) {
                 setShip(shipData.getShip());

@@ -1,5 +1,6 @@
 package data.scripts.net.data.tables.server.combat.entities;
 
+import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
@@ -19,9 +20,11 @@ import data.scripts.plugins.MPServerPlugin;
 
 import java.util.*;
 
-public class ShipTable extends EntityTable<ShipData> implements OutboundEntityManager {
+public class ShipTable implements OutboundEntityManager {
 
     public static final int MAX_SHIPS = 500;
+
+    private final EntityTable<ShipData> shipTable;
 
     private final Map<ShipAPI, Short> registered;
     private final Set<Short> deleted;
@@ -30,8 +33,9 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     private final MPServerPlugin serverPlugin;
 
     public ShipTable(MPServerPlugin serverPlugin) {
-        super(new ShipData[MAX_SHIPS]);
         this.serverPlugin = serverPlugin;
+
+        shipTable = new EntityTable<>(new ShipData[MAX_SHIPS]);
 
         registered = new HashMap<>();
         deleted = new HashSet<>();
@@ -44,8 +48,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         Map<Short, InstanceData> out = new HashMap<>();
 
         if (typeID == ShipData.TYPE_ID) {
-            for (int i = 0; i < table.length; i++) {
-                ShipData data = table[i];
+            for (int i = 0; i < shipTable.array().length; i++) {
+                ShipData data = shipTable.array()[i];
                 if (data != null) {
                     InstanceData instanceData = data.sourceExecute(amount);
 
@@ -100,7 +104,9 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         Set<ShipAPI> diff = new HashSet<>(registered.keySet());
 
         for (ShipAPI ship : engine.getShips()) {
-            if (ship.isFighter() || ship.isPiece() || ship.isHulk()) continue;
+            if (ship.isPiece()) {
+                continue;
+            }
 
             if (registered.containsKey(ship)) {
                 diff.remove(ship);
@@ -113,7 +119,8 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
             deleteEntry(d);
         }
 
-        for (ShipData shipData : table) {
+        for (int i = 0; i < shipTable.limit; i++) {
+            ShipData shipData = shipTable.array()[i];
             if (shipData != null) shipData.update(amount, this, plugin);
         }
         for (ShieldData shieldData : shields.registered.values()) {
@@ -122,15 +129,26 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         for (WeaponData weaponData : weapons.registered.values()) {
             weaponData.update(amount, this, plugin);
         }
+
+        // debug
+        for (int i = 0; i < shipTable.limit; i++) {
+            ShipData data = shipTable.array()[i];
+            String text = "null";
+            if (data != null) {
+                text = data.getShip().getHullSpec().getHullName();
+            }
+            CMUtils.getGuiDebug().putText(ShipTable.class, "k" + i, i + ": " + text);
+        }
+
     }
 
     public short createEntry(ShipAPI ship) {
-        short id = (short) getVacant();
+        PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
+
+        ShipData shipData = new ShipData(ship, playerShips);
+        short id = shipTable.add(shipData);
 
         registered.put(ship, id);
-        PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
-        ShipData shipData = new ShipData(id, ship, playerShips);
-        table[id] = shipData;
 
         if (ship.getShield() != null) {
             shields.registered.put(id, new ShieldData(id, ship.getShield(), ship));
@@ -144,12 +162,11 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     private void deleteEntry(ShipAPI ship) {
         short index = registered.get(ship);
 
-        table[index] = null;
+        shipTable.remove(index);
 
         registered.remove(ship);
         if (ship.getShield() != null) shields.delete(index);
         weapons.delete(index);
-        markVacant(index);
 
         deleted.add(index);
     }
@@ -158,7 +175,7 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
         Map<Short, InstanceData> out = new HashMap<>();
 
         for (short id : registered.values()) {
-            ShipData shipData = table[id];
+            ShipData shipData = shipTable.array()[id];
 
             shipData.sourceExecute(0f);
 
@@ -191,5 +208,9 @@ public class ShipTable extends EntityTable<ShipData> implements OutboundEntityMa
     @Override
     public PacketType getOutboundPacketType() {
         return PacketType.DATAGRAM;
+    }
+
+    public EntityTable<ShipData> getShipTable() {
+        return shipTable;
     }
 }

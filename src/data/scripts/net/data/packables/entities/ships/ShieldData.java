@@ -111,7 +111,7 @@ public class ShieldData extends EntityData {
             if (shield == null) {
                 ClientShipTable clientShipTable = (ClientShipTable) manager;
 
-                setShield(clientShipTable.getShips().get(instanceID).getShip().getShield());
+                setShield(clientShipTable.getShipTable().array()[instanceID].getShip().getShield());
             }
         }
     }

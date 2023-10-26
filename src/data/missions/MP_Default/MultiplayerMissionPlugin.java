@@ -54,7 +54,7 @@ public class MultiplayerMissionPlugin extends BaseEveryFrameCombatPlugin {
         short hostID = playerShips.getHostShipID();
         ShipAPI host = null;
         if (hostID != BaseEntityManager.DEFAULT_HOST_INSTANCE) {
-            ShipData shipData = playerShips.getShipTable().getTable()[hostID];
+            ShipData shipData = playerShips.getShipTable().getShipTable().array()[hostID];
 
             if (shipData != null) {
                 host = shipData.getShip();

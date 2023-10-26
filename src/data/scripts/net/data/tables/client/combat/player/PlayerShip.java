@@ -1,12 +1,13 @@
 package data.scripts.net.data.tables.client.combat.player;
 
+import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
-import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
+import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
@@ -48,7 +49,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
                 requestingTransfer = false;
                 requestedID = -1;
 
-                ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
+                ShipData data = clientShipTable.getShipTable().array()[serverPlayerData.getActiveID()];
                 if (data != null) {
                     engine.setPlayerShipExternal(data.getShip());
                 }
@@ -57,12 +58,23 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
             }
         }
 
-        Short id = clientShipTable.getShipIDs().get(engine.getPlayerShip());
-        boolean update = engine.getPlayerShip() == null || (id != null && id != serverPlayerData.getActiveID());
+        boolean update = false;
+        short id = -1;
+        if (engine.getPlayerShip() != null) {
+            Short i = clientShipTable.getShipIDs().get(engine.getPlayerShip());
+            if (i != null) {
+                id = i;
+            }
+
+            update = true;
+        }
+
+        CMUtils.getGuiDebug().putText(PlayerShip.class, "SERVER ACTIVE", "SERVER ACTIVE: " + serverPlayerData.getActiveID());
+        CMUtils.getGuiDebug().putText(PlayerShip.class, "ACTUAL ACTIVE", "ACTUAL ACTIVE: " + id);
 
         if (update && serverPlayerData.getActiveID() != -1) {
-            ShipData data = clientShipTable.getShips().get(serverPlayerData.getActiveID());
-            if (data != null) {
+            ShipData data = clientShipTable.getShipTable().array()[serverPlayerData.getActiveID()];
+            if (data != null && data.getShip() != null) {
                 Global.getCombatEngine().setPlayerShipExternal(data.getShip());
             }
         }
@@ -112,12 +124,12 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
 
     public ShipAPI getActiveShip() {
         if (serverPlayerData.getActiveID() == -1) return null;
-        return clientShipTable.getShips().get(serverPlayerData.getActiveID()).getShip();
+        return clientShipTable.getShipTable().array()[serverPlayerData.getActiveID()].getShip();
     }
 
     public ShipAPI getHostShip() {
         if (serverPlayerData.getHostID() == -1) return null;
-        ShipData shipData = clientShipTable.getShips().get(serverPlayerData.getHostID());
+        ShipData shipData = clientShipTable.getShipTable().array()[serverPlayerData.getHostID()];
         if (shipData != null) {
             return shipData.getShip();
         }
