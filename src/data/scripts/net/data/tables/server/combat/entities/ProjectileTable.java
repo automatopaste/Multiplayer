@@ -91,20 +91,22 @@ public class ProjectileTable implements OutboundEntityManager {
         if (w != null) {
             weaponSpecID = datastore.getWeaponIDs().get(w);
         } else {
-            weaponSpecID = datastore.getWeaponIDs().get(projectile.getWeapon().getSpec().getWeaponId());
+            String weaponID = projectile.getWeapon().getSpec().getWeaponId();
+            Short s = datastore.getWeaponIDs().get(weaponID);
+            if (s == null) {
+                Global.getLogger(ProjectileTable.class).error("weapon id not found for damaging projectile " + weaponID);
+                return;
+            } else {
+                weaponSpecID = s;
+            }
         }
 
         if (projectile instanceof MovingRay) {
             movingRays.registered.put(id, new MovingRayData(id, (MovingRay) projectile, weaponSpecID, shipTable));
-            return;
-        }
-        if (projectile instanceof BallisticProjectile) {
+        } else if (projectile instanceof BallisticProjectile) {
             ballisticProjectiles.registered.put(id, new BallisticProjectileData(id, (BallisticProjectile) projectile, weaponSpecID, shipTable));
-            return;
-        }
-        if (projectile instanceof Missile) {
+        } else if (projectile instanceof Missile) {
             missiles.registered.put(id, new MissileData(id, (Missile) projectile, weaponSpecID, shipTable));
-            return;
         }
     }
 

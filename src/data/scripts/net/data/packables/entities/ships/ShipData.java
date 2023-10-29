@@ -16,12 +16,14 @@ import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
-import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ShipData extends EntityData {
 
@@ -36,6 +38,7 @@ public class ShipData extends EntityData {
     private ShipAPI ship;
     private String hullID;
     private String fleetMemberID;
+    boolean isFighter;
     private int owner;
     private Vector2f location = new Vector2f(0f, 0f);
     private float facing = 0f;
@@ -217,6 +220,25 @@ public class ShipData extends EntityData {
                     }
                 }
         ));
+        addRecord(new RecordLambda<>(ByteRecord.getDefault().setDebugText("flags"), new SourceExecute<Byte>() {
+            @Override
+            public Byte get() {
+                byte b = 0x00;
+                if (ship.isFighter()) {
+                    b |= 0b00000001;
+                }
+                return b;
+            }
+        }, new DestExecute<Byte>() {
+            @Override
+            public void execute(Byte value, EntityData packable) {
+                ShipData shipData = (ShipData) packable;
+
+                boolean isFighter = (value & 0b00000001) != 0x00;
+
+                shipData.setFighter(isFighter);
+            }
+        }));
         addRecord(new RecordLambda<>(
                 ShortRecord.getDefault().setDebugText("flux vent, overload, engine boost flags"),
                 new SourceExecute<Short>() {
@@ -440,82 +462,74 @@ public class ShipData extends EntityData {
     public void init(MPPlugin plugin, InboundEntityManager manager) {
         if (plugin.getType() != MPPlugin.PluginType.CLIENT) return;
         MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-
         ClientShipTable shipTable = (ClientShipTable) manager;
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        VariantData variantData = clientPlugin.getVariantDataMap().find(fleetMemberID);
-        if (variantData == null) {
-            // variant data missing, request download
-            ((MPClientPlugin) plugin).getConnection().queueVariantDownloadForID(instanceID);
-
-            return;
-        }
-
-        // update variant
         ShipHullSpecAPI hullSpec = Global.getSettings().getHullSpec(hullID);
 
         CombatFleetManagerAPI fleetManager = engine.getFleetManager(owner);
 
-        String hullVariantId = hullID + "_Hull";
-        ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
-                hullVariantId,
-                hullSpec
-        );
+        VariantData variantData;
+        if (isFighter) {
+            String hullVariantId = clientPlugin.getFighterVariantDatastore().getVariants().get(hullID);
+            ship = fleetManager.spawnShipOrWing(hullVariantId, location, facing, 0f);
 
-        int numCapacitors = variantData.getNumFluxCapacitors();
-        variant.setNumFluxCapacitors(numCapacitors);
-        int numVents = variantData.getNumFluxVents();
-        variant.setNumFluxVents(numVents);
-
-        for (String id : variantData.getHullmods()) {
-            variant.addMod(id);
-        }
-
-        slotIDs = new MapSet<>(variantData.getSlotIDs());
-        Map<Byte, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
-
-        for (String id : slotIDs.setA()) {
-            byte s = slotIDs.getA(id);
-
-            String weaponID = fittedWeaponSlots.get(s);
-            if (weaponID != null) variant.addWeapon(id, weaponID);
-        }
-
-        List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
-        for (WeaponGroupSpec spec : groupSpecs) {
-            spec.setAutofireOnByDefault(true);
-            variant.addWeaponGroup(spec);
-        }
-
-        FleetMemberType fleetMemberType = FleetMemberType.SHIP;
-        FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
-
-        fleetManager.addToReserves(fleetMember);
-
-        fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
-
-        ship = fleetManager.spawnFleetMember(fleetMember, location, facing, 0f);
-        ship.setCRAtDeployment(0.7f);
-        ship.setControlsLocked(false);
-
-        Map<String, MPDefaultAutofireAIPlugin> autofirePluginSlotIDs = shipTable.getTempAutofirePlugins().get(ship.getId());
-        Map<Integer, MPDefaultAutofireAIPlugin> autofirePluginSlots = new HashMap<>();
-
-        List<WeaponAPI> weapons = ship.getAllWeapons();
-        outer:
-        for (WeaponAPI w : weapons) {
-            for (String id : slotIDs.setA()) {
-                if (id.equals(w.getSlot().getId())) {
-                    byte i = (byte) (int) slotIDs.getA(id);
-
-                    MPDefaultAutofireAIPlugin autofireAIPlugin = autofirePluginSlotIDs.get(id);
-                    if (autofireAIPlugin != null) autofirePluginSlots.put((int) i, autofireAIPlugin);
-
-                    continue outer;
-                }
+            slotIDs = new MapSet<>();
+            Map<String, Integer> ids = VariantData.getSlotIDs(ship.getVariant());
+            for (String s : ids.keySet()) {
+                slotIDs.put(s, (byte)(int)ids.get(s));
             }
+        } else {
+            String hullVariantId = hullID + "_Hull";
+            ShipVariantAPI variant = Global.getSettings().createEmptyVariant(
+                    hullVariantId,
+                    hullSpec
+            );
+
+            variantData = clientPlugin.getVariantDataMap().find(fleetMemberID);
+            if (variantData == null) {
+                // variant data missing, request download
+                ((MPClientPlugin) plugin).getConnection().queueVariantDownloadForID(instanceID);
+
+                return;
+            }
+
+            int numCapacitors = variantData.getNumFluxCapacitors();
+            variant.setNumFluxCapacitors(numCapacitors);
+            int numVents = variantData.getNumFluxVents();
+            variant.setNumFluxVents(numVents);
+
+            for (String id : variantData.getHullmods()) {
+                variant.addMod(id);
+            }
+
+            slotIDs = new MapSet<>(variantData.getSlotIDs());
+            Map<Byte, String> fittedWeaponSlots = new HashMap<>(variantData.getWeaponSlots());
+
+            for (String id : slotIDs.setA()) {
+                byte s = slotIDs.getA(id);
+
+                String weaponID = fittedWeaponSlots.get(s);
+                if (weaponID != null) variant.addWeapon(id, weaponID);
+            }
+
+            List<WeaponGroupSpec> groupSpecs = variantData.getWeaponGroups();
+            for (WeaponGroupSpec spec : groupSpecs) {
+                spec.setAutofireOnByDefault(true);
+                variant.addWeaponGroup(spec);
+            }
+
+            FleetMemberType fleetMemberType = FleetMemberType.SHIP;
+            FleetMemberAPI fleetMember = Global.getFactory().createFleetMember(fleetMemberType, variant);
+
+            fleetManager.addToReserves(fleetMember);
+
+            fleetMember.getCrewComposition().setCrew(fleetMember.getHullSpec().getMaxCrew());
+
+            ship = fleetManager.spawnFleetMember(fleetMember, location, facing, 0f);
+            ship.setCRAtDeployment(0.7f);
+            ship.setControlsLocked(false);
         }
 
         genSlotIDs();
@@ -622,5 +636,9 @@ public class ShipData extends EntityData {
             this.y = y;
             this.v = v;
         }
+    }
+
+    public void setFighter(boolean isFighter) {
+        this.isFighter = isFighter;
     }
 }

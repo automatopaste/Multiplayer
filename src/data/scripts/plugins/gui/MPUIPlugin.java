@@ -628,6 +628,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
                 int i = 0;
                 for (final ShipAPI ship : ships) {
+                    if (ship.isFighter()) continue;
+
                     if (i > max - 1) break;
 
                     ListPanel.ListPanelParams listPanelParams = new ListPanel.ListPanelParams();

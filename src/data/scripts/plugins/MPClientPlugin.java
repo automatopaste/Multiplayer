@@ -10,6 +10,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.datagen.FighterVariantDatastore;
 import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.tables.client.combat.connection.LobbyInput;
 import data.scripts.net.data.tables.client.combat.connection.TextChatClient;
@@ -45,6 +46,7 @@ public class MPClientPlugin extends MPPlugin {
     private Player player;
 
     private ProjectileSpecDatastore projectileSpecDatastore;
+    private FighterVariantDatastore fighterVariantDatastore;
 
     //debug
     private DebugGraphContainer dataGraph;
@@ -73,6 +75,8 @@ public class MPClientPlugin extends MPPlugin {
 
         projectileSpecDatastore = new ProjectileSpecDatastore();
         initDatastore(projectileSpecDatastore);
+        fighterVariantDatastore = new FighterVariantDatastore();
+        initDatastore(fighterVariantDatastore);
 
         shipTable = new ClientShipTable();
         initEntityManager(shipTable);
@@ -157,6 +161,10 @@ public class MPClientPlugin extends MPPlugin {
 
     public VariantDataMap getVariantDataMap() {
         return variantDataMap;
+    }
+
+    public FighterVariantDatastore getFighterVariantDatastore() {
+        return fighterVariantDatastore;
     }
 
     public Player getPlayerOutput() {

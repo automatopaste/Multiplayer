@@ -1,9 +1,9 @@
 package data.scripts.net.data.tables.server.combat.entities;
 
-import cmu.CMUtils;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.packables.RecordLambda;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
@@ -13,7 +13,6 @@ import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
@@ -131,14 +130,14 @@ public class ShipTable implements OutboundEntityManager {
         }
 
         // debug
-        for (int i = 0; i < shipTable.limit; i++) {
-            ShipData data = shipTable.array()[i];
-            String text = "null";
-            if (data != null) {
-                text = data.getShip().getHullSpec().getHullName();
-            }
-            CMUtils.getGuiDebug().putText(ShipTable.class, "k" + i, i + ": " + text);
-        }
+//        for (int i = 0; i < shipTable.limit; i++) {
+//            ShipData data = shipTable.array()[i];
+//            String text = "null";
+//            if (data != null) {
+//                text = data.getShip().getHullSpec().getHullName();
+//            }
+//            CMUtils.getGuiDebug().putText(ShipTable.class, "k" + i, i + ": " + text);
+//        }
 
     }
 

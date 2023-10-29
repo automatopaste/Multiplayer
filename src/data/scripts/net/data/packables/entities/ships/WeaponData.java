@@ -1,5 +1,6 @@
 package data.scripts.net.data.packables.entities.ships;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipCommand;
 import com.fs.starfarer.api.combat.WeaponAPI;
@@ -111,22 +112,9 @@ public class WeaponData extends EntityData {
 
                                 boolean isDisabled = (states & 0b10000000) != 0x00;
                                 boolean isFiring = (states & 0b01000000) != 0x00;
-
-                                WeaponAPI weapon = weaponSlots.getA(id);
-                                if (weapon == null) {
-                                    continue;
-                                }
-
-                                if (isDisabled) {
-                                    weapon.disable();
-                                } else {
-                                    weapon.repair();
-                                }
-
-                                weapon.setForceFireOneFrame(isFiring);
+                                boolean usePreciseFormat = (states & 0b00100000) != 0;
 
                                 float ratio; // maps 0.0 .. 1.0
-                                boolean usePreciseFormat = (states & 0b00100000) != 0;
                                 if (usePreciseFormat) {
                                     byte p0 = iterator.next();
                                     byte p1 = iterator.next();
@@ -137,7 +125,19 @@ public class WeaponData extends EntityData {
                                     ratio = (b & 0xFF) / 255f;
                                 }
 
-//                                float angle = ConversionUtils.byteToFloat(facing, 360f);
+                                WeaponAPI weapon = weaponSlots.getA(id);
+                                if (weapon == null) {
+                                    Global.getLogger(WeaponData.class).error("weapon was null for id " + id);
+                                    continue;
+                                }
+
+                                if (isDisabled) {
+                                    weapon.disable();
+                                } else {
+                                    weapon.repair();
+                                }
+
+                                weapon.setForceFireOneFrame(isFiring);
 
                                 float arcLength = weapon.getArc();
                                 float arcFacing = weapon.getArcFacing(); // absolute 360 angle

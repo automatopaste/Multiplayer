@@ -1,6 +1,5 @@
 package data.scripts.net.data.tables.client.combat.entities;
 
-import cmu.CMUtils;
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.packables.entities.ships.ShieldData;
@@ -127,14 +126,14 @@ public class ClientShipTable implements InboundEntityManager {
         }
 
         // debug
-        for (int i = 0; i < shipTable.limit; i++) {
-            ShipData data = shipTable.array()[i];
-            String text = "null";
-            if (data != null && data.getShip() != null) {
-                text = data.getShip().getHullSpec().getHullName();
-            }
-            CMUtils.getGuiDebug().putText(ClientShipTable.class, "k" + i, i + ": " + text);
-        }
+//        for (int i = 0; i < shipTable.limit; i++) {
+//            ShipData data = shipTable.array()[i];
+//            String text = "null";
+//            if (data != null && data.getShip() != null) {
+//                text = data.getShip().getHullSpec().getHullName();
+//            }
+//            CMUtils.getGuiDebug().putText(ClientShipTable.class, "k" + i, i + ": " + text);
+//        }
     }
 
     @Override

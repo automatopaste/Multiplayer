@@ -1,4 +1,4 @@
-package data.missions.MP_Default;
+package data.missions.MP_FighterTest;
 
 import com.fs.starfarer.api.fleet.FleetGoal;
 import com.fs.starfarer.api.fleet.FleetMemberType;
@@ -21,8 +21,8 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         api.setFleetTagline(FleetSide.PLAYER, "Us");
         api.setFleetTagline(FleetSide.ENEMY, "Them");
 
-        api.addToFleet(FleetSide.PLAYER, "hyperion_Attack", FleetMemberType.SHIP, true);
-        api.addToFleet(FleetSide.ENEMY, "hyperion_Attack", FleetMemberType.SHIP, true);
+        api.addToFleet(FleetSide.PLAYER, "condor_Attack", FleetMemberType.SHIP, true);
+        api.addToFleet(FleetSide.ENEMY, "condor_Attack", FleetMemberType.SHIP, false);
 
         // Set up the map.
         float width = 15000f;
@@ -45,7 +45,5 @@ public class MissionDefinition implements MissionDefinitionPlugin {
         api.addObjective(minX + width * 0.75f, minY + height * 0.45f, "nav_buoy");
         api.addObjective(minX + width * 0.65f, minY + height * 0.35f, "comm_relay");
         api.addObjective(minX + width * 0.5f, minY + height * 0.25f, "sensor_array");
-
-        api.addPlugin(new MultiplayerMissionPlugin());
     }
 }

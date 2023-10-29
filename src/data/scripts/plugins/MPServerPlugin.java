@@ -9,6 +9,7 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.net.data.DataGenManager;
 import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
+import data.scripts.net.data.datagen.FighterVariantDatastore;
 import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.datagen.ShipVariantDatastore;
 import data.scripts.net.data.tables.server.combat.connection.TextChatHost;
@@ -38,6 +39,7 @@ public class MPServerPlugin extends MPPlugin {
 
     private final ShipVariantDatastore variantDatastore;
     private final ProjectileSpecDatastore projectileSpecDatastore;
+    private final FighterVariantDatastore fighterVariantDatastore;
 
     private final TextChatHost textChatHost;
 
@@ -49,9 +51,10 @@ public class MPServerPlugin extends MPPlugin {
 
         variantDatastore = new ShipVariantDatastore();
         initDatastore(variantDatastore);
-
         projectileSpecDatastore = new ProjectileSpecDatastore();
         initDatastore(projectileSpecDatastore);
+        fighterVariantDatastore = new FighterVariantDatastore();
+        initDatastore(fighterVariantDatastore);
 
         serverConnectionManager = new ServerConnectionManager(this, port);
 
@@ -123,6 +126,10 @@ public class MPServerPlugin extends MPPlugin {
 
     public ShipVariantDatastore getVariantStore() {
         return variantDatastore;
+    }
+
+    public FighterVariantDatastore getFighterVariantDatastore() {
+        return fighterVariantDatastore;
     }
 
     @Override

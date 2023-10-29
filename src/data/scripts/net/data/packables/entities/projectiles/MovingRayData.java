@@ -113,7 +113,7 @@ public class MovingRayData extends EntityData {
                         }
                     }
                 }
-        ).setRate(9999f));
+        ));
         addRecord(new RecordLambda<>(
                 Vector2f16Record.getDefault().setDebugText("velocity"),
                 new SourceExecute<Vector2f>() {
@@ -129,7 +129,7 @@ public class MovingRayData extends EntityData {
                         if (projectile != null) projectile.getVelocity().set(value);
                     }
                 }
-        ).setRate(9999f));
+        ));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("facing"),
                 new SourceExecute<Float>() {
@@ -149,7 +149,7 @@ public class MovingRayData extends EntityData {
                         }
                     }
                 }
-        ).setRate(9999f));
+        ));
         addRecord(new RecordLambda<>(
                 Float16Record.getDefault().setDebugText("angular vel"),
                 new SourceExecute<Float>() {
@@ -165,7 +165,7 @@ public class MovingRayData extends EntityData {
                         if (projectile != null) projectile.setAngularVelocity(value);
                     }
                 }
-        ).setRate(9999f));
+        ));
         addRecord(new RecordLambda<>(
                 ByteRecord.getDefault().setDebugText("hitpoints"),
                 new SourceExecute<Byte>() {
