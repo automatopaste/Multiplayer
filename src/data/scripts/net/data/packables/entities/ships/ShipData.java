@@ -473,7 +473,11 @@ public class ShipData extends EntityData {
         VariantData variantData;
         if (isFighter) {
             String hullVariantId = clientPlugin.getFighterVariantDatastore().getVariants().get(hullID);
+
+            boolean suppress = fleetManager.isSuppressDeploymentMessages();
+            fleetManager.setSuppressDeploymentMessages(true);
             ship = fleetManager.spawnShipOrWing(hullVariantId, location, facing, 0f);
+            fleetManager.setSuppressDeploymentMessages(suppress);
 
             slotIDs = new MapSet<>();
             Map<String, Integer> ids = VariantData.getSlotIDs(ship.getVariant());
