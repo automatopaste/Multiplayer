@@ -11,7 +11,7 @@ import data.scripts.net.data.packables.entities.ships.VariantData;
 import data.scripts.net.data.packables.metadata.ClientConnectionData;
 import data.scripts.net.data.packables.metadata.ServerConnectionData;
 import data.scripts.net.data.tables.server.combat.entities.ProjectileTable;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.plugins.MPPlugin;
 
 import java.io.IOException;

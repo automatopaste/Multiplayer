@@ -13,6 +13,10 @@ import data.scripts.plugins.MPServerPlugin;
 import java.util.*;
 
 public class PlayerLobby implements InboundEntityManager, OutboundEntityManager {
+
+    public static final byte HOST_ID = Byte.MIN_VALUE;
+    public static final short HOST_INSTANCE = Short.MIN_VALUE;
+
     private final Map<Short, ClientData> players;
     private final ClientData host;
 
@@ -25,12 +29,12 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
         String hostUsername = Global.getSettings().getString("MP_UsernameString");
         if (hostUsername.length() > LobbyData.MAX_USERNAME_CHARS) hostUsername = hostUsername.substring(0, LobbyData.MAX_USERNAME_CHARS);
-        host = new ClientData(DEFAULT_HOST_INSTANCE, DEFAULT_HOST_ID, serverPlugin, hostUsername);
-        players.put(DEFAULT_HOST_INSTANCE, host);
+        host = new ClientData(HOST_INSTANCE, HOST_ID, serverPlugin, hostUsername);
+        players.put(HOST_INSTANCE, host);
 
-        usernames.put(DEFAULT_HOST_ID, hostUsername);
+        usernames.put(HOST_ID, hostUsername);
 
-        lobby = new LobbyData(DEFAULT_HOST_INSTANCE, this, playerShips);
+        lobby = new LobbyData(HOST_INSTANCE, this, playerShips);
     }
 
     @Override
@@ -66,7 +70,7 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
 
         InstanceData instanceData = lobby.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put(DEFAULT_HOST_INSTANCE, instanceData);
+            out.put(HOST_INSTANCE, instanceData);
         }
 
         return out;

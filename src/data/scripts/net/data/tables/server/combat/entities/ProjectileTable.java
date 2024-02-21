@@ -17,6 +17,7 @@ import data.scripts.net.data.packables.entities.projectiles.MovingRayData;
 import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.OutboundEntityManager;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.server.combat.entities;
+package data.scripts.net.data.tables.server.combat.entities.ships;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
@@ -103,14 +103,12 @@ public class ShipTable implements OutboundEntityManager {
         Set<ShipAPI> diff = new HashSet<>(registered.keySet());
 
         for (ShipAPI ship : engine.getShips()) {
-            if (ship.isPiece()) {
-                continue;
-            }
-
-            if (registered.containsKey(ship)) {
-                diff.remove(ship);
-            } else {
-                createEntry(ship);
+            if (ship.isAlive()) {
+                if (registered.containsKey(ship)) {
+                    diff.remove(ship);
+                } else {
+                    createEntry(ship);
+                }
             }
         }
 

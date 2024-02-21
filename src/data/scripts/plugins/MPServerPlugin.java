@@ -14,7 +14,7 @@ import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.datagen.ShipVariantDatastore;
 import data.scripts.net.data.tables.server.combat.connection.TextChatHost;
 import data.scripts.net.data.tables.server.combat.entities.ProjectileTable;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerLobby;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.net.io.ServerConnectionManager;

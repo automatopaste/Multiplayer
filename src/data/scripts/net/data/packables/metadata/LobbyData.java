@@ -64,7 +64,7 @@ public class LobbyData extends EntityData {
                     public List<Byte> get() {
                         List<Byte> out = new ArrayList<>();
 
-                        out.add(BaseEntityManager.DEFAULT_HOST_ID);
+                        out.add(PlayerLobby.HOST_ID);
                         short id = playerShips.getHostShipID();
                         out.add((byte) ((id >>> 8) & 0xFF));
                         out.add((byte) (id & 0xFF));

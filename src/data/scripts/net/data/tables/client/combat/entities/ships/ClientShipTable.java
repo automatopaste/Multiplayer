@@ -1,4 +1,4 @@
-package data.scripts.net.data.tables.client.combat.entities;
+package data.scripts.net.data.tables.client.combat.entities.ships;
 
 import com.fs.starfarer.api.combat.ShipAPI;
 import data.scripts.net.data.DataGenManager;
@@ -7,7 +7,7 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.WeaponData;
 import data.scripts.net.data.tables.EntityTable;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultAutofireAIPlugin;
 

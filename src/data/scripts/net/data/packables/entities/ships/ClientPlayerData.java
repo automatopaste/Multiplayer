@@ -17,7 +17,7 @@ import data.scripts.net.data.records.Vector2f32Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 import org.lazywizard.lazylib.VectorUtils;
@@ -37,7 +37,7 @@ public class ClientPlayerData extends EntityData {
     private int controlBitmask;
     private short playerShipID;
     private byte playerShipFlags;
-    private short requestedShipID = -1;
+    private short requestedShipID;
 
     private ShipAPI ship;
 
@@ -232,16 +232,6 @@ public class ClientPlayerData extends EntityData {
         }
     }
 
-    public void transferPlayerShip(ShipAPI dest) {
-        if (ship != null) {
-            ship.resetDefaultAI();
-            ship.getShipAI().forceCircumstanceEvaluation();
-        }
-
-        dest.setShipAI(new MPDefaultShipAIPlugin());
-        ship = dest;
-    }
-
     private void check(ShipTable shipTable) {
         for (int i = 0; i < shipTable.getShipTable().limit; i++) {
             ShipData data = shipTable.getShipTable().array()[i];
@@ -252,6 +242,7 @@ public class ClientPlayerData extends EntityData {
                 if (data.getInstanceID() == playerShipID) {
                     ship.setShipAI(new MPDefaultShipAIPlugin());
                     this.ship = ship;
+                    break;
                 }
             }
         }
@@ -269,6 +260,10 @@ public class ClientPlayerData extends EntityData {
 
     public ShipAPI getShip() {
         return ship;
+    }
+
+    public void setShip(ShipAPI ship) {
+        this.ship = ship;
     }
 
     public int getControlBitmask() {

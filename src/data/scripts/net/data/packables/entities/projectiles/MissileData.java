@@ -11,8 +11,8 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.records.*;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lwjgl.util.vector.Vector2f;
 

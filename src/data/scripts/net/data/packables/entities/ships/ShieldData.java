@@ -7,7 +7,7 @@ import data.scripts.net.data.records.ByteRecord;
 import data.scripts.net.data.records.Float16Record;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.plugins.MPPlugin;
 import org.lazywizard.lazylib.MathUtils;
 

@@ -23,7 +23,7 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
         this.chatbox = chatbox;
         this.playerLobby = playerLobby;
 
-        send = new ChatListenData(DEFAULT_HOST_INSTANCE);
+        send = new ChatListenData(PlayerLobby.HOST_INSTANCE);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
 
         String hostInput = chatbox.getInput();
         if (hostInput != null) {
-            fresh.add(new MPChatboxPlugin.ChatEntry(hostInput, playerLobby.getUsernames().get(DEFAULT_HOST_ID), DEFAULT_HOST_ID));
+            fresh.add(new MPChatboxPlugin.ChatEntry(hostInput, playerLobby.getUsernames().get(PlayerLobby.HOST_ID), PlayerLobby.HOST_ID));
         }
 
         for (short id : listeners.keySet()) {
@@ -76,7 +76,7 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
 
         InstanceData instanceData = send.sourceExecute(amount);
         if (!instanceData.records.isEmpty()) {
-            out.put(DEFAULT_HOST_INSTANCE, instanceData);
+            out.put(PlayerLobby.HOST_INSTANCE, instanceData);
         }
 
         return out;

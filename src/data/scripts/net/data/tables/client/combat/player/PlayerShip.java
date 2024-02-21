@@ -11,7 +11,8 @@ import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
+import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
@@ -25,8 +26,7 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
     private final ClientShipTable clientShipTable;
     private final short instanceID;
 
-    private boolean requestingTransfer = false;
-    private short requestedID = -1;
+    private short requestedID = PlayerShips.NULL_SHIP_ID;
 
     public PlayerShip(short instanceID, ClientShipTable clientShipTable) {
         this.instanceID = instanceID;
@@ -44,48 +44,44 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
         clientPlayerData.update(amount, this, plugin);
         serverPlayerData.update(amount, this, plugin);
 
-        if (requestingTransfer) {
-            if (serverPlayerData.getActiveID() == requestedID) {
-                requestingTransfer = false;
-                requestedID = -1;
+        if (requestedID != PlayerShips.NULL_SHIP_ID && serverPlayerData.getActiveID() == requestedID) {
+            //switch was executed
+            requestedID = PlayerShips.NULL_SHIP_ID;
 
-                ShipData data = clientShipTable.getShipTable().array()[serverPlayerData.getActiveID()];
-                if (data != null) {
-                    engine.setPlayerShipExternal(data.getShip());
-                }
-
-                clientPlayerData.setRequestedShipID((short)-1);
-            }
-        }
-
-        boolean update = false;
-        short id = -1;
-        if (engine.getPlayerShip() != null) {
-            Short i = clientShipTable.getShipIDs().get(engine.getPlayerShip());
-            if (i != null) {
-                id = i;
-            }
-
-            update = true;
-        }
-
-        CMUtils.getGuiDebug().putText(PlayerShip.class, "SERVER ACTIVE", "SERVER ACTIVE: " + serverPlayerData.getActiveID());
-        CMUtils.getGuiDebug().putText(PlayerShip.class, "ACTUAL ACTIVE", "ACTUAL ACTIVE: " + id);
-
-        if (update && serverPlayerData.getActiveID() != -1) {
             ShipData data = clientShipTable.getShipTable().array()[serverPlayerData.getActiveID()];
-            if (data != null && data.getShip() != null) {
-                Global.getCombatEngine().setPlayerShipExternal(data.getShip());
+            if (data != null) {
+                engine.setPlayerShipExternal(data.getShip());
+            }
+        }
+
+        short serverActiveID = serverPlayerData.getActiveID();
+
+        short currentActiveID = PlayerShips.NULL_SHIP_ID;
+        if (engine.getPlayerShip() != null) {
+            Short s = clientShipTable.getShipIDs().get(engine.getPlayerShip());
+            if (s != null) currentActiveID = s;
+        }
+
+        CMUtils.getGuiDebug().putText(PlayerShip.class, "SERVER ACTIVE", "SERVER ACTIVE: " + serverActiveID);
+        CMUtils.getGuiDebug().putText(PlayerShip.class, "ACTUAL ACTIVE", "ACTUAL ACTIVE: " + currentActiveID);
+
+        // check if server has flagged a switch to a different ship
+        if (serverActiveID != currentActiveID) {
+            ShipData data = clientShipTable.getShipTable().array()[serverActiveID];
+
+            if (data != null) {
+                engine.setPlayerShipExternal(data.getShip());
+            } else {
+                Global.getLogger(PlayerShip.class).error("client instructed to switch to null ship");
             }
         }
     }
 
     public void requestTransfer(ShipAPI dest) {
         Short id = clientShipTable.getShipIDs().get(dest);
+
         if (id != null) {
             clientPlayerData.setRequestedShipID(id);
-
-            requestingTransfer = true;
             requestedID = id;
         }
     }

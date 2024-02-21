@@ -12,7 +12,7 @@ import data.scripts.net.data.records.*;
 import data.scripts.net.data.records.collections.ListenArrayRecord;
 import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.InboundEntityManager;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
@@ -582,7 +582,7 @@ public class ShipData extends EntityData {
 
     @Override
     public void delete() {
-
+        Global.getCombatEngine().removeEntity(ship);
     }
 
     @Override

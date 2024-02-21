@@ -15,7 +15,7 @@ import data.scripts.net.data.datagen.ProjectileSpecDatastore;
 import data.scripts.net.data.tables.client.combat.connection.LobbyInput;
 import data.scripts.net.data.tables.client.combat.connection.TextChatClient;
 import data.scripts.net.data.tables.client.combat.entities.ClientProjectileTable;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.client.combat.entities.VariantDataMap;
 import data.scripts.net.data.tables.client.combat.player.Player;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;

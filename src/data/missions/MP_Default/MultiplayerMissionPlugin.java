@@ -13,7 +13,6 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
 import data.scripts.net.data.packables.entities.ships.ShipData;
-import data.scripts.net.data.tables.BaseEntityManager;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.MPServerPlugin;
@@ -53,7 +52,7 @@ public class MultiplayerMissionPlugin extends BaseEveryFrameCombatPlugin {
         // host
         short hostID = playerShips.getHostShipID();
         ShipAPI host = null;
-        if (hostID != BaseEntityManager.DEFAULT_HOST_INSTANCE) {
+        if (hostID != PlayerShips.NULL_SHIP_ID) {
             ShipData shipData = playerShips.getShipTable().getShipTable().array()[hostID];
 
             if (shipData != null) {

@@ -11,9 +11,9 @@ import com.fs.starfarer.api.input.InputEventAPI;
 import data.scripts.MPModPlugin;
 import data.scripts.net.data.packables.entities.ships.ShipData;
 import data.scripts.net.data.packables.entities.ships.ClientPlayerData;
-import data.scripts.net.data.tables.client.combat.entities.ClientShipTable;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
-import data.scripts.net.data.tables.server.combat.entities.ShipTable;
+import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
 import data.scripts.plugins.MPClientPlugin;
 import data.scripts.plugins.MPPlugin;
@@ -730,9 +730,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
                                         ShipAPI s = client.getPlayerShip().getActiveShip();
                                         if (s == null) return "ACTIVE";
-                                    } else {
+                                    } else if (plugin instanceof MPServerPlugin) {
                                         MPServerPlugin server = (MPServerPlugin) plugin;
-                                        if (server == null) return "NULL";
 
                                         PlayerShips playerShips = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
                                         ShipTable shipTable = (ShipTable) server.getEntityManagers().get(ShipTable.class);
