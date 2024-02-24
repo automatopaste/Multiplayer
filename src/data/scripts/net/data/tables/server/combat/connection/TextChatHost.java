@@ -71,12 +71,18 @@ public class TextChatHost implements InboundEntityManager, OutboundEntityManager
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         InstanceData instanceData = send.sourceExecute(amount);
         if (!instanceData.records.isEmpty()) {
-            out.put(PlayerLobby.HOST_INSTANCE, instanceData);
+            connectionOutData.put(PlayerLobby.HOST_INSTANCE, instanceData);
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

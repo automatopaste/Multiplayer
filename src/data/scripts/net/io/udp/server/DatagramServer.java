@@ -15,16 +15,16 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lazywizard.console.Console;
 
+import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class DatagramServer implements Runnable {
     public static final int MAX_QUEUE_SIZE = Global.getSettings().getInt("mpDatagramQueueLimit");
 
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private final Queue<MessageContainer> messageQueue;
+    private final ArrayBlockingQueue<MessageContainer> messageQueue;
 
     private EventLoopGroup workerLoopGroup;
     private Channel channel;
@@ -41,7 +41,7 @@ public class DatagramServer implements Runnable {
         this.port = port;
         this.connectionManager = connectionManager;
 
-        messageQueue = new ConcurrentLinkedQueue<>();
+        messageQueue = new ArrayBlockingQueue<>(MAX_QUEUE_SIZE);
 
         clock = new Clock(ServerConnectionManager.TICK_RATE);
 
@@ -74,6 +74,7 @@ public class DatagramServer implements Runnable {
 
                     if (message == null || message.isEmpty()) continue;
 
+                    InetSocketAddress address = message.getDest();
                     DatagramUtils.SizeData sizeData = DatagramUtils.write(channel, message, message.getDest(), message.getConnectionID());
                     num++;
 
@@ -124,10 +125,12 @@ public class DatagramServer implements Runnable {
     }
 
     public void addMessages(List<MessageContainer> messages) {
-        messageQueue.addAll(messages);
+        for (MessageContainer messageContainer : messages) {
+            if (messageQueue.remainingCapacity() == 0) {
+                messageQueue.poll();
+            }
 
-        while (messageQueue.size() > MAX_QUEUE_SIZE) {
-            messageQueue.remove();
+            messageQueue.offer(messageContainer);
         }
     }
 

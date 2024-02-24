@@ -65,12 +65,18 @@ public class PlayerLobby implements InboundEntityManager, OutboundEntityManager 
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         InstanceData instanceData = lobby.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put(HOST_INSTANCE, instanceData);
+            connectionOutData.put(HOST_INSTANCE, instanceData);
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

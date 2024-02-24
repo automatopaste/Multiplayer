@@ -13,9 +13,11 @@ import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.server.combat.players.PlayerShips;
+import data.scripts.plugins.MPLogger;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +29,8 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
     private final short instanceID;
 
     private short requestedID = PlayerShips.NULL_SHIP_ID;
+
+    private boolean showNullSwitchError = true;
 
     public PlayerShip(short instanceID, ClientShipTable clientShipTable) {
         this.instanceID = instanceID;
@@ -69,10 +73,12 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
         if (serverActiveID != currentActiveID) {
             ShipData data = clientShipTable.getShipTable().array()[serverActiveID];
 
-            if (data != null) {
+            if (data != null && data.getShip() != null) {
                 engine.setPlayerShipExternal(data.getShip());
-            } else {
-                Global.getLogger(PlayerShip.class).error("client instructed to switch to null ship");
+                showNullSwitchError = true;
+            } else if (showNullSwitchError) {
+                MPLogger.error(PlayerShip.class, "client instructed to switch to null ship");
+                showNullSwitchError = false;
             }
         }
     }
@@ -93,12 +99,18 @@ public class PlayerShip implements InboundEntityManager, OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         InstanceData instanceData = clientPlayerData.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put(instanceID, instanceData);
+            connectionOutData.put(instanceID, instanceData);
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

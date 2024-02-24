@@ -11,10 +11,12 @@ import data.scripts.net.data.packables.metadata.ServerPlayerData;
 import data.scripts.net.data.tables.InboundEntityManager;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
+import data.scripts.plugins.MPLogger;
 import data.scripts.plugins.MPPlugin;
 import data.scripts.plugins.ai.MPDefaultShipAIPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,8 +32,8 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
     }
 
     // map client connection id to data object
-    private final Map<Short, ClientPlayerData> controlData = new HashMap<>();
-    private final Map<Short, ServerPlayerData> serverPlayerData = new HashMap<>();
+    private final Map<Byte, ClientPlayerData> controlData = new HashMap<>();
+    private final Map<Byte, ServerPlayerData> serverPlayerData = new HashMap<>();
 
     private final ShipTable shipTable;
     private short hostActiveShipID = NULL_SHIP_ID;
@@ -50,13 +52,13 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         } else {
             hostActiveShipID = shipTable.getRegistered().get(engine.getPlayerShip());
         }
-        for (short id : serverPlayerData.keySet()) {
+        for (byte id : serverPlayerData.keySet()) {
             ServerPlayerData s = serverPlayerData.get(id);
             s.setHostID(hostActiveShipID);
         }
 
-        for (short id : controlData.keySet()) {
-            ClientPlayerData c = controlData.get(id);
+        for (byte connectionID : controlData.keySet()) {
+            ClientPlayerData c = controlData.get(connectionID);
 
             c.update(amount, this, plugin);
 
@@ -68,16 +70,16 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
                     if (shipData != null) {
                         ShipAPI dest = shipData.getShip();
-                        transferControl(dest, false, c);
+                        transferControl(dest, false, c, connectionID);
                     }
                 } else {
-                    Global.getLogger(PlayerShips.class).error("client requested id out of range of local table");
+                    MPLogger.error(PlayerShips.class, "client requested id out of range of local table");
                 }
             }
         }
     }
 
-    public void transferControl(ShipAPI dest, boolean host, ClientPlayerData playerData) {
+    public void transferControl(ShipAPI dest, boolean host, ClientPlayerData playerData, byte connectionID) {
         Short destID = shipTable.getRegistered().get(dest);
         if (destID == null) {
             destID = shipTable.createEntry(dest);
@@ -106,7 +108,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
                 playerData.setShip(dest);
 
-                serverPlayerData.get(playerData.getInstanceID()).setActiveID(destID);
+                serverPlayerData.get(connectionID).setActiveID(destID);
 
                 dest.setShipAI(new MPDefaultShipAIPlugin());
             }
@@ -119,20 +121,20 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         DataGenManager.registerOutboundEntityManager(ServerPlayerData.TYPE_ID, this);
     }
 
-    public Map<Short, ClientPlayerData> getControlData() {
+    public Map<Byte, ClientPlayerData> getControlData() {
         return controlData;
     }
 
     @Override
     public void processDelta(byte typeID, short instanceID, Map<Byte, Object> toProcess, MPPlugin plugin, int tick, byte connectionID) {
-        ClientPlayerData data = controlData.get(instanceID);
+        ClientPlayerData data = controlData.get(connectionID);
 
         if (data == null) {
             data = new ClientPlayerData(instanceID, null);
 
-            controlData.put(instanceID, data);
+            controlData.put(connectionID, data);
             ServerPlayerData s = new ServerPlayerData(instanceID);
-            serverPlayerData.put(instanceID, s);
+            serverPlayerData.put(connectionID, s);
             s.destExecute(new HashMap<Byte, Object>(), tick);
             s.init(plugin, this);
 
@@ -145,25 +147,30 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
 
     @Override
     public void processDeletion(byte typeID, short instanceID, MPPlugin plugin, int tick, byte connectionID) {
-        ClientPlayerData data = controlData.get(instanceID);
+        ClientPlayerData data = controlData.get(connectionID);
 
         if (data != null) {
             data.delete();
 
-            controlData.remove(instanceID);
+            controlData.remove(connectionID);
         }
     }
 
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
 
-        for (ServerPlayerData data : serverPlayerData.values()) {
+        for (byte connectionID : serverPlayerData.keySet()) {
+            ServerPlayerData data = serverPlayerData.get(connectionID);
+
             InstanceData instanceData = data.sourceExecute(amount);
 
+            Map<Short, InstanceData> instanceEntityData = new HashMap<>();
+            instanceEntityData.put(data.getInstanceID(), instanceData);
+
             if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                out.put(data.getInstanceID(), instanceData);
+                out.put(connectionID, instanceEntityData);
             }
         }
 
@@ -184,7 +191,7 @@ public class PlayerShips implements InboundEntityManager, OutboundEntityManager 
         return hostActiveShipID;
     }
 
-    public Map<Short, ServerPlayerData> getServerPlayerData() {
+    public Map<Byte, ServerPlayerData> getServerPlayerData() {
         return serverPlayerData;
     }
 

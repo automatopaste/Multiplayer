@@ -7,6 +7,7 @@ import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,53 +84,48 @@ public class DataGenManager {
      * Order: Type ID -> Instance ID -> Record ID
      * @return data hierarchy
      */
-    public static OutboundData collectOutboundDeltasSocket(float amount, byte connectionID) {
-        OutboundData out = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), connectionID);
+    public static Map<Byte, OutboundData> collectOutboundDeltas(float amount, List<Byte> connectionIDs, OutboundEntityManager.PacketType type) {
+        Map<Byte, OutboundData> connectionOutData = new HashMap<>();
 
-        for (byte source : outboundDataSources.keySet()) {
-            OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Map<Short, InstanceData> entities = manager.getOutbound(source, connectionID, amount);
-                if (entities != null && !entities.isEmpty()) out.out.put(source, entities);
-            }
+        Map<Byte, Map<Byte, Map<Short, InstanceData>>> out = new HashMap<>();
+        Map<Byte, Map<Byte, Set<Short>>> deleted = new HashMap<>();
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, new HashMap<Byte, Map<Short, InstanceData>>());
+            deleted.put(connectionID, new HashMap<Byte, Set<Short>>());
         }
 
         for (byte source : outboundDataSources.keySet()) {
             OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.SOCKET) {
-                Set<Short> instances = manager.getDeleted(source, connectionID);
-                if (instances != null && !instances.isEmpty()) out.deleted.put(source, instances);
+            if (manager.getOutboundPacketType() != type) continue;
+
+            Map<Byte, Map<Short, InstanceData>> connectionEntities = manager.getOutbound(source, amount, connectionIDs);
+
+            for (byte connectionID : connectionEntities.keySet()) {
+                Map<Short, InstanceData> entities = connectionEntities.get(connectionID);
+                if (entities == null || entities.isEmpty()) continue;
+
+                Map<Byte, Map<Short, InstanceData>> sourceEntityData = out.get(connectionID);
+                sourceEntityData.put(source, entities);
+            }
+
+            for (byte connectionID : connectionIDs) {
+                Set<Short> deletedEntities = manager.getDeleted(source, connectionID);
+                if (deletedEntities == null || deletedEntities.isEmpty()) continue;
+
+                Map<Byte, Set<Short>> deletedEntityData = deleted.get(connectionID);
+                deletedEntityData.put(source, deletedEntities);
             }
         }
 
-        return out;
-    }
+        for (byte connectionID : connectionIDs) {
+            Map<Byte, Map<Short, InstanceData>> connectionSourceEntities = out.get(connectionID);
+            Map<Byte, Set<Short>> connectionDeletedEntities = deleted.get(connectionID);
 
-    /**
-     * An ordered hierarchy of data that will be compressed into a byte buffer
-     * Order: Type ID -> Instance ID -> Record ID
-     * @return data hierarchy
-     */
-    public static OutboundData collectOutboundDeltasDatagram(float amount, byte connectionID) {
-        OutboundData out = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), connectionID);
-
-        for (byte source : outboundDataSources.keySet()) {
-            OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Map<Short, InstanceData> entities = manager.getOutbound(source, connectionID, amount);
-                if (entities != null && !entities.isEmpty()) out.out.put(source, entities);
-            }
+            connectionOutData.put(connectionID, new OutboundData(connectionSourceEntities, connectionDeletedEntities, connectionID));
         }
 
-        for (byte source : outboundDataSources.keySet()) {
-            OutboundEntityManager manager = outboundDataSources.get(source);
-            if (manager.getOutboundPacketType() == OutboundEntityManager.PacketType.DATAGRAM) {
-                Set<Short> instances = manager.getDeleted(source, connectionID);
-                if (instances != null && !instances.isEmpty()) out.deleted.put(source, instances);
-            }
-        }
-
-        return out;
+        return connectionOutData;
     }
 
     /**

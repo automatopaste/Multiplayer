@@ -12,11 +12,12 @@ import data.scripts.net.data.InboundData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.datagen.FighterVariantDatastore;
 import data.scripts.net.data.datagen.ProjectileSpecDatastore;
+import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.tables.client.combat.connection.LobbyInput;
 import data.scripts.net.data.tables.client.combat.connection.TextChatClient;
 import data.scripts.net.data.tables.client.combat.entities.ClientProjectileTable;
-import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.client.combat.entities.VariantDataMap;
+import data.scripts.net.data.tables.client.combat.entities.ships.ClientShipTable;
 import data.scripts.net.data.tables.client.combat.player.Player;
 import data.scripts.net.data.tables.client.combat.player.PlayerShip;
 import data.scripts.net.io.BaseConnectionWrapper;
@@ -26,6 +27,7 @@ import org.lazywizard.console.Console;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MPClientPlugin extends MPPlugin {
 
@@ -103,6 +105,9 @@ public class MPClientPlugin extends MPPlugin {
 //        dataGraph2 = new DebugGraphContainer("Inbound Packet Count", 120, 30f);
 
         init = true;
+
+        MPLogger.info(MPClientPlugin.class, "INITIALISATION COMPLETE");
+        MPLogger.info(MPClientPlugin.class, "WELCOME STARFARER");
     }
 
     @Override
@@ -138,10 +143,13 @@ public class MPClientPlugin extends MPPlugin {
         updateEntityManagers(amount);
 
         // outbound data update
-        OutboundData outboundSocket = DataGenManager.collectOutboundDeltasSocket(amount, connection.getConnectionID());
-        connection.getDuplex().updateOutboundSocket(outboundSocket);
-        OutboundData outboundDatagram = DataGenManager.collectOutboundDeltasDatagram(amount, connection.getConnectionID());
-        connection.getDuplex().updateOutboundDatagram(outboundDatagram);
+        List<Byte> connectionIDs = new ArrayList<>();
+        connectionIDs.add(connection.getConnectionID());
+        // this is kinda stupid
+        Map<Byte, OutboundData> outboundSocket = DataGenManager.collectOutboundDeltas(amount, connectionIDs, OutboundEntityManager.PacketType.SOCKET);
+        connection.getDuplex().updateOutboundSocket(outboundSocket.get(connection.getConnectionID()));
+        Map<Byte, OutboundData> outboundDatagram = DataGenManager.collectOutboundDeltas(amount, connectionIDs, OutboundEntityManager.PacketType.DATAGRAM);
+        connection.getDuplex().updateOutboundDatagram(outboundDatagram.get(connection.getConnectionID()));
     }
 
     @Override

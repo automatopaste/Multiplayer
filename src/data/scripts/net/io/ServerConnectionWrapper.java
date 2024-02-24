@@ -157,7 +157,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
+        List<MessageContainer> messages;
+        synchronized (outbound.out) {
+            messages = writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
+        }
+        return messages;
     }
 
     @Override

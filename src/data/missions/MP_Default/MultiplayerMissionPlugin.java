@@ -45,7 +45,7 @@ public class MultiplayerMissionPlugin extends BaseEveryFrameCombatPlugin {
         MPServerPlugin server = (MPServerPlugin) plugin;
 
         PlayerShips playerShips = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
-        Map<Short, ClientPlayerData> controlData = playerShips.getControlData();
+        Map<Byte, ClientPlayerData> controlData = playerShips.getControlData();
 
         //runcode Global.getCombatEngine().applyDamage(Global.getCombatEngine().getPlayerShip(), Global.getCombatEngine().getPlayerShip().getLocation(), 9999999f, DamageType.ENERGY, 0f, true, false, null);
 
@@ -70,14 +70,16 @@ public class MultiplayerMissionPlugin extends BaseEveryFrameCombatPlugin {
             if (hostCooldown.intervalElapsed()) {
                 ShipAPI newShip = spawnShip(engine);
 
-                playerShips.transferControl(newShip, true, null);
+                playerShips.transferControl(newShip, true, null, (byte) 0);
             }
         } else {
             hostCooldown.setElapsed(0f);
         }
 
         // clients
-        for (ClientPlayerData player : controlData.values()) {
+        for (byte connectionID : controlData.keySet()) {
+            ClientPlayerData player = controlData.get(connectionID);
+
             ShipAPI ship = player.getShip();
 
             IntervalUtil cooldown = cooldowns.get(player.getInstanceID());
@@ -91,7 +93,7 @@ public class MultiplayerMissionPlugin extends BaseEveryFrameCombatPlugin {
                 if (cooldown.intervalElapsed()) {
                     ShipAPI newShip = spawnShip(engine);
 
-                    playerShips.transferControl(newShip, false, player);
+                    playerShips.transferControl(newShip, false, player, connectionID);
                 }
             } else {
                 cooldown.setElapsed(0f);

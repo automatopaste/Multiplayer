@@ -9,6 +9,7 @@ import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,12 +27,18 @@ public class Player implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         InstanceData instanceData = player.sourceExecute(amount);
         if (instanceData.records != null && !instanceData.records.isEmpty()) {
-            out.put(this.connectionID, instanceData);
+            connectionOutData.put(this.connectionID, instanceData);
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

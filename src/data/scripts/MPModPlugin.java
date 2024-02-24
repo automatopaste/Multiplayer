@@ -105,4 +105,5 @@ public class MPModPlugin extends BaseModPlugin {
     public static MPPlugin getPlugin() {
         return PLUGIN;
     }
+
 }

@@ -17,22 +17,27 @@ import java.util.List;
 
 public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
 
+    // singleton
+    public static MPChatboxPlugin INSTANCE = null;
+
     private static LazyFont.DrawableString TODRAW14;
 
     private String input;
     private final List<ChatEntry> entries = new ArrayList<>();
 
     private enum ActivePanel {
+        TEXT_ONLY,
+        CHAT,
         NONE,
-        CHAT
     }
-    private ActivePanel active = ActivePanel.NONE;
+    private ActivePanel active = ActivePanel.TEXT_ONLY;
 
     private ListPanel widget;
     private ListPanel chatbox;
+    private ListPanel text;
 
     public MPChatboxPlugin() {
-
+        INSTANCE = this;
     }
 
     @Override
@@ -48,6 +53,7 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
 
         widget = initWidget();
         chatbox = initChatbox();
+        text = initTextPanel();
     }
 
     @Override
@@ -66,10 +72,13 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         CMUKitUI.render(widget, root1, events);
 
         switch (active) {
-            case NONE:
+            case TEXT_ONLY:
+                CMUKitUI.render(text, root2, events);
                 break;
             case CHAT:
                 CMUKitUI.render(chatbox, root2, events);
+                break;
+            case NONE:
                 break;
         }
     }
@@ -96,10 +105,16 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
                 Button button = new Button(buttonParams, text, new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
-                        if (active == ActivePanel.NONE) {
-                            active = ActivePanel.CHAT;
-                        } else {
-                            active = ActivePanel.NONE;
+                        switch (active) {
+                            case TEXT_ONLY:
+                                active = ActivePanel.CHAT;
+                                break;
+                            case CHAT:
+                                active = ActivePanel.NONE;
+                                break;
+                            case NONE:
+                                active = ActivePanel.TEXT_ONLY;
+                                break;
                         }
                     }
                 });
@@ -114,51 +129,12 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         panelParams.y = 380f;
         panelParams.update = false;
 
-        final ListPanel.ListPanelParams chatPanelParams = new ListPanel.ListPanelParams();
-        chatPanelParams.x = 350f;
-        chatPanelParams.y = 360f;
-        chatPanelParams.noDeco = true;
-        chatPanelParams.conformToListSize = true;
-        chatPanelParams.update = true;
-
-        final ListPanel chatPanel = new ListPanel(chatPanelParams, new ListPanel.PanelMaker() {
-            @Override
-            public void make(ListPanel panel) {
-                List<Text> toAdd = new ArrayList<>();
-
-                float height = 0f;
-                for (final ChatEntry entry : entries) {
-                    final String t = entry == null ? "_" : entry.username + ": " + entry.text;
-
-                    TODRAW14.setText(t);
-                    TODRAW14.setMaxWidth(chatPanelParams.x - 4f);
-                    height += TODRAW14.getHeight();
-                    if (height > chatPanelParams.y) break;
-
-                    Text.TextParams textParams = new Text.TextParams();
-                    textParams.color = Color.WHITE;
-                    textParams.maxWidth = chatPanelParams.x - 4f;
-                    textParams.maxHeight = 50f;
-                    Text text = new Text(new Execute<String>() {
-                        @Override
-                        public String get() {
-                            return t;
-                        }
-                    }, TODRAW14, textParams);
-
-                    toAdd.add(text);
-                }
-
-                for (int i = toAdd.size(); i-- > 0;) {
-                    panel.addChild(toAdd.get(i));
-                }
-            }
-        });
+        final ListPanel textPanel = initTextPanel();
 
         return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
             public void make(ListPanel panel1) {
-                panel1.addChild(chatPanel);
+                panel1.addChild(textPanel);
 
                 TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
                 textEntryBoxParams.width = 350f;
@@ -190,6 +166,58 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
+    private ListPanel initTextPanel() {
+        final ListPanel.ListPanelParams textPanelParams = new ListPanel.ListPanelParams();
+        textPanelParams.x = 350f;
+        textPanelParams.y = 360f;
+        textPanelParams.noDeco = true;
+        textPanelParams.conformToListSize = true;
+        textPanelParams.update = true;
+
+        return new ListPanel(textPanelParams, new ListPanel.PanelMaker() {
+            @Override
+            public void make(ListPanel panel) {
+                List<Text> toAdd = new ArrayList<>();
+
+                float height = 0f;
+                for (final ChatEntry entry : entries) {
+                    String t;
+                    if (entry == null) {
+                        t = "_";
+                    } else if (entry.systemMessage) {
+                        t = entry.username + " " + entry.text;
+                    } else {
+                        t = entry.username + ": " + entry.text;
+                    }
+
+                    final String tt = t;
+
+                    TODRAW14.setText(t);
+                    TODRAW14.setMaxWidth(textPanelParams.x - 4f);
+                    height += TODRAW14.getHeight();
+                    if (height > textPanelParams.y) break;
+
+                    Text.TextParams textParams = new Text.TextParams();
+                    textParams.color = Color.WHITE;
+                    textParams.maxWidth = textPanelParams.x - 4f;
+                    textParams.maxHeight = 50f;
+                    Text text = new Text(new Execute<String>() {
+                        @Override
+                        public String get() {
+                            return tt;
+                        }
+                    }, TODRAW14, textParams);
+
+                    toAdd.add(text);
+                }
+
+                for (int i = toAdd.size(); i-- > 0;) {
+                    panel.addChild(toAdd.get(i));
+                }
+            }
+        });
+    }
+
     public String getInput() {
         String out = input;
         input = null;
@@ -204,11 +232,17 @@ public class MPChatboxPlugin extends BaseEveryFrameCombatPlugin {
         public final String text;
         public String username;
         public final byte connectionID;
+        public final boolean systemMessage;
 
         public ChatEntry(String text, String username, byte connectionID) {
+            this(text, username, connectionID, false);
+        }
+
+        public ChatEntry(String text, String username, byte connectionID, boolean systemMessage) {
             this.text = text;
             this.username = username;
             this.connectionID = connectionID;
+            this.systemMessage = systemMessage;
         }
     }
 }

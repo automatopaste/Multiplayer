@@ -19,15 +19,14 @@ import org.lazywizard.console.Console;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class SocketServer implements Runnable {
     public static final int MAX_QUEUE_SIZE = Global.getSettings().getInt("mpSocketQueueLimit");
 
     private final int port;
     private final ServerConnectionManager connectionManager;
-    private final Queue<MessageContainer> messageQueue;
+    private final ArrayBlockingQueue<MessageContainer> messageQueue;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -38,7 +37,7 @@ public class SocketServer implements Runnable {
         this.port = port;
         this.connectionManager = connectionManager;
 
-        messageQueue = new ConcurrentLinkedQueue<>();
+        messageQueue = new ArrayBlockingQueue<>(MAX_QUEUE_SIZE);
 
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
@@ -96,12 +95,12 @@ public class SocketServer implements Runnable {
     }
 
     public void addMessages(List<MessageContainer> messages) {
-        messageQueue.addAll(messages);
-
-        synchronized (messageQueue) {
-            while (messageQueue.size() > MAX_QUEUE_SIZE) {
-                messageQueue.remove();
+        for (MessageContainer messageContainer : messages) {
+            if (messageQueue.remainingCapacity() == 0) {
+                messageQueue.poll();
             }
+
+            messageQueue.offer(messageContainer);
         }
     }
 

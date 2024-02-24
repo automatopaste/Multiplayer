@@ -20,9 +20,12 @@ public class ServerDuplex {
      * Get a map of delta compressed instance ids and their entity
      * @return List of entities with partial data
      */
-    public synchronized Map<Byte, InboundData> getDeltas() {
-        Map<Byte, InboundData> in = new HashMap<>(inbound);
-        inbound.clear();
+    public Map<Byte, InboundData> getDeltas() {
+        Map<Byte, InboundData> in;
+        synchronized (inbound) {
+            in = new HashMap<>(inbound);
+            inbound.clear();
+        }
         return in;
     }
 

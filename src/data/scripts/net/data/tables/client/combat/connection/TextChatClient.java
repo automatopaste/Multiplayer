@@ -69,13 +69,19 @@ public class TextChatClient implements InboundEntityManager, OutboundEntityManag
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         InstanceData instanceData = send.sourceExecute(amount);
 
         if (instanceData != null && instanceData.size > 0) {
-            out.put(instanceID, instanceData);
+            connectionOutData.put(instanceID, instanceData);
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

@@ -18,6 +18,7 @@ import data.scripts.net.data.records.DataRecord;
 import data.scripts.net.data.tables.EntityInstanceMap;
 import data.scripts.net.data.tables.OutboundEntityManager;
 import data.scripts.net.data.tables.server.combat.entities.ships.ShipTable;
+import data.scripts.plugins.MPLogger;
 import data.scripts.plugins.MPPlugin;
 
 import java.util.*;
@@ -95,7 +96,7 @@ public class ProjectileTable implements OutboundEntityManager {
             String weaponID = projectile.getWeapon().getSpec().getWeaponId();
             Short s = datastore.getWeaponIDs().get(weaponID);
             if (s == null) {
-                Global.getLogger(ProjectileTable.class).error("weapon id not found for damaging projectile " + weaponID);
+                MPLogger.error(ProjectileTable.class, "weapon id not found for damaging projectile " + weaponID);
                 return;
             } else {
                 weaponSpecID = s;
@@ -139,15 +140,17 @@ public class ProjectileTable implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         if (typeID == MovingRayData.TYPE_ID) {
             for (MovingRayData movingRayData : movingRays.registered.values()) {
                 InstanceData instanceData = movingRayData.sourceExecute(amount);
 
                 if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                    out.put(movingRayData.getInstanceID(), instanceData);
+                    connectionOutData.put(movingRayData.getInstanceID(), instanceData);
                 }
             }
         } else if (typeID == BallisticProjectileData.TYPE_ID) {
@@ -155,7 +158,7 @@ public class ProjectileTable implements OutboundEntityManager {
                 InstanceData instanceData = ballisticProjectileData.sourceExecute(amount);
 
                 if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                    out.put(ballisticProjectileData.getInstanceID(), instanceData);
+                    connectionOutData.put(ballisticProjectileData.getInstanceID(), instanceData);
                 }
             }
         } else if (typeID == MissileData.TYPE_ID) {
@@ -163,9 +166,13 @@ public class ProjectileTable implements OutboundEntityManager {
                 InstanceData instanceData = missileData.sourceExecute(amount);
 
                 if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                    out.put(missileData.getInstanceID(), instanceData);
+                    connectionOutData.put(missileData.getInstanceID(), instanceData);
                 }
             }
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;

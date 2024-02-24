@@ -772,7 +772,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                             MPServerPlugin serverPlugin = (MPServerPlugin) plugin;
                                             PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
 
-                                            playerShips.transferControl(ship, true, null);
+                                            playerShips.transferControl(ship, true, null, (byte) 0);
                                             break;
                                     }
                                 }

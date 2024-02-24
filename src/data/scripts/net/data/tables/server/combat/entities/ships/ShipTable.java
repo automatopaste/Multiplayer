@@ -43,8 +43,10 @@ public class ShipTable implements OutboundEntityManager {
     }
 
     @Override
-    public Map<Short, InstanceData> getOutbound(byte typeID, byte connectionID, float amount) {
-        Map<Short, InstanceData> out = new HashMap<>();
+    public Map<Byte, Map<Short, InstanceData>> getOutbound(byte typeID, float amount, List<Byte> connectionIDs) {
+        Map<Byte, Map<Short, InstanceData>> out = new HashMap<>();
+
+        Map<Short, InstanceData> connectionOutData = new HashMap<>();
 
         if (typeID == ShipData.TYPE_ID) {
             for (int i = 0; i < shipTable.array().length; i++) {
@@ -53,7 +55,7 @@ public class ShipTable implements OutboundEntityManager {
                     InstanceData instanceData = data.sourceExecute(amount);
 
                     if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                        out.put((short) i, instanceData);
+                        connectionOutData.put((short) i, instanceData);
                     }
                 }
             }
@@ -64,7 +66,7 @@ public class ShipTable implements OutboundEntityManager {
                 InstanceData instanceData = shieldData.sourceExecute(amount);
 
                 if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                    out.put(id, instanceData);
+                    connectionOutData.put(id, instanceData);
                 }
             }
         } else if (typeID == WeaponData.TYPE_ID) {
@@ -74,9 +76,13 @@ public class ShipTable implements OutboundEntityManager {
                 InstanceData instanceData = weaponData.sourceExecute(amount);
 
                 if (instanceData.records != null && !instanceData.records.isEmpty()) {
-                    out.put(id, instanceData);
+                    connectionOutData.put(id, instanceData);
                 }
             }
+        }
+
+        for (byte connectionID : connectionIDs) {
+            out.put(connectionID, connectionOutData);
         }
 
         return out;
