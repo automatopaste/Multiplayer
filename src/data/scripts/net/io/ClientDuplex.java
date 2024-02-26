@@ -62,24 +62,34 @@ public class ClientDuplex {
     }
 
     public synchronized void updateOutboundSocket(OutboundData bufferData) {
-        ServerDuplex.updateEntities(outboundSocket.out, bufferData.out);
-        ServerDuplex.updateDeleted(outboundSocket.deleted, bufferData.deleted);
+        synchronized (outboundSocket.sync) {
+            ServerDuplex.updateEntities(outboundSocket.getOut(), bufferData.getOut());
+            ServerDuplex.updateDeleted(outboundSocket.getDeleted(), bufferData.getDeleted());
+        }
     }
 
     public void updateOutboundDatagram(OutboundData bufferData) {
-        ServerDuplex.updateEntities(outboundDatagram.out, bufferData.out);
-        ServerDuplex.updateDeleted(outboundDatagram.deleted, bufferData.deleted);
+        synchronized (outboundDatagram.sync) {
+            ServerDuplex.updateEntities(outboundDatagram.getOut(), bufferData.getOut());
+            ServerDuplex.updateDeleted(outboundDatagram.getDeleted(), bufferData.getDeleted());
+        }
     }
 
     public OutboundData getOutboundSocket() {
-        OutboundData out = outboundSocket;
-        outboundSocket = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), (byte) -1);
+        OutboundData out;
+        synchronized (outboundSocket.sync) {
+            out = outboundSocket;
+            outboundSocket = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), (byte) -1);
+        }
         return out;
     }
 
     public OutboundData getOutboundDatagram() {
-        OutboundData out = outboundDatagram;
-        outboundDatagram = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), (byte) -1);
+        OutboundData out;
+        synchronized (outboundDatagram.sync) {
+            out = outboundDatagram;
+            outboundDatagram = new OutboundData(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), (byte) -1);
+        }
         return out;
     }
 

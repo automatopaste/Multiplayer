@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class OutboundData {
-    public final Map<Byte, Map<Short, InstanceData>> out;
-    public final Map<Byte, Set<Short>> deleted;
-    public int size = -1;
-    public byte connectionID;
+    private final Map<Byte, Map<Short, InstanceData>> out;
+    private final Map<Byte, Set<Short>> deleted;
+    private int size = -1;
+    private final byte connectionID;
+
+    public final Object sync = new Object();
 
     public OutboundData(byte connectionID) {
         this(new HashMap<Byte, Map<Short, InstanceData>>(), new HashMap<Byte, Set<Short>>(), connectionID);
@@ -22,5 +24,17 @@ public class OutboundData {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public Map<Byte, Map<Short, InstanceData>> getOut() {
+        return out;
+    }
+
+    public Map<Byte, Set<Short>> getDeleted() {
+        return deleted;
     }
 }

@@ -6,6 +6,7 @@ import data.scripts.net.data.InboundData;
 import data.scripts.net.data.InstanceData;
 import data.scripts.net.data.OutboundData;
 import data.scripts.net.data.records.DataRecord;
+import data.scripts.plugins.MPLogger;
 import data.scripts.plugins.MPPlugin;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -96,13 +97,14 @@ public abstract class BaseConnectionWrapper {
         toWrite.add(activeDest);
 
         int size = 0;
-        for (byte type : data.out.keySet()) {
-            Map<Short, InstanceData> instances = data.out.get(type);
+        for (byte type : data.getOut().keySet()) {
 
-            Map<Short, InstanceData> activeInstanceDest = activeDest.out.get(type);
+            Map<Short, InstanceData> instances = data.getOut().get(type);
+
+            Map<Short, InstanceData> activeInstanceDest = activeDest.getOut().get(type);
             if (activeInstanceDest == null) {
                 activeInstanceDest = new HashMap<>();
-                activeDest.out.put(type, activeInstanceDest);
+                activeDest.getOut().put(type, activeInstanceDest);
             }
 
             for (short instance : instances.keySet()) {
@@ -115,7 +117,7 @@ public abstract class BaseConnectionWrapper {
                     toWrite.add(activeDest);
 
                     activeInstanceDest = new HashMap<>();
-                    activeDest.out.put(type, activeInstanceDest);
+                    activeDest.getOut().put(type, activeInstanceDest);
 
                     size = 0;
                 }
@@ -127,20 +129,20 @@ public abstract class BaseConnectionWrapper {
         }
 
         outer:
-        for (byte type : data.deleted.keySet()) {
-            Set<Short> deleted = data.deleted.get(type);
+        for (byte type : data.getDeleted().keySet()) {
+            Set<Short> deleted = data.getDeleted().get(type);
 
             int bigness = (1 + deleted.size()) * 2;
 
             if (bigness >= MAX_PACKET_SIZE) {
-                throw new RuntimeException("Deleted instance buffer of size " + bigness + " exceeded maximum buffer size " + MAX_PACKET_SIZE);
+                MPLogger.error(BaseConnectionWrapper.class, "Deleted instance buffer of size " + bigness + " exceeded maximum buffer size " + MAX_PACKET_SIZE);
             }
 
             for (OutboundData outboundData : toWrite) {
-                int d = MAX_PACKET_SIZE - outboundData.size;
+                int d = MAX_PACKET_SIZE - outboundData.getSize();
 
                 if (d > bigness) {
-                    outboundData.deleted.put(type, deleted);
+                    outboundData.getDeleted().put(type, deleted);
                     continue outer;
                 }
             }
@@ -154,13 +156,13 @@ public abstract class BaseConnectionWrapper {
         for (OutboundData outboundData : toWrite) {
             ByteBuf dest = initBuffer(tick, connectionID);
 
-            dest.writeByte(outboundData.out.size());
+            dest.writeByte(outboundData.getOut().size());
 
-            for (byte type : outboundData.out.keySet()) {
+            for (byte type : outboundData.getOut().keySet()) {
                 // write type byte
                 dest.writeByte(type);
 
-                Map<Short, InstanceData> instances = outboundData.out.get(type);
+                Map<Short, InstanceData> instances = outboundData.getOut().get(type);
 
                 // write num instances short
                 dest.writeShort(instances.size());
@@ -190,13 +192,13 @@ public abstract class BaseConnectionWrapper {
                 }
             }
 
-            dest.writeByte(outboundData.deleted.size());
+            dest.writeByte(outboundData.getDeleted().size());
 
-            for (byte type : outboundData.deleted.keySet()) {
+            for (byte type : outboundData.getDeleted().keySet()) {
                 // write type byte
                 dest.writeByte(type);
 
-                Set<Short> instances = outboundData.deleted.get(type);
+                Set<Short> instances = outboundData.getDeleted().get(type);
 
                 // write num instances short
                 dest.writeShort(instances.size());

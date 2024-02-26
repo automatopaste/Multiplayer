@@ -62,8 +62,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 
         connectionState = BaseConnectionWrapper.ordinalToConnectionState(receive.getConnectionState());
 
-        OutboundData outbound = duplex.getOutboundSocket();
-
         switch (connectionState) {
             case INITIALISATION_READY:
             //case INITIALISING:
@@ -113,7 +111,6 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
         send.setState(connectionState);
 
         instance.put((short) connectionID, send.sourceExecute(0f));
-        outbound.out.put(ClientConnectionData.TYPE_ID, instance);
 
         CMUtils.getGuiDebug().putText(
                 ServerConnectionWrapper.class,
@@ -123,14 +120,20 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
 //        dataGraph.increment(send.getLatency());
 //        CMUtils.getGuiDebug().putContainer(ClientConnectionWrapper.class, "dataGraph", dataGraph);
 
-        return writeBuffer(outbound, tick, null, connectionID);
+        OutboundData outbound = duplex.getOutboundSocket();
+
+        List<MessageContainer> messages;
+        synchronized (outbound.sync) {
+            outbound.getOut().put(ClientConnectionData.TYPE_ID, instance);
+
+            messages = writeBuffer(outbound, tick, null, connectionID);
+        }
+        return messages;
     }
 
     @Override
     public List<MessageContainer> getDatagrams() throws IOException {
         if (send == null || connectionState != ConnectionState.SIMULATING) return null;
-
-        OutboundData outbound = duplex.getOutboundDatagram();
 
         switch (connectionState) {
             case INITIALISATION_READY:
@@ -146,7 +149,13 @@ public class ClientConnectionWrapper extends BaseConnectionWrapper {
                 break;
         }
 
-        return writeBuffer(outbound, tick, null, connectionID);
+        OutboundData outbound = duplex.getOutboundDatagram();
+
+        List<MessageContainer> messages;
+        synchronized (outbound.sync) {
+            messages = writeBuffer(outbound, tick, null, connectionID);
+        }
+        return messages;
     }
 
     public void updateInbound(InboundData entities, int tick) {

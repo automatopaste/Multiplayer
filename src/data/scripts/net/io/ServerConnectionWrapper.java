@@ -66,7 +66,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                     variants.put(variantData.getInstanceID(), variantData.sourceExecute(0f));
                 }
 
-                outbound.out.put(VariantData.TYPE_ID, variants);
+                outbound.getOut().put(VariantData.TYPE_ID, variants);
 
                 connectionState = ConnectionState.SPAWNING_READY;
 
@@ -76,11 +76,11 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 CMUtils.getGuiDebug().putText(ServerConnectionWrapper.class, "debug" + connectionID, connectionID + ": spawning entities on client...");
 
                 Map<Short, InstanceData> ships = shipTable.getShipsRegistered();
-                outbound.out.put(ShipData.TYPE_ID, ships);
+                outbound.getOut().put(ShipData.TYPE_ID, ships);
 
                 ProjectileTable projectileTable = (ProjectileTable) connectionManager.getServerPlugin().getEntityManagers().get(ProjectileTable.class);
                 Map<Byte, Map<Short, InstanceData>> projectiles = projectileTable.getProjectilesRegistered();
-                outbound.out.putAll(projectiles);
+                outbound.getOut().putAll(projectiles);
 
                 connectionState = ConnectionState.SIMULATION_READY;
 
@@ -114,7 +114,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                         }
                     }
 
-                    outbound.out.put(VariantData.TYPE_ID, v);
+                    outbound.getOut().put(VariantData.TYPE_ID, v);
                 }
 
                 break;
@@ -126,7 +126,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         Map<Short, InstanceData> instance = new HashMap<>();
         send.flush();
         instance.put((short) connectionID, send.sourceExecute(0f));
-        outbound.out.put(ServerConnectionData.TYPE_ID, instance);
+        outbound.getOut().put(ServerConnectionData.TYPE_ID, instance);
 
         CMUtils.getGuiDebug().putText(
                 ServerConnectionWrapper.class,
@@ -134,11 +134,15 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
                 "client " + connectionID + " effective round trip latency " + send.getLatency()
         );
 
-        return writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
+        List<MessageContainer> messages;
+        synchronized (outbound.sync) {
+            messages = writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
+        }
+        return messages;
     }
 
     @Override
-    public List<MessageContainer> getDatagrams() throws IOException {
+    public synchronized List<MessageContainer> getDatagrams() throws IOException {
         if (connectionState != ConnectionState.SIMULATING) return null;
 
         OutboundData outbound = connectionManager.getDuplex().getOutboundDatagram(connectionID);
@@ -158,7 +162,7 @@ public class ServerConnectionWrapper extends BaseConnectionWrapper {
         }
 
         List<MessageContainer> messages;
-        synchronized (outbound.out) {
+        synchronized (outbound.sync) {
             messages = writeBuffer(outbound, connectionManager.getTick(), remoteAddress, connectionID);
         }
         return messages;

@@ -86,8 +86,10 @@ public class ServerDuplex {
             }
         }
 
-        updateEntities(data.out, outboundData.out);
-        updateDeleted(data.deleted, outboundData.deleted);
+        synchronized (data.sync) {
+            updateEntities(data.getOut(), outboundData.getOut());
+            updateDeleted(data.getDeleted(), outboundData.getDeleted());
+        }
     }
 
     public void updateOutboundDatagram(byte connectionID, OutboundData outboundData) {
@@ -100,28 +102,30 @@ public class ServerDuplex {
             }
         }
 
-        updateEntities(data.out, outboundData.out);
-        updateDeleted(data.deleted, outboundData.deleted);
+        synchronized (data.sync) {
+            updateEntities(data.getOut(), outboundData.getOut());
+            updateDeleted(data.getDeleted(), outboundData.getDeleted());
+        }
     }
 
     public OutboundData getOutboundSocket(byte connectionID) {
+        OutboundData out;
         synchronized (outboundSocket) {
-            OutboundData out = outboundSocket.get(connectionID);
+            out = outboundSocket.get(connectionID);
             if (out == null) out = new OutboundData(connectionID);
-
-            outboundSocket.put(connectionID, new OutboundData(connectionID));
-            return out;
+            outboundSocket.put(connectionID, out);
         }
+        return out;
     }
 
     public OutboundData getOutboundDatagram(byte connectionID) {
+        OutboundData out;
         synchronized (outboundDatagram) {
-            OutboundData out = outboundDatagram.get(connectionID);
+            out = outboundDatagram.get(connectionID);
             if (out == null) out = new OutboundData(connectionID);
-
-            outboundDatagram.put(connectionID, new OutboundData(connectionID));
-            return out;
+            outboundDatagram.put(connectionID, out);
         }
+        return out;
     }
 
     public static void updateEntities(Map<Byte, Map<Short, InstanceData>> dest, Map<Byte, Map<Short, InstanceData>> deltaMap) {
