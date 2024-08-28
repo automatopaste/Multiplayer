@@ -34,11 +34,15 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
     private static LazyFont.DrawableString TODRAW14;
     private static LazyFont.DrawableString TODRAW24;
 
+    // Define a class-level field for the scaling multiplier
+    private float scaleMult;
+
     private ListPanel hostPanel;
     private ListPanel joinPanel;
     private ListPanel widgetPanel;
     private ListPanel selectPanel;
     private GridPanel shipSelectionPanel;
+
     private enum ActivePanel {
         NONE,
         SELECT,
@@ -46,6 +50,7 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         JOIN,
         SHIP_SELECT
     }
+
     private ActivePanel active = ActivePanel.NONE;
 
     private boolean cameraLockToShip = false;
@@ -53,11 +58,16 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     @Override
     public void init(CombatEngineAPI engine) {
+        // Initialize scaling multiplier
+        scaleMult = Global.getSettings().getScreenScaleMult();
+
         if (TODRAW14 == null) {
             try {
                 LazyFont fontdraw = LazyFont.loadFont("graphics/fonts/victor14.fnt");
                 TODRAW14 = fontdraw.createText();
-                if (Global.getSettings().getScreenScaleMult() > 1f) TODRAW14.setFontSize(14f * Global.getSettings().getScreenScaleMult());
+                // If scaling is greater than 1, adjust small font size by the multiplier
+                if (scaleMult > 1f)
+                    TODRAW14.setFontSize(14f * scaleMult);
             } catch (FontException ignored) {
             }
         }
@@ -65,7 +75,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
             try {
                 LazyFont fontdraw = LazyFont.loadFont("graphics/fonts/orbitron24aa.fnt");
                 TODRAW24 = fontdraw.createText();
-                if (Global.getSettings().getScreenScaleMult() > 1f) TODRAW24.setFontSize(24f * Global.getSettings().getScreenScaleMult());
+                // If scaling is greater than 1, adjust large font size by the multiplier
+                if (scaleMult > 1f)
+                    TODRAW24.setFontSize(24f * scaleMult);
             } catch (FontException ignored) {
             }
         }
@@ -81,11 +93,13 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         if (Global.getCurrentState() == GameState.TITLE) {
             return;
         }
-        if (TODRAW14 == null) return;
+        if (TODRAW14 == null)
+            return;
 
         MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
         if (plugin instanceof MPClientPlugin) {
-            if (shipSelectionPanel == null) shipSelectionPanel = initShipSelectionUI(plugin);
+            if (shipSelectionPanel == null)
+                shipSelectionPanel = initShipSelectionUI(plugin);
         } else {
             shipSelectionPanel = null;
         }
@@ -93,10 +107,11 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         float w = Global.getSettings().getScreenWidthPixels();
         float h = Global.getSettings().getScreenHeightPixels();
 
-        Vector2f root1 = new Vector2f(w - 32f, h - 148f);
+        // Use scaleMult to adjust the root position of UI elements
+        Vector2f root1 = new Vector2f(w - 32f * scaleMult, h - 244f * scaleMult);
         CMUKitUI.render(widgetPanel, root1, events);
 
-        Vector2f root2 = new Vector2f(w - 306f, h - 175f);
+        Vector2f root2 = new Vector2f(w - 306f * scaleMult, h - 271f * scaleMult);
 
         shipSelectionPanel = initShipSelectionUI(plugin);
 
@@ -148,7 +163,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 CMUKitUI.render(joinPanel, root2, events);
                 break;
             case SHIP_SELECT:
-                Vector2f s = new Vector2f((w - shipSelectionPanel.getWidth()) * 0.5f, (h + shipSelectionPanel.getHeight()) * 0.5f);
+                Vector2f s = new Vector2f((w - shipSelectionPanel.getWidth()) * 0.5f,
+                        (h + shipSelectionPanel.getHeight()) * 0.5f);
                 CMUKitUI.render(shipSelectionPanel, s, events);
                 break;
         }
@@ -156,15 +172,17 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     private ListPanel initWidget() {
         ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
-        panelParams.x = 26f;
-        panelParams.y = 26f;
+        // Use scaleMult to set the x and y positions of the panel
+        panelParams.x = 26f * scaleMult;
+        panelParams.y = 26f * scaleMult;
 
         return new ListPanel(panelParams, new ListPanel.PanelMaker() {
             @Override
             public void make(ListPanel panel1) {
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
-                buttonParams.width = 24f;
-                buttonParams.height = 24f;
+                // Use scaleMult to set the width and height of the button
+                buttonParams.width = 24f * scaleMult;
+                buttonParams.height = 24f * scaleMult;
                 buttonParams.text = "MP";
                 Text.TextParams textParams = new Text.TextParams();
                 textParams.align = LazyFont.TextAlignment.CENTER;
@@ -193,8 +211,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     private ListPanel initSelect() {
         ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
-        panelParams.x = 300f;
-        panelParams.y = 120f;
+        // Use scaleMult to set the x and y positions of the select panel
+        panelParams.x = 300f * scaleMult;
+        panelParams.y = 120f * scaleMult;
         panelParams.update = true;
         panelParams.conformToListSize = true;
 
@@ -219,8 +238,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, buttonTextParams);
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
-                buttonParams.width = 120f;
-                buttonParams.height = 24f;
+                // Scale the button's width and height using scaleMult
+                buttonParams.width = 120f * scaleMult;
+                buttonParams.height = 24f * scaleMult;
                 Button.ButtonCallback buttonCallback = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -239,8 +259,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, buttonTextParams2);
                 Button.ButtonParams buttonParams2 = new Button.ButtonParams();
-                buttonParams2.width = 120f;
-                buttonParams2.height = 24f;
+                // Scale the button's width and height using scaleMult
+                buttonParams2.width = 120f * scaleMult;
+                buttonParams2.height = 24f * scaleMult;
                 Button.ButtonCallback buttonCallback2 = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -259,8 +280,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, buttonTextParams3);
                 Button.ButtonParams buttonParams3 = new Button.ButtonParams();
-                buttonParams3.width = 120f;
-                buttonParams3.height = 24f;
+                // Scale the button's width and height using scaleMult
+                buttonParams3.width = 120f * scaleMult;
+                buttonParams3.height = 24f * scaleMult;
                 Button.ButtonCallback buttonCallback3 = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -282,8 +304,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         }
                     }, TODRAW14, buttonTextParams4);
                     Button.ButtonParams buttonParams4 = new Button.ButtonParams();
-                    buttonParams4.width = 120f;
-                    buttonParams4.height = 24f;
+                    // Scale the button's width and height using scaleMult
+                    buttonParams4.width = 120f * scaleMult;
+                    buttonParams4.height = 24f * scaleMult;
                     Button.ButtonCallback buttonCallback4 = new Button.ButtonCallback() {
                         @Override
                         public void onClick() {
@@ -305,8 +328,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                         }
                     }, TODRAW14, buttonTextParams4);
                     Button.ButtonParams buttonParams4 = new Button.ButtonParams();
-                    buttonParams4.width = 120f;
-                    buttonParams4.height = 24f;
+                    // Scale the button's width and height using scaleMult
+                    buttonParams4.width = 120f * scaleMult;
+                    buttonParams4.height = 24f * scaleMult;
                     Button.ButtonCallback buttonCallback4 = new Button.ButtonCallback() {
                         @Override
                         public void onClick() {
@@ -324,8 +348,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     private ListPanel initHostUI() {
         ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
-        panelParams.x = 300f;
-        panelParams.y = 120f;
+        // Use scaleMult to set the x and y positions of the host panel
+        panelParams.x = 300f * scaleMult;
+        panelParams.y = 120f * scaleMult;
         panelParams.conformToListSize = true;
 
         return new ListPanel(panelParams, new ListPanel.PanelMaker() {
@@ -354,8 +379,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     s = "";
                 }
                 TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
-                textEntryBoxParams.height = 26f;
-                textEntryBoxParams.width = 80f;
+                // Use scaleMult to set the width and height of the text entry box
+                textEntryBoxParams.width = 80f * scaleMult;
+                textEntryBoxParams.height = 26f * scaleMult;
                 Text.TextParams entryBoxTextParams = new Text.TextParams();
                 entryBoxTextParams.align = LazyFont.TextAlignment.LEFT;
                 final TextEntryBox textEntryBox = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
@@ -370,8 +396,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, buttonTextParams1);
                 Button.ButtonParams buttonParams1 = new Button.ButtonParams();
-                buttonParams1.width = 60f;
-                buttonParams1.height = 20f;
+                // Use scaleMult to set the width and height of the button
+                buttonParams1.width = 60f * scaleMult;
+                buttonParams1.height = 20f * scaleMult;
                 Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -397,8 +424,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW24, buttonTextParams);
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
-                buttonParams.width = 120f;
-                buttonParams.height = 28f;
+                // Use scaleMult to set the width and height of the button
+                buttonParams.width = 120f * scaleMult;
+                buttonParams.height = 28f * scaleMult;
                 Button.ButtonCallback buttonCallback = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -419,8 +447,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
     private ListPanel initConnectionUI() {
         ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
-        panelParams.x = 300f;
-        panelParams.y = 150f;
+        // Use scaleMult to set the x and y positions of the connection panel
+        panelParams.x = 300f * scaleMult;
+        panelParams.y = 150f * scaleMult;
         panelParams.conformToListSize = true;
 
         return new ListPanel(panelParams, new ListPanel.PanelMaker() {
@@ -460,8 +489,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     p = 0;
                 }
                 TextEntryBox.TextEntryBoxParams textEntryBoxParams = new TextEntryBox.TextEntryBoxParams();
-                textEntryBoxParams.height = 30f;
-                textEntryBoxParams.width = 200f;
+                // Use scaleMult to set the width and height of the text entry box
+                textEntryBoxParams.width = 200f * scaleMult;
+                textEntryBoxParams.height = 30f * scaleMult;
                 Text.TextParams entryBoxTextParams = new Text.TextParams();
                 entryBoxTextParams.align = LazyFont.TextAlignment.LEFT;
                 final TextEntryBox textEntryBox1 = new TextEntryBox(textEntryBoxParams, TODRAW14, entryBoxTextParams);
@@ -478,8 +508,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW14, buttonTextParams1);
                 Button.ButtonParams buttonParams1 = new Button.ButtonParams();
-                buttonParams1.width = 60f;
-                buttonParams1.height = 20f;
+                // Use scaleMult to set the width and height of the button
+                buttonParams1.width = 60f * scaleMult;
+                buttonParams1.height = 20f * scaleMult;
                 Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -506,8 +537,9 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                     }
                 }, TODRAW24, buttonTextParams);
                 Button.ButtonParams buttonParams = new Button.ButtonParams();
-                buttonParams.width = 120f;
-                buttonParams.height = 28f;
+                // Use scaleMult to set the width and height of the button
+                buttonParams.width = 120f * scaleMult;
+                buttonParams.height = 28f * scaleMult;
                 Button.ButtonCallback buttonCallback = new Button.ButtonCallback() {
                     @Override
                     public void onClick() {
@@ -534,64 +566,69 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         });
     }
 
-//    private ListPanel initShipSelectionUI() {
-//        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
-//        panelParams.x = 300f;
-//        panelParams.y = 150f;
-//        panelParams.conformToListSize = true;
-//        panelParams.update = true;
-//        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
-//            @Override
-//            public void make(ListPanel panel) {
-//                Text.TextParams textParams = new Text.TextParams();
-//                Text text = new Text(new Execute<String>() {
-//                    @Override
-//                    public String get() {
-//                        return "SHIP SELECTION";
-//                    }
-//                }, TODRAW24, textParams);
-//                panel.addChild(text);
-//
-//                MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
-//                final MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-//
-//                for (final ShipAPI s : Global.getCombatEngine().getShips()) {
-//                    if (!s.isFighter() && s.isAlive()) {
-//                        Text.TextParams buttonTextParams1 = new Text.TextParams();
-//                        buttonTextParams1.align = LazyFont.TextAlignment.LEFT;
-//
-//                        if (s.getOwner() == 0) buttonTextParams1.color = Color.GREEN;
-//                        else if (s.getOwner() == 1) buttonTextParams1.color = Color.RED;
-//                        else buttonTextParams1.color = Color.YELLOW;
-//
-//                        Text buttonText1 = new Text(new Execute<String>() {
-//                            @Override
-//                            public String get() {
-//                                return s.getHullSpec().getNameWithDesignationWithDashClass();
-//                            }
-//                        }, TODRAW14, buttonTextParams1);
-//
-//                        Button.ButtonParams buttonParams1 = new Button.ButtonParams();
-//                        buttonParams1.width = 280f;
-//                        buttonParams1.height = 26f;
-//                        Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
-//                            @Override
-//                            public void onClick() {
-//                                clientPlugin.getPlayerShip().setPlayerShipID(s.getFleetMemberId());
-//                            }
-//                        };
-//                        Button button1 = new Button(buttonParams1, buttonText1, buttonCallback1);
-//                        panel.addChild(button1);
-//                    }
-//                }
-//            }
-//        });
-//    }
+    // @formatter:off
+    /*
+    private ListPanel initShipSelectionUI() {
+        ListPanel.ListPanelParams panelParams = new ListPanel.ListPanelParams();
+        panelParams.x = 300f;
+        panelParams.y = 150f;
+        panelParams.conformToListSize = true;
+        panelParams.update = true;
+        return new ListPanel(panelParams, new ListPanel.PanelMaker() {
+            @Override
+            public void make(ListPanel panel) {
+                Text.TextParams textParams = new Text.TextParams();
+                Text text = new Text(new Execute<String>() {
+                    @Override
+                    public String get() {
+                        return "SHIP SELECTION";
+                    }
+                }, TODRAW24, textParams);
+                panel.addChild(text);
+
+                MPPlugin plugin = (MPPlugin) Global.getCombatEngine().getCustomData().get(MPPlugin.DATA_KEY);
+                final MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
+
+                for (final ShipAPI s : Global.getCombatEngine().getShips()) {
+                    if (!s.isFighter() && s.isAlive()) {
+                        Text.TextParams buttonTextParams1 = new Text.TextParams();
+                        buttonTextParams1.align = LazyFont.TextAlignment.LEFT;
+
+                        if (s.getOwner() == 0) buttonTextParams1.color = Color.GREEN;
+                        else if (s.getOwner() == 1) buttonTextParams1.color = Color.RED;
+                        else buttonTextParams1.color = Color.YELLOW;
+
+                        Text buttonText1 = new Text(new Execute<String>() {
+                            @Override
+                            public String get() {
+                                return s.getHullSpec().getNameWithDesignationWithDashClass();
+                            }
+                        }, TODRAW14, buttonTextParams1);
+
+                        Button.ButtonParams buttonParams1 = new Button.ButtonParams();
+                        buttonParams1.width = 280f;
+                        buttonParams1.height = 26f;
+                        Button.ButtonCallback buttonCallback1 = new Button.ButtonCallback() {
+                            @Override
+                            public void onClick() {
+                                clientPlugin.getPlayerShip().setPlayerShipID(s.getFleetMemberId());
+                            }
+                        };
+                        Button button1 = new Button(buttonParams1, buttonText1, buttonCallback1);
+                        panel.addChild(button1);
+                    }
+                }
+            }
+        });
+    }
+    */
+    // @formatter:on
 
     private GridPanel initShipSelectionUI(final MPPlugin plugin) {
         final GridPanel.GridParams params = new GridPanel.GridParams();
-        params.x = 1000f;
-        params.y = 600f;
+        // Use scaleMult to set the x and y dimensions of the grid panel
+        params.x = 1000f * scaleMult;
+        params.y = 600f * scaleMult;
         params.edgePad = 0f;
         params.update = true;
 
@@ -607,20 +644,23 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                 } else if (plugin.getType() == MPPlugin.PluginType.SERVER) {
                     ShipTable shipTable = (ShipTable) plugin.getEntityManagers().get(ShipTable.class);
                     for (ShipData data : shipTable.getShipTable().array()) {
-                        if (data == null || data.getShip() == null) continue;
+                        if (data == null || data.getShip() == null)
+                            continue;
 
                         ships.add(data.getShip());
                     }
                 } else if (plugin.getType() == MPPlugin.PluginType.CLIENT) {
-                    ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers().get(ClientShipTable.class);
+                    ClientShipTable clientShipTable = (ClientShipTable) plugin.getEntityManagers()
+                            .get(ClientShipTable.class);
                     for (ShipData data : clientShipTable.getShipTable().array()) {
-                        if (data == null || data.getShip() == null) continue;
+                        if (data == null || data.getShip() == null)
+                            continue;
 
                         ships.add(data.getShip());
                     }
                 }
 
-                final int x = 5, y = 4, max = x * y;
+                final int x = 5, y = 4, max = x * y;  // Seems like columns and rows
                 int xi = 0, yi = 0;
                 final float dx = params.x / x, dy = params.y / y;
 
@@ -628,11 +668,14 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
                 int i = 0;
                 for (final ShipAPI ship : ships) {
-                    if (ship.isFighter()) continue;
+                    if (ship.isFighter())
+                        continue;
 
-                    if (i > max - 1) break;
+                    if (i > max - 1)
+                        break;
 
                     ListPanel.ListPanelParams listPanelParams = new ListPanel.ListPanelParams();
+                    // Floats dx and dy are already scaled by the grid size
                     listPanelParams.x = dx;
                     listPanelParams.y = dy;
                     listPanelParams.mode = ListPanel.ListMode.VERTICAL;
@@ -660,47 +703,51 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
 
                             Text.TextParams textParams1 = new Text.TextParams();
                             textParams1.align = LazyFont.TextAlignment.LEFT;
-                            textParams1.maxWidth = dx;
-                            textParams1.maxHeight = dy;
+                            // Use scaleMult to set the max width and height of the text
+                            textParams1.maxWidth = dx * scaleMult;
+                            textParams1.maxHeight = dy * scaleMult;
                             textParams1.color = c;
                             Text text1 = new Text(new Execute<String>() {
                                 @Override
                                 public String get() {
                                     String n = ship.getName();
-                                    if (n == null) return "NULL";
+                                    if (n == null)
+                                        return "NULL";
                                     return n;
                                 }
                             }, TODRAW14, textParams1);
 
                             Text.TextParams textParams2 = new Text.TextParams();
                             textParams2.align = LazyFont.TextAlignment.LEFT;
-                            textParams2.maxWidth = dx;
-                            textParams2.maxHeight = dy;
+                            // Use scaleMult to set the max width and height of the text
+                            textParams2.maxWidth = dx * scaleMult;
+                            textParams2.maxHeight = dy * scaleMult;
                             textParams2.color = Color.WHITE;
                             Text text2 = new Text(new Execute<String>() {
                                 @Override
                                 public String get() {
                                     String sf = String.format("%s"
-                                            + "\nLOC: [%s, %s]"
-                                            + "\nVEL: [%s, %s]",
+                                                    + "\nLOC: [%s, %s]"
+                                                    + "\nVEL: [%s, %s]",
                                             ship.getHullSpec().getNameWithDesignationWithDashClass(),
                                             (int) ship.getLocation().x,
                                             (int) ship.getLocation().y,
                                             (int) ship.getVelocity().x,
-                                            (int) ship.getVelocity().y
-                                    );
+                                            (int) ship.getVelocity().y);
 
                                     return sf;
                                 }
                             }, TODRAW14, textParams2);
 
                             Button.ButtonParams buttonParams = new Button.ButtonParams();
-                            buttonParams.height = 24f;
-                            buttonParams.width = 140f;
+                            // Use scaleMult to set the width and height of the button
+                            buttonParams.width = 140f * scaleMult;
+                            buttonParams.height = 24f * scaleMult;
                             final Text.TextParams buttonTextParams = new Text.TextParams();
                             buttonTextParams.color = Color.WHITE;
-                            buttonTextParams.maxHeight = 16f;
-                            buttonTextParams.maxWidth = 40f;
+                            // Use scaleMult to set the max width and height of the button text
+                            buttonTextParams.maxWidth = 40f * scaleMult;
+                            buttonTextParams.maxHeight = 16f * scaleMult;
                             buttonTextParams.align = LazyFont.TextAlignment.CENTER;
                             Text buttonText = new Text(new Execute<String>() {
                                 @Override
@@ -729,15 +776,19 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                         }
 
                                         ShipAPI s = client.getPlayerShip().getActiveShip();
-                                        if (s == null) return "ACTIVE";
+                                        if (s == null)
+                                            return "ACTIVE";
                                     } else if (plugin instanceof MPServerPlugin) {
                                         MPServerPlugin server = (MPServerPlugin) plugin;
 
-                                        PlayerShips playerShips = (PlayerShips) server.getEntityManagers().get(PlayerShips.class);
-                                        ShipTable shipTable = (ShipTable) server.getEntityManagers().get(ShipTable.class);
+                                        PlayerShips playerShips = (PlayerShips) server.getEntityManagers()
+                                                .get(PlayerShips.class);
+                                        ShipTable shipTable = (ShipTable) server.getEntityManagers()
+                                                .get(ShipTable.class);
 
                                         Short id = shipTable.getRegistered().get(ship);
-                                        if (id == null) return "NULL";
+                                        if (id == null)
+                                            return "NULL";
 
                                         if (id.equals(playerShips.getHostShipID())) {
                                             buttonTextParams.color = Color.YELLOW;
@@ -764,13 +815,15 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
                                     switch (plugin.getType()) {
                                         case CLIENT:
                                             MPClientPlugin clientPlugin = (MPClientPlugin) plugin;
-                                            PlayerShip playerShip = (PlayerShip) clientPlugin.getEntityManagers().get(PlayerShip.class);
+                                            PlayerShip playerShip = (PlayerShip) clientPlugin.getEntityManagers()
+                                                    .get(PlayerShip.class);
 
                                             playerShip.requestTransfer(ship);
                                             break;
                                         case SERVER:
                                             MPServerPlugin serverPlugin = (MPServerPlugin) plugin;
-                                            PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers().get(PlayerShips.class);
+                                            PlayerShips playerShips = (PlayerShips) serverPlugin.getEntityManagers()
+                                                    .get(PlayerShips.class);
 
                                             playerShips.transferControl(ship, true, null, (byte) 0);
                                             break;
@@ -800,7 +853,8 @@ public class MPUIPlugin extends BaseEveryFrameCombatPlugin {
         int p;
         try {
             p = Integer.parseInt(port);
-            if (p < 1026 || p > 65535) throw new NumberFormatException();
+            if (p < 1026 || p > 65535)
+                throw new NumberFormatException();
         } catch (NumberFormatException n) {
             infoText.setExecute(new Execute<String>() {
                 @Override
